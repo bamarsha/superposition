@@ -5,7 +5,7 @@ import scala.util.Random
 object RandomStringifier {
   def main(args: Array[String]): Unit = {
     for (i <- LazyList.from(0)) {
-      if (i % 1000000 == 0) {
+      if (i % 10000000 == 0) {
         println(i)
       }
       val word = randomWord()

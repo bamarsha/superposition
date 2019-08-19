@@ -2,16 +2,18 @@ package engine.graphics;
 
 import engine.core.Settings;
 import engine.graphics.opengl.Framebuffer;
-import java.nio.IntBuffer;
-import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
-import static org.lwjgl.glfw.GLFW.*;
+import engine.graphics.opengl.GLState;
 import org.lwjgl.glfw.*;
-import static org.lwjgl.glfw.GLFW.*;
 import org.lwjgl.opengl.GL;
-import static org.lwjgl.opengl.GL11.glViewport;
 import org.lwjgl.opengl.GLUtil;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
+
+import java.nio.IntBuffer;
+
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public abstract class Window {
@@ -68,8 +70,8 @@ public abstract class Window {
         GL.createCapabilities();
         glfwSwapInterval(0);
 
-//        GLState.enable(GL_DEPTH_TEST, GL_BLEND);
-//        GLState.setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GLState.enable(GL_BLEND);
+        GLState.setBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         if (Settings.SHOW_OPENGL_DEBUG_INFO) {
             GLUtil.setupDebugMessageCallback();
         }
