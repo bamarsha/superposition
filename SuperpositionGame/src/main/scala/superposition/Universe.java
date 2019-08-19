@@ -2,7 +2,6 @@ package superposition;
 
 import static engine.core.Game.dt;
 import engine.core.Input;
-import engine.util.math.Complex;
 import engine.util.math.Vec2d;
 
 public class Universe {

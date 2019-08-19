@@ -11,7 +11,6 @@ import engine.graphics.opengl.Shader;
 import engine.graphics.opengl.Texture;
 import engine.graphics.sprites.Sprite;
 import static engine.util.Color.*;
-import engine.util.math.Complex;
 import engine.util.math.Transformation;
 import engine.util.math.Vec2d;
 import java.util.HashSet;
