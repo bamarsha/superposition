@@ -7,8 +7,6 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>${project.artifactId}-${project.version}</name>
-
     <modules>
         <module>RGBEngine</module>
         <module>SuperpositionGame</module>

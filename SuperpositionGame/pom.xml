@@ -1,24 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>Superposition</groupId>
     <artifactId>SuperpositionGame</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>${project.artifactId}</name>
     <description>My wonderfull scala app</description>
-    <inceptionYear>2018</inceptionYear>
-    <licenses>
-        <license>
-            <name>My License</name>
-            <url>http://....</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+    <inceptionYear>2019</inceptionYear>
 
     <properties>
+        <encoding>UTF-8</encoding>
         <maven.compiler.source>12</maven.compiler.source>
         <maven.compiler.target>12</maven.compiler.target>
-        <encoding>UTF-8</encoding>
         <scala.version>2.13.0</scala.version>
         <scala.compat.version>2.13</scala.compat.version>
     </properties>
@@ -47,13 +40,13 @@
                     <execution>
                         <goals>
                             <goal>compile</goal>
-                            <goal>testCompile</goal>
                         </goals>
                         <configuration>
                             <args>
                                 <arg>-dependencyfile</arg>
                                 <arg>${project.build.directory}/.scala_dependencies</arg>
-                                <arg>-optimise</arg>
+                                <arg>-opt:l:inline</arg>
+                                <arg>-opt-inline-from:**</arg>
                             </args>
                         </configuration>
                     </execution>
