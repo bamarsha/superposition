@@ -12,7 +12,7 @@ public class Universe {
 
     public Universe(GameLevel gameLevel) {
         this.gameLevel = gameLevel;
-        this.amplitude = new Complex(1);
+        this.amplitude = new Complex(1.0, 0.0);
         this.state = new GameObjectState[GameLevel.NumObjects()];
         for (int i = 0; i < GameLevel.NumObjects(); i++) {
             state[i] = new GameObjectState();

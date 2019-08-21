@@ -48,17 +48,17 @@ private class GameLevel extends Entity {
         case Gate.X => u.state(target).onOff = !u.state(target).onOff
         case Gate.Z =>
           if (u.state(target).onOff) {
-            u.amplitude = u.amplitude.mul(new Complex(-1))
+            u.amplitude *= Complex(-1.0)
           }
         case Gate.T =>
           if (u.state(target).onOff) {
-            u.amplitude = u.amplitude.mul(Complex.polar(1, Pi / 4))
+            u.amplitude *= Complex.polar(1.0, Pi / 4.0)
           }
         case Gate.H =>
-          u.amplitude = u.amplitude.mul(new Complex(sqrt(0.5)))
+          u.amplitude /= Complex(sqrt(2.0))
           val copy = u.copy()
           if (u.state(target).onOff) {
-            u.amplitude = u.amplitude.mul(new Complex(-1))
+            u.amplitude *= Complex(-1.0)
           }
           copy.state(target).onOff = !copy.state(target).onOff
           universes = copy :: universes
@@ -69,17 +69,17 @@ private class GameLevel extends Entity {
   private def combine(): Unit =
     universes = universes
       .groupMapReduce(getStateId)(identity)((u1, u2) => {
-        u2.amplitude = u2.amplitude.add(u1.amplitude)
+        u2.amplitude += u1.amplitude
         u2
       })
       .values
-      .filter(_.amplitude.magnitudeSquared() > 1e-6)
+      .filter(_.amplitude.magnitudeSquared > 1e-6)
       .toList
 
   private def normalize(): Unit = {
-    val sum = universes.map(_.amplitude.magnitudeSquared()).sum
+    val sum = universes.map(_.amplitude.magnitudeSquared).sum
     for (u <- universes) {
-      u.amplitude = u.amplitude.div(new Complex(sqrt(sum)))
+      u.amplitude /= Complex(sqrt(sum))
     }
   }
 
@@ -119,7 +119,7 @@ private class GameLevel extends Entity {
 
     var minVal = 0.0
     for (u <- universes) {
-      val maxVal = minVal + u.amplitude.magnitudeSquared()
+      val maxVal = minVal + u.amplitude.magnitudeSquared
 
       frameBuffer.clear(CLEAR)
       for (s <- u.state) {
@@ -133,7 +133,7 @@ private class GameLevel extends Entity {
       shader.setMVP(Transformation.IDENTITY)
       shader.setUniform("minVal", minVal.asInstanceOf[Float])
       shader.setUniform("maxVal", maxVal.asInstanceOf[Float])
-      shader.setUniform("hue", (u.amplitude.phase() / (2 * Pi)).asInstanceOf[Float])
+      shader.setUniform("hue", (u.amplitude.phase / (2.0 * Pi)).asInstanceOf[Float])
       Framebuffer.drawToWindow(colorBuffer, shader)
       Camera.current = Camera.camera2d
 
