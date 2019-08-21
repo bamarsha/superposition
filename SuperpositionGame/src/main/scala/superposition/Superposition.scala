@@ -15,6 +15,7 @@ object Superposition {
 
     new FPSBehavior().create()
     new QuitOnEscapeBehavior().create()
+    GameLevel.init()
     new GameLevel().create()
 
     Game.run()

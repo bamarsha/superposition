@@ -13,8 +13,8 @@ public class Universe {
     public Universe(GameLevel gameLevel) {
         this.gameLevel = gameLevel;
         this.amplitude = new Complex(1);
-        this.state = new GameObjectState[gameLevel.numObjects];
-        for (int i = 0; i < gameLevel.numObjects; i++) {
+        this.state = new GameObjectState[GameLevel.NumObjects()];
+        for (int i = 0; i < GameLevel.NumObjects(); i++) {
             state[i] = new GameObjectState();
             state[i].position = new Vec2d(i + 1, 1);
         }
@@ -23,7 +23,7 @@ public class Universe {
     public Universe copy() {
         var u = new Universe(gameLevel);
         u.amplitude = amplitude;
-        for (int i = 0; i < gameLevel.numObjects; i++) {
+        for (int i = 0; i < GameLevel.NumObjects(); i++) {
             u.state[i] = state[i].copy();
         }
         return u;
