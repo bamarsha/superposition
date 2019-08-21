@@ -6,24 +6,22 @@ import engine.util.math.Vec2d;
 
 public class Universe {
 
-    public final GameLevel gameLevel;
     public Complex amplitude;
     public GameObjectState[] state;
 
-    public Universe(GameLevel gameLevel) {
-        this.gameLevel = gameLevel;
+    public Universe(int numObjects) {
         this.amplitude = new Complex(1.0, 0.0);
-        this.state = new GameObjectState[GameLevel.NumObjects()];
-        for (int i = 0; i < GameLevel.NumObjects(); i++) {
+        this.state = new GameObjectState[numObjects];
+        for (int i = 0; i < state.length; i++) {
             state[i] = new GameObjectState();
             state[i].position = new Vec2d(i + 1, 1);
         }
     }
 
     public Universe copy() {
-        var u = new Universe(gameLevel);
+        var u = new Universe(state.length);
         u.amplitude = amplitude;
-        for (int i = 0; i < GameLevel.NumObjects(); i++) {
+        for (int i = 0; i < state.length; i++) {
             u.state[i] = state[i].copy();
         }
         return u;

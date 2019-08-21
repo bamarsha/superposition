@@ -18,7 +18,7 @@ private object GameLevel {
     val X, Z, T, H = Value
   }
 
-  val NumObjects: Int = 2
+  private val NumObjects: Int = 2
 
   def init(): Unit =
     declareSystem(classOf[GameLevel], (level: GameLevel) => level.step())
@@ -36,7 +36,7 @@ private object GameLevel {
 private class GameLevel extends Entity {
   import GameLevel._
 
-  private var universes: List[Universe] = List(new Universe(this))
+  private var universes: List[Universe] = List(new Universe(NumObjects))
   private val frameBuffer: Framebuffer = new Framebuffer()
   private val colorBuffer: Texture = frameBuffer.attachColorBuffer()
   private val shader: Shader = Shader.load("universe")
