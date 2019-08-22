@@ -23,15 +23,6 @@ private object GameLevel {
 
   def init(): Unit =
     declareSystem(classOf[GameLevel], (level: GameLevel) => level.step())
-
-  private def getStateId(universe: Universe): Int =
-    universe.state
-      .zipWithIndex
-      .map({ case (state, index) =>
-        if (state.onOff) pow(2, index).toInt
-        else 0
-      })
-      .sum
 }
 
 private class GameLevel extends Entity {
@@ -48,24 +39,24 @@ private class GameLevel extends Entity {
   }
 
   private def applyGate(gate: Gate.Value, target: Int, controls: Int*): Unit = {
-    for (u <- universes.filter(u => controls.forall(u.state(_).onOff))) {
+    for (u <- universes.filter(u => controls.forall(u.particles(_).on))) {
       gate match {
-        case Gate.X => u.state(target).onOff = !u.state(target).onOff
+        case Gate.X => u.particles(target).on = !u.particles(target).on
         case Gate.Z =>
-          if (u.state(target).onOff) {
+          if (u.particles(target).on) {
             u.amplitude *= Complex(-1.0)
           }
         case Gate.T =>
-          if (u.state(target).onOff) {
+          if (u.particles(target).on) {
             u.amplitude *= Complex.polar(1.0, Pi / 4.0)
           }
         case Gate.H =>
           u.amplitude /= Complex(sqrt(2.0))
           val copy = u.copy()
-          if (u.state(target).onOff) {
+          if (u.particles(target).on) {
             u.amplitude *= Complex(-1.0)
           }
-          copy.state(target).onOff = !copy.state(target).onOff
+          copy.particles(target).on = !copy.particles(target).on
           universes = copy :: universes
       }
     }
@@ -73,7 +64,7 @@ private class GameLevel extends Entity {
 
   private def combine(): Unit =
     universes = universes
-      .groupMapReduce(getStateId)(identity)((u1, u2) => {
+      .groupMapReduce(_.state)(identity)((u1, u2) => {
         u2.amplitude += u1.amplitude
         u2
       })
@@ -90,7 +81,7 @@ private class GameLevel extends Entity {
 
   private def step(): Unit = {
     val selected = universes
-      .flatMap(_.state.zipWithIndex)
+      .flatMap(_.particles.zipWithIndex)
       .filter(_._1.position.sub(Input.mouse()).length() < 0.5)
       .map(_._2)
       .toSet
@@ -110,9 +101,8 @@ private class GameLevel extends Entity {
     }
 
     for (u <- universes) {
-      u.physicsStep()
+      u.step()
     }
-
     combine()
     normalize()
     draw()
@@ -127,9 +117,9 @@ private class GameLevel extends Entity {
       val maxVal = minVal + u.amplitude.magnitudeSquared
 
       frameBuffer.clear(CLEAR)
-      for (s <- u.state) {
-        val color = if (s.onOff) WHITE else BLACK
-        Sprite.load("cat.png").draw(Transformation.create(s.position, 0, 1), color)
+      for (p <- u.particles) {
+        val color = if (p.on) WHITE else BLACK
+        Sprite.load("cat.png").draw(Transformation.create(p.position, 0, 1), color)
       }
 
       val camera = new Camera2d()
