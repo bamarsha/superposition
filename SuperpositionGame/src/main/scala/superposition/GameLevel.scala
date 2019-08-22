@@ -19,6 +19,7 @@ private object GameLevel {
   }
 
   private val NumObjects: Int = 2
+  private val UniverseShader: Shader = Shader.load("universe")
 
   def init(): Unit =
     declareSystem(classOf[GameLevel], (level: GameLevel) => level.step())
@@ -37,10 +38,14 @@ private class GameLevel extends Entity {
   import GameLevel._
 
   private var universes: List[Universe] = List(new Universe(NumObjects))
-  private val frameBuffer: Framebuffer = new Framebuffer()
-  private val colorBuffer: Texture = frameBuffer.attachColorBuffer()
-  private val shader: Shader = Shader.load("universe")
+  private var frameBuffer: Framebuffer = _
+  private var colorBuffer: Texture = _
   private var time: Double = 0.0
+
+  override protected def onCreate(): Unit = {
+    frameBuffer = new Framebuffer()
+    colorBuffer = frameBuffer.attachColorBuffer()
+  }
 
   private def applyGate(gate: Gate.Value, target: Int, controls: Int*): Unit = {
     for (u <- universes.filter(u => controls.forall(u.state(_).onOff))) {
@@ -115,7 +120,7 @@ private class GameLevel extends Entity {
 
   private def draw(): Unit = {
     time += dt()
-    shader.setUniform("time", time.asInstanceOf[Float])
+    UniverseShader.setUniform("time", time.asInstanceOf[Float])
 
     var minVal = 0.0
     for (u <- universes) {
@@ -130,11 +135,11 @@ private class GameLevel extends Entity {
       val camera = new Camera2d()
       camera.lowerLeft = new Vec2d(-1, -1)
       Camera.current = camera
-      shader.setMVP(Transformation.IDENTITY)
-      shader.setUniform("minVal", minVal.asInstanceOf[Float])
-      shader.setUniform("maxVal", maxVal.asInstanceOf[Float])
-      shader.setUniform("hue", (u.amplitude.phase / (2.0 * Pi)).asInstanceOf[Float])
-      Framebuffer.drawToWindow(colorBuffer, shader)
+      UniverseShader.setMVP(Transformation.IDENTITY)
+      UniverseShader.setUniform("minVal", minVal.asInstanceOf[Float])
+      UniverseShader.setUniform("maxVal", maxVal.asInstanceOf[Float])
+      UniverseShader.setUniform("hue", (u.amplitude.phase / (2.0 * Pi)).asInstanceOf[Float])
+      Framebuffer.drawToWindow(colorBuffer, UniverseShader)
       Camera.current = Camera.camera2d
 
       minVal = maxVal
