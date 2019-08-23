@@ -39,24 +39,24 @@ private class GameLevel extends Entity {
   }
 
   private def applyGate(gate: Gate.Value, target: Int, controls: Int*): Unit = {
-    for (u <- universes.filter(u => controls.forall(u.particles(_).on))) {
+    for (u <- universes.filter(u => controls.forall(u.bits(_).on))) {
       gate match {
-        case Gate.X => u.particles(target).on = !u.particles(target).on
+        case Gate.X => u.bits(target).on = !u.bits(target).on
         case Gate.Z =>
-          if (u.particles(target).on) {
+          if (u.bits(target).on) {
             u.amplitude *= Complex(-1.0)
           }
         case Gate.T =>
-          if (u.particles(target).on) {
+          if (u.bits(target).on) {
             u.amplitude *= Complex.polar(1.0, Pi / 4.0)
           }
         case Gate.H =>
           u.amplitude /= Complex(sqrt(2.0))
           val copy = u.copy()
-          if (u.particles(target).on) {
+          if (u.bits(target).on) {
             u.amplitude *= Complex(-1.0)
           }
-          copy.particles(target).on = !copy.particles(target).on
+          copy.bits(target).on = !copy.bits(target).on
           universes = copy :: universes
       }
     }
@@ -81,7 +81,7 @@ private class GameLevel extends Entity {
 
   private def step(): Unit = {
     val selected = universes
-      .flatMap(_.particles.zipWithIndex)
+      .flatMap(_.bits.zipWithIndex)
       .filter(_._1.position.sub(Input.mouse()).length() < 0.5)
       .map(_._2)
       .toSet
@@ -100,9 +100,7 @@ private class GameLevel extends Entity {
       }
     }
 
-    for (u <- universes) {
-      u.step()
-    }
+    universes.foreach(_.step())
     combine()
     normalize()
     draw()
@@ -117,9 +115,9 @@ private class GameLevel extends Entity {
       val maxVal = minVal + u.amplitude.magnitudeSquared
 
       frameBuffer.clear(CLEAR)
-      for (p <- u.particles) {
-        val color = if (p.on) WHITE else BLACK
-        Sprite.load("cat.png").draw(Transformation.create(p.position, 0, 1), color)
+      for (b <- u.bits) {
+        val color = if (b.on) WHITE else BLACK
+        Sprite.load("cat.png").draw(Transformation.create(b.position, 0, 1), color)
       }
 
       val camera = new Camera2d()
