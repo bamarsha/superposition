@@ -28,7 +28,7 @@ private object Multiverse {
   private val UniverseShader: Shader = Shader.load("universe")
 
   def init(): Unit =
-    declareSystem(classOf[Multiverse], (m: Multiverse) => m.step())
+    declareSystem(classOf[Multiverse], (_: Multiverse).step())
 }
 
 private class Multiverse extends Entity {
@@ -88,8 +88,8 @@ private class Multiverse extends Entity {
   private def step(): Unit = {
     val selected = universes
       .flatMap(_.bits.zipWithIndex)
-      .filter({ case (bit, _) => bit.position.sub(Input.mouse()).length() < 0.5 })
-      .map({ case (_, index) => index })
+      .filter { case (bit, _) => bit.position.sub(Input.mouse()).length() < 0.5 }
+      .map { case (_, index) => index }
       .toSet
     for ((key, gate) <- GateKeys) {
       if (Input.keyJustPressed(key)) {
@@ -114,7 +114,7 @@ private class Multiverse extends Entity {
       u.bits.foreach(_.draw())
 
       val camera = new Camera2d()
-      camera.lowerLeft = new Vec2d(-1, -1)
+      camera.lowerLeft = new Vec2d(-1.0, -1.0)
       Camera.current = camera
       UniverseShader.setMVP(Transformation.IDENTITY)
       UniverseShader.setUniform("minVal", minVal.asInstanceOf[Float])

@@ -9,7 +9,7 @@ private class Universe(size: Int) {
   var bits: Array[Bit] = Array.tabulate(size)(i => Bit(new Vec2d(i + 1.0, 1.0)))
 
   def state: Int =
-    bits.zipWithIndex.map({ case (p, i) => if (p.on) pow(2, i).toInt else 0 }).sum
+    bits.zipWithIndex.map { case (p, i) => if (p.on) pow(2, i).toInt else 0 }.sum
 
   def step(): Unit = bits.foreach(_.step())
 
