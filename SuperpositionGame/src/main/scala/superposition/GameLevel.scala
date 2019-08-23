@@ -18,6 +18,13 @@ private object GameLevel {
     val X, Z, T, H = Value
   }
 
+  private val GateKeys = List(
+    (GLFW_KEY_X, Gate.X),
+    (GLFW_KEY_Z, Gate.Z),
+    (GLFW_KEY_T, Gate.T),
+    (GLFW_KEY_H, Gate.H)
+  )
+
   private val NumObjects: Int = 2
   private val UniverseShader: Shader = Shader.load("universe")
 
@@ -82,24 +89,14 @@ private class GameLevel extends Entity {
   private def step(): Unit = {
     val selected = universes
       .flatMap(_.bits.zipWithIndex)
-      .filter(_._1.position.sub(Input.mouse()).length() < 0.5)
-      .map(_._2)
+      .filter({ case (bit, _) => bit.position.sub(Input.mouse()).length() < 0.5 })
+      .map({ case (_, index) => index })
       .toSet
-    for (i <- selected) {
-      if (Input.keyJustPressed(GLFW_KEY_X)) {
-        applyGate(Gate.X, i)
-      }
-      if (Input.keyJustPressed(GLFW_KEY_Z)) {
-        applyGate(Gate.Z, i)
-      }
-      if (Input.keyJustPressed(GLFW_KEY_T)) {
-        applyGate(Gate.T, i)
-      }
-      if (Input.keyJustPressed(GLFW_KEY_H)) {
-        applyGate(Gate.H, i)
+    for ((key, gate) <- GateKeys) {
+      if (Input.keyJustPressed(key)) {
+        selected.foreach(applyGate(gate, _))
       }
     }
-
     universes.foreach(_.step())
     combine()
     normalize()
