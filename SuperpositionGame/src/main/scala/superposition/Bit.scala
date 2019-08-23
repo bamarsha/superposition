@@ -2,7 +2,9 @@ package superposition
 
 import engine.core.Game.dt
 import engine.core.Input
-import engine.util.math.Vec2d
+import engine.graphics.sprites.Sprite
+import engine.util.Color.{BLACK, WHITE}
+import engine.util.math.{Transformation, Vec2d}
 
 private case class Bit(var position: Vec2d = new Vec2d(0.0, 0.0),
                        var velocity: Vec2d = new Vec2d(0.0, 0.0),
@@ -15,5 +17,10 @@ private case class Bit(var position: Vec2d = new Vec2d(0.0, 0.0),
     if (selected) {
       position = position.lerp(Input.mouse(), dt())
     }
+  }
+
+  def draw(): Unit = {
+    val color = if (on) WHITE else BLACK
+    Sprite.load("cat.png").draw(Transformation.create(position, 0, 1), color)
   }
 }

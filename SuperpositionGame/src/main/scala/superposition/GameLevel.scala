@@ -11,7 +11,7 @@ import engine.util.Color._
 import engine.util.math.{Transformation, Vec2d}
 import org.lwjgl.glfw.GLFW._
 
-import scala.math.{Pi, pow, sqrt}
+import scala.math.{Pi, sqrt}
 
 private object GameLevel {
   private object Gate extends Enumeration {
@@ -112,10 +112,7 @@ private class GameLevel extends Entity {
       val maxVal = minVal + u.amplitude.magnitudeSquared
 
       frameBuffer.clear(CLEAR)
-      for (b <- u.bits) {
-        val color = if (b.on) WHITE else BLACK
-        Sprite.load("cat.png").draw(Transformation.create(b.position, 0, 1), color)
-      }
+      u.bits.foreach(_.draw())
 
       val camera = new Camera2d()
       camera.lowerLeft = new Vec2d(-1, -1)
