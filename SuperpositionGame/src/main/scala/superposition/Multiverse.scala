@@ -6,14 +6,13 @@ import engine.core.Input
 import engine.graphics.Camera
 import engine.graphics.Camera.Camera2d
 import engine.graphics.opengl.{Framebuffer, Shader, Texture}
-import engine.graphics.sprites.Sprite
 import engine.util.Color._
 import engine.util.math.{Transformation, Vec2d}
 import org.lwjgl.glfw.GLFW._
 
 import scala.math.{Pi, sqrt}
 
-private object GameLevel {
+private object Multiverse {
   private object Gate extends Enumeration {
     val X, Z, T, H = Value
   }
@@ -29,11 +28,11 @@ private object GameLevel {
   private val UniverseShader: Shader = Shader.load("universe")
 
   def init(): Unit =
-    declareSystem(classOf[GameLevel], (level: GameLevel) => level.step())
+    declareSystem(classOf[Multiverse], (m: Multiverse) => m.step())
 }
 
-private class GameLevel extends Entity {
-  import GameLevel._
+private class Multiverse extends Entity {
+  import Multiverse._
 
   private var universes: List[Universe] = List(new Universe(NumObjects))
   private var frameBuffer: Framebuffer = _
