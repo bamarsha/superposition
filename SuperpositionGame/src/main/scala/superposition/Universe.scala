@@ -16,12 +16,12 @@ private class Universe(size: Int) {
   /**
    * The probability amplitude of this universe.
    */
-  var amplitude: Complex = Complex(1.0)
+  var amplitude: Complex = Complex(1)
 
   /**
    * The bits in this universe.
    */
-  var bits: Array[Bit] = Array.tabulate(size)(i => Bit(new Vec2d(i + 1.0, 1.0)))
+  var bits: Array[Bit] = Array.tabulate(size)(i => Bit(new Vec2d(1 + i, 1)))
 
   /**
    * The state of this universe, given by Σ,,i,, b,,i,, · 2^i^, where b,,i,, is the state of the ith bit.

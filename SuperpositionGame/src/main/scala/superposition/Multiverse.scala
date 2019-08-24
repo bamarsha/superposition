@@ -37,7 +37,7 @@ private class Multiverse extends Entity {
   private var universes: List[Universe] = List(new Universe(NumObjects))
   private var frameBuffer: Framebuffer = _
   private var colorBuffer: Texture = _
-  private var time: Double = 0.0
+  private var time: Double = 0
 
   override protected def onCreate(): Unit = {
     frameBuffer = new Framebuffer()
@@ -50,17 +50,17 @@ private class Multiverse extends Entity {
         case Gate.X => u.bits(target).on = !u.bits(target).on
         case Gate.Z =>
           if (u.bits(target).on) {
-            u.amplitude *= Complex(-1.0)
+            u.amplitude *= Complex(-1)
           }
         case Gate.T =>
           if (u.bits(target).on) {
-            u.amplitude *= Complex.polar(1.0, Pi / 4.0)
+            u.amplitude *= Complex.polar(1, Pi / 4)
           }
         case Gate.H =>
-          u.amplitude /= Complex(sqrt(2.0))
+          u.amplitude /= Complex(sqrt(2))
           val copy = u.copy()
           if (u.bits(target).on) {
-            u.amplitude *= Complex(-1.0)
+            u.amplitude *= Complex(-1)
           }
           copy.bits(target).on = !copy.bits(target).on
           universes = copy :: universes
@@ -114,12 +114,12 @@ private class Multiverse extends Entity {
       u.bits.foreach(_.draw())
 
       val camera = new Camera2d()
-      camera.lowerLeft = new Vec2d(-1.0, -1.0)
+      camera.lowerLeft = new Vec2d(-1, -1)
       Camera.current = camera
       UniverseShader.setMVP(Transformation.IDENTITY)
       UniverseShader.setUniform("minVal", minVal.asInstanceOf[Float])
       UniverseShader.setUniform("maxVal", maxVal.asInstanceOf[Float])
-      UniverseShader.setUniform("hue", (u.amplitude.phase / (2.0 * Pi)).asInstanceOf[Float])
+      UniverseShader.setUniform("hue", (u.amplitude.phase / (2 * Pi)).asInstanceOf[Float])
       Framebuffer.drawToWindow(colorBuffer, UniverseShader)
       Camera.current = Camera.camera2d
 

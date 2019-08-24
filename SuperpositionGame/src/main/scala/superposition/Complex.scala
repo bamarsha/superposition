@@ -22,7 +22,7 @@ private object Complex {
  * @param real the real part
  * @param imag the imaginary part
  */
-private case class Complex(real: Double, imag: Double = 0.0) {
+private case class Complex(real: Double, imag: Double = 0) {
   /**
    * Adds two complex numbers.
    *

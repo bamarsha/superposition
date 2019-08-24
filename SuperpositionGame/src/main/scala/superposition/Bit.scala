@@ -15,8 +15,8 @@ import engine.util.math.{Transformation, Vec2d}
  * @param velocity the initial velocity
  * @param on the initial state
  */
-private case class Bit(var position: Vec2d = new Vec2d(0.0, 0.0),
-                       var velocity: Vec2d = new Vec2d(0.0, 0.0),
+private case class Bit(var position: Vec2d = new Vec2d(0, 0),
+                       var velocity: Vec2d = new Vec2d(0, 0),
                        var on: Boolean = false) {
   private var selected: Boolean = false
 
