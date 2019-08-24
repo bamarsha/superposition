@@ -75,11 +75,11 @@ private class Multiverse extends Entity {
         u2
       })
       .values
-      .filter(_.amplitude.magnitudeSquared > 1e-6)
+      .filter(_.amplitude.squaredMagnitude > 1e-6)
       .toList
 
   private def normalize(): Unit = {
-    val sum = universes.map(_.amplitude.magnitudeSquared).sum
+    val sum = universes.map(_.amplitude.squaredMagnitude).sum
     for (u <- universes) {
       u.amplitude /= Complex(sqrt(sum))
     }
@@ -108,7 +108,7 @@ private class Multiverse extends Entity {
 
     var minVal = 0.0
     for (u <- universes) {
-      val maxVal = minVal + u.amplitude.magnitudeSquared
+      val maxVal = minVal + u.amplitude.squaredMagnitude
 
       frameBuffer.clear(CLEAR)
       u.bits.foreach(_.draw())
