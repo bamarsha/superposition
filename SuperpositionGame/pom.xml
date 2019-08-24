@@ -21,6 +21,20 @@
         <scala.compat.version>2.13</scala.compat.version>
     </properties>
 
+    <profiles>
+        <profile>
+            <id>startOnFirstThread</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <startOnFirstThread>-XstartOnFirstThread</startOnFirstThread>
+            </properties>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>org.scala-lang</groupId>
@@ -40,7 +54,6 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.3.2</version>
                 <executions>
                     <execution>
                         <goals>
@@ -56,6 +69,17 @@
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <launchers>
+                        <launcher>
+                            <id>superposition</id>
+                            <mainClass>superposition.Superposition</mainClass>
+                            <jvmArgs>
+                                <jvmArg>${startOnFirstThread}</jvmArg>
+                            </jvmArgs>
+                        </launcher>
+                    </launchers>
+                </configuration>
             </plugin>
         </plugins>
     </build>
