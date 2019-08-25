@@ -5,7 +5,9 @@ import engine.core.Behavior.Entity
 import engine.graphics.sprites.Sprite
 import engine.util.Color.{BLACK, WHITE}
 import engine.util.math.{Transformation, Vec2d}
-import extras.physics.PhysicsComponent
+import extras.physics.{PhysicsComponent, Rectangle}
+
+import scala.jdk.CollectionConverters._
 
 /**
  * A physical object that carries a single bit as its state.
@@ -22,6 +24,14 @@ private class Quball(position: Vec2d, var on: Boolean = false) extends Entity {
 
   Behavior.track(classOf[Quball])
 
+  override protected def onCreate(): Unit =
+    physics.collider = PhysicsComponent.wallCollider(new Vec2d(1, 1), List(
+      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(-8, 4.5)),
+      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(8, -4.5)),
+      new Rectangle(new Vec2d(-8, 4.5), new Vec2d(8, 4.5)),
+      new Rectangle(new Vec2d(8, -4.5), new Vec2d(8, 4.5))
+    ).asJavaCollection)
+
   /**
    * Draws this bit.
    */
@@ -32,9 +42,9 @@ private class Quball(position: Vec2d, var on: Boolean = false) extends Entity {
 
   def copy(): Quball = {
     val quball = new Quball(physics.position, on)
-    quball.physics.velocity = quball.physics.velocity
+    quball.physics.velocity = physics.velocity
     quball.physics.collider = physics.collider
-    quball.physics.hitWall = quball.physics.hitWall
+    quball.physics.hitWall = physics.hitWall
     quball
   }
 }

@@ -55,7 +55,10 @@ private class Player extends Entity {
         carrying = List()
       }
     }
-    carrying.foreach(_.physics.position = physics.position)
+    carrying.foreach(quball => {
+      quball.physics.position = physics.position
+      quball.physics.velocity = physics.velocity
+    })
 
     draw()
   }

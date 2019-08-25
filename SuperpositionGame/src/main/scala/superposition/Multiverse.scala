@@ -67,16 +67,18 @@ private class Multiverse extends Entity {
     }
   }
 
-  private def combine(): Unit =
-    universes = universes
+  private def combine(): Unit = {
+    val (combined, removed) = universes
       .groupMapReduce(_.state)(identity)((u1, u2) => {
         u2.amplitude += u1.amplitude
         u1.destroy()
         u2
       })
       .values
-      .filter(_.amplitude.squaredMagnitude > 1e-6)
-      .toList
+      .partition(_.amplitude.squaredMagnitude > 1e-6)
+    removed.foreach(_.destroy())
+    universes = combined.toList
+  }
 
   private def normalize(): Unit = {
     val sum = universes.map(_.amplitude.squaredMagnitude).sum

@@ -65,7 +65,7 @@ public abstract class Behavior {
         public final void destroy() {
             for (var entry : behaviors.entrySet()) {
                 if (TRACKED_BEHAVIORS.containsKey(entry.getKey())) {
-                    TRACKED_BEHAVIORS.remove(entry.getKey()).add(entry.getValue());
+                    TRACKED_BEHAVIORS.get(entry.getKey()).remove(entry.getValue());
                 }
                 entry.getValue().onDestroy();
             }
