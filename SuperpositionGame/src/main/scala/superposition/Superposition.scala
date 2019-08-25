@@ -6,7 +6,15 @@ import engine.util.Color
 import engine.util.math.Vec2d
 import extras.behaviors.{FPSBehavior, QuitOnEscapeBehavior}
 
+/**
+ * The main class for the Superposition game.
+ */
 object Superposition {
+  /**
+   * Runs the Superposition game.
+   *
+   * @param args the command-line arguments
+   */
   def main(args: Array[String]): Unit = {
     Settings.WINDOW_WIDTH = 1280
     Settings.WINDOW_HEIGHT = 720

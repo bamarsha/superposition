@@ -21,7 +21,7 @@ private class Universe(size: Int) extends Entity {
   var amplitude: Complex = Complex(1)
 
   /**
-   * The bits in this universe.
+   * The quballs in this universe.
    */
   var quballs: Array[Quball] = Array.tabulate(size)(i => new Quball(new Vec2d(1 + i, 1)))
 

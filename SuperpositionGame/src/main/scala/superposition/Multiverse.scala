@@ -28,6 +28,12 @@ private object Multiverse {
   private val UniverseShader: Shader = Shader.load("universe")
 }
 
+/**
+ * The multiverse is a collection of universes.
+ *
+ * Multiple universes represent qubits in superposition. The multiverse can apply quantum gates to qubits by changing
+ * the amplitude of a universe or creating a copy of a universe.
+ */
 private class Multiverse extends Entity {
   import Multiverse._
 
@@ -40,6 +46,25 @@ private class Multiverse extends Entity {
     frameBuffer = new Framebuffer()
     colorBuffer = frameBuffer.attachColorBuffer()
     universes.foreach(_.create())
+  }
+
+  /**
+   * Steps time forward for the multiverse.
+   */
+  def step(): Unit = {
+    val selected = universes
+      .flatMap(_.quballs.zipWithIndex)
+      .filter { case (quball, _) => quball.physics.position.sub(Input.mouse()).length() < 0.5 }
+      .map { case (_, index) => index }
+      .toSet
+    for ((key, gate) <- GateKeys) {
+      if (Input.keyJustPressed(key)) {
+        selected.foreach(applyGate(gate, _))
+      }
+    }
+    combine()
+    normalize()
+    draw()
   }
 
   private def applyGate(gate: Gate.Value, target: Int, controls: Int*): Unit = {
@@ -85,22 +110,6 @@ private class Multiverse extends Entity {
     for (u <- universes) {
       u.amplitude /= Complex(sqrt(sum))
     }
-  }
-
-  def step(): Unit = {
-    val selected = universes
-      .flatMap(_.quballs.zipWithIndex)
-      .filter { case (quball, _) => quball.physics.position.sub(Input.mouse()).length() < 0.5 }
-      .map { case (_, index) => index }
-      .toSet
-    for ((key, gate) <- GateKeys) {
-      if (Input.keyJustPressed(key)) {
-        selected.foreach(applyGate(gate, _))
-      }
-    }
-    combine()
-    normalize()
-    draw()
   }
 
   private def draw(): Unit = {

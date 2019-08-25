@@ -11,24 +11,33 @@ import org.lwjgl.glfw.GLFW.{GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_S, GLFW_KEY_SPACE, 
 import scala.jdk.CollectionConverters._
 
 private object Player {
-  val speed: Double = 5
+  private val speed: Double = 5
 }
 
+/**
+ * The player character in the game.
+ */
 private class Player extends Entity {
   import Player._
 
+  /**
+   * This player's physics component.
+   */
   val physics: PhysicsComponent = require(classOf[PhysicsComponent])
-  var carrying: List[Quball] = List()
 
-  override protected def onCreate(): Unit = {
+  private var carrying: List[Quball] = List()
+
+  override protected def onCreate(): Unit =
     physics.collider = PhysicsComponent.wallCollider(new Vec2d(1, 1), List(
       new Rectangle(new Vec2d(-8, -4.5), new Vec2d(-8, 4.5)),
       new Rectangle(new Vec2d(-8, -4.5), new Vec2d(8, -4.5)),
       new Rectangle(new Vec2d(-8, 4.5), new Vec2d(8, 4.5)),
       new Rectangle(new Vec2d(8, -4.5), new Vec2d(8, 4.5))
     ).asJavaCollection)
-  }
 
+  /**
+   * Steps time forward for this player.
+   */
   def step(): Unit = {
     physics.velocity = new Vec2d(0, 0)
     if (Input.keyDown(GLFW_KEY_W)) {
@@ -63,7 +72,6 @@ private class Player extends Entity {
     draw()
   }
 
-  private def draw(): Unit = {
+  private def draw(): Unit =
     Sprite.load("cat.png").draw(Transformation.create(physics.position, 0, 1), WHITE)
-  }
 }
