@@ -18,7 +18,7 @@
         <maven.compiler.target>12</maven.compiler.target>
         <kotlin.version>1.3.50</kotlin.version>
         <kotlin.code.style>official</kotlin.code.style>
-        <lwjgl.version>3.2.2</lwjgl.version>
+        <lwjgl.version>3.2.1</lwjgl.version>
         <joml.version>1.9.17</joml.version>
     </properties>
 
@@ -40,7 +40,7 @@
             <activation>
                 <os>
                     <family>mac</family>
-                    <arch>amd64</arch>
+                    <arch>x86_64</arch>
                 </os>
             </activation>
             <properties>

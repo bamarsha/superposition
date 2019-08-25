@@ -11,7 +11,6 @@ object Superposition {
     Settings.WINDOW_WIDTH = 1280
     Settings.WINDOW_HEIGHT = 720
     Settings.BACKGROUND_COLOR = Color.GRAY
-    Settings.ENABLE_VSYNC = false
 
     Game.init()
     Game.declareSystem(classOf[Multiverse], (_: Multiverse).step())
