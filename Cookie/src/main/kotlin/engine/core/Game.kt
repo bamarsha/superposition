@@ -1,17 +1,32 @@
 package engine.core
 
-import engine.core.Behavior.Companion.track
 import engine.graphics.Window
 import java.util.*
 
 
 object Game {
 
+    private val TRACKED_BEHAVIORS = HashMap<Class<out Behavior>, MutableCollection<Behavior>>()
     private val SYSTEMS = LinkedList<() -> Unit>()
 
     private var prevTime: Long = 0
     private var dt: Double = 0.toDouble()
     private var shouldClose: Boolean = false
+
+    fun create(e: Entity) {
+        for ((key, value) in e.behaviors) {
+            track(key)
+            TRACKED_BEHAVIORS[key]!!.add(value)
+            value.onCreate()
+        }
+    }
+
+    fun destroy(e: Entity) {
+        for ((key, value) in e.behaviors) {
+            track(key).remove(value)
+            value.onDestroy()
+        }
+    }
 
     fun declareSystem(r: () -> Unit) {
         SYSTEMS.add(r)
@@ -64,5 +79,12 @@ object Game {
 
     fun stop() {
         shouldClose = true
+    }
+
+    fun <T : Behavior> track(c: Class<T>): MutableCollection<T> {
+        if (!TRACKED_BEHAVIORS.containsKey(c)) {
+            TRACKED_BEHAVIORS[c] = HashSet()
+        }
+        return (TRACKED_BEHAVIORS[c] ?: throw RuntimeException()) as MutableCollection<T>
     }
 }

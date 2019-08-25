@@ -1,6 +1,6 @@
 package extras.behaviors
 
-import engine.core.Behavior.Entity
+import engine.core.Entity
 import engine.core.Game
 import engine.core.Input
 
@@ -17,7 +17,7 @@ class QuitOnEscapeBehavior : Entity() {
     companion object {
 
         init {
-            Game.declareSystem(QuitOnEscapeBehavior::class.java) { obj: QuitOnEscapeBehavior -> obj.step() }
+            Game.declareSystem(QuitOnEscapeBehavior::class.java) { obj -> obj.step() }
         }
     }
 }
