@@ -1,15 +1,8 @@
 package superposition
 
-import engine.graphics.Camera
-import engine.graphics.Camera.Camera2d
-import engine.graphics.opengl.Shader
-import engine.util.math.{Transformation, Vec2d}
+import engine.util.math.Vec2d
 
-import scala.math.{Pi, pow}
-
-private object Universe {
-  private val UniverseShader: Shader = Shader.load("universe")
-}
+import scala.math.pow
 
 /**
  * A game universe.
@@ -20,7 +13,6 @@ private object Universe {
  * @param size the number of bits in this universe
  */
 private class Universe(size: Int) {
-  import Universe._
 
   /**
    * The probability amplitude of this universe.
@@ -57,22 +49,8 @@ private class Universe(size: Int) {
 
   /**
    * Draws this universe.
-   *
-   * @param time the current game time
-   * @param minValue the minimum value of the noise range for this universe
-   * @param maxValue the maximum value of the noise range for this universe
    */
-  def draw(time: Double, minValue: Double, maxValue: Double): Unit = {
+  def draw(): Unit = {
     bits.foreach(_.draw())
-
-    val camera = new Camera2d()
-    camera.lowerLeft = new Vec2d(-1, -1)
-    Camera.current = camera
-    UniverseShader.setMVP(Transformation.IDENTITY)
-    UniverseShader.setUniform("time", time.asInstanceOf[Float])
-    UniverseShader.setUniform("minVal", minValue.asInstanceOf[Float])
-    UniverseShader.setUniform("maxVal", maxValue.asInstanceOf[Float])
-    UniverseShader.setUniform("hue", (amplitude.phase / (2 * Pi)).asInstanceOf[Float])
-    Camera.current = Camera.camera2d
   }
 }

@@ -3,6 +3,11 @@ package superposition
 import engine.core.Behavior.Entity
 import engine.core.Game.dt
 import engine.core.Input
+import engine.graphics.Camera
+import engine.graphics.Camera.Camera2d
+import engine.graphics.opengl.{Framebuffer, Shader, Texture}
+import engine.util.Color.CLEAR
+import engine.util.math.{Transformation, Vec2d}
 import org.lwjgl.glfw.GLFW._
 
 import scala.math.{Pi, sqrt}
@@ -20,13 +25,21 @@ private object Multiverse {
   )
 
   private val NumObjects: Int = 2
+  private val UniverseShader: Shader = Shader.load("universe")
 }
 
 private class Multiverse extends Entity {
   import Multiverse._
 
   private var universes: List[Universe] = List(new Universe(NumObjects))
+  private var frameBuffer: Framebuffer = _
+  private var colorBuffer: Texture = _
   private var time: Double = 0
+
+  override protected def onCreate(): Unit = {
+    frameBuffer = new Framebuffer()
+    colorBuffer = frameBuffer.attachColorBuffer()
+  }
 
   private def applyGate(gate: Gate.Value, target: Int, controls: Int*): Unit = {
     for (u <- universes.filter(u => controls.forall(u.bits(_).on))) {
@@ -88,10 +101,25 @@ private class Multiverse extends Entity {
 
   private def draw(): Unit = {
     time += dt()
+    UniverseShader.setUniform("time", time.asInstanceOf[Float])
+
     var minValue = 0.0
     for (u <- universes) {
       val maxValue = minValue + u.amplitude.squaredMagnitude
-      u.draw(time, minValue, maxValue)
+
+      frameBuffer.clear(CLEAR)
+      u.bits.foreach(_.draw())
+
+      val camera = new Camera2d()
+      camera.lowerLeft = new Vec2d(-1, -1)
+      Camera.current = camera
+      UniverseShader.setMVP(Transformation.IDENTITY)
+      UniverseShader.setUniform("minVal", minValue.asInstanceOf[Float])
+      UniverseShader.setUniform("maxVal", maxValue.asInstanceOf[Float])
+      UniverseShader.setUniform("hue", (u.amplitude.phase / (2 * Pi)).asInstanceOf[Float])
+      Framebuffer.drawToWindow(colorBuffer, UniverseShader)
+      Camera.current = Camera.camera2d
+
       minValue = maxValue
     }
   }
