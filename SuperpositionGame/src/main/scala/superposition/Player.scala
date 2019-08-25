@@ -54,22 +54,27 @@ private class Player extends Entity {
     }
 
     if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
-      if (carrying.isEmpty) {
-        carrying = Behavior
-          .track(classOf[Quball])
-          .asScala
-          .filter(_.physics.position.sub(physics.position).length() < 0.5)
-          .toList
-      } else {
-        carrying = List()
-      }
+      toggleCarrying()
     }
-    carrying.foreach(quball => {
+    for (quball <- carrying) {
       quball.physics.position = physics.position
       quball.physics.velocity = physics.velocity
-    })
+    }
 
     draw()
+  }
+
+  private def toggleCarrying(): Unit = {
+    if (carrying.isEmpty) {
+      val nearby = Behavior
+        .track(classOf[Quball])
+        .asScala
+        .filter(_.physics.position.sub(physics.position).length() < 0.5)
+        .groupBy(_.qubit)
+      carrying = if (nearby.isEmpty) List() else nearby.head._2.toList
+    } else {
+      carrying = List()
+    }
   }
 
   private def draw(): Unit =

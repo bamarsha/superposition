@@ -13,10 +13,11 @@ import scala.jdk.CollectionConverters._
  * A quball is a physical object that has a classical bit in each universe, but corresponds to a single qubit in the
  * multiverse.
  *
+ * @param qubit the qubit number corresponding to this quball
  * @param position the initial position of the quball
  * @param on the initial state of the bit
  */
-private class Quball(position: Vec2d, var on: Boolean = false) extends Entity {
+private class Quball(val qubit: Int, position: Vec2d, var on: Boolean = false) extends Entity {
   Behavior.track(classOf[Quball])
 
   /**
@@ -47,7 +48,7 @@ private class Quball(position: Vec2d, var on: Boolean = false) extends Entity {
    * @return a copy of this quball
    */
   def copy(): Quball = {
-    val quball = new Quball(physics.position, on)
+    val quball = new Quball(qubit, physics.position, on)
     quball.physics.velocity = physics.velocity
     quball.physics.collider = physics.collider
     quball.physics.hitWall = physics.hitWall

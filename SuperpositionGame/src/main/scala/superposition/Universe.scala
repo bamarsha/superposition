@@ -11,9 +11,17 @@ import scala.math.pow
  * Universes contain objects in a particular (definite) state that can interact with each other, but not with objects
  * from other universes. It corresponds to a basis vector with a particular amplitude (coefficient) in a quantum state.
  *
+ * The index of each quball in the vector must correspond to its qubit number.
+ *
  * @param quballs the quballs in this universe
+ * @throws IllegalArgumentException if quball indices do not match qubit numbers
  */
 private class Universe(val quballs: Vector[Quball]) extends Entity {
+  scala.Predef.require(
+    quballs.zipWithIndex.forall { case (q, i) => q.qubit == i },
+    "quball indices do not match qubit numbers"
+  )
+
   /**
    * The probability amplitude of this universe.
    */
@@ -25,17 +33,16 @@ private class Universe(val quballs: Vector[Quball]) extends Entity {
    * @param size the number of quballs in this universe
    */
   def this(size: Int) =
-    this(Vector.tabulate(size)(i => new Quball(new Vec2d(1 + i, 1))))
+    this(Vector.tabulate(size)(i => new Quball(i, new Vec2d(1 + i, 1))))
 
   override protected def onCreate(): Unit = quballs.foreach(_.create())
 
   override protected def onDestroy(): Unit = quballs.foreach(_.destroy())
   
   /**
-   * The state of this universe, given by Σ,,i,, b,,i,, · 2^i^, where b,,i,, is the state of the ith bit.
+   * The state of this universe, given by Σ,,i,, b,,i,, · 2^i^, where b,,i,, is the state of the ith qubit.
    */
-  def state: Int =
-    quballs.zipWithIndex.map { case (p, i) => if (p.on) pow(2, i).toInt else 0 }.sum
+  def state: Int = quballs.map(q => if (q.on) pow(2, q.qubit).toInt else 0).sum
 
   /**
    * Creates a deep copy of this universe.
