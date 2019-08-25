@@ -1,6 +1,6 @@
 package extras.behaviors
 
-import engine.core.Behavior.Entity
+import engine.core.Entity
 import engine.core.Game
 import engine.core.Game.dt
 import engine.graphics.Window
@@ -30,7 +30,7 @@ class FPSBehavior : Entity() {
     companion object {
 
         init {
-            Game.declareSystem(FPSBehavior::class.java) { obj: FPSBehavior -> obj.step() }
+            Game.declareSystem(FPSBehavior::class.java) { obj -> obj.step() }
         }
     }
 }
