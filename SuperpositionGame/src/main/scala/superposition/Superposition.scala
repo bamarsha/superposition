@@ -8,6 +8,8 @@ import extras.behaviors.{FPSBehavior, QuitOnEscapeBehavior}
 
 object Superposition {
   def main(args: Array[String]): Unit = {
+    Settings.WINDOW_WIDTH = 1280
+    Settings.WINDOW_HEIGHT = 720
     Settings.BACKGROUND_COLOR = Color.GRAY
     Game.init()
 
