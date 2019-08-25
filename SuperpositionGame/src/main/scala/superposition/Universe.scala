@@ -1,8 +1,15 @@
 package superposition
 
-import engine.util.math.Vec2d
+import engine.graphics.Camera
+import engine.graphics.Camera.Camera2d
+import engine.graphics.opengl.Shader
+import engine.util.math.{Transformation, Vec2d}
 
-import scala.math.pow
+import scala.math.{Pi, pow}
+
+private object Universe {
+  private val UniverseShader: Shader = Shader.load("universe")
+}
 
 /**
  * A game universe.
@@ -13,6 +20,8 @@ import scala.math.pow
  * @param size the number of bits in this universe
  */
 private class Universe(size: Int) {
+  import Universe._
+
   /**
    * The probability amplitude of this universe.
    */
@@ -30,11 +39,6 @@ private class Universe(size: Int) {
     bits.zipWithIndex.map { case (p, i) => if (p.on) pow(2, i).toInt else 0 }.sum
 
   /**
-   * Steps physics forward for this universe.
-   */
-  def step(): Unit = bits.foreach(_.step())
-
-  /**
    * Creates a deep copy of this universe.
    *
    * @return a deep copy of this universe
@@ -44,5 +48,31 @@ private class Universe(size: Int) {
     u.amplitude = amplitude
     u.bits = bits.map(_.copy())
     u
+  }
+
+  /**
+   * Steps physics forward for this universe.
+   */
+  def step(): Unit = bits.foreach(_.step())
+
+  /**
+   * Draws this universe.
+   *
+   * @param time the current game time
+   * @param minValue the minimum value of the noise range for this universe
+   * @param maxValue the maximum value of the noise range for this universe
+   */
+  def draw(time: Double, minValue: Double, maxValue: Double): Unit = {
+    bits.foreach(_.draw())
+
+    val camera = new Camera2d()
+    camera.lowerLeft = new Vec2d(-1, -1)
+    Camera.current = camera
+    UniverseShader.setMVP(Transformation.IDENTITY)
+    UniverseShader.setUniform("time", time.asInstanceOf[Float])
+    UniverseShader.setUniform("minVal", minValue.asInstanceOf[Float])
+    UniverseShader.setUniform("maxVal", maxValue.asInstanceOf[Float])
+    UniverseShader.setUniform("hue", (amplitude.phase / (2 * Pi)).asInstanceOf[Float])
+    Camera.current = Camera.camera2d
   }
 }
