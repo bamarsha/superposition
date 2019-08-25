@@ -4,7 +4,7 @@ import engine.core.Behavior;
 import engine.core.Game;
 import engine.util.math.Vec2d;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.function.Predicate;
 
 public class PhysicsComponent extends Behavior.Component {
@@ -18,7 +18,7 @@ public class PhysicsComponent extends Behavior.Component {
     public Predicate<Vec2d> collider = v -> false;
     public boolean hitWall = false;
 
-    public static Predicate<Vec2d> wallCollider(Vec2d hitboxSize, List<Rectangle> walls) {
+    public static Predicate<Vec2d> wallCollider(Vec2d hitboxSize, Collection<Rectangle> walls) {
         return pos -> {
             var hitbox = Rectangle.fromCenterSize(pos, hitboxSize);
             return walls.stream().anyMatch(hitbox::intersects);
