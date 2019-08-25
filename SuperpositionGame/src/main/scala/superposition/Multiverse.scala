@@ -39,27 +39,29 @@ private class Multiverse extends Entity {
   override protected def onCreate(): Unit = {
     frameBuffer = new Framebuffer()
     colorBuffer = frameBuffer.attachColorBuffer()
+    universes.foreach(_.create())
   }
 
   private def applyGate(gate: Gate.Value, target: Int, controls: Int*): Unit = {
-    for (u <- universes.filter(u => controls.forall(u.bits(_).on))) {
+    for (u <- universes.filter(u => controls.forall(u.quballs(_).on))) {
       gate match {
-        case Gate.X => u.bits(target).on = !u.bits(target).on
+        case Gate.X => u.quballs(target).on = !u.quballs(target).on
         case Gate.Z =>
-          if (u.bits(target).on) {
+          if (u.quballs(target).on) {
             u.amplitude *= Complex(-1)
           }
         case Gate.T =>
-          if (u.bits(target).on) {
+          if (u.quballs(target).on) {
             u.amplitude *= Complex.polar(1, Pi / 4)
           }
         case Gate.H =>
           u.amplitude /= Complex(sqrt(2))
           val copy = u.copy()
-          if (u.bits(target).on) {
+          copy.create()
+          if (u.quballs(target).on) {
             u.amplitude *= Complex(-1)
           }
-          copy.bits(target).on = !copy.bits(target).on
+          copy.quballs(target).on = !copy.quballs(target).on
           universes = copy :: universes
       }
     }
@@ -69,6 +71,7 @@ private class Multiverse extends Entity {
     universes = universes
       .groupMapReduce(_.state)(identity)((u1, u2) => {
         u2.amplitude += u1.amplitude
+        u1.destroy()
         u2
       })
       .values
@@ -84,8 +87,8 @@ private class Multiverse extends Entity {
 
   def step(): Unit = {
     val selected = universes
-      .flatMap(_.bits.zipWithIndex)
-      .filter { case (bit, _) => bit.position.sub(Input.mouse()).length() < 0.5 }
+      .flatMap(_.quballs.zipWithIndex)
+      .filter { case (quball, _) => quball.physics.position.sub(Input.mouse()).length() < 0.5 }
       .map { case (_, index) => index }
       .toSet
     for ((key, gate) <- GateKeys) {
@@ -93,7 +96,6 @@ private class Multiverse extends Entity {
         selected.foreach(applyGate(gate, _))
       }
     }
-    universes.foreach(_.step())
     combine()
     normalize()
     draw()
@@ -108,7 +110,7 @@ private class Multiverse extends Entity {
       val maxValue = minValue + u.amplitude.squaredMagnitude
 
       frameBuffer.clear(CLEAR)
-      u.bits.foreach(_.draw())
+      u.draw()
 
       val camera = new Camera2d()
       camera.lowerLeft = new Vec2d(-1, -1)

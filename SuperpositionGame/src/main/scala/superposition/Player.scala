@@ -1,12 +1,12 @@
 package superposition
 
 import engine.core.Behavior.Entity
-import engine.core.Input
+import engine.core.{Behavior, Input}
 import engine.graphics.sprites.Sprite
 import engine.util.Color.WHITE
 import engine.util.math.{Transformation, Vec2d}
 import extras.physics.{PhysicsComponent, Rectangle}
-import org.lwjgl.glfw.GLFW.{GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_S, GLFW_KEY_W}
+import org.lwjgl.glfw.GLFW.{GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_S, GLFW_KEY_SPACE, GLFW_KEY_W}
 
 import scala.jdk.CollectionConverters._
 
@@ -17,7 +17,8 @@ private object Player {
 private class Player extends Entity {
   import Player._
 
-  var physics: PhysicsComponent = require(classOf[PhysicsComponent])
+  val physics: PhysicsComponent = require(classOf[PhysicsComponent])
+  var carrying: List[Quball] = List()
 
   override protected def onCreate(): Unit = {
     physics.collider = PhysicsComponent.wallCollider(new Vec2d(1, 1), List(
@@ -42,6 +43,20 @@ private class Player extends Entity {
     if (Input.keyDown(GLFW_KEY_D)) {
       physics.velocity = physics.velocity.add(new Vec2d(speed, 0))
     }
+
+    if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
+      if (carrying.isEmpty) {
+        carrying = Behavior
+          .track(classOf[Quball])
+          .asScala
+          .filter(_.physics.position.sub(physics.position).length() < 0.5)
+          .toList
+      } else {
+        carrying = List()
+      }
+    }
+    carrying.foreach(_.physics.position = physics.position)
+
     draw()
   }
 

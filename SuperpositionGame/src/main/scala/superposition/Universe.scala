@@ -1,5 +1,6 @@
 package superposition
 
+import engine.core.Behavior.Entity
 import engine.util.math.Vec2d
 
 import scala.math.pow
@@ -12,7 +13,7 @@ import scala.math.pow
  *
  * @param size the number of bits in this universe
  */
-private class Universe(size: Int) {
+private class Universe(size: Int) extends Entity {
 
   /**
    * The probability amplitude of this universe.
@@ -22,13 +23,17 @@ private class Universe(size: Int) {
   /**
    * The bits in this universe.
    */
-  var bits: Array[Bit] = Array.tabulate(size)(i => Bit(new Vec2d(1 + i, 1)))
+  var quballs: Array[Quball] = Array.tabulate(size)(i => new Quball(new Vec2d(1 + i, 1)))
 
+  override protected def onCreate(): Unit = quballs.foreach(_.create())
+
+  override protected def onDestroy(): Unit = quballs.foreach(_.destroy())
+  
   /**
    * The state of this universe, given by Σ,,i,, b,,i,, · 2^i^, where b,,i,, is the state of the ith bit.
    */
   def state: Int =
-    bits.zipWithIndex.map { case (p, i) => if (p.on) pow(2, i).toInt else 0 }.sum
+    quballs.zipWithIndex.map { case (p, i) => if (p.on) pow(2, i).toInt else 0 }.sum
 
   /**
    * Creates a deep copy of this universe.
@@ -38,19 +43,12 @@ private class Universe(size: Int) {
   def copy(): Universe = {
     val u = new Universe(size)
     u.amplitude = amplitude
-    u.bits = bits.map(_.copy())
+    u.quballs = quballs.map(_.copy())
     u
   }
 
   /**
-   * Steps physics forward for this universe.
-   */
-  def step(): Unit = bits.foreach(_.step())
-
-  /**
    * Draws this universe.
    */
-  def draw(): Unit = {
-    bits.foreach(_.draw())
-  }
+  def draw(): Unit = quballs.foreach(_.draw())
 }
