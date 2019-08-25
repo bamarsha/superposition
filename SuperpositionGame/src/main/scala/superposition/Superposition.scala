@@ -11,14 +11,18 @@ object Superposition {
     Settings.WINDOW_WIDTH = 1280
     Settings.WINDOW_HEIGHT = 720
     Settings.BACKGROUND_COLOR = Color.GRAY
-    Game.init()
+    Settings.ENABLE_VSYNC = false
 
-    Camera.camera2d.upperRight = new Vec2d(16, 9)
+    Game.init()
+    Game.declareSystem(classOf[Multiverse], (_: Multiverse).step())
+    Game.declareSystem(classOf[Player], (_: Player).step())
+
+    Camera.camera2d.setCenterSize(new Vec2d(0, 0), new Vec2d(16, 9))
 
     new FPSBehavior().create()
     new QuitOnEscapeBehavior().create()
-    Multiverse.init()
     new Multiverse().create()
+    new Player().create()
 
     Game.run()
   }

@@ -1,7 +1,7 @@
 package superposition
 
 import engine.core.Behavior.Entity
-import engine.core.Game.{declareSystem, dt}
+import engine.core.Game.dt
 import engine.core.Input
 import org.lwjgl.glfw.GLFW._
 
@@ -20,9 +20,6 @@ private object Multiverse {
   )
 
   private val NumObjects: Int = 2
-
-  def init(): Unit =
-    declareSystem(classOf[Multiverse], (_: Multiverse).step())
 }
 
 private class Multiverse extends Entity {
@@ -72,7 +69,7 @@ private class Multiverse extends Entity {
     }
   }
 
-  private def step(): Unit = {
+  def step(): Unit = {
     val selected = universes
       .flatMap(_.bits.zipWithIndex)
       .filter { case (bit, _) => bit.position.sub(Input.mouse()).length() < 0.5 }
