@@ -53,9 +53,9 @@ private class Multiverse extends Entity {
    */
   def step(): Unit = {
     val selected = universes
-      .flatMap(_.quballs.zipWithIndex)
-      .filter { case (quball, _) => quball.physics.position.sub(Input.mouse()).length() < 0.5 }
-      .map { case (_, index) => index }
+      .flatMap(_.quballs)
+      .filter(_.physics.position.sub(Input.mouse()).length() < 0.5)
+      .map(_.qubit)
       .toSet
     for ((key, gate) <- GateKeys) {
       if (Input.keyJustPressed(key)) {
