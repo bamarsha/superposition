@@ -11,7 +11,21 @@ import org.lwjgl.glfw.GLFW.{GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_S, GLFW_KEY_SPACE, 
 import scala.jdk.CollectionConverters._
 
 private object Player {
-  private val speed: Double = 5
+  private val Speed: Double = 5
+
+  private val WalkKeys: List[(Int, Vec2d)] = List(
+    (GLFW_KEY_W, new Vec2d(0, 1)),
+    (GLFW_KEY_A, new Vec2d(-1, 0)),
+    (GLFW_KEY_S, new Vec2d(0, -1)),
+    (GLFW_KEY_D, new Vec2d(1, 0))
+  )
+
+  private def walkVelocity(): Vec2d = {
+    val direction = WalkKeys.foldLeft(new Vec2d(0, 0)) {
+      case (acc, (key, direction)) => if (Input.keyDown(key)) acc.add(direction) else acc
+    }
+    if (direction.length() == 0) direction else direction.setLength(Speed)
+  }
 }
 
 /**
@@ -39,20 +53,7 @@ private class Player extends Entity {
    * Steps time forward for this player.
    */
   def step(): Unit = {
-    physics.velocity = new Vec2d(0, 0)
-    if (Input.keyDown(GLFW_KEY_W)) {
-      physics.velocity = physics.velocity.add(new Vec2d(0, speed))
-    }
-    if (Input.keyDown(GLFW_KEY_A)) {
-      physics.velocity = physics.velocity.add(new Vec2d(-speed, 0))
-    }
-    if (Input.keyDown(GLFW_KEY_S)) {
-      physics.velocity = physics.velocity.add(new Vec2d(0, -speed))
-    }
-    if (Input.keyDown(GLFW_KEY_D)) {
-      physics.velocity = physics.velocity.add(new Vec2d(speed, 0))
-    }
-
+    physics.velocity = walkVelocity()
     if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
       toggleCarrying()
     }
@@ -60,7 +61,6 @@ private class Player extends Entity {
       quball.physics.position = physics.position
       quball.physics.velocity = physics.velocity
     }
-
     draw()
   }
 

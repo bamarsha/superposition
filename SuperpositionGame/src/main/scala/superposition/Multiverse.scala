@@ -17,7 +17,7 @@ private object Multiverse {
     val X, Z, T, H = Value
   }
 
-  private val GateKeys = List(
+  private val GateKeys: List[(Int, Gate.Value)] = List(
     (GLFW_KEY_X, Gate.X),
     (GLFW_KEY_Z, Gate.Z),
     (GLFW_KEY_T, Gate.T),
