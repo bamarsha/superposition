@@ -78,5 +78,5 @@ private class Player extends Entity {
   }
 
   private def draw(): Unit =
-    Sprite.load("cat.png").draw(Transformation.create(physics.position, 0, 1), WHITE)
+    Sprite.load(getClass.getResource("sprites/cat.png")).draw(Transformation.create(physics.position, 0, 1), WHITE)
 }

@@ -1,13 +1,14 @@
 package engine.graphics.opengl;
 
+import java.io.IOException;
+import java.net.URL;
 import java.nio.ByteBuffer;
+
 import static org.lwjgl.opengl.ARBTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_MAX_LEVEL;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
-import static org.lwjgl.stb.STBImage.stbi_failure_reason;
-import static org.lwjgl.stb.STBImage.stbi_load;
-import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
+import static org.lwjgl.stb.STBImage.*;
 
 public class Texture extends GLObject {
 
@@ -38,14 +39,25 @@ public class Texture extends GLObject {
         return width;
     }
 
-    public static Texture load(String fileName) {
+    public static Texture load(URL url) {
         int[] widthArray = new int[1];
         int[] heightArray = new int[1];
         int[] compArray = new int[1];
         stbi_set_flip_vertically_on_load(true);
-        ByteBuffer image = stbi_load("sprites/" + fileName, widthArray, heightArray, compArray, 4);
+
+        byte[] bytes;
+        try {
+            bytes = url.openStream().readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load image " + url, e);
+        }
+
+        ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length);
+        buffer.put(bytes);
+        buffer.flip();
+        ByteBuffer image = stbi_load_from_memory(buffer, widthArray, heightArray, compArray, 4);
         if (image == null) {
-            throw new RuntimeException("Failed to load image " + fileName + " : " + stbi_failure_reason());
+            throw new RuntimeException("Failed to load image " + url + ": " + stbi_failure_reason());
         }
 
         Texture t = new Texture(GL_TEXTURE_2D);

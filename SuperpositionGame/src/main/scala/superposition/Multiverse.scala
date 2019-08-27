@@ -25,7 +25,7 @@ private object Multiverse {
   )
 
   private val NumObjects: Int = 2
-  private val UniverseShader: Shader = Shader.load(classOf[Multiverse].getResource(_), "universe")
+  private val UniverseShader: Shader = Shader.load(classOf[Multiverse].getResource(_), "shaders/universe")
 }
 
 /**

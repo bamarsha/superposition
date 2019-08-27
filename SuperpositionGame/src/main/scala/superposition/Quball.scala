@@ -44,7 +44,7 @@ private class Quball(val qubit: Int, position: Vec2d, var on: Boolean = false) e
    */
   def draw(): Unit = {
     val color = if (on) WHITE else BLACK
-    Sprite.load("ball.png").draw(Transformation.create(physics.position, 0, 1), color)
+    Sprite.load(getClass.getResource("sprites/ball.png")).draw(Transformation.create(physics.position, 0, 1), color)
   }
 
   /**
