@@ -33,7 +33,7 @@ public class Font {
         return FONT_CACHE.get(fileName);
     }
 
-    private static final Shader FONT_SHADER = Shader.load("sprite", "font");
+    private static final Shader FONT_SHADER = Shader.load(Font.class::getResource, "font");
 
     private Texture[] textures;
     private final Map<Integer, FontChar> charMap = new HashMap();

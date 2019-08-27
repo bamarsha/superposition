@@ -17,7 +17,7 @@ import engine.util.math.Vec3d;
 
 public class Graphics {
 
-    private static final Shader COLOR_SHADER = Shader.load("color");
+    private static final Shader COLOR_SHADER = Shader.load(Graphics.class::getResource, "color");
 
     private static final int CIRCLE_DETAIL = 40;
 

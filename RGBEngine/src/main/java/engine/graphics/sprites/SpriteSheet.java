@@ -38,7 +38,7 @@ public class SpriteSheet {
         return SPRITE_SHEET_CACHE.get(fileName);
     }
 
-    public static final Shader SPRITE_SHEET_SHADER = Shader.load("sprite_sheet");
+    public static final Shader SPRITE_SHEET_SHADER = Shader.load(SpriteSheet.class::getResource, "sprite_sheet");
 
     public static final VertexArrayObject SPRITE_SHEET_VAO = VertexArrayObject.createVAO(() -> {
         BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{

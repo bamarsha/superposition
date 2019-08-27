@@ -26,7 +26,7 @@ public class Sprite {
         return SPRITE_CACHE.get(fileName);
     }
 
-    public static final Shader SPRITE_SHADER = Shader.load("sprite");
+    public static final Shader SPRITE_SHADER = Shader.load(Sprite.class::getResource, "sprite");
 
     public static final VertexArrayObject SPRITE_VAO = VertexArrayObject.createVAO(() -> {
         BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{
