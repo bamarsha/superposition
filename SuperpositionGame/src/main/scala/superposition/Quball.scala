@@ -9,6 +9,10 @@ import extras.physics.{PhysicsComponent, Rectangle}
 
 import scala.jdk.CollectionConverters._
 
+private object Quball {
+  private val QuballSprite: Sprite = Sprite.load(getClass.getResource("sprites/ball.png"))
+}
+
 /**
  * A quball is a physical object that has a classical bit in each universe, but corresponds to a single qubit in the
  * multiverse.
@@ -18,6 +22,8 @@ import scala.jdk.CollectionConverters._
  * @param on the initial state of this quball
  */
 private class Quball(val qubit: Int, position: Vec2d, var on: Boolean = false) extends Entity {
+  import Quball._
+
   Behavior.track(classOf[Quball])
 
   /**
@@ -44,7 +50,7 @@ private class Quball(val qubit: Int, position: Vec2d, var on: Boolean = false) e
    */
   def draw(): Unit = {
     val color = if (on) WHITE else BLACK
-    Sprite.load("ball.png").draw(Transformation.create(physics.position, 0, 1), color)
+    QuballSprite.draw(Transformation.create(physics.position, 0, 1), color)
   }
 
   /**

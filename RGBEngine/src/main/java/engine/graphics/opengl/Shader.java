@@ -1,16 +1,20 @@
 package engine.graphics.opengl;
 
 import engine.graphics.Camera;
-import java.util.HashMap;
-import org.joml.Matrix4d;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 import engine.util.Color;
-import engine.util.Resources;
 import engine.util.math.Transformation;
 import engine.util.math.Vec2d;
 import engine.util.math.Vec3d;
 import engine.util.math.Vec4d;
+import org.joml.Matrix4d;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.function.Function;
+
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 
 public class Shader extends GLObject {
 
@@ -59,23 +63,63 @@ public class Shader extends GLObject {
         return uniformLocations.get(name);
     }
 
-    public static Shader load(String name) {
-        return load(name, name);
+    /**
+     * Loads a vertex and fragment shader using the resource mapping function and the name of the shader.
+     *
+     * The shader is loaded from the files name.vert and name.frag.
+     *
+     * @param getResource a function that maps a filename to its resource URL
+     * @param name the name of the shader
+     * @return the shader
+     */
+    public static Shader load(Function<String, URL> getResource, String name) {
+        return loadGeom(getResource.apply(name + ".vert"), null, getResource.apply(name + ".frag"));
     }
 
-    public static Shader loadGeom(String name) {
-        return loadGeom(name, name, name);
-    }
-
-    public static Shader load(String vert, String frag) {
+    /**
+     * Loads a vertex and fragment shader from the vert and frag files.
+     *
+     * @param vert the URL of the shader's vert file, or null
+     * @param frag the URL of the shader's frag file, or null
+     * @return the shader
+     */
+    public static Shader load(URL vert, URL frag) {
         return loadGeom(vert, null, frag);
     }
 
-    public static Shader loadGeom(String vert, String geom, String frag) {
-        return new Shader(
-                vert == null ? null : Resources.loadFileAsString("src/main/java/shaders/" + vert + ".vert"),
-                geom == null ? null : Resources.loadFileAsString("src/main/java/shaders/" + geom + ".geom"),
-                frag == null ? null : Resources.loadFileAsString("src/main/java/shaders/" + frag + ".frag"));
+    /**
+     * Loads a vertex, geometry and fragment shader using the resource mapping function and the name of the shader.
+     *
+     * The shader is loaded from the files name.vert, name.geom and name.frag.
+     *
+     * @param getResource a function that maps a filename to its resource URL
+     * @param name the name of the shader
+     * @return the shader
+     */
+    public static Shader loadGeom(Function<String, URL> getResource, String name) {
+        return loadGeom(
+                getResource.apply(name + ".vert"),
+                getResource.apply(name + ".geom"),
+                getResource.apply(name + ".frag"));
+    }
+
+    /**
+     * Loads a vertex and fragment shader from the vert, geom and frag files.
+     *
+     * @param vert the URL of the shader's vert file, or null
+     * @param geom the URL of the shader's geom file, or null
+     * @param frag the URL of the shader's frag file, or null
+     * @return the shader
+     */
+    public static Shader loadGeom(URL vert, URL geom, URL frag) {
+        try {
+            return new Shader(
+                    vert == null ? null : new String(vert.openStream().readAllBytes()),
+                    geom == null ? null : new String(geom.openStream().readAllBytes()),
+                    frag == null ? null : new String(frag.openStream().readAllBytes()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setMVP(Transformation t) {

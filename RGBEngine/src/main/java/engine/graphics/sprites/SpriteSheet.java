@@ -13,6 +13,8 @@ import engine.graphics.opengl.VertexArrayObject;
 import engine.util.Color;
 import engine.util.math.Transformation;
 import engine.util.math.Vec2d;
+
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import static org.lwjgl.opengl.GL11.*;
@@ -28,17 +30,17 @@ public class SpriteSheet {
 
     public static final int SHEET_DEPTH = 32;
 
-    private static final Map<String, SpriteSheet> SPRITE_SHEET_CACHE = new HashMap();
+    private static final Map<URL, SpriteSheet> SPRITE_SHEET_CACHE = new HashMap();
 
-    public static SpriteSheet load(String fileName) {
-        if (!SPRITE_SHEET_CACHE.containsKey(fileName)) {
-            SpriteSheet s = new SpriteSheet(fileName);
-            SPRITE_SHEET_CACHE.put(fileName, s);
+    public static SpriteSheet load(URL url) {
+        if (!SPRITE_SHEET_CACHE.containsKey(url)) {
+            SpriteSheet s = new SpriteSheet(url);
+            SPRITE_SHEET_CACHE.put(url, s);
         }
-        return SPRITE_SHEET_CACHE.get(fileName);
+        return SPRITE_SHEET_CACHE.get(url);
     }
 
-    public static final Shader SPRITE_SHEET_SHADER = Shader.load("sprite_sheet");
+    public static final Shader SPRITE_SHEET_SHADER = Shader.load(SpriteSheet.class::getResource, "sprite_sheet");
 
     public static final VertexArrayObject SPRITE_SHEET_VAO = VertexArrayObject.createVAO(() -> {
         BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{
@@ -55,8 +57,8 @@ public class SpriteSheet {
 
     private final Texture texture;
 
-    private SpriteSheet(String fileName) {
-        this.texture = Texture.load(fileName);
+    private SpriteSheet(URL url) {
+        this.texture = Texture.load(url);
     }
 
     public void draw(Transformation t, int id, Color color) {

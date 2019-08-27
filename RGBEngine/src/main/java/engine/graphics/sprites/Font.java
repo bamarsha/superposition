@@ -6,11 +6,14 @@ import engine.graphics.opengl.Shader;
 import engine.graphics.opengl.Texture;
 import engine.graphics.opengl.VertexArrayObject;
 import engine.util.Color;
-import engine.util.Resources;
 import engine.util.math.Transformation;
 import engine.util.math.Vec2d;
 import engine.util.math.Vec3d;
 import static java.lang.Integer.parseInt;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,17 +26,17 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 
 public class Font {
 
-    private static final Map<String, Font> FONT_CACHE = new HashMap();
+    private static final Map<URL, Font> FONT_CACHE = new HashMap();
 
-    public static Font load(String fileName) {
-        if (!FONT_CACHE.containsKey(fileName)) {
-            Font s = new Font(fileName);
-            FONT_CACHE.put(fileName, s);
+    public static Font load(URL url) {
+        if (!FONT_CACHE.containsKey(url)) {
+            Font s = new Font(url);
+            FONT_CACHE.put(url, s);
         }
-        return FONT_CACHE.get(fileName);
+        return FONT_CACHE.get(url);
     }
 
-    private static final Shader FONT_SHADER = Shader.load("sprite", "font");
+    private static final Shader FONT_SHADER = Shader.load(Font.class::getResource, "font");
 
     private Texture[] textures;
     private final Map<Integer, FontChar> charMap = new HashMap();
@@ -57,8 +60,14 @@ public class Font {
     private int scaleW, scaleH;
     private int pages;
 
-    private Font(String name) {
-        String[] fontDesc = Resources.loadFileAsString("fonts/" + name + ".fnt").split("[\r\n]+");
+    private Font(URL url) {
+        String[] fontDesc;
+        try {
+            fontDesc = new String(url.openStream().readAllBytes()).split("[\r\n]+");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         for (String line : fontDesc) {
             Map<String, String> nvp = parseNameValuePairs(line);
             switch (parseTag(line)) {
@@ -89,7 +98,11 @@ public class Font {
                 case "page":
                     int id = parseInt(nvp.get("id"));
                     String file = nvp.get("file");
-                    textures[id] = Texture.load("../fonts/" + file);
+                    try {
+                        textures[id] = Texture.load(new URL(url, file));
+                    } catch (MalformedURLException e) {
+                        throw new RuntimeException(e);
+                    }
                     break;
                 case "chars":
                     break;

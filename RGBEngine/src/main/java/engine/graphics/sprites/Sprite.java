@@ -7,6 +7,8 @@ import engine.graphics.opengl.Texture;
 import engine.graphics.opengl.VertexArrayObject;
 import engine.util.Color;
 import engine.util.math.Transformation;
+
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import static org.lwjgl.opengl.GL11.*;
@@ -16,17 +18,17 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 
 public class Sprite {
 
-    private static final Map<String, Sprite> SPRITE_CACHE = new HashMap();
+    private static final Map<URL, Sprite> SPRITE_CACHE = new HashMap();
 
-    public static Sprite load(String fileName) {
-        if (!SPRITE_CACHE.containsKey(fileName)) {
-            Sprite s = new Sprite(fileName);
-            SPRITE_CACHE.put(fileName, s);
+    public static Sprite load(URL url) {
+        if (!SPRITE_CACHE.containsKey(url)) {
+            Sprite s = new Sprite(url);
+            SPRITE_CACHE.put(url, s);
         }
-        return SPRITE_CACHE.get(fileName);
+        return SPRITE_CACHE.get(url);
     }
 
-    public static final Shader SPRITE_SHADER = Shader.load("sprite");
+    public static final Shader SPRITE_SHADER = Shader.load(Sprite.class::getResource, "sprite");
 
     public static final VertexArrayObject SPRITE_VAO = VertexArrayObject.createVAO(() -> {
         BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{
@@ -43,8 +45,8 @@ public class Sprite {
 
     private final Texture texture;
 
-    private Sprite(String fileName) {
-        this.texture = Texture.load(fileName);
+    private Sprite(URL url) {
+        this.texture = Texture.load(url);
     }
 
     public void draw(Transformation t, Color color) {

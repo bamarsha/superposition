@@ -20,6 +20,8 @@ private object Player {
     (GLFW_KEY_D, new Vec2d(1, 0))
   )
 
+  private val PlayerSprite: Sprite = Sprite.load(getClass.getResource("sprites/cat.png"))
+
   private def walkVelocity(): Vec2d = {
     val direction = WalkKeys.foldLeft(new Vec2d(0, 0)) {
       case (acc, (key, direction)) => if (Input.keyDown(key)) acc.add(direction) else acc
@@ -78,5 +80,5 @@ private class Player extends Entity {
   }
 
   private def draw(): Unit =
-    Sprite.load("cat.png").draw(Transformation.create(physics.position, 0, 1), WHITE)
+    PlayerSprite.draw(Transformation.create(physics.position, 0, 1), WHITE)
 }
