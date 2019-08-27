@@ -6,7 +6,6 @@ import engine.graphics.opengl.Shader;
 import engine.graphics.opengl.Texture;
 import engine.graphics.opengl.VertexArrayObject;
 import engine.util.Color;
-import engine.util.Resources;
 import engine.util.math.Transformation;
 import engine.util.math.Vec2d;
 import engine.util.math.Vec3d;
