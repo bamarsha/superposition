@@ -14,8 +14,8 @@ import scala.jdk.CollectionConverters._
  * multiverse.
  *
  * @param qubit the qubit number corresponding to this quball
- * @param position the initial position of the quball
- * @param on the initial state of the bit
+ * @param position the initial position of this quball
+ * @param on the initial state of this quball
  */
 private class Quball(val qubit: Int, position: Vec2d, var on: Boolean = false) extends Entity {
   Behavior.track(classOf[Quball])
@@ -33,6 +33,11 @@ private class Quball(val qubit: Int, position: Vec2d, var on: Boolean = false) e
       new Rectangle(new Vec2d(-8, 4.5), new Vec2d(8, 4.5)),
       new Rectangle(new Vec2d(8, -4.5), new Vec2d(8, 4.5))
     ).asJavaCollection)
+
+  /**
+   * Flips this quball between the on and off states.
+   */
+  def flip(): Unit = on = !on
 
   /**
    * Draws this quball.

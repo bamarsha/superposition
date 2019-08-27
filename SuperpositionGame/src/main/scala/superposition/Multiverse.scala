@@ -70,7 +70,7 @@ private class Multiverse extends Entity {
   private def applyGate(gate: Gate.Value, target: Int, controls: Int*): Unit = {
     for (u <- universes.filter(u => controls.forall(u.quballs(_).on))) {
       gate match {
-        case Gate.X => u.quballs(target).on = !u.quballs(target).on
+        case Gate.X => u.quballs(target).flip()
         case Gate.Z =>
           if (u.quballs(target).on) {
             u.amplitude *= Complex(-1)
@@ -86,7 +86,7 @@ private class Multiverse extends Entity {
           if (u.quballs(target).on) {
             u.amplitude *= Complex(-1)
           }
-          copy.quballs(target).on = !copy.quballs(target).on
+          copy.quballs(target).flip()
           universes = copy :: universes
       }
     }
