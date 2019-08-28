@@ -26,7 +26,7 @@ private class Universe extends Entity {
    */
   var amplitude: Complex = Complex(1)
 
-  override def onDestroy(): Unit = gameObjects.foreach(_.destroy())
+  override def onDestroy(): Unit = gameObjects.foreach(_.entity.destroy())
 
   private def gameObjects: Iterable[GameObject] =
     Behavior.track(classOf[GameObject]).asScala.filter(_.universe eq this)

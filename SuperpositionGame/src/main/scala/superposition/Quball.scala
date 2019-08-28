@@ -33,7 +33,6 @@ private class Quball(id: Int, on: Boolean, position: Vec2d, universe: Universe) 
   val gameObject: GameObject = require(classOf[GameObject])
   gameObject.universe = universe
   gameObject.copy = universe => new Quball(qubit.id, qubit.on, physics.position, universe).create()
-  gameObject.destroy = destroy
   gameObject.draw = () => {
     val color = if (qubit.on) WHITE else BLACK
     QuballSprite.draw(Transformation.create(physics.position, 0, 1), color)

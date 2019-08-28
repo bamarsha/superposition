@@ -28,7 +28,7 @@ public abstract class Behavior {
     public static class Component extends Behavior {
 
         private static Entity currentEntity;
-        private final Entity entity;
+        public final Entity entity;
 
         public Component() {
             if (currentEntity == null) {

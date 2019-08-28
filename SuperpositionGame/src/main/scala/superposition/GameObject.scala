@@ -13,7 +13,5 @@ private class GameObject extends Component {
 
   var copy: Universe => Unit = _
 
-  var destroy: () => Unit = _
-
   var draw: () => Unit = _
 }
