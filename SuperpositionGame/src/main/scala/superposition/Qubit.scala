@@ -10,7 +10,7 @@ private class Qubit extends Component {
 
   var on: Boolean = _
 
-  val physics: Physics = require(classOf[Physics])
+  val gameObject: GameObject = require(classOf[GameObject])
 
   def flip(): Unit = on = !on
 }

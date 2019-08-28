@@ -39,12 +39,14 @@ private class Player(position: Vec2d, universe: Universe) extends Entity {
   /**
    * This player's physics component.
    */
-  val physics: Physics = require(classOf[Physics])
+  val physics: PhysicsComponent = require(classOf[PhysicsComponent])
   physics.position = position
-  physics.universe = universe
-  physics.copy = universe => new Player(physics.position, universe).create()
-  physics.destroy = destroy
-  physics.draw = () =>
+
+  val gameObject: GameObject = require(classOf[GameObject])
+  gameObject.universe = universe
+  gameObject.copy = universe => new Player(physics.position, universe).create()
+  gameObject.destroy = destroy
+  gameObject.draw = () =>
     PlayerSprite.draw(Transformation.create(physics.position, 0, 1), WHITE)
 
   private var carrying: List[Quball] = List()

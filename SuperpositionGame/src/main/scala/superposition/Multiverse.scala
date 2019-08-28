@@ -58,7 +58,7 @@ private class Multiverse extends Entity {
    */
   def step(): Unit = {
     val selected = Behavior.track(classOf[Qubit]).asScala
-      .filter(_.physics.position.sub(Input.mouse()).length() < 0.5)
+      .filter(_.gameObject.physics.position.sub(Input.mouse()).length() < 0.5)
       .map(_.id)
       .toSet
     for ((key, gate) <- GateKeys) {

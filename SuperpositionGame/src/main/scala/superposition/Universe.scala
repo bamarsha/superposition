@@ -11,8 +11,9 @@ import scala.jdk.CollectionConverters._
 /**
  * A game universe.
  *
- * Universes contain objects in a particular (definite) state that can interact with each other, but not with objects
- * from other universes. It corresponds to a basis vector with a particular amplitude (coefficient) in a quantum state.
+ * Universes contain game objects in a particular (definite) state that can interact with each other, but not with game
+ * objects from other universes. It corresponds to a basis vector with a particular amplitude (coefficient) in a quantum
+ * state.
  *
  * The index of each quball in the vector must correspond to its qubit number.
  *
@@ -25,13 +26,13 @@ private class Universe extends Entity {
    */
   var amplitude: Complex = Complex(1)
 
-  override def onDestroy(): Unit = objects.foreach(_.destroy())
+  override def onDestroy(): Unit = gameObjects.foreach(_.destroy())
 
-  private def objects: Iterable[Physics] =
-    Behavior.track(classOf[Physics]).asScala.filter(_.universe eq this)
+  private def gameObjects: Iterable[GameObject] =
+    Behavior.track(classOf[GameObject]).asScala.filter(_.universe eq this)
 
   def qubits: Iterable[Qubit] =
-    Behavior.track(classOf[Qubit]).asScala.filter(_.physics.universe eq this)
+    Behavior.track(classOf[Qubit]).asScala.filter(_.gameObject.universe eq this)
 
   def qubit(id: Int): Qubit = qubits.find(_.id == id).get
 
@@ -48,13 +49,13 @@ private class Universe extends Entity {
   }
 
   /**
-   * Creates a copy of this universe and all of its objects.
+   * Creates a copy of this universe and all of its game objects.
    *
    * @return a copy of this universe
    */
   def copy(): Universe = {
     val universe = new Universe()
-    objects.foreach(_.copy(universe))
+    gameObjects.foreach(_.copy(universe))
     universe.amplitude = amplitude
     universe
   }
@@ -62,5 +63,5 @@ private class Universe extends Entity {
   /**
    * Draws this universe.
    */
-  def draw(): Unit = objects.foreach(_.draw())
+  def draw(): Unit = gameObjects.foreach(_.draw())
 }
