@@ -29,7 +29,6 @@ object Superposition {
     new FPSBehavior().create()
     new QuitOnEscapeBehavior().create()
     new Multiverse().create()
-    new Player().create()
 
     Game.run()
   }

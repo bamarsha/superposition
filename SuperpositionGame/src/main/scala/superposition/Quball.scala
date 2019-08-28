@@ -21,16 +21,25 @@ private object Quball {
  * @param position the initial position of this quball
  * @param on the initial state of this quball
  */
-private class Quball(val qubit: Int, position: Vec2d, var on: Boolean = false) extends Entity {
+private class Quball(id: Int, on: Boolean, position: Vec2d, universe: Universe) extends Entity {
   import Quball._
-
-  Behavior.track(classOf[Quball])
 
   /**
    * This quball's physics component.
    */
-  val physics: PhysicsComponent = require(classOf[PhysicsComponent])
+  val physics: Physics = require(classOf[Physics])
   physics.position = position
+  physics.universe = universe
+  physics.copy = universe => new Quball(qubit.id, qubit.on, physics.position, universe).create()
+  physics.destroy = destroy
+  physics.draw = () => {
+    val color = if (qubit.on) WHITE else BLACK
+    QuballSprite.draw(Transformation.create(physics.position, 0, 1), color)
+  }
+
+  val qubit: Qubit = require(classOf[Qubit])
+  qubit.id = id
+  qubit.on = on
 
   override protected def onCreate(): Unit =
     physics.collider = PhysicsComponent.wallCollider(new Vec2d(1, 1), List(
@@ -43,26 +52,5 @@ private class Quball(val qubit: Int, position: Vec2d, var on: Boolean = false) e
   /**
    * Flips this quball between the on and off states.
    */
-  def flip(): Unit = on = !on
-
-  /**
-   * Draws this quball.
-   */
-  def draw(): Unit = {
-    val color = if (on) WHITE else BLACK
-    QuballSprite.draw(Transformation.create(physics.position, 0, 1), color)
-  }
-
-  /**
-   * Creates a copy of this quball.
-   *
-   * @return a copy of this quball
-   */
-  def copy(): Quball = {
-    val quball = new Quball(qubit, physics.position, on)
-    quball.physics.velocity = physics.velocity
-    quball.physics.collider = physics.collider
-    quball.physics.hitWall = physics.hitWall
-    quball
-  }
+  def flip(): Unit = qubit.on = !qubit.on
 }

@@ -2,7 +2,7 @@ package superposition
 
 import engine.core.Behavior.Entity
 import engine.core.Game.dt
-import engine.core.Input
+import engine.core.{Behavior, Input}
 import engine.graphics.Camera
 import engine.graphics.Camera.Camera2d
 import engine.graphics.opengl.{Framebuffer, Shader, Texture}
@@ -11,6 +11,8 @@ import engine.util.math.{Transformation, Vec2d}
 import org.lwjgl.glfw.GLFW._
 
 import scala.math.{Pi, sqrt}
+
+import scala.jdk.CollectionConverters._
 
 private object Multiverse {
   private object Gate extends Enumeration {
@@ -37,7 +39,7 @@ private object Multiverse {
 private class Multiverse extends Entity {
   import Multiverse._
 
-  private var universes: List[Universe] = List(new Universe(NumObjects))
+  private var universes: List[Universe] = List(new Universe())
   private var frameBuffer: Framebuffer = _
   private var colorBuffer: Texture = _
   private var time: Double = 0
@@ -45,17 +47,19 @@ private class Multiverse extends Entity {
   override protected def onCreate(): Unit = {
     frameBuffer = new Framebuffer()
     colorBuffer = frameBuffer.attachColorBuffer()
-    universes.foreach(_.create())
+    for (u <- universes) {
+      u.create(NumObjects)
+      new Player(new Vec2d(0, 0), u).create()
+    }
   }
 
   /**
    * Steps time forward for the multiverse.
    */
   def step(): Unit = {
-    val selected = universes
-      .flatMap(_.quballs)
+    val selected = Behavior.track(classOf[Qubit]).asScala
       .filter(_.physics.position.sub(Input.mouse()).length() < 0.5)
-      .map(_.qubit)
+      .map(_.id)
       .toSet
     for ((key, gate) <- GateKeys) {
       if (Input.keyJustPressed(key)) {
@@ -68,25 +72,25 @@ private class Multiverse extends Entity {
   }
 
   private def applyGate(gate: Gate.Value, target: Int, controls: Int*): Unit = {
-    for (u <- universes.filter(u => controls.forall(u.quballs(_).on))) {
+    for (u <- universes.filter(u => controls.forall(u.qubit(_).on))) {
       gate match {
-        case Gate.X => u.quballs(target).flip()
+        case Gate.X => u.qubit(target).flip()
         case Gate.Z =>
-          if (u.quballs(target).on) {
+          if (u.qubit(target).on) {
             u.amplitude *= Complex(-1)
           }
         case Gate.T =>
-          if (u.quballs(target).on) {
+          if (u.qubit(target).on) {
             u.amplitude *= Complex.polar(1, Pi / 4)
           }
         case Gate.H =>
           u.amplitude /= Complex(sqrt(2))
           val copy = u.copy()
           copy.create()
-          if (u.quballs(target).on) {
+          if (u.qubit(target).on) {
             u.amplitude *= Complex(-1)
           }
-          copy.quballs(target).flip()
+          copy.qubit(target).flip()
           universes = copy :: universes
       }
     }

@@ -33,13 +33,19 @@ private object Player {
 /**
  * The player character in the game.
  */
-private class Player extends Entity {
+private class Player(position: Vec2d, universe: Universe) extends Entity {
   import Player._
 
   /**
    * This player's physics component.
    */
-  val physics: PhysicsComponent = require(classOf[PhysicsComponent])
+  val physics: Physics = require(classOf[Physics])
+  physics.position = position
+  physics.universe = universe
+  physics.copy = universe => new Player(physics.position, universe).create()
+  physics.destroy = destroy
+  physics.draw = () =>
+    PlayerSprite.draw(Transformation.create(physics.position, 0, 1), WHITE)
 
   private var carrying: List[Quball] = List()
 
@@ -63,7 +69,6 @@ private class Player extends Entity {
       quball.physics.position = physics.position
       quball.physics.velocity = physics.velocity
     }
-    draw()
   }
 
   private def toggleCarrying(): Unit = {
@@ -78,7 +83,4 @@ private class Player extends Entity {
       carrying = List()
     }
   }
-
-  private def draw(): Unit =
-    PlayerSprite.draw(Transformation.create(physics.position, 0, 1), WHITE)
 }
