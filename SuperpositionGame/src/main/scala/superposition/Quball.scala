@@ -31,7 +31,7 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
 
   val gameObject: GameObject = require(classOf[GameObject])
   gameObject.universe = universe
-  gameObject.copy = copy
+  gameObject.copyTo = copyTo
   gameObject.draw = draw
 
   val qubit: Qubit = require(classOf[Qubit])
@@ -51,7 +51,7 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
    */
   def flip(): Unit = qubit.flip()
 
-  private def copy(universe: Universe): Unit =
+  private def copyTo(universe: Universe): Unit =
     new Quball(universe, qubit.id, qubit.on, physics.position).create()
 
   private def draw(): Unit = {

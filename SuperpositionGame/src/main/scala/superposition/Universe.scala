@@ -58,7 +58,7 @@ private class Universe extends Entity {
    */
   def copy(): Universe = {
     val universe = new Universe()
-    gameObjects.foreach(_.copy(universe))
+    gameObjects.foreach(_.copyTo(universe))
     universe.amplitude = amplitude
     universe
   }
