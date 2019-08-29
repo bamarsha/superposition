@@ -35,10 +35,10 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
     ).asJavaCollection
   )
 
-  private val gameObject: GameObject = require(classOf[GameObject])
-  gameObject.universe = universe
-  gameObject.copyTo = copyTo
-  gameObject.draw = draw
+  private val universeObject: UniverseObject = require(classOf[UniverseObject])
+  universeObject.universe = universe
+  universeObject.copyTo = copyTo
+  universeObject.draw = draw
 
   private val qubit: Qubit = require(classOf[Qubit])
   qubit.id = id

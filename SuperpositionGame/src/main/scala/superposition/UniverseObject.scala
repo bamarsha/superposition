@@ -5,10 +5,10 @@ import engine.core.Behavior.Component
 import extras.physics.PhysicsComponent
 
 /**
- * A game object is any physical object that exists within a particular universe.
+ * A universe object is any object that exists within a particular universe.
  */
-private class GameObject extends Component {
-  Behavior.track(classOf[GameObject])
+private class UniverseObject extends Component {
+  Behavior.track(classOf[UniverseObject])
 
   /**
    * The physics component of this game object.

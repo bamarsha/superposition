@@ -10,9 +10,9 @@ private class Qubit extends Component {
   Behavior.track(classOf[Qubit])
 
   /**
-   * The game object for this qubit.
+   * The universe object for this qubit.
    */
-  val gameObject: GameObject = require(classOf[GameObject])
+  val universeObject: UniverseObject = require(classOf[UniverseObject])
 
   /**
    * The index of this qubit.
@@ -24,7 +24,7 @@ private class Qubit extends Component {
    */
   var on: Boolean = _
 
-  override protected def onCreate(): Unit = gameObject.universe.add(this)
+  override protected def onCreate(): Unit = universeObject.universe.add(this)
 
   /**
    * Flips this qubit between the on and off states.

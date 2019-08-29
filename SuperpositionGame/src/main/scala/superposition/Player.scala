@@ -48,12 +48,12 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
     ).asJavaCollection
   )
 
-  private val gameObject: GameObject = require(classOf[GameObject])
-  gameObject.universe = universe
-  gameObject.copyTo = copyTo
-  gameObject.draw = draw
+  private val universeObject: UniverseObject = require(classOf[UniverseObject])
+  universeObject.universe = universe
+  universeObject.copyTo = copyTo
+  universeObject.draw = draw
 
-  private var carrying: Option[GameObject] = None
+  private var carrying: Option[UniverseObject] = None
 
   /**
    * Steps time forward for this player.
@@ -63,15 +63,15 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
     if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
       toggleCarrying()
     }
-    for (gameObject <- carrying) {
-      gameObject.physics.position = physics.position
-      gameObject.physics.velocity = physics.velocity
+    for (universeObject <- carrying) {
+      universeObject.physics.position = physics.position
+      universeObject.physics.velocity = physics.velocity
     }
   }
 
   private def toggleCarrying(): Unit =
     if (carrying.isEmpty)
-      carrying = gameObject.universe.gameObjects.find(
+      carrying = universeObject.universe.objects.find(
         o => o.entity != this && o.physics.position.sub(physics.position).length() < 0.5
       )
     else

@@ -9,9 +9,8 @@ import scala.math.pow
 /**
  * A game universe.
  *
- * Universes contain game objects in a particular (definite) state that can interact with each other, but not with game
- * objects from other universes. It corresponds to a basis vector with a particular amplitude (coefficient) in a quantum
- * state.
+ * Universes contain objects in a particular (definite) state that can interact with each other, but not with objects
+ * from other universes. It corresponds to a basis vector with a particular amplitude (coefficient) in a quantum state.
  */
 private class Universe extends Entity {
   /**
@@ -19,16 +18,16 @@ private class Universe extends Entity {
    */
   var amplitude: Complex = Complex(1)
 
-  private var _gameObjects: Set[GameObject] = new HashSet[GameObject]()
+  private var _objects: Set[UniverseObject] = new HashSet[UniverseObject]()
 
   private var _qubits: Map[Int, Qubit] = new HashMap[Int, Qubit]()
 
-  override protected def onDestroy(): Unit = gameObjects.foreach(_.entity.destroy())
+  override protected def onDestroy(): Unit = objects.foreach(_.entity.destroy())
 
   /**
-   * The game objects in this universe.
+   * The objects in this universe.
    */
-  def gameObjects: Set[GameObject] = _gameObjects
+  def objects: Set[UniverseObject] = _objects
 
   /**
    * The qubits in this universe.
@@ -54,11 +53,11 @@ private class Universe extends Entity {
   }
 
   /**
-   * Adds the game object to this universe.
+   * Adds the object to this universe.
    *
-   * @param gameObject the game object to add
+   * @param universeObject the object to add
    */
-  def add(gameObject: GameObject): Unit = _gameObjects += gameObject
+  def add(universeObject: UniverseObject): Unit = _objects += universeObject
 
   /**
    * Adds the qubit to this universe.
@@ -68,13 +67,13 @@ private class Universe extends Entity {
   def add(qubit: Qubit): Unit = _qubits += (qubit.id -> qubit)
 
   /**
-   * Creates a copy of this universe and all of its game objects.
+   * Creates a copy of this universe and all of its objects.
    *
    * @return a copy of this universe
    */
   def copy(): Universe = {
     val universe = new Universe()
-    gameObjects.foreach(_.copyTo(universe))
+    objects.foreach(_.copyTo(universe))
     universe.amplitude = amplitude
     universe
   }
@@ -82,5 +81,5 @@ private class Universe extends Entity {
   /**
    * Draws this universe.
    */
-  def draw(): Unit = gameObjects.foreach(_.draw())
+  def draw(): Unit = objects.foreach(_.draw())
 }
