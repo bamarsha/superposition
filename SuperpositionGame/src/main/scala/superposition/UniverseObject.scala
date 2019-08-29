@@ -1,6 +1,5 @@
 package superposition
 
-import engine.core.Behavior
 import engine.core.Behavior.Component
 import extras.physics.PhysicsComponent
 
@@ -8,8 +7,6 @@ import extras.physics.PhysicsComponent
  * A universe object is any object that exists within a particular universe.
  */
 private class UniverseObject extends Component {
-  Behavior.track(classOf[UniverseObject])
-
   /**
    * The physics component of this game object.
    */
