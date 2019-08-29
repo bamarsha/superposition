@@ -1,12 +1,10 @@
 package superposition
 
-import engine.core.Behavior
 import engine.core.Behavior.Entity
 import engine.util.math.Vec2d
 
+import scala.collection.immutable.{HashMap, HashSet}
 import scala.math.pow
-
-import scala.jdk.CollectionConverters._
 
 /**
  * A game universe.
@@ -26,27 +24,32 @@ private class Universe extends Entity {
    */
   var amplitude: Complex = Complex(1)
 
-  override def onDestroy(): Unit = gameObjects.foreach(_.entity.destroy())
+  private var _gameObjects: Set[GameObject] = new HashSet[GameObject]()
 
-  private def gameObjects: Iterable[GameObject] =
-    Behavior.track(classOf[GameObject]).asScala.filter(_.universe eq this)
+  private var _qubits: Map[Int, Qubit] = new HashMap[Int, Qubit]()
 
-  def qubits: Iterable[Qubit] =
-    Behavior.track(classOf[Qubit]).asScala.filter(_.gameObject.universe eq this)
+  def gameObjects: Set[GameObject] = _gameObjects
 
-  def qubit(id: Int): Qubit = qubits.find(_.id == id).get
+  def qubits: Map[Int, Qubit] = _qubits
+
+  override protected def onDestroy(): Unit = gameObjects.foreach(_.entity.destroy())
 
   /**
    * The state of this universe, given by Σ,,i,, q,,i,, · 2^i^, where q,,i,, is the state of the ith qubit.
    */
   def state: Int =
-    qubits.map(q => if (q.on) pow(2, q.id).toInt else 0).sum
+    qubits.values.map(q => if (q.on) pow(2, q.id).toInt else 0).sum
 
   def create(size: Int): Unit = {
     for (i <- 0 until size) {
-      new Quball(i, false, new Vec2d(1 + i, 1), this).create()
+      new Quball(this, i, false, new Vec2d(1 + i, 1)).create()
     }
+    new Player(this, new Vec2d(0, 0)).create()
   }
+
+  def add(gameObject: GameObject): Unit = _gameObjects += gameObject
+
+  def add(qubit: Qubit): Unit = _qubits += (qubit.id -> qubit)
 
   /**
    * Creates a copy of this universe and all of its game objects.

@@ -14,4 +14,6 @@ private class GameObject extends Component {
   var copy: Universe => Unit = _
 
   var draw: () => Unit = _
+
+  override protected def onCreate(): Unit = universe.add(this)
 }

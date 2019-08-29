@@ -33,7 +33,7 @@ private object Player {
 /**
  * The player character in the game.
  */
-private class Player(position: Vec2d, universe: Universe) extends Entity {
+private class Player(universe: Universe, position: Vec2d) extends Entity {
   import Player._
 
   /**
@@ -44,7 +44,7 @@ private class Player(position: Vec2d, universe: Universe) extends Entity {
 
   val gameObject: GameObject = require(classOf[GameObject])
   gameObject.universe = universe
-  gameObject.copy = universe => new Player(physics.position, universe).create()
+  gameObject.copy = universe => new Player(universe, physics.position).create()
   gameObject.draw = () =>
     PlayerSprite.draw(Transformation.create(physics.position, 0, 1), WHITE)
 

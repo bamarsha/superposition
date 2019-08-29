@@ -26,7 +26,6 @@ private object Multiverse {
     (GLFW_KEY_H, Gate.H)
   )
 
-  private val NumObjects: Int = 2
   private val UniverseShader: Shader = Shader.load(classOf[Multiverse].getResource(_), "shaders/universe")
 }
 
@@ -47,10 +46,7 @@ private class Multiverse extends Entity {
   override protected def onCreate(): Unit = {
     frameBuffer = new Framebuffer()
     colorBuffer = frameBuffer.attachColorBuffer()
-    for (u <- universes) {
-      u.create(NumObjects)
-      new Player(new Vec2d(0, 0), u).create()
-    }
+    universes.foreach(_.create(2))
   }
 
   /**
@@ -72,25 +68,25 @@ private class Multiverse extends Entity {
   }
 
   private def applyGate(gate: Gate.Value, target: Int, controls: Int*): Unit = {
-    for (u <- universes.filter(u => controls.forall(u.qubit(_).on))) {
+    for (u <- universes.filter(u => controls.forall(u.qubits(_).on))) {
       gate match {
-        case Gate.X => u.qubit(target).flip()
+        case Gate.X => u.qubits(target).flip()
         case Gate.Z =>
-          if (u.qubit(target).on) {
+          if (u.qubits(target).on) {
             u.amplitude *= Complex(-1)
           }
         case Gate.T =>
-          if (u.qubit(target).on) {
+          if (u.qubits(target).on) {
             u.amplitude *= Complex.polar(1, Pi / 4)
           }
         case Gate.H =>
           u.amplitude /= Complex(sqrt(2))
           val copy = u.copy()
           copy.create()
-          if (u.qubit(target).on) {
+          if (u.qubits(target).on) {
             u.amplitude *= Complex(-1)
           }
-          copy.qubit(target).flip()
+          copy.qubits(target).flip()
           universes = copy :: universes
       }
     }

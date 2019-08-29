@@ -1,6 +1,5 @@
 package superposition
 
-import engine.core.Behavior
 import engine.core.Behavior.Entity
 import engine.graphics.sprites.Sprite
 import engine.util.Color.{BLACK, WHITE}
@@ -21,7 +20,7 @@ private object Quball {
  * @param position the initial position of this quball
  * @param on the initial state of this quball
  */
-private class Quball(id: Int, on: Boolean, position: Vec2d, universe: Universe) extends Entity {
+private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) extends Entity {
   import Quball._
 
   /**
@@ -32,7 +31,7 @@ private class Quball(id: Int, on: Boolean, position: Vec2d, universe: Universe) 
 
   val gameObject: GameObject = require(classOf[GameObject])
   gameObject.universe = universe
-  gameObject.copy = universe => new Quball(qubit.id, qubit.on, physics.position, universe).create()
+  gameObject.copy = universe => new Quball(universe, qubit.id, qubit.on, physics.position).create()
   gameObject.draw = () => {
     val color = if (qubit.on) WHITE else BLACK
     QuballSprite.draw(Transformation.create(physics.position, 0, 1), color)
