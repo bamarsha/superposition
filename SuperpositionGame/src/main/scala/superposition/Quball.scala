@@ -31,11 +31,8 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
 
   val gameObject: GameObject = require(classOf[GameObject])
   gameObject.universe = universe
-  gameObject.copy = universe => new Quball(universe, qubit.id, qubit.on, physics.position).create()
-  gameObject.draw = () => {
-    val color = if (qubit.on) WHITE else BLACK
-    QuballSprite.draw(Transformation.create(physics.position, 0, 1), color)
-  }
+  gameObject.copy = copy
+  gameObject.draw = draw
 
   val qubit: Qubit = require(classOf[Qubit])
   qubit.id = id
@@ -53,4 +50,12 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
    * Flips this quball between the on and off states.
    */
   def flip(): Unit = qubit.on = !qubit.on
+
+  private def copy(universe: Universe): Unit =
+    new Quball(universe, qubit.id, qubit.on, physics.position).create()
+
+  private def draw(): Unit = {
+    val color = if (qubit.on) WHITE else BLACK
+    QuballSprite.draw(Transformation.create(physics.position, 0, 1), color)
+  }
 }

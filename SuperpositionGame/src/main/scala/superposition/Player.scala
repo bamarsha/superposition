@@ -44,9 +44,8 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
 
   val gameObject: GameObject = require(classOf[GameObject])
   gameObject.universe = universe
-  gameObject.copy = universe => new Player(universe, physics.position).create()
-  gameObject.draw = () =>
-    PlayerSprite.draw(Transformation.create(physics.position, 0, 1), WHITE)
+  gameObject.copy = copy
+  gameObject.draw = draw
 
   private var carrying: List[Quball] = List()
 
@@ -84,4 +83,10 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
       carrying = List()
     }
   }
+
+  private def copy(universe: Universe): Unit =
+    new Player(universe, physics.position).create()
+
+  private def draw(): Unit =
+    PlayerSprite.draw(Transformation.create(physics.position, 0, 1), WHITE)
 }
