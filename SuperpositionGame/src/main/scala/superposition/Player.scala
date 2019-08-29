@@ -1,12 +1,12 @@
 package superposition
 
 import engine.core.Behavior.Entity
-import engine.core.{Behavior, Input}
+import engine.core.Input
 import engine.graphics.sprites.Sprite
 import engine.util.Color.WHITE
 import engine.util.math.{Transformation, Vec2d}
 import extras.physics.{PhysicsComponent, Rectangle}
-import org.lwjgl.glfw.GLFW.{GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_S, GLFW_KEY_SPACE, GLFW_KEY_W}
+import org.lwjgl.glfw.GLFW._
 
 import scala.jdk.CollectionConverters._
 
@@ -56,7 +56,7 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
   gameObject.copyTo = copyTo
   gameObject.draw = draw
 
-  private var carrying: List[Quball] = List()
+  private var carrying: Option[GameObject] = None
 
   /**
    * Steps time forward for this player.
@@ -66,24 +66,19 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
     if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
       toggleCarrying()
     }
-    for (quball <- carrying) {
-      quball.physics.position = physics.position
-      quball.physics.velocity = physics.velocity
+    for (gameObject <- carrying) {
+      gameObject.physics.position = physics.position
+      gameObject.physics.velocity = physics.velocity
     }
   }
 
-  private def toggleCarrying(): Unit = {
-    if (carrying.isEmpty) {
-      val nearby = Behavior
-        .track(classOf[Quball])
-        .asScala
-        .filter(_.physics.position.sub(physics.position).length() < 0.5)
-        .groupBy(_.qubit)
-      carrying = if (nearby.isEmpty) List() else nearby.head._2.toList
-    } else {
-      carrying = List()
-    }
-  }
+  private def toggleCarrying(): Unit =
+    if (carrying.isEmpty)
+      carrying = gameObject.universe.gameObjects.find(
+        o => o.entity != this && o.physics.position.sub(physics.position).length() < 0.5
+      )
+    else
+      carrying = None
 
   private def copyTo(universe: Universe): Unit =
     new Player(universe, physics.position).create()
