@@ -36,10 +36,7 @@ private object Player {
 private class Player(universe: Universe, position: Vec2d) extends Entity {
   import Player._
 
-  /**
-   * This player's physics component.
-   */
-  val physics: PhysicsComponent = require(classOf[PhysicsComponent])
+  private val physics: PhysicsComponent = require(classOf[PhysicsComponent])
   physics.position = position
   physics.collider = PhysicsComponent.wallCollider(
     new Vec2d(1, 1),
@@ -51,7 +48,7 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
     ).asJavaCollection
   )
 
-  val gameObject: GameObject = require(classOf[GameObject])
+  private val gameObject: GameObject = require(classOf[GameObject])
   gameObject.universe = universe
   gameObject.copyTo = copyTo
   gameObject.draw = draw

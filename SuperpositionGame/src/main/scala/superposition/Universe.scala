@@ -12,11 +12,6 @@ import scala.math.pow
  * Universes contain game objects in a particular (definite) state that can interact with each other, but not with game
  * objects from other universes. It corresponds to a basis vector with a particular amplitude (coefficient) in a quantum
  * state.
- *
- * The index of each quball in the vector must correspond to its qubit number.
- *
- * @param quballs the quballs in this universe
- * @throws IllegalArgumentException if quball indices do not match qubit numbers
  */
 private class Universe extends Entity {
   /**
@@ -28,11 +23,17 @@ private class Universe extends Entity {
 
   private var _qubits: Map[Int, Qubit] = new HashMap[Int, Qubit]()
 
+  override protected def onDestroy(): Unit = gameObjects.foreach(_.entity.destroy())
+
+  /**
+   * The game objects in this universe.
+   */
   def gameObjects: Set[GameObject] = _gameObjects
 
+  /**
+   * The qubits in this universe.
+   */
   def qubits: Map[Int, Qubit] = _qubits
-
-  override protected def onDestroy(): Unit = gameObjects.foreach(_.entity.destroy())
 
   /**
    * The state of this universe, given by Σ,,i,, q,,i,, · 2^i^, where q,,i,, is the state of the ith qubit.
@@ -40,6 +41,11 @@ private class Universe extends Entity {
   def state: Int =
     qubits.values.map(q => if (q.on) pow(2, q.id).toInt else 0).sum
 
+  /**
+   * Creates this universe with the player and quballs in their starting positions.
+   *
+   * @param size the number of quballs to create
+   */
   def create(size: Int): Unit = {
     for (i <- 0 until size) {
       new Quball(this, i, false, new Vec2d(1 + i, 1)).create()
@@ -47,8 +53,18 @@ private class Universe extends Entity {
     new Player(this, new Vec2d(0, 0)).create()
   }
 
+  /**
+   * Adds the game object to this universe.
+   *
+   * @param gameObject the game object to add
+   */
   def add(gameObject: GameObject): Unit = _gameObjects += gameObject
 
+  /**
+   * Adds the qubit to this universe.
+   *
+   * @param qubit the qubit to add
+   */
   def add(qubit: Qubit): Unit = _qubits += (qubit.id -> qubit)
 
   /**

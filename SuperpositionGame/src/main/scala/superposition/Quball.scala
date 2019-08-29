@@ -13,20 +13,17 @@ private object Quball {
 }
 
 /**
- * A quball is a physical object that has a classical bit in each universe, but corresponds to a single qubit in the
- * multiverse.
+ * A quball is the most basic physical representation of a qubit.
  *
- * @param qubit the qubit number corresponding to this quball
- * @param position the initial position of this quball
+ * @param universe the universe this quball belongs to
+ * @param id the qubit number corresponding to this quball
  * @param on the initial state of this quball
+ * @param position the initial position of this quball
  */
 private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) extends Entity {
   import Quball._
 
-  /**
-   * This quball's physics component.
-   */
-  val physics: PhysicsComponent = require(classOf[PhysicsComponent])
+  private val physics: PhysicsComponent = require(classOf[PhysicsComponent])
   physics.position = position
   physics.collider = PhysicsComponent.wallCollider(
     new Vec2d(1, 1),
@@ -38,19 +35,14 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
     ).asJavaCollection
   )
 
-  val gameObject: GameObject = require(classOf[GameObject])
+  private val gameObject: GameObject = require(classOf[GameObject])
   gameObject.universe = universe
   gameObject.copyTo = copyTo
   gameObject.draw = draw
 
-  val qubit: Qubit = require(classOf[Qubit])
+  private val qubit: Qubit = require(classOf[Qubit])
   qubit.id = id
   qubit.on = on
-
-  /**
-   * Flips this quball between the on and off states.
-   */
-  def flip(): Unit = qubit.flip()
 
   private def copyTo(universe: Universe): Unit =
     new Quball(universe, qubit.id, qubit.on, physics.position).create()
