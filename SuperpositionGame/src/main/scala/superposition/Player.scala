@@ -41,6 +41,15 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
    */
   val physics: PhysicsComponent = require(classOf[PhysicsComponent])
   physics.position = position
+  physics.collider = PhysicsComponent.wallCollider(
+    new Vec2d(1, 1),
+    List(
+      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(-8, 4.5)),
+      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(8, -4.5)),
+      new Rectangle(new Vec2d(-8, 4.5), new Vec2d(8, 4.5)),
+      new Rectangle(new Vec2d(8, -4.5), new Vec2d(8, 4.5))
+    ).asJavaCollection
+  )
 
   val gameObject: GameObject = require(classOf[GameObject])
   gameObject.universe = universe
@@ -48,14 +57,6 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
   gameObject.draw = draw
 
   private var carrying: List[Quball] = List()
-
-  override protected def onCreate(): Unit =
-    physics.collider = PhysicsComponent.wallCollider(new Vec2d(1, 1), List(
-      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(-8, 4.5)),
-      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(8, -4.5)),
-      new Rectangle(new Vec2d(-8, 4.5), new Vec2d(8, 4.5)),
-      new Rectangle(new Vec2d(8, -4.5), new Vec2d(8, 4.5))
-    ).asJavaCollection)
 
   /**
    * Steps time forward for this player.

@@ -28,6 +28,15 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
    */
   val physics: PhysicsComponent = require(classOf[PhysicsComponent])
   physics.position = position
+  physics.collider = PhysicsComponent.wallCollider(
+    new Vec2d(1, 1),
+    List(
+      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(-8, 4.5)),
+      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(8, -4.5)),
+      new Rectangle(new Vec2d(-8, 4.5), new Vec2d(8, 4.5)),
+      new Rectangle(new Vec2d(8, -4.5), new Vec2d(8, 4.5))
+    ).asJavaCollection
+  )
 
   val gameObject: GameObject = require(classOf[GameObject])
   gameObject.universe = universe
@@ -37,14 +46,6 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
   val qubit: Qubit = require(classOf[Qubit])
   qubit.id = id
   qubit.on = on
-
-  override protected def onCreate(): Unit =
-    physics.collider = PhysicsComponent.wallCollider(new Vec2d(1, 1), List(
-      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(-8, 4.5)),
-      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(8, -4.5)),
-      new Rectangle(new Vec2d(-8, 4.5), new Vec2d(8, 4.5)),
-      new Rectangle(new Vec2d(8, -4.5), new Vec2d(8, 4.5))
-    ).asJavaCollection)
 
   /**
    * Flips this quball between the on and off states.
