@@ -49,7 +49,7 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
   /**
    * Flips this quball between the on and off states.
    */
-  def flip(): Unit = qubit.on = !qubit.on
+  def flip(): Unit = qubit.flip()
 
   private def copy(universe: Universe): Unit =
     new Quball(universe, qubit.id, qubit.on, physics.position).create()
