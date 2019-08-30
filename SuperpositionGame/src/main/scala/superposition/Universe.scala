@@ -73,8 +73,12 @@ private class Universe extends Entity {
    */
   def copy(): Universe = {
     val universe = new Universe()
-    objects.foreach(_.copyTo(universe))
     universe.amplitude = amplitude
+    val copies = HashMap.from(objects.map(o => o -> o.copyTo(universe)))
+    for (o <- copies.values) {
+      o.onCopyFinished(copies)
+      o.entity.create()
+    }
     universe
   }
 

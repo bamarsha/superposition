@@ -44,8 +44,8 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
   qubit.id = id
   qubit.on = on
 
-  private def copyTo(universe: Universe): Unit =
-    new Quball(universe, qubit.id, qubit.on, physics.position).create()
+  private def copyTo(universe: Universe): UniverseObject =
+    new Quball(universe, qubit.id, qubit.on, physics.position).universeObject
 
   private def draw(): Unit = {
     val color = if (qubit.on) WHITE else BLACK

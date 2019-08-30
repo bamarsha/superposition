@@ -5,25 +5,35 @@ import extras.physics.PhysicsComponent
 
 /**
  * A universe object is any object that exists within a particular universe.
+ *
+ * When an entity with the universe object component is created, it is automatically added to its universe's list of
+ * objects.
  */
 private class UniverseObject extends Component {
   /**
-   * The physics component of this game object.
+   * The physics component of this object.
    */
   val physics: PhysicsComponent = require(classOf[PhysicsComponent])
 
   /**
-   * The universe this game object belongs to.
+   * The universe this object belongs to.
    */
   var universe: Universe = _
 
   /**
-   * Copies this game object to another universe.
+   * Copies this object's entity to another universe. Returns the universe object component of the new entity.
    */
-  var copyTo: Universe => Unit = _
+  var copyTo: Universe => UniverseObject = _
 
   /**
-   * Draws this game object.
+   * Called after this object's entity has been copied to a new universe with a map from all objects in the old universe
+   * to the corresponding objects in the new universe.
+   */
+  //noinspection ScalaUnnecessaryParentheses
+  var onCopyFinished: Map[UniverseObject, UniverseObject] => Unit = (_ => ())
+
+  /**
+   * Draws this object.
    */
   var draw: () => Unit = _
 

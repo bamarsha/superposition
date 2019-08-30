@@ -51,6 +51,7 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
   private val universeObject: UniverseObject = require(classOf[UniverseObject])
   universeObject.universe = universe
   universeObject.copyTo = copyTo
+  universeObject.onCopyFinished = onCopyFinished
   universeObject.draw = draw
 
   private var carrying: Option[UniverseObject] = None
@@ -77,8 +78,14 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
     else
       carrying = None
 
-  private def copyTo(universe: Universe): Unit =
-    new Player(universe, physics.position).create()
+  private def copyTo(universe: Universe): UniverseObject = {
+    val player = new Player(universe, physics.position)
+    player.carrying = carrying
+    player.universeObject
+  }
+
+  private def onCopyFinished(copies: Map[UniverseObject, UniverseObject]): Unit =
+    carrying = carrying.map(copies(_))
 
   private def draw(): Unit =
     PlayerSprite.draw(Transformation.create(physics.position, 0, 1), WHITE)
