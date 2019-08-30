@@ -81,9 +81,4 @@ private class Universe extends Entity {
     }
     universe
   }
-
-  /**
-   * Draws this universe.
-   */
-  def draw(): Unit = objects.foreach(_.draw())
 }

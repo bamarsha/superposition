@@ -4,7 +4,7 @@ import engine.core.Behavior.Entity
 import engine.core.Input
 import engine.graphics.sprites.Sprite
 import engine.util.Color.WHITE
-import engine.util.math.{Transformation, Vec2d}
+import engine.util.math.Vec2d
 import extras.physics.{PhysicsComponent, Rectangle}
 import org.lwjgl.glfw.GLFW._
 
@@ -19,8 +19,6 @@ private object Player {
     (GLFW_KEY_S, new Vec2d(0, -1)),
     (GLFW_KEY_D, new Vec2d(1, 0))
   )
-
-  private val PlayerSprite: Sprite = Sprite.load(getClass.getResource("sprites/cat.png"))
 
   private def walkVelocity(): Vec2d = {
     val direction = WalkKeys.foldLeft(new Vec2d(0, 0)) {
@@ -50,9 +48,10 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
 
   private val universeObject: UniverseObject = require(classOf[UniverseObject])
   universeObject.universe = universe
+  universeObject.sprite = Sprite.load(getClass.getResource("sprites/cat.png"))
+  universeObject.color = WHITE
   universeObject.copyTo = copyTo
   universeObject.onCopyFinished = onCopyFinished
-  universeObject.draw = draw
 
   private var carrying: Option[UniverseObject] = None
 
@@ -86,7 +85,4 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
 
   private def onCopyFinished(copies: Map[UniverseObject, UniverseObject]): Unit =
     carrying = carrying.map(copies(_))
-
-  private def draw(): Unit =
-    PlayerSprite.draw(Transformation.create(physics.position, 0, 1), WHITE)
 }

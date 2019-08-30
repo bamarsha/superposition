@@ -8,10 +8,6 @@ import extras.physics.{PhysicsComponent, Rectangle}
 
 import scala.jdk.CollectionConverters._
 
-private object Quball {
-  private val QuballSprite: Sprite = Sprite.load(getClass.getResource("sprites/ball.png"))
-}
-
 /**
  * A quball is the most basic physical representation of a qubit.
  *
@@ -21,8 +17,6 @@ private object Quball {
  * @param position the initial position of this quball
  */
 private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) extends Entity {
-  import Quball._
-
   private val physics: PhysicsComponent = require(classOf[PhysicsComponent])
   physics.position = position
   physics.collider = PhysicsComponent.wallCollider(
@@ -37,8 +31,8 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
 
   private val universeObject: UniverseObject = require(classOf[UniverseObject])
   universeObject.universe = universe
+  universeObject.sprite = Sprite.load(getClass.getResource("sprites/ball.png"))
   universeObject.copyTo = copyTo
-  universeObject.draw = draw
 
   private val qubit: Qubit = require(classOf[Qubit])
   qubit.id = id
@@ -46,9 +40,4 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
 
   private def copyTo(universe: Universe): UniverseObject =
     new Quball(universe, qubit.id, qubit.on, physics.position).universeObject
-
-  private def draw(): Unit = {
-    val color = if (qubit.on) WHITE else BLACK
-    QuballSprite.draw(Transformation.create(physics.position, 0, 1), color)
-  }
 }
