@@ -1,21 +1,22 @@
 package extras.physics;
 
-import engine.core.Behavior;
+import engine.core.Behavior.Component;
+import engine.core.Behavior.Entity;
 import engine.core.Game;
 import engine.util.math.Vec2d;
 
 import java.util.Collection;
 import java.util.function.Predicate;
 
-public class PhysicsComponent extends Behavior.Component {
+public class PhysicsComponent extends Component<Entity> {
 
     static {
         Game.declareSystem(PhysicsComponent.class, PhysicsComponent::step);
     }
 
-    public Vec2d position = new Vec2d(0, 0);
-    public Vec2d velocity = new Vec2d(0, 0);
-    public Predicate<Vec2d> collider = v -> false;
+    public Vec2d position;
+    public Vec2d velocity;
+    public Predicate<Vec2d> collider;
     public boolean hitWall = false;
 
     public static Predicate<Vec2d> wallCollider(Vec2d hitboxSize, Collection<Rectangle> walls) {
@@ -25,8 +26,11 @@ public class PhysicsComponent extends Behavior.Component {
         };
     }
 
-    public PhysicsComponent(Entity entity) {
+    public PhysicsComponent(Entity entity, Vec2d position, Vec2d velocity, Predicate<Vec2d> collider) {
         super(entity);
+        this.position = position;
+        this.velocity = velocity;
+        this.collider = collider;
     }
 
     private void moveToWall(Vec2d dir) {

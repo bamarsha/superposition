@@ -8,16 +8,29 @@ import engine.graphics.Camera.Camera2d
 import engine.graphics.opengl.{Framebuffer, Shader, Texture}
 import engine.util.Color.CLEAR
 import engine.util.math.{Transformation, Vec2d}
+import extras.physics.Rectangle
 import org.lwjgl.glfw.GLFW._
 
 import scala.math.{Pi, sqrt}
-
 import scala.jdk.CollectionConverters._
 
+/**
+ * Contains settings and static data for the multiverse.
+ */
 private object Multiverse {
   private object Gate extends Enumeration {
     val X, Z, T, H = Value
   }
+
+  /**
+   * The list of walls in the multiverse.
+   */
+  val walls: List[Rectangle] = List(
+    new Rectangle(new Vec2d(-8, -4.5), new Vec2d(-8, 4.5)),
+    new Rectangle(new Vec2d(-8, -4.5), new Vec2d(8, -4.5)),
+    new Rectangle(new Vec2d(-8, 4.5), new Vec2d(8, 4.5)),
+    new Rectangle(new Vec2d(8, -4.5), new Vec2d(8, 4.5))
+  )
 
   private val GateKeys: List[(Int, Gate.Value)] = List(
     (GLFW_KEY_X, Gate.X),

@@ -5,7 +5,7 @@ import engine.core.Input
 import engine.graphics.sprites.Sprite
 import engine.util.Color.WHITE
 import engine.util.math.Vec2d
-import extras.physics.{PhysicsComponent, Rectangle}
+import extras.physics.PhysicsComponent
 import org.lwjgl.glfw.GLFW._
 
 import scala.jdk.CollectionConverters._
@@ -38,17 +38,12 @@ private object Player {
 private class Player(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Player] {
   import Player._
 
-  private val physics: PhysicsComponent = addComponent(new PhysicsComponent(this))
-  physics.position = position
-  physics.collider = PhysicsComponent.wallCollider(
-    new Vec2d(1, 1),
-    List(
-      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(-8, 4.5)),
-      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(8, -4.5)),
-      new Rectangle(new Vec2d(-8, 4.5), new Vec2d(8, 4.5)),
-      new Rectangle(new Vec2d(8, -4.5), new Vec2d(8, 4.5))
-    ).asJavaCollection
-  )
+  private val physics: PhysicsComponent = addComponent(new PhysicsComponent(
+    this,
+    position,
+    new Vec2d(0, 0),
+    PhysicsComponent.wallCollider(new Vec2d(1, 1), Multiverse.walls.asJavaCollection)
+  ))
 
   addComponent(new Drawable(
     entity = this,
