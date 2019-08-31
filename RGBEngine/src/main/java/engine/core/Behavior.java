@@ -1,28 +1,17 @@
 package engine.core;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 public abstract class Behavior {
 
-    private static final Map<Class<? extends Behavior>, Collection<Behavior>> TRACKED_BEHAVIORS = new HashMap();
-
-    public static <T extends Behavior> Collection<T> track(Class<T> c) {
-        if (!TRACKED_BEHAVIORS.containsKey(c)) {
-            TRACKED_BEHAVIORS.put(c, new HashSet());
-        }
-        return (Collection) TRACKED_BEHAVIORS.get(c);
-    }
+    public abstract <T extends Component> T get(Class<T> c);
 
     protected void onCreate() {
     }
 
     protected void onDestroy() {
     }
-
-    public abstract <T extends Component> T getComponent(Class<T> c);
 
     public static class Component<E extends Entity> extends Behavior {
 
@@ -33,39 +22,27 @@ public abstract class Behavior {
         }
 
         @Override
-        public final <T extends Component> T getComponent(Class<T> c) {
-            return entity.getComponent(c);
+        public final <T extends Component> T get(Class<T> c) {
+            return entity.get(c);
         }
     }
 
     public static class Entity extends Behavior {
 
-        private final Map<Class<? extends Behavior>, Behavior> behaviors;
+        final Map<Class<? extends Behavior>, Behavior> behaviors;
 
         public Entity() {
-            behaviors = new HashMap();
+            behaviors = new HashMap<>();
             behaviors.put(getClass(), this);
         }
 
-        public final void create() {
-            for (var entry : behaviors.entrySet()) {
-                if (TRACKED_BEHAVIORS.containsKey(entry.getKey())) {
-                    TRACKED_BEHAVIORS.get(entry.getKey()).add(entry.getValue());
-                }
-                entry.getValue().onCreate();
+        protected final void addAll(Component... a) {
+            for (var c : a) {
+                add(c);
             }
         }
 
-        public final void destroy() {
-            for (var entry : behaviors.entrySet()) {
-                if (TRACKED_BEHAVIORS.containsKey(entry.getKey())) {
-                    TRACKED_BEHAVIORS.get(entry.getKey()).remove(entry.getValue());
-                }
-                entry.getValue().onDestroy();
-            }
-        }
-
-        protected final <T extends Component> T addComponent(T c) {
+        protected final <T extends Component> T add(T c) {
             if (behaviors.containsKey(c.getClass())) {
                 throw new IllegalStateException("Component already exists: " + c.getClass());
             }
@@ -74,11 +51,15 @@ public abstract class Behavior {
         }
 
         @Override
-        public final <T extends Component> T getComponent(Class<T> c) {
+        public final <T extends Component> T get(Class<T> c) {
             if (!behaviors.containsKey(c)) {
-                throw new IllegalStateException("Component not found: " + c);
+                throw new IllegalArgumentException("Component not found: " + c);
             }
             return (T) behaviors.get(c);
+        }
+
+        public final boolean hasComponent(Class<? extends Component> c) {
+            return behaviors.containsKey(c);
         }
     }
 }

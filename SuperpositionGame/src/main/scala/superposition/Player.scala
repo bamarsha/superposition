@@ -38,20 +38,20 @@ private object Player {
 private class Player(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Player] {
   import Player._
 
-  private val physics: PhysicsComponent = addComponent(new PhysicsComponent(
+  private val physics: PhysicsComponent = add(new PhysicsComponent(
     this,
     position,
     new Vec2d(0, 0),
     PhysicsComponent.wallCollider(new Vec2d(1, 1), Multiverse.walls.asJavaCollection)
   ))
 
-  addComponent(new Drawable(
+  add(new Drawable(
     entity = this,
     sprite = Sprite.load(getClass.getResource("sprites/cat.png")),
     color = WHITE
   ))
 
-  private val universeObject: UniverseObject = addComponent(new UniverseObject(this, universe, id))
+  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id))
 
   private var carrying: Option[UniversalId] = None
 

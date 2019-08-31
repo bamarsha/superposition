@@ -2,7 +2,7 @@ package superposition
 
 import engine.core.Behavior.Entity
 import engine.core.Game.dt
-import engine.core.{Behavior, Input}
+import engine.core.{Game, Input}
 import engine.graphics.Camera
 import engine.graphics.Camera.Camera2d
 import engine.graphics.opengl.{Framebuffer, Shader, Texture}
@@ -11,8 +11,8 @@ import engine.util.math.{Transformation, Vec2d}
 import extras.physics.Rectangle
 import org.lwjgl.glfw.GLFW._
 
-import scala.math.{Pi, sqrt}
 import scala.jdk.CollectionConverters._
+import scala.math.{Pi, sqrt}
 
 /**
  * Contains settings and static data for the multiverse.
@@ -66,7 +66,7 @@ private class Multiverse extends Entity {
    * Steps time forward for the multiverse.
    */
   def step(): Unit = {
-    val selected = Behavior.track(classOf[Qubit]).asScala
+    val selected = Game.track(classOf[Qubit]).asScala
       .filter(_.universeObject.physics.position.sub(Input.mouse()).length() < 0.5)
       .map(_.universeObject.id)
       .toSet
@@ -95,7 +95,7 @@ private class Multiverse extends Entity {
         case Gate.H =>
           u.amplitude /= Complex(sqrt(2))
           val copy = u.copy()
-          copy.create()
+          Game.create(copy)
           if (u.qubits(target).on) {
             u.amplitude *= Complex(-1)
           }
@@ -109,12 +109,12 @@ private class Multiverse extends Entity {
     val (combined, removed) = universes
       .groupMapReduce(_.state)(identity)((u1, u2) => {
         u2.amplitude += u1.amplitude
-        u1.destroy()
+        Game.destroy(u1)
         u2
       })
       .values
       .partition(_.amplitude.squaredMagnitude > 1e-6)
-    removed.foreach(_.destroy())
+    removed.foreach(Game.destroy)
     universes = combined.toList
   }
 

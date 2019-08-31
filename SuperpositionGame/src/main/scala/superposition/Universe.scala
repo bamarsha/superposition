@@ -1,6 +1,7 @@
 package superposition
 
 import engine.core.Behavior.Entity
+import engine.core.Game
 import engine.util.math.Vec2d
 
 import scala.collection.immutable.HashMap
@@ -22,7 +23,17 @@ private class Universe extends Entity {
 
   private var _qubits: Map[UniversalId, Qubit] = new HashMap[UniversalId, Qubit]()
 
-  override protected def onDestroy(): Unit = objects.values.foreach(_.entity.destroy())
+  /**
+   * Creates this universe with the player and quballs in their starting positions.
+   *
+   * @param size the number of quballs to create
+   */
+  def create(size: Int): Unit = {
+    for (i <- 0 until size) {
+      Game.create(new Quball(this, UniversalId(i), new Vec2d(1 + i, 1)))
+    }
+    Game.create(new Player(this, UniversalId(size), new Vec2d(0, 0)))
+  }
 
   /**
    * The objects in this universe.
@@ -41,15 +52,19 @@ private class Universe extends Entity {
     qubits.values.map(q => if (q.on) pow(2, q.universeObject.id.value).toInt else 0).sum
 
   /**
-   * Creates this universe with the player and quballs in their starting positions.
+   * Creates a copy of this universe and all of its objects.
    *
-   * @param size the number of quballs to create
+   * @return a copy of this universe
    */
-  def create(size: Int): Unit = {
-    for (i <- 0 until size) {
-      new Quball(this, UniversalId(i), new Vec2d(1 + i, 1)).create()
+  def copy(): Universe = {
+    val universe = new Universe()
+    universe.amplitude = amplitude
+    for (o <- objects.values) {
+      val copy = o.entity.copy()
+      copy.get(classOf[UniverseObject]).universe = universe
+      Game.create(copy)
     }
-    new Player(this, UniversalId(size), new Vec2d(0, 0)).create()
+    universe
   }
 
   /**
@@ -72,19 +87,5 @@ private class Universe extends Entity {
     _qubits += (qubit.universeObject.id -> qubit)
   }
 
-  /**
-   * Creates a copy of this universe and all of its objects.
-   *
-   * @return a copy of this universe
-   */
-  def copy(): Universe = {
-    val universe = new Universe()
-    universe.amplitude = amplitude
-    for (o <- objects.values) {
-      val copy = o.entity.copy()
-      copy.getComponent(classOf[UniverseObject]).universe = universe
-      copy.create()
-    }
-    universe
-  }
+  override protected def onDestroy(): Unit = objects.values.foreach(uo => Game.destroy(uo.entity))
 }

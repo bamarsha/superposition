@@ -17,7 +17,7 @@ import extras.physics.PhysicsComponent
  * @param color the color of this entity's sprite
  */
 private class Drawable(entity: Entity, var sprite: Sprite, var color: Color) extends Component(entity) {
-  private val physics: PhysicsComponent = getComponent(classOf[PhysicsComponent])
+  private val physics: PhysicsComponent = get(classOf[PhysicsComponent])
 
   /**
    * Draws this entity.

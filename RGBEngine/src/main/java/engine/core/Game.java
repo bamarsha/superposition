@@ -1,14 +1,16 @@
 package engine.core;
 
-import static engine.core.Behavior.track;
 import engine.graphics.Window;
-import java.util.LinkedList;
-import java.util.List;
+
+import java.util.*;
 import java.util.function.Consumer;
+
+import static engine.core.Behavior.Entity;
 
 public abstract class Game {
 
-    private static final List<Runnable> SYSTEMS = new LinkedList();
+    private static final Map<Class<? extends Behavior>, Collection<Behavior>> BEHAVIORS = new HashMap<>();
+    private static final List<Runnable> SYSTEMS = new LinkedList<>();
 
     public static void declareSystem(Runnable r) {
         SYSTEMS.add(r);
@@ -18,9 +20,35 @@ public abstract class Game {
         var myBehaviors = track(c);
         declareSystem(() -> {
             for (var b : myBehaviors) {
-                func.accept((T) b);
+                func.accept(b);
             }
         });
+    }
+
+
+    public static void create(Entity e) {
+        for (var entry : e.behaviors.entrySet()) {
+            if (BEHAVIORS.containsKey(entry.getKey())) {
+                BEHAVIORS.get(entry.getKey()).add(entry.getValue());
+            }
+            entry.getValue().onCreate();
+        }
+    }
+
+    public static void destroy(Entity e) {
+        for (var entry : e.behaviors.entrySet()) {
+            if (BEHAVIORS.containsKey(entry.getKey())) {
+                BEHAVIORS.get(entry.getKey()).remove(entry.getValue());
+            }
+            entry.getValue().onDestroy();
+        }
+    }
+
+    public static <T extends Behavior> Collection<T> track(Class<T> c) {
+        if (!BEHAVIORS.containsKey(c)) {
+            BEHAVIORS.put(c, new HashSet<>());
+        }
+        return (Collection) BEHAVIORS.get(c);
     }
 
     private static long prevTime;

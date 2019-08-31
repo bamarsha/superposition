@@ -16,22 +16,22 @@ import scala.jdk.CollectionConverters._
  * @param position the initial position of this quball
  */
 private class Quball(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Quball] {
-  private val physics: PhysicsComponent = addComponent(new PhysicsComponent(
+  private val physics: PhysicsComponent = add(new PhysicsComponent(
     this,
     position,
     new Vec2d(0, 0),
     PhysicsComponent.wallCollider(new Vec2d(1, 1), Multiverse.walls.asJavaCollection)
   ))
 
-  addComponent(new Drawable(
+  add(new Drawable(
     entity = this,
     sprite = Sprite.load(getClass.getResource("sprites/ball.png")),
     color = Color.WHITE
   ))
 
-  private val universeObject: UniverseObject = addComponent(new UniverseObject(this, universe, id))
+  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id))
 
-  private val qubit: Qubit = addComponent(new Qubit(this))
+  private val qubit: Qubit = add(new Qubit(this))
 
   override def copy(): Quball = {
     val quball = new Quball(universeObject.universe, universeObject.id, physics.position)

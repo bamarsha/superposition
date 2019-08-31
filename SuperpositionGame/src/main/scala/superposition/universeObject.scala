@@ -29,12 +29,12 @@ private class UniverseObject(entity: Entity with Copyable[_ <: Entity],
   /**
    * The physics component of this object.
    */
-  val physics: PhysicsComponent = getComponent(classOf[PhysicsComponent])
+  val physics: PhysicsComponent = get(classOf[PhysicsComponent])
 
   /**
    * The drawable component of this object.
    */
-  val drawable: Drawable = getComponent(classOf[Drawable])
+  val drawable: Drawable = get(classOf[Drawable])
 
   override protected def onCreate(): Unit = universe.add(this)
 }

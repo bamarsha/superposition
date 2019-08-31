@@ -26,9 +26,9 @@ object Superposition {
 
     Camera.camera2d.setCenterSize(new Vec2d(0, 0), new Vec2d(16, 9))
 
-    new FPSBehavior().create()
-    new QuitOnEscapeBehavior().create()
-    new Multiverse().create()
+    Game.create(new FPSBehavior())
+    Game.create(new QuitOnEscapeBehavior())
+    Game.create(new Multiverse())
 
     Game.run()
   }
