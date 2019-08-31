@@ -34,7 +34,7 @@ private class Quball(universe: Universe, id: UniversalId, position: Vec2d) exten
     color = Color.WHITE
   ))
 
-  private val universeObject: UniverseObject = addComponent(new UniverseObject(this, id, universe, copyTo))
+  private val universeObject: UniverseObject = addComponent(new UniverseObject(this, universe, id, copyTo))
 
   private val qubit: Qubit = addComponent(new Qubit(this))
 

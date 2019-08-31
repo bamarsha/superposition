@@ -56,7 +56,7 @@ private class Player(universe: Universe, id: UniversalId, position: Vec2d) exten
     color = WHITE
   ))
 
-  private val universeObject: UniverseObject = addComponent(new UniverseObject(this, id, universe, copyTo))
+  private val universeObject: UniverseObject = addComponent(new UniverseObject(this, universe, id, copyTo))
 
   private var carrying: Option[UniversalId] = None
 
