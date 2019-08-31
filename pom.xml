@@ -9,7 +9,6 @@
 
     <modules>
         <module>RGBEngine</module>
-        <module>Cookie</module>
         <module>SuperpositionGame</module>
     </modules>
 
