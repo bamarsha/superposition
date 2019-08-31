@@ -38,7 +38,7 @@ private object Player {
 private class Player(universe: Universe, id: UniversalId, position: Vec2d) extends Entity {
   import Player._
 
-  private val physics: PhysicsComponent = require(classOf[PhysicsComponent])
+  private val physics: PhysicsComponent = using(classOf[PhysicsComponent])
   physics.position = position
   physics.collider = PhysicsComponent.wallCollider(
     new Vec2d(1, 1),
@@ -50,11 +50,11 @@ private class Player(universe: Universe, id: UniversalId, position: Vec2d) exten
     ).asJavaCollection
   )
 
-  private val drawable: Drawable = require(classOf[Drawable])
+  private val drawable: Drawable = using(classOf[Drawable])
   drawable.sprite = Sprite.load(getClass.getResource("sprites/cat.png"))
   drawable.color = WHITE
 
-  private val universeObject: UniverseObject = require(classOf[UniverseObject])
+  private val universeObject: UniverseObject = using(classOf[UniverseObject])
   universeObject.id = id
   universeObject.universe = universe
   universeObject.copyTo = copyTo

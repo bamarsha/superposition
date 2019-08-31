@@ -20,12 +20,12 @@ private class UniverseObject extends Component {
   /**
    * The physics component of this object.
    */
-  val physics: PhysicsComponent = require(classOf[PhysicsComponent])
+  val physics: PhysicsComponent = using(classOf[PhysicsComponent])
 
   /**
    * The drawable component of this object.
    */
-  val drawable: Drawable = require(classOf[Drawable])
+  val drawable: Drawable = using(classOf[Drawable])
 
   /**
    * The ID of this object.

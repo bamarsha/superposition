@@ -23,7 +23,7 @@ public abstract class Behavior {
     protected void onDestroy() {
     }
 
-    protected abstract <T extends Component> T require(Class<T> c);
+    protected abstract <T extends Component> T using(Class<T> c);
 
     public static class Component extends Behavior {
 
@@ -39,8 +39,8 @@ public abstract class Behavior {
         }
 
         @Override
-        protected final <T extends Component> T require(Class<T> c) {
-            return entity.require(c);
+        protected final <T extends Component> T using(Class<T> c) {
+            return entity.using(c);
         }
     }
 
@@ -72,7 +72,7 @@ public abstract class Behavior {
         }
 
         @Override
-        protected final <T extends Component> T require(Class<T> c) {
+        protected final <T extends Component> T using(Class<T> c) {
             if (behaviors.containsKey(c)) {
                 return (T) behaviors.get(c);
             }

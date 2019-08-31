@@ -13,7 +13,7 @@ import extras.physics.PhysicsComponent
  * component to be drawn.
  */
 private class Drawable extends Component {
-  private val physics: PhysicsComponent = require(classOf[PhysicsComponent])
+  private val physics: PhysicsComponent = using(classOf[PhysicsComponent])
 
   /**
    * The sprite for this entity.

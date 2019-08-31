@@ -13,9 +13,9 @@ private class Qubit extends Component {
   /**
    * The universe object for this qubit.
    */
-  val universeObject: UniverseObject = require(classOf[UniverseObject])
+  val universeObject: UniverseObject = using(classOf[UniverseObject])
 
-  private val drawable: Drawable = require(classOf[Drawable])
+  private val drawable: Drawable = using(classOf[Drawable])
 
   private var _on: Boolean = _
 

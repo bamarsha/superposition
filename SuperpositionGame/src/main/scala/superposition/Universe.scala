@@ -58,7 +58,7 @@ private class Universe extends Entity {
    * @param universeObject the object to add
    */
   def add(universeObject: UniverseObject): Unit = {
-    scala.Predef.require(!objects.contains(universeObject.id), "ID has already been used")
+    require(!objects.contains(universeObject.id), "ID has already been used")
     _objects += (universeObject.id -> universeObject)
   }
 
@@ -68,7 +68,7 @@ private class Universe extends Entity {
    * @param qubit the qubit to add
    */
   def add(qubit: Qubit): Unit = {
-    scala.Predef.require(!qubits.contains(qubit.universeObject.id), "ID has already been used")
+    require(!qubits.contains(qubit.universeObject.id), "ID has already been used")
     _qubits += (qubit.universeObject.id -> qubit)
   }
 

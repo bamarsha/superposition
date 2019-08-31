@@ -16,7 +16,7 @@ import scala.jdk.CollectionConverters._
  * @param position the initial position of this quball
  */
 private class Quball(universe: Universe, id: UniversalId, on: Boolean, position: Vec2d) extends Entity {
-  private val physics: PhysicsComponent = require(classOf[PhysicsComponent])
+  private val physics: PhysicsComponent = using(classOf[PhysicsComponent])
   physics.position = position
   physics.collider = PhysicsComponent.wallCollider(
     new Vec2d(1, 1),
@@ -28,15 +28,15 @@ private class Quball(universe: Universe, id: UniversalId, on: Boolean, position:
     ).asJavaCollection
   )
 
-  private val drawable: Drawable = require(classOf[Drawable])
+  private val drawable: Drawable = using(classOf[Drawable])
   drawable.sprite = Sprite.load(getClass.getResource("sprites/ball.png"))
 
-  private val universeObject: UniverseObject = require(classOf[UniverseObject])
+  private val universeObject: UniverseObject = using(classOf[UniverseObject])
   universeObject.id = id
   universeObject.universe = universe
   universeObject.copyTo = copyTo
 
-  private val qubit: Qubit = require(classOf[Qubit])
+  private val qubit: Qubit = using(classOf[Qubit])
   qubit.on = on
 
   private def copyTo(universe: Universe): Entity = {
