@@ -35,7 +35,7 @@ private object Player {
  * @param id the universe object ID for this player
  * @param position the initial position for this player
  */
-private class Player(universe: Universe, id: UniversalId, position: Vec2d) extends Entity {
+private class Player(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Player] {
   import Player._
 
   private val physics: PhysicsComponent = addComponent(new PhysicsComponent(this))
@@ -56,7 +56,7 @@ private class Player(universe: Universe, id: UniversalId, position: Vec2d) exten
     color = WHITE
   ))
 
-  private val universeObject: UniverseObject = addComponent(new UniverseObject(this, universe, id, copyTo))
+  private val universeObject: UniverseObject = addComponent(new UniverseObject(this, universe, id))
 
   private var carrying: Option[UniversalId] = None
 
@@ -69,21 +69,21 @@ private class Player(universe: Universe, id: UniversalId, position: Vec2d) exten
       toggleCarrying()
     }
     for (id <- carrying) {
-      universe.objects(id).physics.position = physics.position
-      universe.objects(id).physics.velocity = physics.velocity
+      universeObject.universe.objects(id).physics.position = physics.position
+      universeObject.universe.objects(id).physics.velocity = physics.velocity
     }
   }
 
   private def toggleCarrying(): Unit =
     if (carrying.isEmpty)
-      carrying = universe.objects.values
+      carrying = universeObject.universe.objects.values
         .find(o => o.entity != this && o.physics.position.sub(physics.position).length() < 0.5)
         .map(_.id)
     else
       carrying = None
 
-  private def copyTo(universe: Universe): Entity = {
-    val player = new Player(universe, universeObject.id, physics.position)
+  override def copy(): Player = {
+    val player = new Player(universeObject.universe, universeObject.id, physics.position)
     player.carrying = carrying
     player
   }

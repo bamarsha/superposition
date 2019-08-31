@@ -22,12 +22,10 @@ private case class UniversalId(value: Int) extends AnyVal
  * @param entity the entity for this component
  * @param universe the universe this object belongs to
  * @param id the ID of this object
- * @param copyTo copies this object's entity to another universe and returns the new entity
  */
-private class UniverseObject(entity: Entity,
-                             val universe: Universe,
-                             val id: UniversalId,
-                             val copyTo: Universe => Entity) extends Component(entity) {
+private class UniverseObject(entity: Entity with Copyable[_ <: Entity],
+                             var universe: Universe,
+                             val id: UniversalId) extends Component(entity) {
   /**
    * The physics component of this object.
    */

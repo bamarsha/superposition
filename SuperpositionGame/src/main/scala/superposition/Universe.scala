@@ -80,7 +80,11 @@ private class Universe extends Entity {
   def copy(): Universe = {
     val universe = new Universe()
     universe.amplitude = amplitude
-    objects.values.foreach(_.copyTo(universe).create())
+    for (o <- objects.values) {
+      val copy = o.entity.copy()
+      copy.getComponent(classOf[UniverseObject]).universe = universe
+      copy.create()
+    }
     universe
   }
 }

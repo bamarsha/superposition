@@ -22,18 +22,18 @@ public abstract class Behavior {
     protected void onDestroy() {
     }
 
-    protected abstract <T extends Component> T getComponent(Class<T> c);
+    public abstract <T extends Component> T getComponent(Class<T> c);
 
-    public static class Component extends Behavior {
+    public static class Component<E extends Entity> extends Behavior {
 
-        public final Entity entity;
+        public final E entity;
 
-        public Component(Entity entity) {
+        public Component(E entity) {
             this.entity = entity;
         }
 
         @Override
-        protected final <T extends Component> T getComponent(Class<T> c) {
+        public final <T extends Component> T getComponent(Class<T> c) {
             return entity.getComponent(c);
         }
     }
@@ -74,7 +74,7 @@ public abstract class Behavior {
         }
 
         @Override
-        protected final <T extends Component> T getComponent(Class<T> c) {
+        public final <T extends Component> T getComponent(Class<T> c) {
             if (!behaviors.containsKey(c)) {
                 throw new IllegalStateException("Component not found: " + c);
             }

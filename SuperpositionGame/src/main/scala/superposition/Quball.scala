@@ -15,7 +15,7 @@ import scala.jdk.CollectionConverters._
  * @param id the universe object ID for this quball
  * @param position the initial position of this quball
  */
-private class Quball(universe: Universe, id: UniversalId, position: Vec2d) extends Entity {
+private class Quball(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Quball] {
   private val physics: PhysicsComponent = addComponent(new PhysicsComponent(this))
   physics.position = position
   physics.collider = PhysicsComponent.wallCollider(
@@ -34,12 +34,12 @@ private class Quball(universe: Universe, id: UniversalId, position: Vec2d) exten
     color = Color.WHITE
   ))
 
-  private val universeObject: UniverseObject = addComponent(new UniverseObject(this, universe, id, copyTo))
+  private val universeObject: UniverseObject = addComponent(new UniverseObject(this, universe, id))
 
   private val qubit: Qubit = addComponent(new Qubit(this))
 
-  private def copyTo(universe: Universe): Entity = {
-    val quball = new Quball(universe, universeObject.id, physics.position)
+  override def copy(): Quball = {
+    val quball = new Quball(universeObject.universe, universeObject.id, physics.position)
     quball.qubit.on = qubit.on
     quball.physics.velocity = physics.velocity
     quball
