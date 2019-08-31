@@ -36,8 +36,8 @@ public class GameOfLife {
     public static void main(String[] args) {
         Game.init();
 
-        new FPSBehavior().create();
-        new QuitOnEscapeBehavior().create();
+        Game.create(new FPSBehavior());
+        Game.create(new QuitOnEscapeBehavior());
 
         Game.declareSystem(() -> {
             double dx = 0, dy = 0;
