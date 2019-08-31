@@ -3,7 +3,7 @@ package superposition
 import engine.core.Behavior.Entity
 import engine.util.math.Vec2d
 
-import scala.collection.immutable.{HashMap, HashSet}
+import scala.collection.immutable.HashMap
 import scala.math.pow
 
 /**
@@ -18,27 +18,27 @@ private class Universe extends Entity {
    */
   var amplitude: Complex = Complex(1)
 
-  private var _objects: Set[UniverseObject] = new HashSet[UniverseObject]()
+  private var _objects: Map[UniversalId, UniverseObject] = new HashMap[UniversalId, UniverseObject]()
 
-  private var _qubits: Map[Int, Qubit] = new HashMap[Int, Qubit]()
+  private var _qubits: Map[UniversalId, Qubit] = new HashMap[UniversalId, Qubit]()
 
-  override protected def onDestroy(): Unit = objects.foreach(_.entity.destroy())
+  override protected def onDestroy(): Unit = objects.values.foreach(_.entity.destroy())
 
   /**
    * The objects in this universe.
    */
-  def objects: Set[UniverseObject] = _objects
+  def objects: Map[UniversalId, UniverseObject] = _objects
 
   /**
    * The qubits in this universe.
    */
-  def qubits: Map[Int, Qubit] = _qubits
+  def qubits: Map[UniversalId, Qubit] = _qubits
 
   /**
    * The state of this universe, given by Σ,,i,, q,,i,, · 2^i^, where q,,i,, is the state of the ith qubit.
    */
   def state: Int =
-    qubits.values.map(q => if (q.on) pow(2, q.id).toInt else 0).sum
+    qubits.values.map(q => if (q.on) pow(2, q.universeObject.id.value).toInt else 0).sum
 
   /**
    * Creates this universe with the player and quballs in their starting positions.
@@ -47,9 +47,9 @@ private class Universe extends Entity {
    */
   def create(size: Int): Unit = {
     for (i <- 0 until size) {
-      new Quball(this, i, false, new Vec2d(1 + i, 1)).create()
+      new Quball(this, UniversalId(i), false, new Vec2d(1 + i, 1)).create()
     }
-    new Player(this, new Vec2d(0, 0)).create()
+    new Player(this, UniversalId(size), new Vec2d(0, 0)).create()
   }
 
   /**
@@ -57,14 +57,20 @@ private class Universe extends Entity {
    *
    * @param universeObject the object to add
    */
-  def add(universeObject: UniverseObject): Unit = _objects += universeObject
+  def add(universeObject: UniverseObject): Unit = {
+    scala.Predef.require(!objects.contains(universeObject.id), "ID has already been used")
+    _objects += (universeObject.id -> universeObject)
+  }
 
   /**
    * Adds the qubit to this universe.
    *
    * @param qubit the qubit to add
    */
-  def add(qubit: Qubit): Unit = _qubits += (qubit.id -> qubit)
+  def add(qubit: Qubit): Unit = {
+    scala.Predef.require(!qubits.contains(qubit.universeObject.id), "ID has already been used")
+    _qubits += (qubit.universeObject.id -> qubit)
+  }
 
   /**
    * Creates a copy of this universe and all of its objects.
@@ -74,11 +80,7 @@ private class Universe extends Entity {
   def copy(): Universe = {
     val universe = new Universe()
     universe.amplitude = amplitude
-    val copies = HashMap.from(objects.map(o => o -> o.copyTo(universe)))
-    for (o <- copies.values) {
-      o.onCopyFinished(copies)
-      o.entity.create()
-    }
+    objects.values.foreach(_.copyTo(universe).create())
     universe
   }
 }

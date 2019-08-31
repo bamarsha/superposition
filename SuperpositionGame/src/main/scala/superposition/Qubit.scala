@@ -15,11 +15,6 @@ private class Qubit extends Component {
    */
   val universeObject: UniverseObject = require(classOf[UniverseObject])
 
-  /**
-   * The index of this qubit.
-   */
-  var id: Int = _
-
   private val drawable: Drawable = require(classOf[Drawable])
 
   private var _on: Boolean = _

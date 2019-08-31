@@ -30,8 +30,12 @@ private object Player {
 
 /**
  * The player character in the game.
+ *
+ * @param universe the universe this player belongs to
+ * @param id the universe object ID for this player
+ * @param position the initial position for this player
  */
-private class Player(universe: Universe, position: Vec2d) extends Entity {
+private class Player(universe: Universe, id: UniversalId, position: Vec2d) extends Entity {
   import Player._
 
   private val physics: PhysicsComponent = require(classOf[PhysicsComponent])
@@ -51,11 +55,11 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
   drawable.color = WHITE
 
   private val universeObject: UniverseObject = require(classOf[UniverseObject])
+  universeObject.id = id
   universeObject.universe = universe
   universeObject.copyTo = copyTo
-  universeObject.onCopyFinished = onCopyFinished
 
-  private var carrying: Option[UniverseObject] = None
+  private var carrying: Option[UniversalId] = None
 
   /**
    * Steps time forward for this player.
@@ -65,26 +69,23 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
     if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
       toggleCarrying()
     }
-    for (universeObject <- carrying) {
-      universeObject.physics.position = physics.position
-      universeObject.physics.velocity = physics.velocity
+    for (id <- carrying) {
+      universe.objects(id).physics.position = physics.position
+      universe.objects(id).physics.velocity = physics.velocity
     }
   }
 
   private def toggleCarrying(): Unit =
     if (carrying.isEmpty)
-      carrying = universeObject.universe.objects.find(
-        o => o.entity != this && o.physics.position.sub(physics.position).length() < 0.5
-      )
+      carrying = universeObject.universe.objects.values
+        .find(o => o.entity != this && o.physics.position.sub(physics.position).length() < 0.5)
+        .map(_.id)
     else
       carrying = None
 
-  private def copyTo(universe: Universe): UniverseObject = {
-    val player = new Player(universe, physics.position)
+  private def copyTo(universe: Universe): Entity = {
+    val player = new Player(universe, universeObject.id, physics.position)
     player.carrying = carrying
-    player.universeObject
+    player
   }
-
-  private def onCopyFinished(copies: Map[UniverseObject, UniverseObject]): Unit =
-    carrying = carrying.map(copies(_))
 }

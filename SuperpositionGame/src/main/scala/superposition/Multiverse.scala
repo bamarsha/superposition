@@ -55,7 +55,7 @@ private class Multiverse extends Entity {
   def step(): Unit = {
     val selected = Behavior.track(classOf[Qubit]).asScala
       .filter(_.universeObject.physics.position.sub(Input.mouse()).length() < 0.5)
-      .map(_.id)
+      .map(_.universeObject.id)
       .toSet
     for ((key, gate) <- GateKeys) {
       if (Input.keyJustPressed(key)) {
@@ -67,7 +67,7 @@ private class Multiverse extends Entity {
     draw()
   }
 
-  private def applyGate(gate: Gate.Value, target: Int, controls: Int*): Unit = {
+  private def applyGate(gate: Gate.Value, target: UniversalId, controls: UniversalId*): Unit = {
     for (u <- universes.filter(u => controls.forall(u.qubits(_).on))) {
       gate match {
         case Gate.X => u.qubits(target).flip()
@@ -121,7 +121,7 @@ private class Multiverse extends Entity {
       val maxValue = minValue + u.amplitude.squaredMagnitude
 
       frameBuffer.clear(CLEAR)
-      u.objects.foreach(_.drawable.draw())
+      u.objects.values.foreach(_.drawable.draw())
 
       val camera = new Camera2d()
       camera.lowerLeft = new Vec2d(-1, -1)

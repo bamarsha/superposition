@@ -11,11 +11,11 @@ import scala.jdk.CollectionConverters._
  * A quball is the most basic physical representation of a qubit.
  *
  * @param universe the universe this quball belongs to
- * @param id the qubit number corresponding to this quball
+ * @param id the universe object ID for this quball
  * @param on the initial state of this quball
  * @param position the initial position of this quball
  */
-private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) extends Entity {
+private class Quball(universe: Universe, id: UniversalId, on: Boolean, position: Vec2d) extends Entity {
   private val physics: PhysicsComponent = require(classOf[PhysicsComponent])
   physics.position = position
   physics.collider = PhysicsComponent.wallCollider(
@@ -32,13 +32,13 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
   drawable.sprite = Sprite.load(getClass.getResource("sprites/ball.png"))
 
   private val universeObject: UniverseObject = require(classOf[UniverseObject])
+  universeObject.id = id
   universeObject.universe = universe
   universeObject.copyTo = copyTo
 
   private val qubit: Qubit = require(classOf[Qubit])
-  qubit.id = id
   qubit.on = on
 
-  private def copyTo(universe: Universe): UniverseObject =
-    new Quball(universe, qubit.id, qubit.on, physics.position).universeObject
+  private def copyTo(universe: Universe): Entity =
+    new Quball(universe, qubit.universeObject.id, qubit.on, physics.position)
 }
