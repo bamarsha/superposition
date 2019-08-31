@@ -2,8 +2,7 @@ package superposition
 
 import engine.core.Behavior.Entity
 import engine.graphics.sprites.Sprite
-import engine.util.Color.{BLACK, WHITE}
-import engine.util.math.{Transformation, Vec2d}
+import engine.util.math.Vec2d
 import extras.physics.{PhysicsComponent, Rectangle}
 
 import scala.jdk.CollectionConverters._
@@ -29,9 +28,11 @@ private class Quball(universe: Universe, id: Int, on: Boolean, position: Vec2d) 
     ).asJavaCollection
   )
 
+  private val drawable: Drawable = require(classOf[Drawable])
+  drawable.sprite = Sprite.load(getClass.getResource("sprites/ball.png"))
+
   private val universeObject: UniverseObject = require(classOf[UniverseObject])
   universeObject.universe = universe
-  universeObject.sprite = Sprite.load(getClass.getResource("sprites/ball.png"))
   universeObject.copyTo = copyTo
 
   private val qubit: Qubit = require(classOf[Qubit])

@@ -46,10 +46,12 @@ private class Player(universe: Universe, position: Vec2d) extends Entity {
     ).asJavaCollection
   )
 
+  private val drawable: Drawable = require(classOf[Drawable])
+  drawable.sprite = Sprite.load(getClass.getResource("sprites/cat.png"))
+  drawable.color = WHITE
+
   private val universeObject: UniverseObject = require(classOf[UniverseObject])
   universeObject.universe = universe
-  universeObject.sprite = Sprite.load(getClass.getResource("sprites/cat.png"))
-  universeObject.color = WHITE
   universeObject.copyTo = copyTo
   universeObject.onCopyFinished = onCopyFinished
 

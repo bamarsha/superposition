@@ -20,9 +20,14 @@ private class Qubit extends Component {
    */
   var id: Int = _
 
+  private val drawable: Drawable = require(classOf[Drawable])
+
   private var _on: Boolean = _
 
-  override protected def onCreate(): Unit = universeObject.universe.add(this)
+  override protected def onCreate(): Unit = {
+    drawable.color = if (on) WHITE else BLACK
+    universeObject.universe.add(this)
+  }
 
   /**
    * Whether this qubit is in the on or off state.
@@ -31,7 +36,7 @@ private class Qubit extends Component {
 
   def on_=(value: Boolean): Unit = {
     _on = value
-    universeObject.color = if (value) WHITE else BLACK
+    drawable.color = if (value) WHITE else BLACK
   }
 
   /**

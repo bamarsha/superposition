@@ -121,7 +121,7 @@ private class Multiverse extends Entity {
       val maxValue = minValue + u.amplitude.squaredMagnitude
 
       frameBuffer.clear(CLEAR)
-      u.objects.foreach(_.draw())
+      u.objects.foreach(_.drawable.draw())
 
       val camera = new Camera2d()
       camera.lowerLeft = new Vec2d(-1, -1)

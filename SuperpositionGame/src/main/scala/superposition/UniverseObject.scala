@@ -1,9 +1,6 @@
 package superposition
 
 import engine.core.Behavior.Component
-import engine.graphics.sprites.Sprite
-import engine.util.Color
-import engine.util.math.Transformation
 import extras.physics.PhysicsComponent
 
 /**
@@ -19,19 +16,14 @@ private class UniverseObject extends Component {
   val physics: PhysicsComponent = require(classOf[PhysicsComponent])
 
   /**
+   * The drawable component of this object.
+   */
+  val drawable: Drawable = require(classOf[Drawable])
+
+  /**
    * The universe this object belongs to.
    */
   var universe: Universe = _
-
-  /**
-   * The sprite for this object.
-   */
-  var sprite: Sprite = _
-
-  /**
-   * The color of this object.
-   */
-  var color: Color = _
 
   /**
    * Copies this object's entity to another universe. Returns the universe object component of the new entity.
@@ -46,11 +38,4 @@ private class UniverseObject extends Component {
   var onCopyFinished: Map[UniverseObject, UniverseObject] => Unit = (_ => ())
 
   override protected def onCreate(): Unit = universe.add(this)
-
-  /**
-   * Draws this object.
-   */
-  def draw(): Unit = {
-    sprite.draw(Transformation.create(physics.position, 0, 1), color)
-  }
 }
