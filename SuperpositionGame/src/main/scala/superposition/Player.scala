@@ -38,7 +38,7 @@ private object Player {
 private class Player(universe: Universe, id: UniversalId, position: Vec2d) extends Entity {
   import Player._
 
-  private val physics: PhysicsComponent = using(classOf[PhysicsComponent])
+  private val physics: PhysicsComponent = addComponent(new PhysicsComponent(this))
   physics.position = position
   physics.collider = PhysicsComponent.wallCollider(
     new Vec2d(1, 1),
@@ -50,14 +50,13 @@ private class Player(universe: Universe, id: UniversalId, position: Vec2d) exten
     ).asJavaCollection
   )
 
-  private val drawable: Drawable = using(classOf[Drawable])
-  drawable.sprite = Sprite.load(getClass.getResource("sprites/cat.png"))
-  drawable.color = WHITE
+  addComponent(new Drawable(
+    entity = this,
+    sprite = Sprite.load(getClass.getResource("sprites/cat.png")),
+    color = WHITE
+  ))
 
-  private val universeObject: UniverseObject = using(classOf[UniverseObject])
-  universeObject.id = id
-  universeObject.universe = universe
-  universeObject.copyTo = copyTo
+  private val universeObject: UniverseObject = addComponent(new UniverseObject(this, id, universe, copyTo))
 
   private var carrying: Option[UniversalId] = None
 
@@ -77,7 +76,7 @@ private class Player(universe: Universe, id: UniversalId, position: Vec2d) exten
 
   private def toggleCarrying(): Unit =
     if (carrying.isEmpty)
-      carrying = universeObject.universe.objects.values
+      carrying = universe.objects.values
         .find(o => o.entity != this && o.physics.position.sub(physics.position).length() < 0.5)
         .map(_.id)
     else

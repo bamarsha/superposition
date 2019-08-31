@@ -1,6 +1,5 @@
 package engine.core;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,24 +22,19 @@ public abstract class Behavior {
     protected void onDestroy() {
     }
 
-    protected abstract <T extends Component> T using(Class<T> c);
+    protected abstract <T extends Component> T getComponent(Class<T> c);
 
     public static class Component extends Behavior {
 
-        private static Entity currentEntity;
         public final Entity entity;
 
-        public Component() {
-            if (currentEntity == null) {
-                throw new RuntimeException("Components cannot be instantiated directly");
-            }
-            entity = currentEntity;
-            currentEntity = null;
+        public Component(Entity entity) {
+            this.entity = entity;
         }
 
         @Override
-        protected final <T extends Component> T using(Class<T> c) {
-            return entity.using(c);
+        protected final <T extends Component> T getComponent(Class<T> c) {
+            return entity.getComponent(c);
         }
     }
 
@@ -71,19 +65,20 @@ public abstract class Behavior {
             }
         }
 
+        protected final <T extends Component> T addComponent(T c) {
+            if (behaviors.containsKey(c.getClass())) {
+                throw new IllegalStateException("Component already exists: " + c.getClass());
+            }
+            behaviors.put(c.getClass(), c);
+            return c;
+        }
+
         @Override
-        protected final <T extends Component> T using(Class<T> c) {
-            if (behaviors.containsKey(c)) {
-                return (T) behaviors.get(c);
+        protected final <T extends Component> T getComponent(Class<T> c) {
+            if (!behaviors.containsKey(c)) {
+                throw new IllegalStateException("Component not found: " + c);
             }
-            try {
-                Component.currentEntity = this;
-                T newT = c.getConstructor().newInstance();
-                behaviors.put(c, newT);
-                return newT;
-            } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
-                throw new RuntimeException(ex);
-            }
+            return (T) behaviors.get(c);
         }
     }
 }

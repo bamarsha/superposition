@@ -47,7 +47,7 @@ private class Universe extends Entity {
    */
   def create(size: Int): Unit = {
     for (i <- 0 until size) {
-      new Quball(this, UniversalId(i), false, new Vec2d(1 + i, 1)).create()
+      new Quball(this, UniversalId(i), new Vec2d(1 + i, 1)).create()
     }
     new Player(this, UniversalId(size), new Vec2d(0, 0)).create()
   }

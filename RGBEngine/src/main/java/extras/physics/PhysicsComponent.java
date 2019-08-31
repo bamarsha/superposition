@@ -25,6 +25,10 @@ public class PhysicsComponent extends Behavior.Component {
         };
     }
 
+    public PhysicsComponent(Entity entity) {
+        super(entity);
+    }
+
     private void moveToWall(Vec2d dir) {
         for (var i = 1; i <= 10; i++) {
             var newPos = position.add(dir.mul(Math.pow(.5, i)));

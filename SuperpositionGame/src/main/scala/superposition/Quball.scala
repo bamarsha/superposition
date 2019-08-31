@@ -2,6 +2,7 @@ package superposition
 
 import engine.core.Behavior.Entity
 import engine.graphics.sprites.Sprite
+import engine.util.Color
 import engine.util.math.Vec2d
 import extras.physics.{PhysicsComponent, Rectangle}
 
@@ -12,11 +13,10 @@ import scala.jdk.CollectionConverters._
  *
  * @param universe the universe this quball belongs to
  * @param id the universe object ID for this quball
- * @param on the initial state of this quball
  * @param position the initial position of this quball
  */
-private class Quball(universe: Universe, id: UniversalId, on: Boolean, position: Vec2d) extends Entity {
-  private val physics: PhysicsComponent = using(classOf[PhysicsComponent])
+private class Quball(universe: Universe, id: UniversalId, position: Vec2d) extends Entity {
+  private val physics: PhysicsComponent = addComponent(new PhysicsComponent(this))
   physics.position = position
   physics.collider = PhysicsComponent.wallCollider(
     new Vec2d(1, 1),
@@ -28,19 +28,19 @@ private class Quball(universe: Universe, id: UniversalId, on: Boolean, position:
     ).asJavaCollection
   )
 
-  private val drawable: Drawable = using(classOf[Drawable])
-  drawable.sprite = Sprite.load(getClass.getResource("sprites/ball.png"))
+  addComponent(new Drawable(
+    entity = this,
+    sprite = Sprite.load(getClass.getResource("sprites/ball.png")),
+    color = Color.WHITE
+  ))
 
-  private val universeObject: UniverseObject = using(classOf[UniverseObject])
-  universeObject.id = id
-  universeObject.universe = universe
-  universeObject.copyTo = copyTo
+  private val universeObject: UniverseObject = addComponent(new UniverseObject(this, id, universe, copyTo))
 
-  private val qubit: Qubit = using(classOf[Qubit])
-  qubit.on = on
+  private val qubit: Qubit = addComponent(new Qubit(this))
 
   private def copyTo(universe: Universe): Entity = {
-    val quball = new Quball(universe, qubit.universeObject.id, qubit.on, physics.position)
+    val quball = new Quball(universe, universeObject.id, physics.position)
+    quball.qubit.on = qubit.on
     quball.physics.velocity = physics.velocity
     quball
   }

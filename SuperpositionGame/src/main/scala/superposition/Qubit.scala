@@ -1,26 +1,26 @@
 package superposition
 
 import engine.core.Behavior
-import engine.core.Behavior.Component
+import engine.core.Behavior.{Component, Entity}
 import engine.util.Color.{BLACK, WHITE}
 
 /**
  * A qubit is any game object with a binary state.
  */
-private class Qubit extends Component {
+private class Qubit(entity: Entity) extends Component(entity) {
   Behavior.track(classOf[Qubit])
 
   /**
    * The universe object for this qubit.
    */
-  val universeObject: UniverseObject = using(classOf[UniverseObject])
+  val universeObject: UniverseObject = getComponent(classOf[UniverseObject])
 
-  private val drawable: Drawable = using(classOf[Drawable])
+  private val drawable: Drawable = getComponent(classOf[Drawable])
+  drawable.color = if (on) WHITE else BLACK
 
   private var _on: Boolean = _
 
   override protected def onCreate(): Unit = {
-    drawable.color = if (on) WHITE else BLACK
     universeObject.universe.add(this)
   }
 
