@@ -39,6 +39,9 @@ private class Quball(universe: Universe, id: UniversalId, on: Boolean, position:
   private val qubit: Qubit = require(classOf[Qubit])
   qubit.on = on
 
-  private def copyTo(universe: Universe): Entity =
-    new Quball(universe, qubit.universeObject.id, qubit.on, physics.position)
+  private def copyTo(universe: Universe): Entity = {
+    val quball = new Quball(universe, qubit.universeObject.id, qubit.on, physics.position)
+    quball.physics.velocity = physics.velocity
+    quball
+  }
 }
