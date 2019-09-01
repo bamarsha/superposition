@@ -29,7 +29,7 @@ object Superposition {
 
     Game.create(new FPSBehavior())
     Game.create(new QuitOnEscapeBehavior())
-    Game.create(new Multiverse(level1()))
+    Game.create(level1())
 
     Game.run()
   }

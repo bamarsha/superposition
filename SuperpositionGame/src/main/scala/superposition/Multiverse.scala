@@ -22,16 +22,6 @@ private object Multiverse {
     val X, Z, T, H = Value
   }
 
-  /**
-   * The list of walls in the multiverse.
-   */
-  val walls: List[Rectangle] = List(
-    new Rectangle(new Vec2d(-8, -4.5), new Vec2d(-8, 4.5)),
-    new Rectangle(new Vec2d(-8, -4.5), new Vec2d(8, -4.5)),
-    new Rectangle(new Vec2d(-8, 4.5), new Vec2d(8, 4.5)),
-    new Rectangle(new Vec2d(8, -4.5), new Vec2d(8, 4.5))
-  )
-
   private val GateKeys: List[(Int, Gate.Value)] = List(
     (GLFW_KEY_X, Gate.X),
     (GLFW_KEY_Z, Gate.Z),
@@ -48,17 +38,19 @@ private object Multiverse {
  * Multiple universes represent qubits in superposition. The multiverse can apply quantum gates to qubits by changing
  * the amplitude of a universe or creating a copy of a universe.
  *
- * @param universe the initial universe in this multiverse
+ * @param _universes the initial universes in the multiverse
+ * @param walls the list of walls in the multiverse
  */
-private class Multiverse(universe: Universe) extends Entity {
+private class Multiverse(_universes: => List[Universe], val walls: List[Rectangle]) extends Entity {
   import Multiverse._
 
-  private var universes: List[Universe] = List(universe)
+  private var universes: List[Universe] = _
   private var frameBuffer: Framebuffer = _
   private var colorBuffer: Texture = _
   private var time: Double = 0
 
   override protected def onCreate(): Unit = {
+    universes = _universes
     frameBuffer = new Framebuffer()
     colorBuffer = frameBuffer.attachColorBuffer()
   }

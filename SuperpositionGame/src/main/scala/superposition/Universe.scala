@@ -2,7 +2,7 @@ package superposition
 
 import engine.core.Behavior.Entity
 import engine.core.Game
-import engine.util.math.Vec2d
+import extras.physics.Rectangle
 
 import scala.collection.immutable.HashMap
 import scala.math.pow
@@ -12,8 +12,10 @@ import scala.math.pow
  *
  * Universes contain objects in a particular (definite) state that can interact with each other, but not with objects
  * from other universes. It corresponds to a basis vector with a particular amplitude (coefficient) in a quantum state.
+ *
+ * @param multiverse the multiverse this universe belongs to
  */
-private class Universe extends Entity {
+private class Universe(multiverse: Multiverse) extends Entity {
   /**
    * The probability amplitude of this universe.
    */
@@ -40,12 +42,17 @@ private class Universe extends Entity {
     qubits.values.map(q => if (q.on) pow(2, q.universeObject.id.value).toInt else 0).sum
 
   /**
+   * The list of walls in this universe.
+   */
+  def walls: List[Rectangle] = multiverse.walls
+
+  /**
    * Creates a copy of this universe and all of its objects.
    *
    * @return a copy of this universe
    */
   def copy(): Universe = {
-    val universe = new Universe()
+    val universe = new Universe(multiverse)
     universe.amplitude = amplitude
     for (o <- objects.values) {
       val copy = o.entity.copy()
