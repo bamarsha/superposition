@@ -41,7 +41,7 @@ private object Multiverse {
  * @param _universes the initial universes in the multiverse
  * @param walls the list of walls in the multiverse
  */
-private class Multiverse(_universes: => List[Universe], val walls: List[Rectangle]) extends Entity {
+private class Multiverse(_universes: => List[Universe], val walls: List[Wall]) extends Entity {
   import Multiverse._
 
   private var universes: List[Universe] = _
@@ -122,6 +122,8 @@ private class Multiverse(_universes: => List[Universe], val walls: List[Rectangl
   private def draw(): Unit = {
     time += dt()
     UniverseShader.setUniform("time", time.asInstanceOf[Float])
+
+    walls.foreach(_.draw())
 
     var minValue = 0.0
     for (u <- universes) {

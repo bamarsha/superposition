@@ -20,7 +20,7 @@ private class Quball(universe: Universe, id: UniversalId, position: Vec2d) exten
     this,
     position,
     new Vec2d(0, 0),
-    PhysicsComponent.wallCollider(new Vec2d(1, 1), universe.walls.asJavaCollection)
+    PhysicsComponent.wallCollider(new Vec2d(1, 1), universe.walls.map(_.rectangle).asJavaCollection)
   ))
 
   add(new Drawable(

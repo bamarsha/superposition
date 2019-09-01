@@ -1,6 +1,7 @@
 package superposition
 
 import engine.core.Game
+import engine.graphics.sprites.Sprite
 import engine.util.math.Vec2d
 import extras.physics.Rectangle
 
@@ -14,12 +15,18 @@ private object Levels {
    * @return the multiverse for level 1
    */
   def level1(): Multiverse = {
+    val sprite = Sprite.load(getClass.getResource("sprites/cat.png"))
     val walls = List(
-      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(-8, 4.5)),
-      new Rectangle(new Vec2d(-8, -4.5), new Vec2d(8, -4.5)),
-      new Rectangle(new Vec2d(-8, 4.5), new Vec2d(8, 4.5)),
-      new Rectangle(new Vec2d(8, -4.5), new Vec2d(8, 4.5))
+      new Wall(sprite, new Rectangle(new Vec2d(-8, -4.5), new Vec2d(-8, 4.5))),
+      new Wall(sprite, new Rectangle(new Vec2d(-8, -4.5), new Vec2d(8, -4.5))),
+      new Wall(sprite, new Rectangle(new Vec2d(0, 1), new Vec2d(0, 3))),
+      new Wall(sprite, new Rectangle(new Vec2d(0, -3), new Vec2d(0, -1))),
+      new Wall(sprite, new Rectangle(new Vec2d(1, 0), new Vec2d(3, 0))),
+      new Wall(sprite, new Rectangle(new Vec2d(-3, 0), new Vec2d(-1, 0))),
+      new Wall(sprite, new Rectangle(new Vec2d(-8, 4.5), new Vec2d(8, 4.5))),
+      new Wall(sprite, new Rectangle(new Vec2d(8, -4.5), new Vec2d(8, 4.5)))
     )
+
     lazy val multiverse: Multiverse = new Multiverse(List(universe), walls)
 
     lazy val universe = new Universe(multiverse)

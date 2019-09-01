@@ -44,7 +44,7 @@ private class Universe(multiverse: Multiverse) extends Entity {
   /**
    * The list of walls in this universe.
    */
-  def walls: List[Rectangle] = multiverse.walls
+  def walls: List[Wall] = multiverse.walls
 
   /**
    * Creates a copy of this universe and all of its objects.
