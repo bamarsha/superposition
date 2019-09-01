@@ -24,18 +24,6 @@ private class Universe extends Entity {
   private var _qubits: Map[UniversalId, Qubit] = new HashMap[UniversalId, Qubit]()
 
   /**
-   * Creates this universe with the player and quballs in their starting positions.
-   *
-   * @param size the number of quballs to create
-   */
-  def create(size: Int): Unit = {
-    for (i <- 0 until size) {
-      Game.create(new Quball(this, UniversalId(i), new Vec2d(1 + i, 1)))
-    }
-    Game.create(new Player(this, UniversalId(size), new Vec2d(0, 0)))
-  }
-
-  /**
    * The objects in this universe.
    */
   def objects: Map[UniversalId, UniverseObject] = _objects

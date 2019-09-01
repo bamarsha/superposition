@@ -47,11 +47,13 @@ private object Multiverse {
  *
  * Multiple universes represent qubits in superposition. The multiverse can apply quantum gates to qubits by changing
  * the amplitude of a universe or creating a copy of a universe.
+ *
+ * @param universe the initial universe in this multiverse
  */
-private class Multiverse extends Entity {
+private class Multiverse(universe: Universe) extends Entity {
   import Multiverse._
 
-  private var universes: List[Universe] = List(new Universe())
+  private var universes: List[Universe] = List(universe)
   private var frameBuffer: Framebuffer = _
   private var colorBuffer: Texture = _
   private var time: Double = 0
@@ -59,7 +61,6 @@ private class Multiverse extends Entity {
   override protected def onCreate(): Unit = {
     frameBuffer = new Framebuffer()
     colorBuffer = frameBuffer.attachColorBuffer()
-    universes.foreach(_.create(2))
   }
 
   /**
