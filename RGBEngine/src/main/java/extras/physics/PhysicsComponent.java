@@ -33,20 +33,27 @@ public class PhysicsComponent extends Component<Entity> {
         this.collider = collider;
     }
 
-    private void moveToWall(Vec2d dir) {
+    private boolean moveToWall(Vec2d dir) {
         for (var i = 1; i <= 10; i++) {
             var newPos = position.add(dir.mul(Math.pow(.5, i)));
             if (!collider.test(newPos)) {
                 position = newPos;
+            } else {
+                return true;
             }
         }
+        return false;
     }
 
     public void step() {
         var dir = velocity.mul(Game.dt());
         if (hitWall = collider.test(position.add(dir))) {
-            moveToWall(new Vec2d(dir.x, 0.0));
-            moveToWall(new Vec2d(0.0, dir.y));
+            if (moveToWall(new Vec2d(dir.x, 0.0))) {
+                velocity = velocity.setX(0);
+            }
+            if (moveToWall(new Vec2d(0.0, dir.y))) {
+                velocity = velocity.setY(0);
+            }
         } else {
             position = position.add(dir);
         }
