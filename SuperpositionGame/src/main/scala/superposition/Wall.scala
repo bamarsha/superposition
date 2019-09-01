@@ -17,9 +17,8 @@ class Wall(sprite: Sprite, val rectangle: Rectangle) {
    */
   def draw(): Unit = {
     val span = rectangle.upperRight.sub(rectangle.lowerLeft)
-    for (x <- 0 to span.x.asInstanceOf[Int];
-         y <- 0 to span.y.asInstanceOf[Int]) {
-      sprite.draw(Transformation.create(rectangle.lowerLeft.add(new Vec2d(x, y)), 0, 1), WHITE)
+    for (x <- 0 until span.x.asInstanceOf[Int]; y <- 0 until span.y.asInstanceOf[Int]) {
+      sprite.draw(Transformation.create(rectangle.lowerLeft.add(new Vec2d(x + 0.5, y + 0.5)), 0, 1), WHITE)
     }
   }
 }
