@@ -59,7 +59,8 @@ private class Multiverse(_universes: => List[Universe], val walls: List[Rectangl
    * Steps time forward for the multiverse.
    */
   def step(): Unit = {
-    val selected = Game.track(classOf[Qubit]).asScala
+    val selected = universes
+      .flatMap(_.qubits.values)
       .filter(_.universeObject.physics.position.sub(Input.mouse()).length() < 0.5)
       .map(_.universeObject.id)
       .toSet
