@@ -5,16 +5,6 @@ import engine.util.math.Vec2d
 import extras.physics.{PhysicsComponent, Rectangle}
 
 /**
- * Represents the ID of a universe object.
- *
- * A universal ID is unique within a universe but not within the multiverse; copies of an entity in other universes will
- * have the same ID.
- *
- * @param value the ID
- */
-private case class UniversalId(value: Int) extends AnyVal
-
-/**
  * A universe object is any object that exists within a particular universe.
  *
  * @param entity the entity for this component
