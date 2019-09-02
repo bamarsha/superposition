@@ -4,20 +4,19 @@ import engine.core.Behavior.Entity
 import engine.graphics.sprites.Sprite
 import engine.util.Color.{BLACK, WHITE}
 import engine.util.math.Vec2d
-import extras.physics.PhysicsComponent
+import extras.physics.PositionComponent
 
 /**
  * A door is an object with a qubit that other objects can pass through if the qubit is off, but not if the qubit is on.
  *
- * @param universe the universe this door belongs to
- * @param id       the universe object ID for this door
- * @param position the position of this door
+ * @param universe  the universe this door belongs to
+ * @param id        the universe object ID for this door
+ * @param _position the position of this door
  */
-private final class Door(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Door] {
-  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, new Vec2d(1, 1)))
+private final class Door(universe: Universe, id: UniversalId, _position: Vec2d) extends Entity with Copyable[Door] {
+  private val position: PositionComponent = add(new PositionComponent(this, _position))
 
-  private val physics: PhysicsComponent =
-    add(new PhysicsComponent(this, position, new Vec2d(0, 0), universeObject.collides))
+  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, new Vec2d(1, 1)))
 
   private val drawable: Drawable =
     add(new Drawable(this, Sprite.load(getClass.getResource("sprites/roof_right.png")), color = BLACK))
@@ -28,7 +27,7 @@ private final class Door(universe: Universe, id: UniversalId, position: Vec2d) e
   }))
 
   override def copy(): Door = {
-    val door = new Door(universeObject.universe, universeObject.id, physics.position)
+    val door = new Door(universeObject.universe, universeObject.id, position.value)
     door.qubit.on = qubit.on
     door
   }

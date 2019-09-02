@@ -65,7 +65,7 @@ private final class Multiverse(_universes: => List[Universe], val walls: List[Wa
   private def step(): Unit = {
     val selected = universes
       .flatMap(_.qubits.values)
-      .filter(_.universeObject.physics.position.sub(Input.mouse()).length() < 0.5)
+      .filter(_.universeObject.position.value.sub(Input.mouse()).length() < 0.5)
       .map(_.universeObject.id)
       .toSet
     for ((key, gate) <- GateKeys) {

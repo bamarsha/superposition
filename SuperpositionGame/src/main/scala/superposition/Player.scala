@@ -5,7 +5,7 @@ import engine.core.{Game, Input}
 import engine.graphics.sprites.Sprite
 import engine.util.Color.WHITE
 import engine.util.math.Vec2d
-import extras.physics.PhysicsComponent
+import extras.physics.{PhysicsComponent, PositionComponent}
 import org.lwjgl.glfw.GLFW._
 
 /**
@@ -38,18 +38,19 @@ private object Player {
 /**
  * The player character in the game.
  *
- * @param universe the universe this player belongs to
- * @param id       the universe object ID for this player
- * @param position the initial position for this player
+ * @param universe  the universe this player belongs to
+ * @param id        the universe object ID for this player
+ * @param _position the initial position for this player
  */
-private final class Player(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Player] {
+private final class Player(universe: Universe, id: UniversalId, _position: Vec2d) extends Entity with Copyable[Player] {
 
   import Player._
 
+  private val position: PositionComponent = add(new PositionComponent(this, _position))
+
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, new Vec2d(1.8, 1.8)))
 
-  private val physics: PhysicsComponent =
-    add(new PhysicsComponent(this, position, new Vec2d(0, 0), universeObject.collides))
+  private val physics: PhysicsComponent = add(new PhysicsComponent(this, new Vec2d(0, 0), universeObject.collides))
 
   add(new Drawable(
     entity = this,
@@ -66,21 +67,21 @@ private final class Player(universe: Universe, id: UniversalId, position: Vec2d)
       toggleCarrying()
     }
     for (id <- carrying) {
-      universeObject.universe.objects(id).physics.position = physics.position
-      universeObject.universe.objects(id).physics.velocity = physics.velocity
+      universeObject.universe.physicsObjects(id).position.value = physics.position.value
+      universeObject.universe.physicsObjects(id).velocity = physics.velocity
     }
   }
 
   private def toggleCarrying(): Unit =
     if (carrying.isEmpty)
-      carrying = universeObject.universe.objects.values
-        .find(o => o.entity != this && o.physics.position.sub(physics.position).length() < 1)
-        .map(_.id)
+      carrying = universeObject.universe.physicsObjects
+        .find(o => o._2.entity != this && o._2.position.value.sub(position.value).length() < 1)
+        .map(_._1)
     else
       carrying = None
 
   override def copy(): Player = {
-    val player = new Player(universeObject.universe, universeObject.id, physics.position)
+    val player = new Player(universeObject.universe, universeObject.id, position.value)
     player.carrying = carrying
     player
   }

@@ -2,6 +2,7 @@ package superposition
 
 import engine.core.Behavior.Entity
 import engine.core.Game
+import extras.physics.PhysicsComponent
 
 import scala.collection.immutable.HashMap
 import scala.math.pow
@@ -22,6 +23,8 @@ private final class Universe(multiverse: Multiverse) extends Entity {
 
   private var _objects: Map[UniversalId, UniverseObject] = new HashMap[UniversalId, UniverseObject]()
 
+  private var _physicsObjects: Map[UniversalId, PhysicsComponent] = new HashMap[UniversalId, PhysicsComponent]()
+
   private var _qubits: Map[UniversalId, Qubit] = new HashMap[UniversalId, Qubit]()
 
   override protected def onCreate(): Unit = objects.values.foreach(o => Game.create(o.entity))
@@ -32,6 +35,11 @@ private final class Universe(multiverse: Multiverse) extends Entity {
    * The objects in this universe.
    */
   def objects: Map[UniversalId, UniverseObject] = _objects
+
+  /**
+   * The objects with physics in this universe.
+   */
+  def physicsObjects: Map[UniversalId, PhysicsComponent] = _physicsObjects
 
   /**
    * The qubits in this universe.
@@ -80,6 +88,9 @@ private final class Universe(multiverse: Multiverse) extends Entity {
     require(!objects.contains(universeObject.id), "ID has already been used")
 
     _objects += (universeObject.id -> universeObject)
+    if (entity.has(classOf[PhysicsComponent])) {
+      _physicsObjects += (universeObject.id -> entity.get(classOf[PhysicsComponent]))
+    }
     if (entity.has(classOf[Qubit])) {
       _qubits += (universeObject.id -> entity.get(classOf[Qubit]))
     }

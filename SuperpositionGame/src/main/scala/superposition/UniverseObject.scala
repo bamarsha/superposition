@@ -2,7 +2,7 @@ package superposition
 
 import engine.core.Behavior.{Component, Entity}
 import engine.util.math.Vec2d
-import extras.physics.{PhysicsComponent, Rectangle}
+import extras.physics.{PositionComponent, Rectangle}
 
 /**
  * A universe object is any object that exists within a particular universe.
@@ -19,9 +19,9 @@ private final class UniverseObject(entity: Entity with Copyable[_ <: Entity],
                                    val hitboxSize: Vec2d = new Vec2d(0, 0),
                                    var collidesWithObjects: Boolean = false) extends Component(entity) {
   /**
-   * The physics component of this object.
+   * The position component of this object.
    */
-  lazy val physics: PhysicsComponent = get(classOf[PhysicsComponent])
+  lazy val position: PositionComponent = get(classOf[PositionComponent])
 
   /**
    * The drawable component of this object.
@@ -36,10 +36,10 @@ private final class UniverseObject(entity: Entity with Copyable[_ <: Entity],
    */
   def collides(position: Vec2d): Boolean = {
     val hitbox = Rectangle.fromCenterSize(position, hitboxSize)
-    val walls = universe.walls.map(_.rectangle)
+    val walls = universe.walls.map(_.hitbox)
     val otherObjects = universe.objects.values
-      .filter(o => o != this && o.collidesWithObjects)
-      .map(o => Rectangle.fromCenterSize(o.physics.position, o.hitboxSize))
+      .filter(o => o.entity != (this: Component[_]).entity && o.collidesWithObjects)
+      .map(o => Rectangle.fromCenterSize(o.position.value, o.hitboxSize))
     walls.appendedAll(otherObjects).exists(hitbox.intersects)
   }
 }

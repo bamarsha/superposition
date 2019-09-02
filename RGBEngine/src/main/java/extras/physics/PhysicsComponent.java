@@ -14,7 +14,7 @@ public class PhysicsComponent extends Component<Entity> {
         Game.declareSystem(PhysicsComponent.class, PhysicsComponent::step);
     }
 
-    public Vec2d position;
+    public PositionComponent position;
     public Vec2d velocity;
     public Predicate<Vec2d> collider;
     public boolean hitWall = false;
@@ -26,18 +26,22 @@ public class PhysicsComponent extends Component<Entity> {
         };
     }
 
-    public PhysicsComponent(Entity entity, Vec2d position, Vec2d velocity, Predicate<Vec2d> collider) {
+    public PhysicsComponent(Entity entity, Vec2d velocity, Predicate<Vec2d> collider) {
         super(entity);
-        this.position = position;
         this.velocity = velocity;
         this.collider = collider;
     }
 
+    @Override
+    protected void onCreate() {
+        position = get(PositionComponent.class);
+    }
+
     private boolean moveToWall(Vec2d dir) {
         for (var i = 1; i <= 10; i++) {
-            var newPos = position.add(dir.mul(Math.pow(.5, i)));
+            var newPos = position.value.add(dir.mul(Math.pow(.5, i)));
             if (!collider.test(newPos)) {
-                position = newPos;
+                position.value = newPos;
             } else {
                 return true;
             }
@@ -47,7 +51,7 @@ public class PhysicsComponent extends Component<Entity> {
 
     public void step() {
         var dir = velocity.mul(Game.dt());
-        if (hitWall = collider.test(position.add(dir))) {
+        if (hitWall = collider.test(position.value.add(dir))) {
             if (moveToWall(new Vec2d(dir.x, 0.0))) {
                 velocity = velocity.setX(0);
             }
@@ -55,7 +59,7 @@ public class PhysicsComponent extends Component<Entity> {
                 velocity = velocity.setY(0);
             }
         } else {
-            position = position.add(dir);
+            position.value = position.value.add(dir);
         }
     }
 }

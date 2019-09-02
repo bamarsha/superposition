@@ -5,7 +5,7 @@ import engine.graphics.sprites.Sprite
 import engine.util.Color
 import engine.util.Color.WHITE
 import engine.util.math.{Transformation, Vec2d}
-import extras.physics.PhysicsComponent
+import extras.physics.PositionComponent
 
 /**
  * The drawable component draws an entity with a sprite at its current position.
@@ -22,11 +22,11 @@ private final class Drawable(entity: Entity,
                              val sprite: Sprite,
                              val scale: Vec2d = new Vec2d(1, 1),
                              var color: Color = WHITE) extends Component(entity) {
-  private val physics: PhysicsComponent = get(classOf[PhysicsComponent])
+  private val position: PositionComponent = get(classOf[PositionComponent])
 
   /**
    * Draws this entity.
    */
   def draw(): Unit =
-    sprite.draw(Transformation.create(physics.position, 0, scale), color)
+    sprite.draw(Transformation.create(position.value, 0, scale), color)
 }
