@@ -25,7 +25,7 @@ object Superposition {
     Game.declareSystem(classOf[Multiverse], (_: Multiverse).step())
     Game.declareSystem(classOf[Player], (_: Player).step())
 
-    Camera.camera2d.setCenterSize(new Vec2d(0, 0), new Vec2d(16, 9))
+    Camera.camera2d.setCenterSize(new Vec2d(0, 0), new Vec2d(32, 18))
 
     Game.create(new FPSBehavior())
     Game.create(new QuitOnEscapeBehavior())

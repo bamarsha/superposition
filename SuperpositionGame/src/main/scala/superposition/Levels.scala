@@ -17,14 +17,14 @@ private object Levels {
   def level1(): Multiverse = {
     val sprite = Sprite.load(getClass.getResource("sprites/cat.png"))
     val walls = List(
-      new Wall(sprite, new Rectangle(new Vec2d(-8, -4.5), new Vec2d(-7, 4.5))),
-      new Wall(sprite, new Rectangle(new Vec2d(-8, -4.5), new Vec2d(8, -3.5))),
-      new Wall(sprite, new Rectangle(new Vec2d(2, -0.5), new Vec2d(4, 0.5))),
-      new Wall(sprite, new Rectangle(new Vec2d(-4, -0.5), new Vec2d(-2, 0.5))),
-      new Wall(sprite, new Rectangle(new Vec2d(-0.5, 1), new Vec2d(0.5, 3))),
-      new Wall(sprite, new Rectangle(new Vec2d(-0.5, -3), new Vec2d(0.5, -1))),
-      new Wall(sprite, new Rectangle(new Vec2d(-8, 3.5), new Vec2d(8, 4.5))),
-      new Wall(sprite, new Rectangle(new Vec2d(7, -4.5), new Vec2d(8, 4.5)))
+      new Wall(sprite, new Rectangle(new Vec2d(-16, -9), new Vec2d(-15, 9))),
+      new Wall(sprite, new Rectangle(new Vec2d(-16, -9), new Vec2d(16, -8))),
+      new Wall(sprite, new Rectangle(new Vec2d(4, -0.5), new Vec2d(8, 0.5))),
+      new Wall(sprite, new Rectangle(new Vec2d(-8, -0.5), new Vec2d(-4, 0.5))),
+      new Wall(sprite, new Rectangle(new Vec2d(-0.5, 2), new Vec2d(0.5, 6.5))),
+      new Wall(sprite, new Rectangle(new Vec2d(-0.5, -6.5), new Vec2d(0.5, -2))),
+      new Wall(sprite, new Rectangle(new Vec2d(-16, 8), new Vec2d(16, 9))),
+      new Wall(sprite, new Rectangle(new Vec2d(15, -9), new Vec2d(16, 9)))
     )
 
     lazy val multiverse: Multiverse = new Multiverse(List(universe), walls)

@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFW._
 import scala.jdk.CollectionConverters._
 
 private object Player {
-  private val Speed: Double = 5
+  private val Speed: Double = 7.5
 
   private val WalkKeys: List[(Int, Vec2d)] = List(
     (GLFW_KEY_W, new Vec2d(0, 1)),
@@ -42,12 +42,13 @@ private class Player(universe: Universe, id: UniversalId, position: Vec2d) exten
     this,
     position,
     new Vec2d(0, 0),
-    PhysicsComponent.wallCollider(new Vec2d(1, 1), universe.walls.map(_.rectangle).asJavaCollection)
+    PhysicsComponent.wallCollider(new Vec2d(1.8, 1.8), universe.walls.map(_.rectangle).asJavaCollection)
   ))
 
   add(new Drawable(
     entity = this,
     sprite = Sprite.load(getClass.getResource("sprites/cat.png")),
+    scale = new Vec2d(2, 2),
     color = WHITE
   ))
 
@@ -72,7 +73,7 @@ private class Player(universe: Universe, id: UniversalId, position: Vec2d) exten
   private def toggleCarrying(): Unit =
     if (carrying.isEmpty)
       carrying = universeObject.universe.objects.values
-        .find(o => o.entity != this && o.physics.position.sub(physics.position).length() < 0.5)
+        .find(o => o.entity != this && o.physics.position.sub(physics.position).length() < 1)
         .map(_.id)
     else
       carrying = None
