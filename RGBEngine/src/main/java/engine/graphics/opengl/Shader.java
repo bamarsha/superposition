@@ -2,13 +2,13 @@ package engine.graphics.opengl;
 
 import engine.graphics.Camera;
 import engine.util.Color;
+import engine.util.Resources;
 import engine.util.math.Transformation;
 import engine.util.math.Vec2d;
 import engine.util.math.Vec3d;
 import engine.util.math.Vec4d;
 import org.joml.Matrix4d;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.function.Function;
@@ -112,14 +112,7 @@ public class Shader extends GLObject {
      * @return the shader
      */
     public static Shader loadGeom(URL vert, URL geom, URL frag) {
-        try {
-            return new Shader(
-                    vert == null ? null : new String(vert.openStream().readAllBytes()),
-                    geom == null ? null : new String(geom.openStream().readAllBytes()),
-                    frag == null ? null : new String(frag.openStream().readAllBytes()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return new Shader(Resources.loadStringNullable(vert), Resources.loadStringNullable(geom), Resources.loadStringNullable(frag));
     }
 
     public void setMVP(Transformation t) {
