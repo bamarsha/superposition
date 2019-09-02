@@ -8,8 +8,6 @@ import engine.util.math.Vec2d
 import extras.physics.PhysicsComponent
 import org.lwjgl.glfw.GLFW._
 
-import scala.jdk.CollectionConverters._
-
 private object Player {
   private val Speed: Double = 7.5
 
@@ -38,12 +36,10 @@ private object Player {
 private class Player(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Player] {
   import Player._
 
-  private val physics: PhysicsComponent = add(new PhysicsComponent(
-    this,
-    position,
-    new Vec2d(0, 0),
-    PhysicsComponent.wallCollider(new Vec2d(1.8, 1.8), universe.walls.map(_.rectangle).asJavaCollection)
-  ))
+  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, new Vec2d(1.8, 1.8)))
+
+  private val physics: PhysicsComponent =
+    add(new PhysicsComponent(this, position, new Vec2d(0, 0), universeObject.collides))
 
   add(new Drawable(
     entity = this,
@@ -51,8 +47,6 @@ private class Player(universe: Universe, id: UniversalId, position: Vec2d) exten
     scale = new Vec2d(2, 2),
     color = WHITE
   ))
-
-  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id))
 
   private var carrying: Option[UniversalId] = None
 

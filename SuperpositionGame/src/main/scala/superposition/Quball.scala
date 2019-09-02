@@ -2,11 +2,9 @@ package superposition
 
 import engine.core.Behavior.Entity
 import engine.graphics.sprites.Sprite
-import engine.util.Color
+import engine.util.Color.{BLACK, WHITE}
 import engine.util.math.Vec2d
 import extras.physics.PhysicsComponent
-
-import scala.jdk.CollectionConverters._
 
 /**
  * A quball is the most basic physical representation of a qubit.
@@ -16,22 +14,18 @@ import scala.jdk.CollectionConverters._
  * @param position the initial position of this quball
  */
 private class Quball(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Quball] {
-  private val physics: PhysicsComponent = add(new PhysicsComponent(
-    this,
-    position,
-    new Vec2d(0, 0),
-    PhysicsComponent.wallCollider(new Vec2d(1, 1), universe.walls.map(_.rectangle).asJavaCollection)
-  ))
+  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, new Vec2d(1, 1)))
 
-  add(new Drawable(
+  private val physics: PhysicsComponent =
+    add(new PhysicsComponent(this, position, new Vec2d(0, 0), universeObject.collides))
+
+  private val drawable: Drawable = add(new Drawable(
     entity = this,
     sprite = Sprite.load(getClass.getResource("sprites/ball.png")),
-    color = Color.WHITE
+    color = BLACK
   ))
 
-  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id))
-
-  private val qubit: Qubit = add(new Qubit(this))
+  private val qubit: Qubit = add(new Qubit(this, on => drawable.color = if (on) WHITE else BLACK))
 
   override def copy(): Quball = {
     val quball = new Quball(universeObject.universe, universeObject.id, physics.position)

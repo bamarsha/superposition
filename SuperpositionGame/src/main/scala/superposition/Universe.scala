@@ -2,7 +2,6 @@ package superposition
 
 import engine.core.Behavior.Entity
 import engine.core.Game
-import extras.physics.Rectangle
 
 import scala.collection.immutable.HashMap
 import scala.math.pow

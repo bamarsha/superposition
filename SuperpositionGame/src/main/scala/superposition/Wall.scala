@@ -8,17 +8,19 @@ import extras.physics.Rectangle
 /**
  * A wall in the environment.
  *
- * @param sprite the sprite for this wall
  * @param rectangle the bounding rectangle for this wall
+ * @param sprite the sprite for this wall
  */
-class Wall(sprite: Sprite, val rectangle: Rectangle) {
+class Wall(val rectangle: Rectangle, sprite: Sprite) {
   /**
    * Draws this wall.
    */
   def draw(): Unit = {
     val span = rectangle.upperRight.sub(rectangle.lowerLeft)
-    for (x <- 0 until span.x.asInstanceOf[Int]; y <- 0 until span.y.asInstanceOf[Int]) {
-      sprite.draw(Transformation.create(rectangle.lowerLeft.add(new Vec2d(x + 0.5, y + 0.5)), 0, 1), WHITE)
+    for (x <- 0 until span.x.asInstanceOf[Int];
+         y <- 0 until span.y.asInstanceOf[Int]) {
+      val center = rectangle.lowerLeft.add(new Vec2d(x + 0.5, y + 0.5))
+      sprite.draw(Transformation.create(center, 0, 1), WHITE)
     }
   }
 }
