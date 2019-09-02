@@ -6,8 +6,10 @@ import engine.core.{Game, Input}
 import engine.graphics.Camera
 import engine.graphics.Camera.Camera2d
 import engine.graphics.opengl.{Framebuffer, Shader, Texture}
+import engine.util.Color
 import engine.util.Color.CLEAR
 import engine.util.math.{Transformation, Vec2d}
+import extras.tiles.{Tilemap, TilemapRenderer}
 import org.lwjgl.glfw.GLFW._
 
 import scala.math.{Pi, sqrt}
@@ -54,6 +56,9 @@ private final class Multiverse(_universes: => List[Universe], val walls: List[Wa
   private var frameBuffer: Framebuffer = _
   private var colorBuffer: Texture = _
   private var time: Double = 0
+
+  private var tiles: Tilemap = Tilemap.load(getClass.getResource("level1.tmx"))
+  private var tileRenderer: TilemapRenderer = new TilemapRenderer(tiles, source => Texture.load(getClass.getResource(source)))
 
   override protected def onCreate(): Unit = {
     universes = _universes
@@ -124,6 +129,8 @@ private final class Multiverse(_universes: => List[Universe], val walls: List[Wa
   }
 
   private def draw(): Unit = {
+    tileRenderer.draw(Transformation.create(new Vec2d(-16, -9), 0, 1), Color.WHITE)
+
     time += dt()
     UniverseShader.setUniform("time", time.asInstanceOf[Float])
 

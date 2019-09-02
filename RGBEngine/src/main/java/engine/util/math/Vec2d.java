@@ -54,10 +54,7 @@ public class Vec2d {
         if (Double.doubleToLongBits(this.x) != Double.doubleToLongBits(other.x)) {
             return false;
         }
-        if (Double.doubleToLongBits(this.y) != Double.doubleToLongBits(other.y)) {
-            return false;
-        }
-        return true;
+        return Double.doubleToLongBits(this.y) == Double.doubleToLongBits(other.y);
     }
 
     public Vec2d floor() {
