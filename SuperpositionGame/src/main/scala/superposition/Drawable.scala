@@ -15,13 +15,13 @@ import extras.physics.PhysicsComponent
  *
  * @param entity the entity for this component
  * @param sprite the sprite for this entity
- * @param scale the scale of the sprite
- * @param color the color of the sprite
+ * @param scale  the scale of the sprite
+ * @param color  the color of the sprite
  */
-private class Drawable(entity: Entity,
-                       val sprite: Sprite,
-                       val scale: Vec2d = new Vec2d(1, 1),
-                       var color: Color = WHITE) extends Component(entity) {
+private final class Drawable(entity: Entity,
+                             val sprite: Sprite,
+                             val scale: Vec2d = new Vec2d(1, 1),
+                             var color: Color = WHITE) extends Component(entity) {
   private val physics: PhysicsComponent = get(classOf[PhysicsComponent])
 
   /**

@@ -9,7 +9,7 @@ private object Complex {
   /**
    * Creates a complex number from its polar form re^iθ^.
    *
-   * @param r the radius r
+   * @param r     the radius r
    * @param theta the angle θ
    * @return the complex number re^iθ^
    */
@@ -22,7 +22,7 @@ private object Complex {
  * @param real the real part
  * @param imag the imaginary part
  */
-private case class Complex(real: Double, imag: Double = 0) {
+private final case class Complex(real: Double, imag: Double = 0) {
   /**
    * Adds two complex numbers.
    *
@@ -62,13 +62,12 @@ private case class Complex(real: Double, imag: Double = 0) {
   )
 
   /**
-   * The magnitude, or absolute value, of this complex nuumber.
+   * The magnitude, or absolute value, of this complex number.
    */
   def magnitude: Double = sqrt(squaredMagnitude)
 
   /**
    * The squared magnitude, or squared absolute value, of this complex number.
-   * @return
    */
   def squaredMagnitude: Double = real * real + imag * imag
 

@@ -10,10 +10,10 @@ import extras.physics.PhysicsComponent
  * A quball is the most basic physical representation of a qubit.
  *
  * @param universe the universe this quball belongs to
- * @param id the universe object ID for this quball
+ * @param id       the universe object ID for this quball
  * @param position the initial position of this quball
  */
-private class Quball(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Quball] {
+private final class Quball(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Quball] {
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, new Vec2d(1, 1)))
 
   private val physics: PhysicsComponent =

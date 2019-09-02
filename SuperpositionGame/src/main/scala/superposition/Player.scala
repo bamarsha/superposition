@@ -30,10 +30,11 @@ private object Player {
  * The player character in the game.
  *
  * @param universe the universe this player belongs to
- * @param id the universe object ID for this player
+ * @param id       the universe object ID for this player
  * @param position the initial position for this player
  */
-private class Player(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Player] {
+private final class Player(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Player] {
+
   import Player._
 
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, new Vec2d(1.8, 1.8)))

@@ -8,16 +8,15 @@ import engine.graphics.Camera.Camera2d
 import engine.graphics.opengl.{Framebuffer, Shader, Texture}
 import engine.util.Color.CLEAR
 import engine.util.math.{Transformation, Vec2d}
-import extras.physics.Rectangle
 import org.lwjgl.glfw.GLFW._
 
-import scala.jdk.CollectionConverters._
 import scala.math.{Pi, sqrt}
 
 /**
  * Contains settings and static data for the multiverse.
  */
 private object Multiverse {
+
   private object Gate extends Enumeration {
     val X, Z, T, H = Value
   }
@@ -39,9 +38,10 @@ private object Multiverse {
  * the amplitude of a universe or creating a copy of a universe.
  *
  * @param _universes the initial universes in the multiverse
- * @param walls the list of walls in the multiverse
+ * @param walls      the list of walls in the multiverse
  */
-private class Multiverse(_universes: => List[Universe], val walls: List[Wall]) extends Entity {
+private final class Multiverse(_universes: => List[Universe], val walls: List[Wall]) extends Entity {
+
   import Multiverse._
 
   private var universes: List[Universe] = _

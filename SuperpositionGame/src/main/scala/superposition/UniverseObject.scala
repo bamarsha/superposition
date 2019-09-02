@@ -7,17 +7,17 @@ import extras.physics.{PhysicsComponent, Rectangle}
 /**
  * A universe object is any object that exists within a particular universe.
  *
- * @param entity the entity for this component
- * @param universe the universe this object belongs to
- * @param id the ID of this object
- * @param hitboxSize the size of this object's hitbox
+ * @param entity              the entity for this component
+ * @param universe            the universe this object belongs to
+ * @param id                  the ID of this object
+ * @param hitboxSize          the size of this object's hitbox
  * @param collidesWithObjects whether this object collides with other objects in the universe (excluding walls)
  */
-private class UniverseObject(entity: Entity with Copyable[_ <: Entity],
-                             var universe: Universe,
-                             val id: UniversalId,
-                             val hitboxSize: Vec2d = new Vec2d(0, 0),
-                             var collidesWithObjects: Boolean = false) extends Component(entity) {
+private final class UniverseObject(entity: Entity with Copyable[_ <: Entity],
+                                   var universe: Universe,
+                                   val id: UniversalId,
+                                   val hitboxSize: Vec2d = new Vec2d(0, 0),
+                                   var collidesWithObjects: Boolean = false) extends Component(entity) {
   /**
    * The physics component of this object.
    */

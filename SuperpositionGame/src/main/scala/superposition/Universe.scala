@@ -14,7 +14,7 @@ import scala.math.pow
  *
  * @param multiverse the multiverse this universe belongs to
  */
-private class Universe(multiverse: Multiverse) extends Entity {
+private final class Universe(multiverse: Multiverse) extends Entity {
   /**
    * The probability amplitude of this universe.
    */
@@ -69,7 +69,6 @@ private class Universe(multiverse: Multiverse) extends Entity {
    * Adds the entity to this universe.
    *
    * @param entity the entity to add
-   *
    * @throws IllegalArgumentException if the entity does not have a [[superposition.UniverseObject]] component
    * @throws IllegalArgumentException if the entity's universe is not the same as this universe
    * @throws IllegalArgumentException if the entity's universal ID has already been used in this universe

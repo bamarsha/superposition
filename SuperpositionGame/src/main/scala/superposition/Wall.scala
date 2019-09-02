@@ -9,9 +9,9 @@ import extras.physics.Rectangle
  * A wall in the environment.
  *
  * @param rectangle the bounding rectangle for this wall
- * @param sprite the sprite for this wall
+ * @param sprite    the sprite for this wall
  */
-class Wall(val rectangle: Rectangle, sprite: Sprite) {
+private final class Wall(val rectangle: Rectangle, sprite: Sprite) {
   /**
    * Draws this wall.
    */

@@ -5,10 +5,10 @@ import engine.core.Behavior.{Component, Entity}
 /**
  * A qubit is any game object with a binary state.
  *
- * @param entity the entity for this component
+ * @param entity   the entity for this component
  * @param onChange called when the state of this qubit changes
  */
-private class Qubit(entity: Entity, onChange: Boolean => Unit = _ => ()) extends Component(entity) {
+private final class Qubit(entity: Entity, onChange: Boolean => Unit = _ => ()) extends Component(entity) {
   /**
    * The universe object for this qubit.
    */

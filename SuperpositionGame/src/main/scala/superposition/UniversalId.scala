@@ -8,4 +8,4 @@ package superposition
  *
  * @param value the ID
  */
-private case class UniversalId(value: Int) extends AnyVal
+private final case class UniversalId(value: Int) extends AnyVal

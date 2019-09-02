@@ -10,10 +10,10 @@ import extras.physics.PhysicsComponent
  * A door is an object with a qubit that other objects can pass through if the qubit is off, but not if the qubit is on.
  *
  * @param universe the universe this door belongs to
- * @param id the universe object ID for this door
+ * @param id       the universe object ID for this door
  * @param position the position of this door
  */
-private class Door(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Door] {
+private final class Door(universe: Universe, id: UniversalId, position: Vec2d) extends Entity with Copyable[Door] {
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, new Vec2d(1, 1)))
 
   private val physics: PhysicsComponent =
