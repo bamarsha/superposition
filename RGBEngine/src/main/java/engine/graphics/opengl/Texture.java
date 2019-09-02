@@ -1,6 +1,7 @@
 package engine.graphics.opengl;
 
-import java.io.IOException;
+import engine.util.Resources;
+
 import java.net.URL;
 import java.nio.ByteBuffer;
 
@@ -45,13 +46,7 @@ public class Texture extends GLObject {
         int[] compArray = new int[1];
         stbi_set_flip_vertically_on_load(true);
 
-        byte[] bytes;
-        try {
-            bytes = url.openStream().readAllBytes();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load image " + url, e);
-        }
-
+        byte[] bytes = Resources.loadBytes(url);
         ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length);
         buffer.put(bytes);
         buffer.flip();

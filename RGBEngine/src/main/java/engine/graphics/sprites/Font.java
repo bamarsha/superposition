@@ -1,23 +1,24 @@
 package engine.graphics.sprites;
 
 import engine.graphics.opengl.BufferObject;
-import static engine.graphics.opengl.GLObject.bindAll;
 import engine.graphics.opengl.Shader;
 import engine.graphics.opengl.Texture;
 import engine.graphics.opengl.VertexArrayObject;
 import engine.util.Color;
+import engine.util.Resources;
 import engine.util.math.Transformation;
 import engine.util.math.Vec2d;
 import engine.util.math.Vec3d;
-import static java.lang.Integer.parseInt;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static engine.graphics.opengl.GLObject.bindAll;
+import static java.lang.Integer.parseInt;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
@@ -61,14 +62,7 @@ public class Font {
     private int pages;
 
     private Font(URL url) {
-        String[] fontDesc;
-        try {
-            fontDesc = new String(url.openStream().readAllBytes()).split("[\r\n]+");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        for (String line : fontDesc) {
+        for (String line : Resources.loadString(url).split("[\r\n]+")) {
             Map<String, String> nvp = parseNameValuePairs(line);
             switch (parseTag(line)) {
                 case "info":
