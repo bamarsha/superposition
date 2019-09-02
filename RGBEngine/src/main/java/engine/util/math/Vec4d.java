@@ -62,10 +62,7 @@ public class Vec4d {
         if (Double.doubleToLongBits(this.z) != Double.doubleToLongBits(other.z)) {
             return false;
         }
-        if (Double.doubleToLongBits(this.w) != Double.doubleToLongBits(other.w)) {
-            return false;
-        }
-        return true;
+        return Double.doubleToLongBits(this.w) == Double.doubleToLongBits(other.w);
     }
 
     public Vec4d floor() {

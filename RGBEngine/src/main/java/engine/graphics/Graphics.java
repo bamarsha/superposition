@@ -1,19 +1,20 @@
 package engine.graphics;
 
 import engine.graphics.opengl.BufferObject;
-import static engine.graphics.opengl.GLObject.bindAll;
 import engine.graphics.opengl.Shader;
 import engine.graphics.opengl.VertexArrayObject;
+import engine.util.Color;
+import engine.util.math.MathUtils;
+import engine.util.math.Transformation;
+import engine.util.math.Vec2d;
+import engine.util.math.Vec3d;
+
+import static engine.graphics.opengl.GLObject.bindAll;
+import static engine.util.math.MathUtils.rotate;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import engine.util.Color;
-import engine.util.math.MathUtils;
-import static engine.util.math.MathUtils.rotate;
-import engine.util.math.Transformation;
-import engine.util.math.Vec2d;
-import engine.util.math.Vec3d;
 
 public class Graphics {
 
@@ -22,7 +23,7 @@ public class Graphics {
     private static final int CIRCLE_DETAIL = 40;
 
     private static final VertexArrayObject CIRCLE_VAO = VertexArrayObject.createVAO(() -> {
-        float circleVertices[] = new float[CIRCLE_DETAIL * 3 + 6];
+        float[] circleVertices = new float[CIRCLE_DETAIL * 3 + 6];
         for (int i = 0; i <= CIRCLE_DETAIL; i++) {
             circleVertices[3 * i + 3] = (float) Math.cos(i * 2 * Math.PI / CIRCLE_DETAIL);
             circleVertices[3 * i + 4] = (float) Math.sin(i * 2 * Math.PI / CIRCLE_DETAIL);
