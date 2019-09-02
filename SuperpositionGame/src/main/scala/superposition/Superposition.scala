@@ -22,8 +22,8 @@ object Superposition {
     Settings.BACKGROUND_COLOR = Color.GRAY
 
     Game.init()
-    Game.declareSystem(classOf[Multiverse], (_: Multiverse).step())
-    Game.declareSystem(classOf[Player], (_: Player).step())
+    Multiverse.declareSystem()
+    Player.declareSystem()
 
     Camera.camera2d.setCenterSize(new Vec2d(0, 0), new Vec2d(32, 18))
 

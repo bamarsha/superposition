@@ -1,13 +1,16 @@
 package superposition
 
 import engine.core.Behavior.Entity
-import engine.core.Input
+import engine.core.{Game, Input}
 import engine.graphics.sprites.Sprite
 import engine.util.Color.WHITE
 import engine.util.math.Vec2d
 import extras.physics.PhysicsComponent
 import org.lwjgl.glfw.GLFW._
 
+/**
+ * Contains settings and initialization for the player.
+ */
 private object Player {
   private val Speed: Double = 7.5
 
@@ -17,6 +20,12 @@ private object Player {
     (GLFW_KEY_S, new Vec2d(0, -1)),
     (GLFW_KEY_D, new Vec2d(1, 0))
   )
+
+  /**
+   * Declares the player system.
+   */
+  def declareSystem(): Unit =
+    Game.declareSystem(classOf[Player], (_: Player).step())
 
   private def walkVelocity(): Vec2d = {
     val direction = WalkKeys.foldLeft(new Vec2d(0, 0)) {
@@ -51,10 +60,7 @@ private final class Player(universe: Universe, id: UniversalId, position: Vec2d)
 
   private var carrying: Option[UniversalId] = None
 
-  /**
-   * Steps time forward for this player.
-   */
-  def step(): Unit = {
+  private def step(): Unit = {
     physics.velocity = walkVelocity()
     if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
       toggleCarrying()

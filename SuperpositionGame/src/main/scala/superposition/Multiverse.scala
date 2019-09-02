@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW._
 import scala.math.{Pi, sqrt}
 
 /**
- * Contains settings and static data for the multiverse.
+ * Contains settings and initialization for the multiverse.
  */
 private object Multiverse {
 
@@ -29,6 +29,12 @@ private object Multiverse {
   )
 
   private val UniverseShader: Shader = Shader.load(classOf[Multiverse].getResource(_), "shaders/universe")
+
+  /**
+   * Declares the multiverse system.
+   */
+  def declareSystem(): Unit =
+    Game.declareSystem(classOf[Multiverse], (_: Multiverse).step())
 }
 
 /**
@@ -56,10 +62,7 @@ private final class Multiverse(_universes: => List[Universe], val walls: List[Wa
     colorBuffer = frameBuffer.attachColorBuffer()
   }
 
-  /**
-   * Steps time forward for the multiverse.
-   */
-  def step(): Unit = {
+  private def step(): Unit = {
     val selected = universes
       .flatMap(_.qubits.values)
       .filter(_.universeObject.physics.position.sub(Input.mouse()).length() < 0.5)
