@@ -51,6 +51,7 @@ private class Multiverse(_universes: => List[Universe], val walls: List[Wall]) e
 
   override protected def onCreate(): Unit = {
     universes = _universes
+    universes.foreach(Game.create(_))
     frameBuffer = new Framebuffer()
     colorBuffer = frameBuffer.attachColorBuffer()
   }

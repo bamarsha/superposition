@@ -16,9 +16,6 @@ private case class UniversalId(value: Int) extends AnyVal
 /**
  * A universe object is any object that exists within a particular universe.
  *
- * When an entity with the universe object component is created, it is automatically added to its universe's list of
- * objects.
- *
  * @param entity the entity for this component
  * @param universe the universe this object belongs to
  * @param id the ID of this object
@@ -35,6 +32,4 @@ private class UniverseObject(entity: Entity with Copyable[_ <: Entity],
    * The drawable component of this object.
    */
   val drawable: Drawable = get(classOf[Drawable])
-
-  override protected def onCreate(): Unit = universe.add(this)
 }

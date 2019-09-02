@@ -50,6 +50,7 @@ public abstract class Behavior {
             return c;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public final <T extends Component> T get(Class<T> c) {
             if (!behaviors.containsKey(c)) {
@@ -58,7 +59,7 @@ public abstract class Behavior {
             return (T) behaviors.get(c);
         }
 
-        public final boolean hasComponent(Class<? extends Component> c) {
+        public final boolean has(Class<? extends Component> c) {
             return behaviors.containsKey(c);
         }
     }

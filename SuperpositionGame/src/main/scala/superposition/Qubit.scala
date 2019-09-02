@@ -20,10 +20,6 @@ private class Qubit(entity: Entity) extends Component(entity) {
 
   private var _on: Boolean = _
 
-  override protected def onCreate(): Unit = {
-    universeObject.universe.add(this)
-  }
-
   /**
    * Whether this qubit is in the on or off state.
    */

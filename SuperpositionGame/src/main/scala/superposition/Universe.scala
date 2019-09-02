@@ -25,6 +25,10 @@ private class Universe(multiverse: Multiverse) extends Entity {
 
   private var _qubits: Map[UniversalId, Qubit] = new HashMap[UniversalId, Qubit]()
 
+  override protected def onCreate(): Unit = objects.values.foreach(o => Game.create(o.entity))
+
+  override protected def onDestroy(): Unit = objects.values.foreach(o => Game.destroy(o.entity))
+
   /**
    * The objects in this universe.
    */
@@ -47,40 +51,39 @@ private class Universe(multiverse: Multiverse) extends Entity {
   def walls: List[Wall] = multiverse.walls
 
   /**
-   * Creates a copy of this universe and all of its objects.
+   * Returns a copy of this universe and all of its objects.
    *
    * @return a copy of this universe
    */
   def copy(): Universe = {
     val universe = new Universe(multiverse)
     universe.amplitude = amplitude
-    for (o <- objects.values) {
-      val copy = o.entity.copy()
+    for (e <- objects.values.map(_.entity)) {
+      val copy = e.copy()
       copy.get(classOf[UniverseObject]).universe = universe
-      Game.create(copy)
+      universe.add(copy)
     }
     universe
   }
 
   /**
-   * Adds the object to this universe.
+   * Adds the entity to this universe.
    *
-   * @param universeObject the object to add
+   * @param entity the entity to add
+   *
+   * @throws IllegalArgumentException if the entity does not have a [[superposition.UniverseObject]] component
+   * @throws IllegalArgumentException if the entity's universe is not the same as this universe
+   * @throws IllegalArgumentException if the entity's universal ID has already been used in this universe
    */
-  def add(universeObject: UniverseObject): Unit = {
+  def add(entity: Entity): Unit = {
+    require(entity.has(classOf[UniverseObject]), "Entity is not a universe object")
+    val universeObject = entity.get(classOf[UniverseObject])
+    require(universeObject.universe == this, "Entity is not a part of this universe")
     require(!objects.contains(universeObject.id), "ID has already been used")
+
     _objects += (universeObject.id -> universeObject)
+    if (entity.has(classOf[Qubit])) {
+      _qubits += (universeObject.id -> entity.get(classOf[Qubit]))
+    }
   }
-
-  /**
-   * Adds the qubit to this universe.
-   *
-   * @param qubit the qubit to add
-   */
-  def add(qubit: Qubit): Unit = {
-    require(!qubits.contains(qubit.universeObject.id), "ID has already been used")
-    _qubits += (qubit.universeObject.id -> qubit)
-  }
-
-  override protected def onDestroy(): Unit = objects.values.foreach(uo => Game.destroy(uo.entity))
 }
