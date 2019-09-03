@@ -57,19 +57,16 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
   /**
    * The list of walls in the multiverse.
    */
-  val walls: List[Rectangle] = tiles.layers.asScala
-    .filter(_.properties.asScala.exists(p => p.name == "collision" && p.value.toBoolean))
-    .flatMap(layer =>
-      for (x <- 0 until layer.width; y <- 0 until layer.height) yield {
-        if (layer.data.tiles(x)(y) == 0)
-          None
-        else {
-          val absoluteX = x - 16 + layer.offsetX
-          val absoluteY = y - 9 + layer.offsetY
-          Some(new Rectangle(new Vec2d(absoluteX, absoluteY), new Vec2d(absoluteX + 1, absoluteY + 1)))
-        }
-      }
-    ).flatten.toList
+  val walls: List[Rectangle] =
+    (for (layer <- tiles.layers.asScala
+          if layer.properties.asScala.exists(p => p.name == "collision" && p.value.toBoolean)) yield
+      for (x <- 0 until layer.width; y <- 0 until layer.height
+           if layer.data.tiles(x)(y) != 0) yield {
+        val absoluteX = x - 16 + layer.offsetX
+        val absoluteY = y - 9 + layer.offsetY
+        new Rectangle(new Vec2d(absoluteX, absoluteY), new Vec2d(absoluteX + 1, absoluteY + 1))
+      })
+      .flatten.toList
 
   private var universes: List[Universe] = _
 
@@ -104,7 +101,7 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
   }
 
   private def applyGate(gate: Gate.Value, target: UniversalId, controls: UniversalId*): Unit = {
-    for (u <- universes; if controls.forall(u.qubits(_).on)) {
+    for (u <- universes if controls.forall(u.qubits(_).on)) {
       gate match {
         case Gate.X => u.qubits(target).flip()
         case Gate.Z =>
