@@ -1,20 +1,20 @@
 package engine.graphics.sprites;
 
-import engine.graphics.opengl.BufferObject;
-import static engine.graphics.opengl.GLObject.bindAll;
 import engine.graphics.opengl.Shader;
 import engine.graphics.opengl.Texture;
 import engine.graphics.opengl.VertexArrayObject;
 import engine.util.Color;
 import engine.util.math.Transformation;
+import engine.util.math.Vec2d;
+import engine.util.math.Vec3d;
 
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+
+import static engine.graphics.opengl.GLObject.bindAll;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.glDrawArrays;
 
 public class Sprite {
 
@@ -31,16 +31,10 @@ public class Sprite {
     public static final Shader SPRITE_SHADER = Shader.load(Sprite.class::getResource, "sprite");
 
     public static final VertexArrayObject SPRITE_VAO = VertexArrayObject.createVAO(() -> {
-        BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{
-            0.5f, 0.5f, 0, 1, 1,
-            0.5f, -0.5f, 0, 1, 0,
-            -0.5f, -0.5f, 0, 0, 0,
-            -0.5f, 0.5f, 0, 0, 1
-        });
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 20, 0);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, false, 20, 12);
-        glEnableVertexAttribArray(1);
+        var b = new VertexArrayObject.VAOBuilder(3, 2);
+        b.addQuad(0, new Vec3d(-.5, -.5, 0), new Vec3d(1, 0, 0), new Vec3d(0, 1, 0));
+        b.addQuad(1, new Vec2d(0, 0), new Vec2d(1, 0), new Vec2d(0, 1));
+        return b;
     });
 
     private final Texture texture;
@@ -57,7 +51,7 @@ public class Sprite {
         SPRITE_SHADER.setMVP(t);
         SPRITE_SHADER.setUniform("color", color);
         bindAll(texture, SPRITE_SHADER, SPRITE_VAO);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
     public int getHeight() {

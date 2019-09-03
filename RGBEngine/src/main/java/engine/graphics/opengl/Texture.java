@@ -1,6 +1,7 @@
 package engine.graphics.opengl;
 
 import engine.util.Resources;
+import org.lwjgl.system.MemoryStack;
 
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -41,26 +42,26 @@ public class Texture extends GLObject {
     }
 
     public static Texture load(URL url) {
-        int[] widthArray = new int[1];
-        int[] heightArray = new int[1];
-        int[] compArray = new int[1];
         stbi_set_flip_vertically_on_load(true);
 
-        byte[] bytes = Resources.loadBytes(url);
-        ByteBuffer buffer = ByteBuffer.allocateDirect(bytes.length);
-        buffer.put(bytes);
-        buffer.flip();
-        ByteBuffer image = stbi_load_from_memory(buffer, widthArray, heightArray, compArray, 4);
-        if (image == null) {
-            throw new RuntimeException("Failed to load image " + url + ": " + stbi_failure_reason());
-        }
+        try (var stack = MemoryStack.stackPush()) {
+            var buffer = stack.bytes(Resources.loadBytes(url));
+            var width = stack.mallocInt(1);
+            var height = stack.mallocInt(1);
+            var channels = stack.mallocInt(1);
 
-        Texture t = new Texture(GL_TEXTURE_2D);
-        t.setParameter(GL_TEXTURE_MAX_LEVEL, 16);
-        t.setParameter(GL_TEXTURE_MAX_ANISOTROPY, 16);
-        t.setParameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        t.uploadData(widthArray[0], heightArray[0], image);
-        return t;
+            ByteBuffer image = stbi_load_from_memory(buffer, width, height, channels, 4);
+            if (image == null) {
+                throw new RuntimeException("Failed to load image " + url + ": " + stbi_failure_reason());
+            }
+
+            Texture t = new Texture(GL_TEXTURE_2D);
+            t.setParameter(GL_TEXTURE_MAX_LEVEL, 16);
+            t.setParameter(GL_TEXTURE_MAX_ANISOTROPY, 16);
+            t.setParameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            t.uploadData(width.get(0), height.get(0), image);
+            return t;
+        }
     }
 
     public void setParameter(int name, int value) {

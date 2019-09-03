@@ -185,14 +185,15 @@ public class Font {
                             0 + 4 * j, 2 + 4 * j, 3 + 4 * j
                         }, 0, indices, j * 6, 6);
                     }
-                    ft.vaoArray[i] = VertexArrayObject.createVAO(() -> {
-                        BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, vertices);
-                        BufferObject ebo = new BufferObject(GL_ELEMENT_ARRAY_BUFFER, indices);
-                        glVertexAttribPointer(0, 3, GL_FLOAT, false, 20, 0);
-                        glEnableVertexAttribArray(0);
-                        glVertexAttribPointer(1, 2, GL_FLOAT, false, 20, 12);
-                        glEnableVertexAttribArray(1);
-                    });
+                    VertexArrayObject vao = new VertexArrayObject();
+                    vao.bind();
+                    BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, vertices);
+                    BufferObject ebo = new BufferObject(GL_ELEMENT_ARRAY_BUFFER, indices);
+                    glVertexAttribPointer(0, 3, GL_FLOAT, false, 20, 0);
+                    glEnableVertexAttribArray(0);
+                    glVertexAttribPointer(1, 2, GL_FLOAT, false, 20, 12);
+                    glEnableVertexAttribArray(1);
+                    ft.vaoArray[i] = vao;
                 }
             }
             textMap.put(text, ft);

@@ -3,25 +3,17 @@ package engine.graphics.opengl;
 import engine.core.Settings;
 import engine.util.Color;
 import engine.util.math.Vec2d;
+
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.*;
 
 public class Framebuffer extends GLObject {
 
     public static final VertexArrayObject FRAMEBUFFER_VAO = VertexArrayObject.createVAO(() -> {
-        BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{
-            -1, -1, 0, 0,
-            1, -1, 1, 0,
-            1, 1, 1, 1,
-            -1, 1, 0, 1
-        });
-        glVertexAttribPointer(0, 2, GL_FLOAT, false, 16, 0);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, false, 16, 8);
-        glEnableVertexAttribArray(1);
+        var b = new VertexArrayObject.VAOBuilder(2, 2);
+        b.addQuad(0, new Vec2d(-1, -1), new Vec2d(2, 0), new Vec2d(0, 2));
+        b.addQuad(1, new Vec2d(0, 0), new Vec2d(1, 0), new Vec2d(0, 1));
+        return b;
     });
 
     public final int width, height;
@@ -88,14 +80,14 @@ public class Framebuffer extends GLObject {
         glDeleteFramebuffers(id);
     }
 
-    public void drawToSelf(Texture texture, Shader shader) {
-        bindAll(this, texture, shader, FRAMEBUFFER_VAO);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-    }
-
     public static void drawToWindow(Texture texture, Shader shader) {
         GLState.bindFramebuffer(null);
         bindAll(texture, shader, FRAMEBUFFER_VAO);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+
+    public void drawToSelf(Texture texture, Shader shader) {
+        bindAll(this, texture, shader, FRAMEBUFFER_VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 }

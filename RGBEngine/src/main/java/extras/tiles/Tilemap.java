@@ -100,7 +100,8 @@ public class Tilemap extends XMLElement {
                             throw new IllegalStateException("Data is badly formatted");
                         }
                         for (int x = 0; x < width; x++) {
-                            tiles[x][y] = Integer.parseInt(row[x]);
+
+                            tiles[x][y] = (int) Long.parseLong(row[x]);
                         }
                     }
                 } else {
