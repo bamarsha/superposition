@@ -36,10 +36,9 @@ private final class UniverseObject(entity: Entity with Copyable[_ <: Entity],
    */
   def collides(position: Vec2d): Boolean = {
     val hitbox = Rectangle.fromCenterSize(position, hitboxSize)
-    val walls = universe.walls.map(_.hitbox)
     val otherObjects = universe.objects.values
       .filter(o => o.entity != (this: Component[_]).entity && o.collidesWithObjects)
       .map(o => Rectangle.fromCenterSize(o.position.value, o.hitboxSize))
-    walls.appendedAll(otherObjects).exists(hitbox.intersects)
+    universe.walls.appendedAll(otherObjects).exists(hitbox.intersects)
   }
 }

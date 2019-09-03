@@ -2,7 +2,7 @@ package superposition
 
 import engine.core.Behavior.Entity
 import engine.core.Game
-import extras.physics.PhysicsComponent
+import extras.physics.{PhysicsComponent, Rectangle}
 
 import scala.collection.immutable.HashMap
 import scala.math.pow
@@ -55,7 +55,7 @@ private final class Universe(multiverse: Multiverse) extends Entity {
   /**
    * The list of walls in this universe.
    */
-  def walls: List[Wall] = multiverse.walls
+  def walls: List[Rectangle] = multiverse.walls
 
   /**
    * Returns a copy of this universe and all of its objects.

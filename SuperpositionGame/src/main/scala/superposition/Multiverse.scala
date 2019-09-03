@@ -9,9 +9,11 @@ import engine.graphics.opengl.{Framebuffer, Shader, Texture}
 import engine.util.Color
 import engine.util.Color.CLEAR
 import engine.util.math.{Transformation, Vec2d}
+import extras.physics.Rectangle
 import extras.tiles.{Tilemap, TilemapRenderer}
 import org.lwjgl.glfw.GLFW._
 
+import scala.jdk.CollectionConverters._
 import scala.math.{Pi, sqrt}
 
 /**
@@ -46,19 +48,37 @@ private object Multiverse {
  * the amplitude of a universe or creating a copy of a universe.
  *
  * @param _universes the initial universes in the multiverse
- * @param walls      the list of walls in the multiverse
+ * @param tiles      the tiles in the multiverse
  */
-private final class Multiverse(_universes: => List[Universe], val walls: List[Wall]) extends Entity {
+private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) extends Entity {
 
   import Multiverse._
 
+  /**
+   * The list of walls in the multiverse.
+   */
+  val walls: List[Rectangle] =
+    tiles.layers.asScala
+      .filter(_.properties.asScala.exists(p => p.name == "collision" && p.value.toBoolean))
+      .flatMap(_.data.tiles.zipWithIndex.map {
+        case (column, x) => column.zipWithIndex.map {
+          case (tile, y) =>
+            if (tile != 0)
+              // TODO: Add in the layer offset.
+              Some(new Rectangle(new Vec2d(x - 16, y - 9), new Vec2d(x - 15, y - 8)))
+            else
+              None
+        }.flatten
+      }).flatten.toList
+
   private var universes: List[Universe] = _
+
   private var frameBuffer: Framebuffer = _
   private var colorBuffer: Texture = _
   private var time: Double = 0
 
-  private var tiles: Tilemap = Tilemap.load(getClass.getResource("level1.tmx"))
-  private var tileRenderer: TilemapRenderer = new TilemapRenderer(tiles, source => Texture.load(getClass.getResource(source)))
+  private val tileRenderer: TilemapRenderer =
+    new TilemapRenderer(tiles, source => Texture.load(getClass.getResource(source)))
 
   override protected def onCreate(): Unit = {
     universes = _universes
@@ -133,8 +153,6 @@ private final class Multiverse(_universes: => List[Universe], val walls: List[Wa
 
     time += dt()
     UniverseShader.setUniform("time", time.asInstanceOf[Float])
-
-    walls.foreach(_.draw())
 
     var minValue = 0.0
     for (u <- universes) {
