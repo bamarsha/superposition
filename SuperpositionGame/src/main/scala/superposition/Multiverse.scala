@@ -21,7 +21,10 @@ import scala.math.{Pi, sqrt}
  */
 private object Multiverse {
 
-  private object Gate extends Enumeration {
+  /**
+   * A quantum logic gate.
+   */
+  object Gate extends Enumeration {
     val X, Z, T, H = Value
   }
 
@@ -84,23 +87,26 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
     colorBuffer = frameBuffer.attachColorBuffer()
   }
 
-  private def step(): Unit = {
-    val selected = universes
-      .flatMap(_.qubits.values)
-      .filter(_.universeObject.position.value.sub(Input.mouse()).length() < 0.5)
-      .map(_.universeObject.id)
-      .toSet
-    for ((key, gate) <- GateKeys) {
-      if (Input.keyJustPressed(key)) {
-        selected.foreach(applyGate(gate, _))
-      }
-    }
-    combine()
-    normalize()
-    draw()
-  }
+  /**
+   * Returns the set of qubits that are within 1 unit of the position.
+   *
+   * @param position the position from which to look for nearby qubits
+   * @return the set of qubits that are within 1 unit of the position
+   */
+  def qubitsNear(position: Vec2d): Set[UniversalId] = universes
+    .flatMap(_.qubits.values)
+    .filter(_.universeObject.position.value.sub(position).length() < 1)
+    .map(_.universeObject.id)
+    .toSet
 
-  private def applyGate(gate: Gate.Value, target: UniversalId, controls: UniversalId*): Unit = {
+  /**
+   * Applies the quantum logic gate to the target qubit controlled by the control qubits, if any.
+   *
+   * @param gate the gate to apply
+   * @param target the target qubit
+   * @param controls the control qubits
+   */
+  def applyGate(gate: Gate.Value, target: UniversalId, controls: UniversalId*): Unit = {
     for (u <- universes if controls.forall(u.qubits(_).on)) {
       gate match {
         case Gate.X => u.qubits(target).flip()
@@ -123,6 +129,18 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
           universes = copy :: universes
       }
     }
+  }
+
+  private def step(): Unit = {
+    val selected = qubitsNear(Input.mouse())
+    for ((key, gate) <- GateKeys) {
+      if (Input.keyJustPressed(key)) {
+        selected.foreach(applyGate(gate, _))
+      }
+    }
+    combine()
+    normalize()
+    draw()
   }
 
   private def combine(): Unit = {

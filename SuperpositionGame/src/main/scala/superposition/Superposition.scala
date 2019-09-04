@@ -5,7 +5,7 @@ import engine.graphics.Camera
 import engine.util.Color
 import engine.util.math.Vec2d
 import extras.behaviors.{FPSBehavior, QuitOnEscapeBehavior}
-import superposition.Levels.level1
+import superposition.Levels.createLevel1
 
 /**
  * The main class for the Superposition game.
@@ -23,14 +23,16 @@ object Superposition {
 
     Game.init()
     Multiverse.declareSystem()
+    Draw.declareSystem()
+    Machine.declareSystem()
     Player.declareSystem()
 
     Camera.camera2d.setCenterSize(new Vec2d(0, 0), new Vec2d(32, 18))
 
     Game.create(new FPSBehavior())
     Game.create(new QuitOnEscapeBehavior())
-    Game.create(level1)
 
+    createLevel1()
     Game.run()
   }
 }

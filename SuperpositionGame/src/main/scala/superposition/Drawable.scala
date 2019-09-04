@@ -8,10 +8,10 @@ import engine.util.math.{Transformation, Vec2d}
 import extras.physics.PositionComponent
 
 /**
- * The drawable component draws an entity with a sprite at its current position.
- *
- * Note that having a drawable component by itself does nothing; it also needs a [[superposition.UniverseObject]]
- * component to be drawn.
+ * The drawable component gives an entity the ability to be drawn.
+ * <p>
+ * Note that having a drawable component by itself does nothing; it also needs either a [[superposition.UniverseObject]]
+ * or [[superposition.Draw]] component to be drawn.
  *
  * @param entity the entity for this component
  * @param sprite the sprite for this entity
