@@ -59,14 +59,14 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
    */
   val walls: List[Rectangle] =
     (for (layer <- tiles.layers.asScala
-          if layer.properties.asScala.exists(p => p.name == "collision" && p.value.toBoolean)) yield
-      for (x <- 0 until layer.width; y <- 0 until layer.height
-           if layer.data.tiles(x)(y) != 0) yield {
-        val absoluteX = x - 16 + layer.offsetX
-        val absoluteY = y - 9 + layer.offsetY
-        new Rectangle(new Vec2d(absoluteX, absoluteY), new Vec2d(absoluteX + 1, absoluteY + 1))
-      })
-      .flatten.toList
+          if layer.properties.asScala.exists(p => p.name == "collision" && p.value.toBoolean);
+          x <- 0 until layer.width;
+          y <- 0 until layer.height
+          if layer.data.tiles(x)(y) != 0) yield {
+      val absoluteX = x - 16 + layer.offsetX.toDouble / tiles.tileWidth
+      val absoluteY = y - 9 + layer.offsetY.toDouble / tiles.tileHeight
+      new Rectangle(new Vec2d(absoluteX, absoluteY), new Vec2d(absoluteX + 1, absoluteY + 1))
+    }).toList
 
   private var universes: List[Universe] = _
 
