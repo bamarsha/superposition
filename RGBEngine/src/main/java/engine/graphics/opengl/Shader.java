@@ -18,29 +18,32 @@ import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 
 public class Shader extends GLObject {
 
-    private final HashMap<String, Integer> uniformLocations = new HashMap<>();
+    private final HashMap<String, Integer> uniformLocations = new HashMap();
 
     private Shader(String vertexShaderSource, String geometryShaderSource, String fragmentShaderSource) {
         super(glCreateProgram());
+
         attach(GL_VERTEX_SHADER, vertexShaderSource);
         attach(GL_GEOMETRY_SHADER, geometryShaderSource);
         attach(GL_FRAGMENT_SHADER, fragmentShaderSource);
+
         glLinkProgram(id);
         if (glGetProgrami(id, GL_LINK_STATUS) != GL_TRUE) {
             throw new RuntimeException("Shader program doesn't link:\n" + glGetProgramInfoLog(id));
         }
     }
 
-    /**
-     * Loads a vertex and fragment shader using the resource mapping function and the name of the shader.
-     * The shader is loaded from the files name.vert and name.frag.
-     *
-     * @param getResource a function that maps a filename to its resource URL
-     * @param name        the name of the shader
-     * @return the shader
-     */
-    public static Shader load(Function<String, URL> getResource, String name) {
-        return loadGeom(getResource.apply(name + ".vert"), null, getResource.apply(name + ".frag"));
+    private void attach(int type, String source) {
+        if (source != null) {
+            int shader = glCreateShader(type);
+            glShaderSource(shader, source);
+            glCompileShader(shader);
+            if (glGetShaderi(shader, GL_COMPILE_STATUS) != GL_TRUE) {
+                throw new RuntimeException("Shader doesn't compile:\n" + glGetShaderInfoLog(shader));
+            }
+            glAttachShader(id, shader);
+            glDeleteShader(shader);
+        }
     }
 
     @Override
@@ -53,32 +56,24 @@ public class Shader extends GLObject {
         glDeleteProgram(id);
     }
 
-    /**
-     * Loads a vertex, geometry and fragment shader using the resource mapping function and the name of the shader.
-     * The shader is loaded from the files name.vert, name.geom and name.frag.
-     *
-     * @param getResource a function that maps a filename to its resource URL
-     * @param name        the name of the shader
-     * @return the shader
-     */
-    public static Shader loadGeom(Function<String, URL> getResource, String name) {
-        return loadGeom(
-                getResource.apply(name + ".vert"),
-                getResource.apply(name + ".geom"),
-                getResource.apply(name + ".frag"));
+    private int getUniformLocation(String name) {
+        if (!uniformLocations.containsKey(name)) {
+            uniformLocations.put(name, glGetUniformLocation(id, name));
+        }
+        return uniformLocations.get(name);
     }
 
-    private void attach(int type, String source) {
-        if (source != null) {
-            int shaderId = glCreateShader(type);
-            glShaderSource(shaderId, source);
-            glCompileShader(shaderId);
-            if (glGetShaderi(shaderId, GL_COMPILE_STATUS) != GL_TRUE) {
-                throw new RuntimeException("Shader doesn't compile:\n" + glGetShaderInfoLog(shaderId));
-            }
-            glAttachShader(id, shaderId);
-            glDeleteShader(shaderId);
-        }
+    /**
+     * Loads a vertex and fragment shader using the resource mapping function and the name of the shader.
+     *
+     * The shader is loaded from the files name.vert and name.frag.
+     *
+     * @param getResource a function that maps a filename to its resource URL
+     * @param name the name of the shader
+     * @return the shader
+     */
+    public static Shader load(Function<String, URL> getResource, String name) {
+        return loadGeom(getResource.apply(name + ".vert"), null, getResource.apply(name + ".frag"));
     }
 
     /**
@@ -92,15 +87,20 @@ public class Shader extends GLObject {
         return loadGeom(vert, null, frag);
     }
 
-    private int getUniformLocation(String name) {
-        if (!uniformLocations.containsKey(name)) {
-            var loc = glGetUniformLocation(id, name);
-            if (loc == -1) {
-                throw new IllegalArgumentException(String.format("Could not find uniform variable %s", name));
-            }
-            uniformLocations.put(name, loc);
-        }
-        return uniformLocations.get(name);
+    /**
+     * Loads a vertex, geometry and fragment shader using the resource mapping function and the name of the shader.
+     *
+     * The shader is loaded from the files name.vert, name.geom and name.frag.
+     *
+     * @param getResource a function that maps a filename to its resource URL
+     * @param name the name of the shader
+     * @return the shader
+     */
+    public static Shader loadGeom(Function<String, URL> getResource, String name) {
+        return loadGeom(
+                getResource.apply(name + ".vert"),
+                getResource.apply(name + ".geom"),
+                getResource.apply(name + ".frag"));
     }
 
     /**
@@ -165,9 +165,9 @@ public class Shader extends GLObject {
         bind();
         int uniform = getUniformLocation(name);
         glUniformMatrix4fv(uniform, false, new float[]{
-                (float) mat.m00(), (float) mat.m01(), (float) mat.m02(), (float) mat.m03(),
-                (float) mat.m10(), (float) mat.m11(), (float) mat.m12(), (float) mat.m13(),
-                (float) mat.m20(), (float) mat.m21(), (float) mat.m22(), (float) mat.m23(),
-                (float) mat.m30(), (float) mat.m31(), (float) mat.m32(), (float) mat.m33()});
+            (float) mat.m00(), (float) mat.m01(), (float) mat.m02(), (float) mat.m03(),
+            (float) mat.m10(), (float) mat.m11(), (float) mat.m12(), (float) mat.m13(),
+            (float) mat.m20(), (float) mat.m21(), (float) mat.m22(), (float) mat.m23(),
+            (float) mat.m30(), (float) mat.m31(), (float) mat.m32(), (float) mat.m33()});
     }
 }

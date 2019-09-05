@@ -1,25 +1,29 @@
 package engine.graphics.opengl;
 
 import engine.core.Settings;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL20.glUseProgram;
-import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
+import static org.lwjgl.opengl.GL30.glBindFramebuffer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public class GLState {
 
     private static GLState state = new GLState();
 
     private int blendFunc1, blendFunc2;
-    private final Map<Integer, BufferObject> buffers = new HashMap<>();
-    private final Map<Integer, Boolean> flags = new HashMap<>();
+    private final Map<Integer, BufferObject> buffers = new HashMap();
+    private final Map<Integer, Boolean> flags = new HashMap();
     private Framebuffer framebuffer = null;
     private Shader shader = null;
     private Texture[] texture = new Texture[32];

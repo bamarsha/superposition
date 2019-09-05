@@ -1,5 +1,6 @@
 package engine.graphics;
 
+import engine.graphics.opengl.BufferObject;
 import engine.graphics.opengl.Shader;
 import engine.graphics.opengl.VertexArrayObject;
 import engine.util.Color;
@@ -11,6 +12,9 @@ import engine.util.math.Vec3d;
 import static engine.graphics.opengl.GLObject.bindAll;
 import static engine.util.math.MathUtils.rotate;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 
 public class Graphics {
 
@@ -19,18 +23,20 @@ public class Graphics {
     private static final int CIRCLE_DETAIL = 40;
 
     private static final VertexArrayObject CIRCLE_VAO = VertexArrayObject.createVAO(() -> {
-        var b = new VertexArrayObject.VAOBuilder(3);
+        float[] circleVertices = new float[CIRCLE_DETAIL * 3 + 6];
         for (int i = 0; i <= CIRCLE_DETAIL; i++) {
-            b.add(0, Math.cos(i * 2 * Math.PI / CIRCLE_DETAIL), Math.sin(i * 2 * Math.PI / CIRCLE_DETAIL));
+            circleVertices[3 * i + 3] = (float) Math.cos(i * 2 * Math.PI / CIRCLE_DETAIL);
+            circleVertices[3 * i + 4] = (float) Math.sin(i * 2 * Math.PI / CIRCLE_DETAIL);
         }
-        return b;
+        BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, circleVertices);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 12, 0);
+        glEnableVertexAttribArray(0);
     });
 
     private static final VertexArrayObject LINE_VAO = VertexArrayObject.createVAO(() -> {
-        var b = new VertexArrayObject.VAOBuilder(3);
-        b.add(0, 0, 0, 0);
-        b.add(0, 1, 0, 0);
-        return b;
+        BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{0, 0, 0, 1, 0, 0});
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 12, 0);
+        glEnableVertexAttribArray(0);
     });
 
     public static void drawCircle(Vec2d center, double size, Color color) {
@@ -62,16 +68,16 @@ public class Graphics {
     }
 
     private static final VertexArrayObject RECTANGLE_VAO = VertexArrayObject.createVAO(() -> {
-        var b = new VertexArrayObject.VAOBuilder(3);
-        b.addQuad(0, new Vec3d(0, 0, 0), new Vec3d(1, 0, 0), new Vec3d(0, 1, 0));
-        return b;
+        BufferObject vbo = new BufferObject(GL_ARRAY_BUFFER, new float[]{0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0});
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 12, 0);
+        glEnableVertexAttribArray(0);
     });
 
     public static void drawRectangle(Transformation t, Color color) {
         COLOR_SHADER.setMVP(t);
         COLOR_SHADER.setUniform("color", color);
         bindAll(COLOR_SHADER, RECTANGLE_VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
 
 //    public static void drawRectangle3d(Vec3d position, Vec3d normal, double rotation, Vec2d size, Vec4d color) {
