@@ -6,7 +6,6 @@ import engine.graphics.sprites.Sprite
 import engine.util.Color.WHITE
 import engine.util.math.Vec2d
 import extras.physics.PositionComponent
-import superposition.Multiverse.Gate
 
 /**
  * Contains initialization for machines.

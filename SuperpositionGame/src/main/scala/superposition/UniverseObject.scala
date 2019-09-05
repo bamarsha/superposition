@@ -29,6 +29,12 @@ private final class UniverseObject(entity: Entity with Copyable[_ <: Entity],
   lazy val drawable: Drawable = get(classOf[Drawable])
 
   /**
+   * The hitbox for this object.
+   */
+  def hitbox: Rectangle =
+    Rectangle.fromCenterSize(position.value, hitboxSize)
+
+  /**
    * Returns true if this object would collide with any other object or wall at the position.
    *
    * @param position the position to test for collision

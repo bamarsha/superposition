@@ -19,6 +19,7 @@ private object Levels {
     }
     universe.add(new Door(universe, UniversalId(2), new Vec2d(4, 1)))
     universe.add(new Player(universe, UniversalId(3), new Vec2d(0, 0)))
+    universe.add(new Laser(universe, UniversalId(4), new Vec2d(-2, -2), new Vec2d(0, -1)))
     Game.create(new Machine(multiverse, UniversalId(2), new Vec2d(6, 1)))
     Game.create(multiverse)
   }

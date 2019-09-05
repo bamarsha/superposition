@@ -21,13 +21,6 @@ import scala.math.{Pi, sqrt}
  */
 private object Multiverse {
 
-  /**
-   * A quantum logic gate.
-   */
-  object Gate extends Enumeration {
-    val X, Z, T, H = Value
-  }
-
   private val GateKeys: List[(Int, Gate.Value)] = List(
     (GLFW_KEY_X, Gate.X),
     (GLFW_KEY_Z, Gate.Z),
@@ -102,8 +95,8 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
   /**
    * Applies the quantum logic gate to the target qubit controlled by the control qubits, if any.
    *
-   * @param gate the gate to apply
-   * @param target the target qubit
+   * @param gate     the gate to apply
+   * @param target   the target qubit
    * @param controls the control qubits
    */
   def applyGate(gate: Gate.Value, target: UniversalId, controls: UniversalId*): Unit = {

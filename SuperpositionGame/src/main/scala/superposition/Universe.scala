@@ -15,7 +15,7 @@ import scala.math.pow
  *
  * @param multiverse the multiverse this universe belongs to
  */
-private final class Universe(multiverse: Multiverse) extends Entity {
+private final class Universe(multiverse: Multiverse) extends Entity with Copyable[Universe] {
   /**
    * The probability amplitude of this universe.
    */
@@ -58,22 +58,6 @@ private final class Universe(multiverse: Multiverse) extends Entity {
   def walls: List[Rectangle] = multiverse.walls
 
   /**
-   * Returns a copy of this universe and all of its objects.
-   *
-   * @return a copy of this universe
-   */
-  def copy(): Universe = {
-    val universe = new Universe(multiverse)
-    universe.amplitude = amplitude
-    for (e <- objects.values.map(_.entity)) {
-      val copy = e.copy()
-      copy.get(classOf[UniverseObject]).universe = universe
-      universe.add(copy)
-    }
-    universe
-  }
-
-  /**
    * Adds the entity to this universe.
    *
    * @param entity the entity to add
@@ -94,5 +78,31 @@ private final class Universe(multiverse: Multiverse) extends Entity {
     if (entity.has(classOf[Qubit])) {
       _qubits += (universeObject.id -> entity.get(classOf[Qubit]))
     }
+  }
+
+  /**
+   * Applies the quantum logic gate to the target qubit.
+   *
+   * @param gate   the gate to apply
+   * @param target the target qubit
+   */
+  def applyGate(gate: Gate.Value, target: UniversalId): Unit =
+  // TODO: Batch gates applied to the same qubit from different universes in the same frame.
+    multiverse.applyGate(gate, target)
+
+  /**
+   * Returns a copy of this universe and all of its objects.
+   *
+   * @return a copy of this universe
+   */
+  override def copy(): Universe = {
+    val universe = new Universe(multiverse)
+    universe.amplitude = amplitude
+    for (e <- objects.values.map(_.entity)) {
+      val copy = e.copy()
+      copy.get(classOf[UniverseObject]).universe = universe
+      universe.add(copy)
+    }
+    universe
   }
 }
