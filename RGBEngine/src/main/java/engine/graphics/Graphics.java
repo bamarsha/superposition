@@ -105,6 +105,6 @@ public class Graphics {
     public static void drawWideLine(Vec2d p1, Vec2d p2, double width, Color color) {
         Vec2d delta = p2.sub(p1);
         Vec2d perp = rotate(delta, Math.PI / 2).setLength(-width / 2);
-        drawRectangle(Transformation.create(p1.add(perp), delta, perp.mul(2)), color);
+        drawRectangle(Transformation.create(p1.sub(perp), delta, perp.mul(2)), color);
     }
 }

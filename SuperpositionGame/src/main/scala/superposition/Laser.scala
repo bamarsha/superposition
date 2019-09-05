@@ -56,8 +56,7 @@ private final class Laser(universe: Universe,
         case _ =>
       }
     }
-    val lineStart = position.value.add(new Vec2d(0.25, 0))
-    drawWideLine(lineStart, new Vec2d(lineStart.x, hit._1.upperRight.y), 0.25, Color.RED)
+    drawWideLine(position.value, new Vec2d(position.value.x, hit._1.upperRight.y), 0.25, Color.RED)
   }
 
   override def copy(): Laser = new Laser(universe, id, position.value, direction)
