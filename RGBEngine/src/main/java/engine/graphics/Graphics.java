@@ -21,7 +21,7 @@ public class Graphics {
     private static final VertexArrayObject CIRCLE_VAO = VertexArrayObject.createVAO(() -> {
         var b = new VertexArrayObject.VAOBuilder(3);
         for (int i = 0; i <= CIRCLE_DETAIL; i++) {
-            b.add(0, Math.cos(i * 2 * Math.PI / CIRCLE_DETAIL), Math.sin(i * 2 * Math.PI / CIRCLE_DETAIL));
+            b.add(0, Math.cos(i * 2 * Math.PI / CIRCLE_DETAIL), Math.sin(i * 2 * Math.PI / CIRCLE_DETAIL), 0);
         }
         return b;
     });
