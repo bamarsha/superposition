@@ -13,6 +13,7 @@ import extras.physics.Rectangle
 import extras.tiles.{Tilemap, TilemapRenderer}
 import org.lwjgl.glfw.GLFW._
 
+import scala.collection.immutable.Queue
 import scala.jdk.CollectionConverters._
 import scala.math.{Pi, sqrt}
 
@@ -65,6 +66,7 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
     }).toList
 
   private var universes: List[Universe] = _
+  private var gateBuffer: Queue[(Gate.Value, UniversalId, Set[UniversalId])] = Queue()
 
   private var frameBuffer: Framebuffer = _
   private var colorBuffer: Texture = _
@@ -94,13 +96,33 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
 
   /**
    * Applies the quantum logic gate to the target qubit controlled by the control qubits, if any.
+   * <p>
+   * Gates are buffered for one frame to avoid duplicate gate applications when an object that exists in multiple
+   * universes tries to apply a gate to the same qubit from multiple universes.
    *
    * @param gate     the gate to apply
    * @param target   the target qubit
    * @param controls the control qubits
    */
-  def applyGate(gate: Gate.Value, target: UniversalId, controls: UniversalId*): Unit = {
-    for (u <- universes if controls.forall(u.qubits(_).on)) {
+  def applyGate(gate: Gate.Value, target: UniversalId, controls: UniversalId*): Unit =
+    gateBuffer :+= (gate, target, controls.toSet)
+
+  private def step(): Unit = {
+    val selected = qubitsNear(Input.mouse())
+    for ((key, gate) <- GateKeys) {
+      if (Input.keyJustPressed(key)) {
+        selected.foreach(applyGate(gate, _))
+      }
+    }
+    flushGates()
+    combine()
+    normalize()
+    draw()
+  }
+
+  private def flushGates(): Unit = {
+    for ((gate, target, controls) <- gateBuffer.distinct;
+         u <- universes if controls.forall(u.qubits(_).on)) {
       gate match {
         case Gate.X => u.qubits(target).flip()
         case Gate.Z =>
@@ -122,18 +144,7 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
           universes = copy :: universes
       }
     }
-  }
-
-  private def step(): Unit = {
-    val selected = qubitsNear(Input.mouse())
-    for ((key, gate) <- GateKeys) {
-      if (Input.keyJustPressed(key)) {
-        selected.foreach(applyGate(gate, _))
-      }
-    }
-    combine()
-    normalize()
-    draw()
+    gateBuffer = Queue()
   }
 
   private def combine(): Unit = {

@@ -92,14 +92,17 @@ private final class Universe(multiverse: Multiverse) extends Entity with Copyabl
   }
 
   /**
-   * Applies the quantum logic gate to the target qubit.
+   * Applies the quantum logic gate to the target qubit controlled by the control qubits, if any.
+   * <p>
+   * Gates are buffered for one frame to avoid duplicate gate applications when an object that exists in multiple
+   * universes tries to apply a gate to the same qubit from multiple universes.
    *
-   * @param gate   the gate to apply
-   * @param target the target qubit
+   * @param gate     the gate to apply
+   * @param target   the target qubit
+   * @param controls the control qubits
    */
-  def applyGate(gate: Gate.Value, target: UniversalId): Unit =
-  // TODO: Batch gates applied to the same qubit from different universes in the same frame.
-    multiverse.applyGate(gate, target)
+  def applyGate(gate: Gate.Value, target: UniversalId, controls: UniversalId*): Unit =
+    multiverse.applyGate(gate, target, controls: _*)
 
   /**
    * Returns a copy of this universe and all of its objects.
