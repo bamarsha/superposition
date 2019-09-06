@@ -1,11 +1,22 @@
 package superposition
 
-import engine.core.Behavior.Entity
+import engine.core.Behavior.{Component, Entity}
 import engine.core.Game
-import extras.physics.{PhysicsComponent, Rectangle}
+import engine.util.math.Vec2d
+import extras.physics.{PhysicsComponent, PositionComponent, Rectangle}
 
 import scala.collection.immutable.HashMap
 import scala.math.pow
+
+/**
+ * Represents the ID of a universe object.
+ *
+ * A universal ID is unique within a universe but not within the multiverse; copies of an entity in other universes will
+ * have the same ID.
+ *
+ * @param value the ID
+ */
+private final case class UniversalId(value: Int) extends AnyVal
 
 /**
  * A game universe.
@@ -104,5 +115,48 @@ private final class Universe(multiverse: Multiverse) extends Entity with Copyabl
       universe.add(copy)
     }
     universe
+  }
+}
+
+/**
+ * A universe object is any object that exists within a particular universe.
+ * <p>
+ * Universe objects <em>must</em> perform all drawing in their [[superposition.Drawable#draw]] method. This makes it
+ * possible for the multiverse to draw copies of an object from different universes in superposition.
+ *
+ * @param entity              the entity for this component
+ * @param universe            the universe this object belongs to
+ * @param id                  the ID of this object
+ * @param hitboxSize          the size of this object's hitbox
+ * @param collidesWithObjects whether this object collides with other objects in the universe (excluding walls)
+ */
+private final class UniverseObject(entity: Entity with Copyable[_ <: Entity] with Drawable,
+                                   var universe: Universe,
+                                   val id: UniversalId,
+                                   val hitboxSize: Vec2d = new Vec2d(0, 0),
+                                   var collidesWithObjects: Boolean = false) extends Component(entity) {
+  /**
+   * The position component of this object.
+   */
+  lazy val position: PositionComponent = get(classOf[PositionComponent])
+
+  /**
+   * The hitbox for this object.
+   */
+  def hitbox: Rectangle =
+    Rectangle.fromCenterSize(position.value, hitboxSize)
+
+  /**
+   * Returns true if this object would collide with any other object or wall at the position.
+   *
+   * @param position the position to test for collision
+   * @return true if this object would collide with any other object or wall at the position
+   */
+  def collides(position: Vec2d): Boolean = {
+    val hitbox = Rectangle.fromCenterSize(position, hitboxSize)
+    val otherObjects = universe.objects.values
+      .filter(o => o.entity != (this: Component[_]).entity && o.collidesWithObjects)
+      .map(o => Rectangle.fromCenterSize(o.position.value, o.hitboxSize))
+    universe.walls.appendedAll(otherObjects).exists(hitbox.intersects)
   }
 }
