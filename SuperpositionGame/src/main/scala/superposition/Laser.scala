@@ -8,6 +8,8 @@ import engine.util.Color
 import engine.util.math.Vec2d
 import extras.physics.{PositionComponent, Rectangle}
 
+import scala.math.Ordering.Double.TotalOrdering
+
 /**
  * Contains initialization for lasers.
  */
@@ -50,7 +52,7 @@ private final class Laser(universe: Universe,
     val beam = new Rectangle(position.value.add(direction.normalize().mul(10)), position.value)
     val hit = (walls ++ objects)
       .filter(_._1.intersects(beam))
-      .minBy(_._1.upperRight.sub(position.value).length())
+      .minBy(_._1.upperRight.sub(position.value).length())(TotalOrdering)
 
     if (hit._2 != targetId) {
       targetId = hit._2
