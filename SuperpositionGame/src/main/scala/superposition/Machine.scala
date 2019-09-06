@@ -26,10 +26,14 @@ private object Machine {
  * @param target     the target qubit
  * @param _position  the position of this machine
  */
-private final class Machine(multiverse: Multiverse, target: UniversalId, _position: Vec2d) extends Entity {
+private final class Machine(multiverse: Multiverse,
+                            target: UniversalId,
+                            _position: Vec2d) extends Entity with Drawable {
   private val position: PositionComponent = add(new PositionComponent(this, _position))
 
-  add(new Drawable(this, Sprite.load(getClass.getResource("sprites/tile1.png")), color = WHITE))
+  private val sprite: DrawableSprite =
+    add(new DrawableSprite(this, Sprite.load(getClass.getResource("sprites/tile1.png")), color = WHITE))
+
   add(new Draw(this))
 
   private var control: Option[UniversalId] = None
@@ -52,4 +56,6 @@ private final class Machine(multiverse: Multiverse, target: UniversalId, _positi
       }
     }
   }
+
+  override def draw(): Unit = sprite.draw()
 }

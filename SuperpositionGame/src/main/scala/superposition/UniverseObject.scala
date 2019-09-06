@@ -6,6 +6,9 @@ import extras.physics.{PositionComponent, Rectangle}
 
 /**
  * A universe object is any object that exists within a particular universe.
+ * <p>
+ * Universe objects <em>must</em> perform all drawing in their [[superposition.Drawable#draw]] method. This makes it
+ * possible for the multiverse to draw copies of an object from different universes in superposition.
  *
  * @param entity              the entity for this component
  * @param universe            the universe this object belongs to
@@ -13,7 +16,7 @@ import extras.physics.{PositionComponent, Rectangle}
  * @param hitboxSize          the size of this object's hitbox
  * @param collidesWithObjects whether this object collides with other objects in the universe (excluding walls)
  */
-private final class UniverseObject(entity: Entity with Copyable[_ <: Entity],
+private final class UniverseObject(entity: Entity with Copyable[_ <: Entity] with Drawable,
                                    var universe: Universe,
                                    val id: UniversalId,
                                    val hitboxSize: Vec2d = new Vec2d(0, 0),
@@ -22,11 +25,6 @@ private final class UniverseObject(entity: Entity with Copyable[_ <: Entity],
    * The position component of this object.
    */
   lazy val position: PositionComponent = get(classOf[PositionComponent])
-
-  /**
-   * The drawable component of this object.
-   */
-  lazy val drawable: Drawable = get(classOf[Drawable])
 
   /**
    * The hitbox for this object.

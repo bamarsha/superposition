@@ -42,7 +42,9 @@ private object Player {
  * @param id        the universe object ID for this player
  * @param _position the initial position for this player
  */
-private final class Player(universe: Universe, id: UniversalId, _position: Vec2d) extends Entity with Copyable[Player] {
+private final class Player(universe: Universe,
+                           id: UniversalId,
+                           _position: Vec2d) extends Entity with Copyable[Player] with Drawable {
 
   import Player._
 
@@ -52,7 +54,7 @@ private final class Player(universe: Universe, id: UniversalId, _position: Vec2d
 
   private val physics: PhysicsComponent = add(new PhysicsComponent(this, new Vec2d(0, 0), universeObject.collides))
 
-  add(new Drawable(
+  val sprite: DrawableSprite = add(new DrawableSprite(
     entity = this,
     sprite = Sprite.load(getClass.getResource("sprites/cat.png")),
     scale = new Vec2d(2, 2),
@@ -85,4 +87,6 @@ private final class Player(universe: Universe, id: UniversalId, _position: Vec2d
     player.carrying = carrying
     player
   }
+
+  override def draw(): Unit = sprite.draw()
 }
