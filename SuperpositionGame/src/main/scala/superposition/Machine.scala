@@ -10,13 +10,13 @@ import extras.physics.PositionComponent
 /**
  * Contains initialization for machines.
  */
-private object Machine {
-  /**
-   * Declares the machine system.
-   */
-  def declareSystem(): Unit =
-    Game.declareSystem(classOf[Machine], (_: Machine).step())
-}
+//private object Machine {
+//  /**
+//   * Declares the machine system.
+//   */
+//  def declareSystem(): Unit =
+//    Game.declareSystem(classOf[Machine], (_: Machine).step())
+//}
 
 /**
  * A machine applies a CNOT gate to the target qubit. It is activated when a qubit comes near the machine, which becomes
@@ -26,36 +26,37 @@ private object Machine {
  * @param target     the target qubit
  * @param _position  the position of this machine
  */
-private final class Machine(multiverse: Multiverse,
-                            target: UniversalId,
-                            _position: Vec2d) extends Entity with Drawable {
-  private val position: PositionComponent = add(new PositionComponent(this, _position))
-
-  private val sprite: DrawableSprite =
-    add(new DrawableSprite(this, Sprite.load(getClass.getResource("sprites/tile1.png")), color = WHITE))
-
-  add(new Draw(this))
-
-  private var control: Option[UniversalId] = None
-
-  private def step(): Unit = {
-    val near = multiverse.qubitsNear(position.value)
-    val last = control
-    control = control match {
-      case Some(id) => if (near.contains(id)) Some(id) else near.headOption
-      case None => near.headOption
-    }
-    if (control != last) {
-      if (last.isDefined) {
-        // Undo the last controlled gate.
-        multiverse.applyGate(Gate.X, target, last.get)
-      }
-      if (control.isDefined) {
-        // Apply the new controlled gate.
-        multiverse.applyGate(Gate.X, target, control.get)
-      }
-    }
-  }
-
-  override def draw(): Unit = sprite.draw()
-}
+// TODO
+//private final class Machine(multiverse: Multiverse,
+//                            target: UniversalId,
+//                            _position: Vec2d) extends Entity with Drawable {
+//  private val position: PositionComponent = add(new PositionComponent(this, _position))
+//
+//  private val sprite: DrawableSprite =
+//    add(new DrawableSprite(this, Sprite.load(getClass.getResource("sprites/tile1.png")), color = WHITE))
+//
+//  add(new Draw(this))
+//
+//  private var control: Option[UniversalId] = None
+//
+//  private def step(): Unit = {
+//    val near = multiverse.qubitsNear(position.value)
+//    val last = control
+//    control = control match {
+//      case Some(id) => if (near.contains(id)) Some(id) else near.headOption
+//      case None => near.headOption
+//    }
+//    if (control != last) {
+//      if (last.isDefined) {
+//        // Undo the last controlled gate.
+//        multiverse.applyGate(Gate.X, target, last.get)
+//      }
+//      if (control.isDefined) {
+//        // Apply the new controlled gate.
+//        multiverse.applyGate(Gate.X, target, control.get)
+//      }
+//    }
+//  }
+//
+//  override def draw(): Unit = sprite.draw()
+//}

@@ -3,10 +3,9 @@ package superposition
 import engine.core.Behavior.{Component, Entity}
 import engine.core.Game
 import engine.util.math.Vec2d
-import extras.physics.{PhysicsComponent, PositionComponent, Rectangle}
+import extras.physics.{PositionComponent, Rectangle}
 
 import scala.collection.immutable.HashMap
-import scala.math.pow
 
 /**
  * Represents the ID of a universe object.
@@ -26,17 +25,15 @@ private final case class UniversalId(value: Int) extends AnyVal
  *
  * @param multiverse the multiverse this universe belongs to
  */
-private final class Universe(multiverse: Multiverse) extends Entity with Copyable[Universe] {
+private final class Universe(val multiverse: Multiverse) extends Entity with Copyable[Universe] {
   /**
    * The probability amplitude of this universe.
    */
   var amplitude: Complex = Complex(1)
 
-  private var _objects: Map[UniversalId, UniverseObject] = new HashMap[UniversalId, UniverseObject]()
+  private var _objects: Map[UniversalId, UniverseObject] = new HashMap()
 
-  private var _physicsObjects: Map[UniversalId, PhysicsComponent] = new HashMap[UniversalId, PhysicsComponent]()
-
-  private var _qubits: Map[UniversalId, Qubit] = new HashMap[UniversalId, Qubit]()
+  private var _bits: Map[UniversalId, Bit] = new HashMap()
 
   override protected def onCreate(): Unit = objects.values.foreach(o => Game.create(o.entity))
 
@@ -48,25 +45,16 @@ private final class Universe(multiverse: Multiverse) extends Entity with Copyabl
   def objects: Map[UniversalId, UniverseObject] = _objects
 
   /**
-   * The objects with physics in this universe.
+   * The bits in this universe.
    */
-  def physicsObjects: Map[UniversalId, PhysicsComponent] = _physicsObjects
+  def bits: Map[UniversalId, Bit] = _bits
 
   /**
-   * The qubits in this universe.
+   * An opaque representation of this universe's state that can be compared for equality with the state of other
+   * universes.
    */
-  def qubits: Map[UniversalId, Qubit] = _qubits
-
-  /**
-   * The state of this universe, given by Σ,,i,, q,,i,, · 2^i^, where q,,i,, is the state of the ith qubit.
-   */
-  def state: Int =
-    qubits.values.map(q => if (q.on) pow(2, q.universeObject.id.value).toInt else 0).sum
-
-  /**
-   * The list of walls in this universe.
-   */
-  def walls: List[Rectangle] = multiverse.walls
+  def state: Equals =
+    bits.view.mapValues(q => (q.on, q.universeObject.cell)).toMap
 
   /**
    * Adds the entity to this universe.
@@ -83,26 +71,10 @@ private final class Universe(multiverse: Multiverse) extends Entity with Copyabl
     require(!objects.contains(universeObject.id), "ID has already been used")
 
     _objects += (universeObject.id -> universeObject)
-    if (entity.has(classOf[PhysicsComponent])) {
-      _physicsObjects += (universeObject.id -> entity.get(classOf[PhysicsComponent]))
-    }
-    if (entity.has(classOf[Qubit])) {
-      _qubits += (universeObject.id -> entity.get(classOf[Qubit]))
+    if (entity.has(classOf[Bit])) {
+      _bits += (universeObject.id -> entity.get(classOf[Bit]))
     }
   }
-
-  /**
-   * Applies the quantum logic gate to the target qubit controlled by the control qubits, if any.
-   * <p>
-   * Gates are buffered for one frame to avoid duplicate gate applications when an object that exists in multiple
-   * universes tries to apply a gate to the same qubit from multiple universes.
-   *
-   * @param gate     the gate to apply
-   * @param target   the target qubit
-   * @param controls the control qubits
-   */
-  def applyGate(gate: Gate.Value, target: UniversalId, controls: UniversalId*): Unit =
-    multiverse.applyGate(gate, target, controls: _*)
 
   /**
    * Returns a copy of this universe and all of its objects.
@@ -130,12 +102,14 @@ private final class Universe(multiverse: Multiverse) extends Entity with Copyabl
  * @param entity              the entity for this component
  * @param universe            the universe this object belongs to
  * @param id                  the ID of this object
+ * @param _cell               the initial grid cell of this object
  * @param hitboxSize          the size of this object's hitbox
  * @param collidesWithObjects whether this object collides with other objects in the universe (excluding walls)
  */
 private final class UniverseObject(entity: Entity with Copyable[_ <: Entity] with Drawable,
                                    var universe: Universe,
                                    val id: UniversalId,
+                                   private var _cell: Cell,
                                    val hitboxSize: Vec2d = new Vec2d(0, 0),
                                    var collidesWithObjects: Boolean = false) extends Component(entity) {
   /**
@@ -144,10 +118,25 @@ private final class UniverseObject(entity: Entity with Copyable[_ <: Entity] wit
   lazy val position: PositionComponent = get(classOf[PositionComponent])
 
   /**
+   * The multiverse this object belongs to.
+   */
+  val multiverse: Multiverse = universe.multiverse
+
+  /**
    * The hitbox for this object.
    */
   def hitbox: Rectangle =
     Rectangle.fromCenterSize(position.value, hitboxSize)
+
+  /**
+   * The grid cell of this obejct.
+   */
+  def cell: Cell = _cell
+
+  def cell_=(value: Cell): Unit = {
+    _cell = value
+    position.value = new Vec2d(value.column + 0.5, value.row + 0.5)
+  }
 
   /**
    * Returns true if this object would collide with any other object or wall at the position.
@@ -155,11 +144,12 @@ private final class UniverseObject(entity: Entity with Copyable[_ <: Entity] wit
    * @param position the position to test for collision
    * @return true if this object would collide with any other object or wall at the position
    */
-  def collides(position: Vec2d): Boolean = {
-    val hitbox = Rectangle.fromCenterSize(position, hitboxSize)
-    val otherObjects = universe.objects.values
-      .filter(o => o.entity != (this: Component[_]).entity && o.collidesWithObjects)
-      .map(o => Rectangle.fromCenterSize(o.position.value, o.hitboxSize))
-    universe.walls.appendedAll(otherObjects).exists(hitbox.intersects)
-  }
+  // TODO
+  //  def collides(position: Vec2d): Boolean = {
+  //    val hitbox = Rectangle.fromCenterSize(position, hitboxSize)
+  //    val otherObjects = universe.objects.values
+  //      .filter(o => o.entity != (this: Component[_]).entity && o.collidesWithObjects)
+  //      .map(o => Rectangle.fromCenterSize(o.position.value, o.hitboxSize))
+  //    universe.walls.appendedAll(otherObjects).exists(hitbox.intersects)
+  //  }
 }

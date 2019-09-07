@@ -2,10 +2,11 @@ package superposition
 
 import engine.core.Behavior.Entity
 import engine.core.{Game, Input}
+import engine.graphics.Graphics.drawRectangleOutline
 import engine.graphics.sprites.Sprite
-import engine.util.Color.WHITE
-import engine.util.math.Vec2d
-import extras.physics.{PhysicsComponent, PositionComponent}
+import engine.util.Color.{BLACK, WHITE}
+import engine.util.math.{Transformation, Vec2d}
+import extras.physics.PositionComponent
 import org.lwjgl.glfw.GLFW._
 
 /**
@@ -19,6 +20,13 @@ private object Player {
     (GLFW_KEY_A, new Vec2d(-1, 0)),
     (GLFW_KEY_S, new Vec2d(0, -1)),
     (GLFW_KEY_D, new Vec2d(1, 0))
+  )
+
+  private val WalkGates: List[(Int, Gate.Value)] = List(
+    (GLFW_KEY_W, Gate.Up),
+    (GLFW_KEY_A, Gate.Left),
+    (GLFW_KEY_S, Gate.Down),
+    (GLFW_KEY_D, Gate.Right)
   )
 
   /**
@@ -38,21 +46,20 @@ private object Player {
 /**
  * The player character in the game.
  *
- * @param universe  the universe this player belongs to
- * @param id        the universe object ID for this player
- * @param _position the initial position for this player
+ * @param universe the universe this player belongs to
+ * @param id       the universe object ID for this player
+ * @param cell     the initial position for this player
  */
 private final class Player(universe: Universe,
                            id: UniversalId,
-                           _position: Vec2d) extends Entity with Copyable[Player] with Drawable {
+                           cell: Cell) extends Entity with Copyable[Player] with Drawable {
 
   import Player._
 
-  private val position: PositionComponent = add(new PositionComponent(this, _position))
+  private val position: PositionComponent =
+    add(new PositionComponent(this, new Vec2d(cell.column + 0.5, cell.row + 0.5)))
 
-  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, new Vec2d(1.8, 1.8)))
-
-  private val physics: PhysicsComponent = add(new PhysicsComponent(this, new Vec2d(0, 0), universeObject.collides))
+  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell, new Vec2d(1.8, 1.8)))
 
   val sprite: DrawableSprite = add(new DrawableSprite(
     entity = this,
@@ -61,32 +68,42 @@ private final class Player(universe: Universe,
     color = WHITE
   ))
 
+  private val bit: Bit = add(new Bit(this, true, on => sprite.color = if (on) WHITE else BLACK))
+
   private var carrying: Option[UniversalId] = None
 
   private def step(): Unit = {
-    physics.velocity = walkVelocity()
+    val multiverse = universeObject.multiverse
+    WalkGates.find { case (key, _) => Input.keyJustPressed(key) }.map(_._2) match {
+      case Some(gate) if multiverse.canApplyGate(gate, id, BitControl(id, on = true)) =>
+        multiverse.applyGate(gate, id, BitControl(id, on = true))
+        for (id <- carrying) {
+          multiverse.applyGate(gate, id, BitControl(id, on = true))
+        }
+      case _ =>
+    }
     if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
       toggleCarrying()
-    }
-    for (id <- carrying) {
-      universeObject.universe.physicsObjects(id).position.value = physics.position.value
-      universeObject.universe.physicsObjects(id).velocity = physics.velocity
     }
   }
 
   private def toggleCarrying(): Unit =
     if (carrying.isEmpty)
-      carrying = universeObject.universe.physicsObjects
-        .find(o => o._2.entity != this && o._2.position.value.sub(position.value).length() < 1)
+      carrying = universeObject.universe.objects
+        .find(o => o._2.entity != this && o._2.cell == cell)
         .map(_._1)
     else
       carrying = None
 
   override def copy(): Player = {
-    val player = new Player(universeObject.universe, universeObject.id, position.value)
+    val player = new Player(universeObject.universe, universeObject.id, universeObject.cell)
+    player.bit.on = bit.on
     player.carrying = carrying
     player
   }
 
-  override def draw(): Unit = sprite.draw()
+  override def draw(): Unit = {
+    sprite.draw()
+    drawRectangleOutline(Transformation.create(new Vec2d(position.value.x - 0.5, position.value.y - 0.5), 0, 1), BLACK)
+  }
 }

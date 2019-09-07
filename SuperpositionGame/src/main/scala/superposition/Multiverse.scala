@@ -9,7 +9,6 @@ import engine.graphics.opengl.{Framebuffer, Shader, Texture}
 import engine.util.Color
 import engine.util.Color.CLEAR
 import engine.util.math.{Transformation, Vec2d}
-import extras.physics.Rectangle
 import extras.tiles.{Tilemap, TilemapRenderer}
 import org.lwjgl.glfw.GLFW._
 
@@ -52,21 +51,22 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
   import Multiverse._
 
   /**
-   * The list of walls in the multiverse.
+   * The walls in the multiverse.
    */
-  val walls: List[Rectangle] =
+  val walls: Set[Cell] =
     (for (layer <- tiles.layers.asScala
           if layer.properties.asScala.exists(p => p.name == "collision" && p.value.toBoolean);
           x <- 0 until layer.width;
           y <- 0 until layer.height
           if layer.data.tiles(x)(y) != 0) yield {
-      val absoluteX = x - 16 + layer.offsetX.toDouble / tiles.tileWidth
-      val absoluteY = y - 9 + layer.offsetY.toDouble / tiles.tileHeight
-      new Rectangle(new Vec2d(absoluteX, absoluteY), new Vec2d(absoluteX + 1, absoluteY + 1))
-    }).toList
+      Cell(
+        (y - 9 + layer.offsetY.toDouble / tiles.tileHeight).round,
+        (x - 16 + layer.offsetX.toDouble / tiles.tileWidth).round
+      )
+    }).toSet
 
   private var universes: List[Universe] = _
-  private var gateBuffer: Queue[(Gate.Value, UniversalId, Set[UniversalId])] = Queue()
+  private var gateBuffer: Queue[(Gate.Value, UniversalId, Seq[Control])] = Queue()
 
   private var frameBuffer: Framebuffer = _
   private var colorBuffer: Texture = _
@@ -83,35 +83,58 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
   }
 
   /**
-   * Returns the set of qubits that are within 1 unit of the position.
+   * Returns the bits that are in the cell in all universes.
    *
-   * @param position the position from which to look for nearby qubits
-   * @return the set of qubits that are within 1 unit of the position
+   * @param cell the cell to find bits in
+   * @return the bits that are in the cell in all universes
    */
-  def qubitsNear(position: Vec2d): Set[UniversalId] = universes
-    .flatMap(_.qubits.values)
-    .filter(_.universeObject.position.value.sub(position).length() < 1)
-    .map(_.universeObject.id)
-    .toSet
+  def bitsInCell(cell: Cell): Set[UniversalId] =
+    universes
+      .flatMap(_.bits.values)
+      .filter(_.universeObject.cell == cell)
+      .map(_.universeObject.id)
+      .toSet
 
   /**
-   * Applies the quantum logic gate to the target qubit controlled by the control qubits, if any.
+   * Returns true if it is valid to apply the quantum gate to the target qubit with the controls.
+   *
+   * @param gate     the gate to apply
+   * @param target   the target qubit
+   * @param controls the controls
+   * @return true if it is valid to apply the quantum gate to the target qubit with the controls
+   */
+  def canApplyGate(gate: Gate.Value, target: UniversalId, controls: Control*): Boolean = {
+    val controlled = withControls(controls: _*)
+    gate match {
+      case Gate.Up => controlled.forall(u => cellOpen(u.objects(target).cell.up))
+      case Gate.Down => controlled.forall(u => cellOpen(u.objects(target).cell.down))
+      case Gate.Left => controlled.forall(u => cellOpen(u.objects(target).cell.left))
+      case Gate.Right => controlled.forall(u => cellOpen(u.objects(target).cell.right))
+      case _ => true
+    }
+  }
+
+  /**
+   * Applies the quantum gate to the target qubit with optional controls.
    * <p>
    * Gates are buffered for one frame to avoid duplicate gate applications when an object that exists in multiple
    * universes tries to apply a gate to the same qubit from multiple universes.
    *
    * @param gate     the gate to apply
    * @param target   the target qubit
-   * @param controls the control qubits
+   * @param controls the controls
    */
-  def applyGate(gate: Gate.Value, target: UniversalId, controls: UniversalId*): Unit =
-    gateBuffer :+= (gate, target, controls.toSet)
+  def applyGate(gate: Gate.Value, target: UniversalId, controls: Control*): Unit = {
+    require(canApplyGate(gate, target, controls: _*), "Applying this gate is not valid")
+    gateBuffer :+= (gate, target, controls)
+  }
 
   private def step(): Unit = {
-    val selected = qubitsNear(Input.mouse())
+    val cell = Cell(Input.mouse().y.floor.toLong, Input.mouse().x.floor.toLong)
+    val selected = bitsInCell(cell)
     for ((key, gate) <- GateKeys) {
       if (Input.keyJustPressed(key)) {
-        selected.foreach(applyGate(gate, _))
+        selected.foreach(id => applyGate(gate, id, PositionControl(id, cell)))
       }
     }
     flushGates()
@@ -120,28 +143,41 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
     draw()
   }
 
+  private def withControls(controls: Control*): List[Universe] =
+    universes.filter(u => controls.forall {
+      case BitControl(id, on) => u.bits(id).on == on
+      case PositionControl(id, cell) => u.objects(id).cell == cell
+    })
+
+  private def cellOpen(gridPosition: Cell): Boolean = !walls.contains(gridPosition)
+
   private def flushGates(): Unit = {
     for ((gate, target, controls) <- gateBuffer.distinct;
-         u <- universes if controls.forall(u.qubits(_).on)) {
+         u <- withControls(controls: _*)) {
+      assert(canApplyGate(gate, target, controls: _*), "Illegal gate in buffer")
       gate match {
-        case Gate.X => u.qubits(target).flip()
+        case Gate.X => u.bits(target).on = !u.bits(target).on
         case Gate.Z =>
-          if (u.qubits(target).on) {
+          if (u.bits(target).on) {
             u.amplitude *= Complex(-1)
           }
         case Gate.T =>
-          if (u.qubits(target).on) {
+          if (u.bits(target).on) {
             u.amplitude *= Complex.polar(1, Pi / 4)
           }
         case Gate.H =>
           u.amplitude /= Complex(sqrt(2))
           val copy = u.copy()
           Game.create(copy)
-          if (u.qubits(target).on) {
+          if (u.bits(target).on) {
             u.amplitude *= Complex(-1)
           }
-          copy.qubits(target).flip()
+          copy.bits(target).on = !copy.bits(target).on
           universes = copy :: universes
+        case Gate.Up => u.objects(target).cell = u.objects(target).cell.up
+        case Gate.Down => u.objects(target).cell = u.objects(target).cell.down
+        case Gate.Left => u.objects(target).cell = u.objects(target).cell.left
+        case Gate.Right => u.objects(target).cell = u.objects(target).cell.right
       }
     }
     gateBuffer = Queue()
