@@ -1,6 +1,7 @@
 package superposition
 
 import engine.core.Behavior.Entity
+import engine.core.Game.dt
 import engine.core.{Game, Input}
 import engine.graphics.Graphics.drawRectangleOutline
 import engine.graphics.sprites.Sprite
@@ -72,16 +73,23 @@ private final class Player(universe: Universe,
 
   private var carrying: Option[UniversalId] = None
 
+  private var timeSinceLastWalk: Double = 0.15
+
   private def step(): Unit = {
-    val multiverse = universeObject.multiverse
-    WalkGates.find { case (key, _) => Input.keyJustPressed(key) }.map(_._2) match {
-      case Some(gate) if multiverse.canApplyGate(gate, id, BitControl(id, on = true)) =>
-        multiverse.applyGate(gate, id, BitControl(id, on = true))
-        for (carry <- carrying) {
-          multiverse.applyGate(gate, carry, BitControl(id, on = true), PositionControl(carry, universeObject.cell))
-        }
-      case _ =>
+    timeSinceLastWalk += dt
+    if (timeSinceLastWalk >= 0.15) {
+      val multiverse = universeObject.multiverse
+      WalkGates.find { case (key, _) => Input.keyDown(key) }.map(_._2) match {
+        case Some(gate) if multiverse.canApplyGate(gate, id, BitControl(id, on = true)) =>
+          multiverse.applyGate(gate, id, BitControl(id, on = true))
+          for (carry <- carrying) {
+            multiverse.applyGate(gate, carry, BitControl(id, on = true), PositionControl(carry, universeObject.cell))
+          }
+          timeSinceLastWalk = 0
+        case _ =>
+      }
     }
+
     if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
       toggleCarrying()
     }
