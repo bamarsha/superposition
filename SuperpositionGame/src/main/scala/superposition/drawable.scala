@@ -2,9 +2,10 @@ package superposition
 
 import engine.core.Behavior.{Component, Entity}
 import engine.core.Game
+import engine.graphics.Graphics.drawRectangleOutline
 import engine.graphics.sprites.Sprite
 import engine.util.Color
-import engine.util.Color.WHITE
+import engine.util.Color.{BLACK, WHITE}
 import engine.util.math.{Transformation, Vec2d}
 import extras.physics.PositionComponent
 
@@ -38,8 +39,11 @@ private final class DrawableSprite(entity: Entity,
   /**
    * Draws this sprite.
    */
-  override def draw(): Unit =
+  override def draw(): Unit = {
     sprite.draw(Transformation.create(position.value, 0, scale), color)
+    // TODO: Remove this outline.
+    drawRectangleOutline(Transformation.create(new Vec2d(position.value.x - 0.5, position.value.y - 0.5), 0, 1), BLACK)
+  }
 }
 
 /**

@@ -110,8 +110,5 @@ private final class Player(universe: Universe,
     player
   }
 
-  override def draw(): Unit = {
-    sprite.draw()
-    drawRectangleOutline(Transformation.create(new Vec2d(position.value.x - 0.5, position.value.y - 0.5), 0, 1), BLACK)
-  }
+  override def draw(): Unit = sprite.draw()
 }
