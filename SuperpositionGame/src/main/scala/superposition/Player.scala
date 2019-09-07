@@ -77,8 +77,8 @@ private final class Player(universe: Universe,
     WalkGates.find { case (key, _) => Input.keyJustPressed(key) }.map(_._2) match {
       case Some(gate) if multiverse.canApplyGate(gate, id, BitControl(id, on = true)) =>
         multiverse.applyGate(gate, id, BitControl(id, on = true))
-        for (id <- carrying) {
-          multiverse.applyGate(gate, id, BitControl(id, on = true))
+        for (carry <- carrying) {
+          multiverse.applyGate(gate, carry, BitControl(id, on = true), PositionControl(carry, universeObject.cell))
         }
       case _ =>
     }
@@ -90,7 +90,7 @@ private final class Player(universe: Universe,
   private def toggleCarrying(): Unit =
     if (carrying.isEmpty)
       carrying = universeObject.universe.objects
-        .find(o => o._2.entity != this && o._2.cell == cell)
+        .find(o => o._2.entity != this && o._2.cell == universeObject.cell)
         .map(_._1)
     else
       carrying = None
