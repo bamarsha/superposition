@@ -3,7 +3,7 @@ package superposition
 import engine.core.Behavior.{Component, Entity}
 import engine.core.Game
 import engine.util.math.Vec2d
-import extras.physics.{PositionComponent, Rectangle}
+import extras.physics.PositionComponent
 
 import scala.collection.immutable.HashMap
 
@@ -99,19 +99,17 @@ private final class Universe(val multiverse: Multiverse) extends Entity with Cop
  * Universe objects <em>must</em> perform all drawing in their [[superposition.Drawable#draw]] method. This makes it
  * possible for the multiverse to draw copies of an object from different universes in superposition.
  *
- * @param entity              the entity for this component
- * @param universe            the universe this object belongs to
- * @param id                  the ID of this object
- * @param _cell               the initial grid cell of this object
- * @param hitboxSize          the size of this object's hitbox
- * @param collidesWithObjects whether this object collides with other objects in the universe (excluding walls)
+ * @param entity     the entity for this component
+ * @param universe   the universe this object belongs to
+ * @param id         the ID of this object
+ * @param _cell      the initial grid cell of this object
+ * @param collision  whether this object collides with other objects in the universe (excluding walls)
  */
 private final class UniverseObject(entity: Entity with Copyable[_ <: Entity] with Drawable,
                                    var universe: Universe,
                                    val id: UniversalId,
                                    private var _cell: Cell,
-                                   val hitboxSize: Vec2d = new Vec2d(0, 0),
-                                   var collidesWithObjects: Boolean = false) extends Component(entity) {
+                                   var collision: Boolean = false) extends Component(entity) {
   /**
    * The position component of this object.
    */
@@ -123,12 +121,6 @@ private final class UniverseObject(entity: Entity with Copyable[_ <: Entity] wit
   val multiverse: Multiverse = universe.multiverse
 
   /**
-   * The hitbox for this object.
-   */
-  def hitbox: Rectangle =
-    Rectangle.fromCenterSize(position.value, hitboxSize)
-
-  /**
    * The grid cell of this obejct.
    */
   def cell: Cell = _cell
@@ -137,19 +129,4 @@ private final class UniverseObject(entity: Entity with Copyable[_ <: Entity] wit
     _cell = value
     position.value = new Vec2d(value.column + 0.5, value.row + 0.5)
   }
-
-  /**
-   * Returns true if this object would collide with any other object or wall at the position.
-   *
-   * @param position the position to test for collision
-   * @return true if this object would collide with any other object or wall at the position
-   */
-  // TODO
-  //  def collides(position: Vec2d): Boolean = {
-  //    val hitbox = Rectangle.fromCenterSize(position, hitboxSize)
-  //    val otherObjects = universe.objects.values
-  //      .filter(o => o.entity != (this: Component[_]).entity && o.collidesWithObjects)
-  //      .map(o => Rectangle.fromCenterSize(o.position.value, o.hitboxSize))
-  //    universe.walls.appendedAll(otherObjects).exists(hitbox.intersects)
-  //  }
 }

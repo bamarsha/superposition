@@ -18,7 +18,7 @@ private final class Quball(universe: Universe,
                            cell: Cell) extends Entity with Copyable[Quball] with Drawable {
   add(new PositionComponent(this, new Vec2d(cell.column + 0.5, cell.row + 0.5)))
 
-  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell, new Vec2d(1, 1)))
+  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell))
 
   private val sprite: DrawableSprite = add(new DrawableSprite(
     entity = this,

@@ -60,7 +60,7 @@ private final class Player(universe: Universe,
   private val position: PositionComponent =
     add(new PositionComponent(this, new Vec2d(cell.column + 0.5, cell.row + 0.5)))
 
-  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell, new Vec2d(1.8, 1.8)))
+  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell))
 
   val sprite: DrawableSprite = add(new DrawableSprite(
     entity = this,
