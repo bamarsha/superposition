@@ -24,27 +24,23 @@ private object Player {
    * Declares the player system.
    */
   def declareSystem(): Unit =
-    Multiverse.declareSubsystem(classOf[Player], stepper())
+    Multiverse.declareSubsystem(classOf[Player], step)
 
-  private def stepper(): (Multiverse, UniversalId, Iterable[Player]) => Unit = {
-    var timeSinceLastWalk = Double.PositiveInfinity
-
-    (multiverse, id, players) => {
-      timeSinceLastWalk += dt
-      if (timeSinceLastWalk >= 0.15) {
-        for (gate <- WalkGates.find { case (key, _) => Input.keyDown(key) }.map(_._2)
-             if multiverse.canApplyGate(gate, id, BitControl(id, on = true))) {
-          for ((cell, Some(carrying)) <- players.map(p => (p.universeObject.cell, p.carrying)).toSet) {
-            multiverse.applyGate(gate, carrying, BitControl(id, on = true), PositionControl(id, cell))
-          }
-          multiverse.applyGate(gate, id, BitControl(id, on = true))
-          timeSinceLastWalk = 0
+  private def step(multiverse: Multiverse, id: UniversalId, players: Iterable[Player]): Unit = {
+    players.foreach(_.timeSinceLastWalk += dt)
+    if (players.head.timeSinceLastWalk >= 0.15) {
+      for (gate <- WalkGates.find { case (key, _) => Input.keyDown(key) }.map(_._2)
+           if multiverse.canApplyGate(gate, id, BitControl(id, on = true))) {
+        for ((cell, Some(carrying)) <- players.map(p => (p.universeObject.cell, p.carrying)).toSet) {
+          multiverse.applyGate(gate, carrying, BitControl(id, on = true), PositionControl(id, cell))
         }
+        multiverse.applyGate(gate, id, BitControl(id, on = true))
+        players.foreach(_.timeSinceLastWalk = 0)
       }
+    }
 
-      if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
-        players.foreach(_.toggleCarrying())
-      }
+    if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
+      players.foreach(_.toggleCarrying())
     }
   }
 }
@@ -73,6 +69,8 @@ private final class Player(universe: Universe,
   private val bit: Bit = add(new Bit(this, true, on => sprite.color = if (on) WHITE else BLACK))
 
   private var carrying: Option[UniversalId] = None
+
+  private var timeSinceLastWalk = Double.PositiveInfinity
 
   private def toggleCarrying(): Unit =
     if (carrying.isEmpty)
