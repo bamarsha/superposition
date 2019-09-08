@@ -26,12 +26,16 @@ private object Laser {
  * @param universe  the universe this laser belongs to
  * @param id        the universe object ID for this laser
  * @param cell      the position of this laser
+ * @param gate      the gate to apply
  * @param direction the direction this laser is pointing
+ * @param control   the cell that controls this laser if it contains a bit, or None if the laser is not controlled
  */
 private final class Laser(universe: Universe,
                           id: UniversalId,
                           cell: Cell,
-                          direction: Direction.Value) extends Entity with Copyable[Laser] with Drawable {
+                          gate: Gate.Value,
+                          direction: Direction.Value,
+                          control: Option[Cell]) extends Entity with Copyable[Laser] with Drawable {
   private val position: PositionComponent =
     add(new PositionComponent(this, new Vec2d(cell.column + 0.5, cell.row + 0.5)))
 
@@ -43,7 +47,7 @@ private final class Laser(universe: Universe,
   private var targetCell: Option[Cell] = None
   private var elapsedTime: Double = 0
 
-  override def copy(): Laser = new Laser(universeObject.universe, id, universeObject.cell, direction)
+  override def copy(): Laser = new Laser(universeObject.universe, id, universeObject.cell, gate, direction, control)
 
   override def draw(): Unit = {
     sprite.draw()
@@ -55,16 +59,25 @@ private final class Laser(universe: Universe,
   private def step(): Unit = {
     elapsedTime += dt
 
+    val universe = universeObject.universe
+    val multiverse = universeObject.multiverse
     if (targetCell.isEmpty &&
       Input.mouseJustPressed(0) &&
-      Cell(Input.mouse().y.floor.toLong, Input.mouse().x.floor.toLong) == universeObject.cell
+      Cell(Input.mouse().y.floor.toLong, Input.mouse().x.floor.toLong) == universeObject.cell &&
+      controlBitIsOn
     ) {
       targetCell = beam.take(50).find(cell =>
-        universeObject.multiverse.walls.contains(cell) ||
-          universeObject.universe.objects.values.exists(_.cell == cell)
+        multiverse.walls.contains(cell) ||
+          universe.objects.values.exists(_.cell == cell)
       )
-      targetCell.flatMap(cell => universeObject.universe.objects.values.find(_.cell == cell).map(_.id)) match {
-        case Some(id) => universeObject.multiverse.applyGate(Gate.X, id)
+      targetCell.flatMap(cell => universe.objects.values.find(_.cell == cell).map(_.id)) match {
+        case Some(id) =>
+          if (control.isEmpty) {
+            multiverse.applyGate(gate, id)
+          } else {
+            val controlId = universe.bitsInCell(control.get).head
+            multiverse.applyGate(gate, id, BitControl(controlId, on = true), PositionControl(controlId, control.get))
+          }
         case _ =>
       }
       elapsedTime = 0
@@ -82,4 +95,10 @@ private final class Laser(universe: Universe,
         case Direction.Right => cell.right
       }
     ).tail
+
+  private def controlBitIsOn: Boolean =
+    control.isEmpty || (universeObject.universe.bitsInCell(control.get).headOption match {
+      case Some(id) => universeObject.universe.bits(id).on
+      case _ => false
+    })
 }

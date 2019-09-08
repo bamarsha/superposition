@@ -89,11 +89,7 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
    * @return the bits that are in the cell in all universes
    */
   def bitsInCell(cell: Cell): Set[UniversalId] =
-    universes
-      .flatMap(_.bits.values)
-      .filter(_.universeObject.cell == cell)
-      .map(_.universeObject.id)
-      .toSet
+    universes.flatMap(_.bitsInCell(cell)).toSet
 
   /**
    * Returns true if it is valid to apply the quantum gate to the target qubit with the controls.

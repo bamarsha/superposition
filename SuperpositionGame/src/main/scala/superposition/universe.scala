@@ -77,6 +77,18 @@ private final class Universe(val multiverse: Multiverse) extends Entity with Cop
   }
 
   /**
+   * Returns the bits that are in the cell in this universe.
+   *
+   * @param cell the cell to find bits in
+   * @return the bits that are in the cell in this universe
+   */
+  def bitsInCell(cell: Cell): Set[UniversalId] =
+    bits.values
+      .filter(_.universeObject.cell == cell)
+      .map(_.universeObject.id)
+      .toSet
+
+  /**
    * Returns a copy of this universe and all of its objects.
    *
    * @return a copy of this universe
