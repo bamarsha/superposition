@@ -1,8 +1,10 @@
 package superposition
 
+import java.util
+
 import engine.core.Behavior.Entity
 import engine.core.Game.dt
-import engine.core.{Game, Input}
+import engine.core.{Behavior, Game, Input}
 import engine.graphics.Camera
 import engine.graphics.Camera.Camera2d
 import engine.graphics.opengl.{Framebuffer, Shader, Texture}
@@ -35,6 +37,25 @@ private object Multiverse {
    */
   def declareSystem(): Unit =
     Game.declareSystem(classOf[Multiverse], (_: Multiverse).step())
+
+  /**
+   * Declares a subsystem of the multiverse.
+   * <p>
+   * Subsystems group behaviors by their universal ID, so all copies of a behavior can be processed at the same time.
+   *
+   * @param cls the behavior class
+   * @param f   the system
+   * @tparam T the type of the behavior
+   */
+  def declareSubsystem[T <: Behavior](cls: Class[T], f: (Multiverse, UniversalId, Iterable[T]) => Unit): Unit = {
+    Game.declareGroupSystem(cls, (behaviors: util.Collection[T]) => behaviors.asScala
+      .groupBy(b => {
+        val u = b.get(classOf[UniverseObject])
+        (u.multiverse, u.id)
+      })
+      .foreachEntry { case ((multiverse, id), behaviors) => f(multiverse, id, behaviors) }
+    )
+  }
 }
 
 /**

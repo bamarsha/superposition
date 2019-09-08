@@ -2,7 +2,7 @@ package superposition
 
 import engine.core.Behavior.Entity
 import engine.core.Game.dt
-import engine.core.{Game, Input}
+import engine.core.Input
 import engine.graphics.sprites.Sprite
 import engine.util.Color.{BLACK, WHITE}
 import engine.util.math.Vec2d
@@ -24,7 +24,29 @@ private object Player {
    * Declares the player system.
    */
   def declareSystem(): Unit =
-    Game.declareSystem(classOf[Player], (_: Player).step())
+    Multiverse.declareSubsystem(classOf[Player], stepper())
+
+  private def stepper(): (Multiverse, UniversalId, Iterable[Player]) => Unit = {
+    var timeSinceLastWalk = Double.PositiveInfinity
+
+    (multiverse, id, players) => {
+      timeSinceLastWalk += dt
+      if (timeSinceLastWalk >= 0.15) {
+        for (gate <- WalkGates.find { case (key, _) => Input.keyDown(key) }.map(_._2)
+             if multiverse.canApplyGate(gate, id, BitControl(id, on = true))) {
+          for ((cell, Some(carrying)) <- players.map(p => (p.universeObject.cell, p.carrying)).toSet) {
+            multiverse.applyGate(gate, carrying, BitControl(id, on = true), PositionControl(id, cell))
+          }
+          multiverse.applyGate(gate, id, BitControl(id, on = true))
+          timeSinceLastWalk = 0
+        }
+      }
+
+      if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
+        players.foreach(_.toggleCarrying())
+      }
+    }
+  }
 }
 
 /**
@@ -37,9 +59,6 @@ private object Player {
 private final class Player(universe: Universe,
                            id: UniversalId,
                            cell: Cell) extends Entity with Copyable[Player] with Drawable {
-
-  import Player._
-
   add(new PositionComponent(this, new Vec2d(cell.column + 0.5, cell.row + 0.5)))
 
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell))
@@ -54,28 +73,6 @@ private final class Player(universe: Universe,
   private val bit: Bit = add(new Bit(this, true, on => sprite.color = if (on) WHITE else BLACK))
 
   private var carrying: Option[UniversalId] = None
-
-  private var timeSinceLastWalk: Double = 0.15
-
-  private def step(): Unit = {
-    timeSinceLastWalk += dt
-    if (timeSinceLastWalk >= 0.15) {
-      val multiverse = universeObject.multiverse
-      WalkGates.find { case (key, _) => Input.keyDown(key) }.map(_._2) match {
-        case Some(gate) if multiverse.canApplyGate(gate, id, BitControl(id, on = true)) =>
-          for (carry <- carrying) {
-            multiverse.applyGate(gate, carry, BitControl(id, on = true), PositionControl(id, universeObject.cell))
-          }
-          multiverse.applyGate(gate, id, BitControl(id, on = true))
-          timeSinceLastWalk = 0
-        case _ =>
-      }
-    }
-
-    if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
-      toggleCarrying()
-    }
-  }
 
   private def toggleCarrying(): Unit =
     if (carrying.isEmpty)
