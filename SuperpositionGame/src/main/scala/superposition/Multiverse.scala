@@ -122,6 +122,14 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
    */
   def applyGate(gate: Gate.Value, target: UniversalId, controls: Control*): Unit = {
     require(canApplyGate(gate, target, controls: _*), "Applying this gate is not valid")
+    require(
+      controls.forall({
+        case BitControl(id, _) if id == target => !Gate.logicGate(gate)
+        case PositionControl(id, _) if id == target => !Gate.positionGate(gate)
+        case _ => true
+      }),
+      "Controlling using the same ID and type as the target"
+    )
     gateBuffer :+= (gate, target, controls)
   }
 

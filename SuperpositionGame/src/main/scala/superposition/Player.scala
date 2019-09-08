@@ -63,10 +63,10 @@ private final class Player(universe: Universe,
       val multiverse = universeObject.multiverse
       WalkGates.find { case (key, _) => Input.keyDown(key) }.map(_._2) match {
         case Some(gate) if multiverse.canApplyGate(gate, id, BitControl(id, on = true)) =>
-          multiverse.applyGate(gate, id, BitControl(id, on = true))
           for (carry <- carrying) {
-            multiverse.applyGate(gate, carry, BitControl(id, on = true), PositionControl(carry, universeObject.cell))
+            multiverse.applyGate(gate, carry, BitControl(id, on = true), PositionControl(id, universeObject.cell))
           }
+          multiverse.applyGate(gate, id, BitControl(id, on = true))
           timeSinceLastWalk = 0
         case _ =>
       }
