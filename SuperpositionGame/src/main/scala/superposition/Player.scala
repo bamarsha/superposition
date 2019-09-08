@@ -29,18 +29,30 @@ private object Player {
   private def step(multiverse: Multiverse, id: UniversalId, players: Iterable[Player]): Unit = {
     players.foreach(_.timeSinceLastWalk += dt)
     if (players.head.timeSinceLastWalk >= 0.15) {
-      for (gate <- WalkGates.find { case (key, _) => Input.keyDown(key) }.map(_._2)
-           if multiverse.canApplyGate(gate, id, BitControl(id, on = true))) {
-        for ((cell, Some(carrying)) <- players.map(p => (p.universeObject.cell, p.carrying)).toSet) {
-          multiverse.applyGate(gate, carrying, BitControl(id, on = true), PositionControl(id, cell))
-        }
-        multiverse.applyGate(gate, id, BitControl(id, on = true))
-        players.foreach(_.timeSinceLastWalk = 0)
+      for (gate <- WalkGates.find { case (key, _) => Input.keyDown(key) }.map(_._2)) {
+        walk(multiverse, id, gate, players)
       }
     }
-
     if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
       players.foreach(_.toggleCarrying())
+    }
+  }
+
+  private def walk(multiverse: Multiverse, id: UniversalId, gate: Gate.Value, players: Iterable[Player]): Unit = {
+    val allCarried = players.map(p => (p.universeObject.cell, p.carrying)).collect {
+      case (cell, Some(carrying)) => (cell, carrying)
+    }.toSet
+    val playersCanWalk = multiverse.canApplyGate(gate, id, BitControl(id, on = true))
+    val carriedCanMove = allCarried.forall {
+      case (cell, carrying) =>
+        multiverse.canApplyGate(gate, carrying, BitControl(id, on = true), PositionControl(id, cell))
+    }
+    if (playersCanWalk && carriedCanMove) {
+      for ((cell, carrying) <- allCarried) {
+        multiverse.applyGate(gate, carrying, BitControl(id, on = true), PositionControl(id, cell))
+      }
+      multiverse.applyGate(gate, id, BitControl(id, on = true))
+      players.foreach(_.timeSinceLastWalk = 0)
     }
   }
 }
