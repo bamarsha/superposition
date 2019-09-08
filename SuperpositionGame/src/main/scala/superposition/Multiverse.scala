@@ -14,7 +14,6 @@ import engine.util.math.{Transformation, Vec2d}
 import extras.tiles.{Tilemap, TilemapRenderer}
 import org.lwjgl.glfw.GLFW._
 
-import scala.collection.immutable.Queue
 import scala.jdk.CollectionConverters._
 import scala.math.{Pi, sqrt}
 
@@ -87,7 +86,6 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
     }).toSet
 
   private var universes: List[Universe] = _
-  private var gateBuffer: Queue[(Gate.Value, UniversalId, Seq[Control])] = Queue()
 
   private var frameBuffer: Framebuffer = _
   private var colorBuffer: Texture = _
@@ -133,9 +131,6 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
 
   /**
    * Applies the quantum gate to the target qubit with optional controls.
-   * <p>
-   * Gates are buffered for one frame to avoid duplicate gate applications when an object that exists in multiple
-   * universes tries to apply a gate to the same qubit from multiple universes.
    *
    * @param gate     the gate to apply
    * @param target   the target qubit
@@ -151,38 +146,8 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
       }),
       "Controlling using the same ID and type as the target"
     )
-    gateBuffer :+= (gate, target, controls)
-  }
 
-  private def step(): Unit = {
-    val cell = Cell(Input.mouse().y.floor.toLong, Input.mouse().x.floor.toLong)
-    val selected = bitsInCell(cell)
-    for ((key, gate) <- GateKeys) {
-      if (Input.keyJustPressed(key)) {
-        selected.foreach(id => applyGate(gate, id, PositionControl(id, cell)))
-      }
-    }
-    flushGates()
-    combine()
-    normalize()
-    draw()
-  }
-
-  private def withControls(controls: Control*): List[Universe] =
-    universes.filter(u => controls.forall {
-      case BitControl(id, on) => u.bits(id).on == on
-      case PositionControl(id, cell) => u.objects(id).cell == cell
-    })
-
-  private def cellOpen(cell: Cell): Boolean =
-    !walls.contains(cell) &&
-      // TODO: This will prevent some valid moves if a cell is open for some copies of the player.
-      universes.forall(u => u.objects.values.filter(_.collision).forall(_.cell != cell))
-
-  private def flushGates(): Unit = {
-    for ((gate, target, controls) <- gateBuffer.distinct;
-         u <- withControls(controls: _*)) {
-      assert(canApplyGate(gate, target, controls: _*), "Illegal gate in buffer")
+    for (u <- withControls(controls: _*)) {
       gate match {
         case Gate.X => u.bits(target).on = !u.bits(target).on
         case Gate.Z =>
@@ -208,8 +173,31 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
         case Gate.Right => u.objects(target).cell = u.objects(target).cell.right
       }
     }
-    gateBuffer = Queue()
   }
+
+  private def cellOpen(cell: Cell): Boolean =
+    !walls.contains(cell) &&
+      // TODO: This will prevent some valid moves if a cell is open for some copies of the player.
+      universes.forall(u => u.objects.values.filter(_.collision).forall(_.cell != cell))
+
+  private def step(): Unit = {
+    val cell = Cell(Input.mouse().y.floor.toLong, Input.mouse().x.floor.toLong)
+    val selected = bitsInCell(cell)
+    for ((key, gate) <- GateKeys) {
+      if (Input.keyJustPressed(key)) {
+        selected.foreach(id => applyGate(gate, id, PositionControl(id, cell)))
+      }
+    }
+    combine()
+    normalize()
+    draw()
+  }
+
+  private def withControls(controls: Control*): List[Universe] =
+    universes.filter(u => controls.forall {
+      case BitControl(id, on) => u.bits(id).on == on
+      case PositionControl(id, cell) => u.objects(id).cell == cell
+    })
 
   private def combine(): Unit = {
     val (combined, removed) = universes

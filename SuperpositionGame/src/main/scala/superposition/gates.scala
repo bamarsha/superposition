@@ -50,7 +50,7 @@ private object Gate extends Enumeration {
    * @param gate the gate to test
    * @return true if the gate is a logic gate
    */
-  def logicGate(gate: Gate.Value): Boolean =
+  def logicGate(gate: Value): Boolean =
     Set(Gate.X, Gate.Z, Gate.T, Gate.H).contains(gate)
 
   /**
@@ -59,7 +59,7 @@ private object Gate extends Enumeration {
    * @param gate the gate to test
    * @return true if the gate is a position gate
    */
-  def positionGate(gate: Gate.Value): Boolean =
+  def positionGate(gate: Value): Boolean =
     Set(Gate.Up, Gate.Down, Gate.Left, Gate.Right).contains(gate)
 }
 

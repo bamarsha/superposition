@@ -2,7 +2,7 @@ package superposition
 
 import engine.core.Behavior.Entity
 import engine.core.Game.dt
-import engine.core.{Game, Input}
+import engine.core.Input
 import engine.graphics.Graphics.drawWideLine
 import engine.graphics.sprites.Sprite
 import engine.util.Color
@@ -17,7 +17,39 @@ private object Laser {
    * Declares the laser system.
    */
   def declareSystem(): Unit =
-    Game.declareSystem(classOf[Laser], (_: Laser).step())
+    Multiverse.declareSubsystem(classOf[Laser], step)
+
+  private def step(multiverse: Multiverse, id: UniversalId, lasers: Iterable[Laser]): Unit = {
+    lasers.foreach(_.elapsedTime += dt)
+
+    val laser = lasers.head
+    if (lasers.exists(_.justFired)) {
+      val targetCell = laser.beam.take(50).find(cell =>
+        multiverse.walls.contains(cell) ||
+          lasers.exists(_.universeObject.universe.objects.values.exists(_.cell == cell))
+      )
+      lasers.foreach(_.targetCell = targetCell)
+      if (targetCell.isDefined) {
+        for (id <- multiverse.bitsInCell(targetCell.get)) {
+          if (laser.control.isEmpty) {
+            multiverse.applyGate(laser.gate, id, PositionControl(id, targetCell.get))
+          } else {
+            val controlId = multiverse.bitsInCell(laser.control.get).head
+            multiverse.applyGate(
+              laser.gate,
+              id,
+              PositionControl(id, targetCell.get),
+              BitControl(controlId, on = true),
+              PositionControl(controlId, laser.control.get)
+            )
+          }
+        }
+      }
+      lasers.foreach(_.elapsedTime = 0)
+    } else if (laser.targetCell.isDefined && laser.elapsedTime >= 1) {
+      lasers.foreach(_.targetCell = None)
+    }
+  }
 }
 
 /**
@@ -33,9 +65,9 @@ private object Laser {
 private final class Laser(universe: Universe,
                           id: UniversalId,
                           cell: Cell,
-                          gate: Gate.Value,
+                          private val gate: Gate.Value,
                           direction: Direction.Value,
-                          control: Option[Cell]) extends Entity with Copyable[Laser] with Drawable {
+                          private val control: Option[Cell]) extends Entity with Copyable[Laser] with Drawable {
   private val position: PositionComponent =
     add(new PositionComponent(this, new Vec2d(cell.column + 0.5, cell.row + 0.5)))
 
@@ -51,38 +83,8 @@ private final class Laser(universe: Universe,
 
   override def draw(): Unit = {
     sprite.draw()
-    if (targetCell.isDefined) {
+    if (targetCell.isDefined && controlBitIsOn) {
       drawWideLine(position.value, new Vec2d(targetCell.get.column + 0.5, targetCell.get.row + 0.5), 0.25, Color.RED)
-    }
-  }
-
-  private def step(): Unit = {
-    elapsedTime += dt
-
-    val universe = universeObject.universe
-    val multiverse = universeObject.multiverse
-    if (targetCell.isEmpty &&
-      Input.mouseJustPressed(0) &&
-      Cell(Input.mouse().y.floor.toLong, Input.mouse().x.floor.toLong) == universeObject.cell &&
-      controlBitIsOn
-    ) {
-      targetCell = beam.take(50).find(cell =>
-        multiverse.walls.contains(cell) ||
-          universe.objects.values.exists(_.cell == cell)
-      )
-      targetCell.flatMap(cell => universe.objects.values.find(_.cell == cell).map(_.id)) match {
-        case Some(id) =>
-          if (control.isEmpty) {
-            multiverse.applyGate(gate, id)
-          } else {
-            val controlId = universe.bitsInCell(control.get).head
-            multiverse.applyGate(gate, id, BitControl(controlId, on = true), PositionControl(controlId, control.get))
-          }
-        case _ =>
-      }
-      elapsedTime = 0
-    } else if (targetCell.isDefined && elapsedTime >= 1) {
-      targetCell = None
     }
   }
 
@@ -101,4 +103,10 @@ private final class Laser(universe: Universe,
       case Some(id) => universeObject.universe.bits(id).on
       case _ => false
     })
+
+  private def justFired: Boolean =
+    targetCell.isEmpty &&
+      Input.mouseJustPressed(0) &&
+      Cell(Input.mouse().y.floor.toLong, Input.mouse().x.floor.toLong) == universeObject.cell &&
+      controlBitIsOn
 }
