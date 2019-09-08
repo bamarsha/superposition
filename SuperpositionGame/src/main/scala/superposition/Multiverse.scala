@@ -149,7 +149,10 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
       case PositionControl(id, cell) => u.objects(id).cell == cell
     })
 
-  private def cellOpen(gridPosition: Cell): Boolean = !walls.contains(gridPosition)
+  private def cellOpen(cell: Cell): Boolean =
+    !walls.contains(cell) &&
+      // TODO: This will prevent some valid moves if a cell is open for some copies of the player.
+      universes.forall(u => u.objects.values.filter(_.collision).forall(_.cell != cell))
 
   private def flushGates(): Unit = {
     for ((gate, target, controls) <- gateBuffer.distinct;

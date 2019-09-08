@@ -22,11 +22,11 @@ object Superposition {
     Settings.BACKGROUND_COLOR = Color.GRAY
 
     Game.init()
-    // TODO: Laser.declareSystem()
+    Laser.declareSystem()
+    Player.declareSystem()
     Multiverse.declareSystem()
     Draw.declareSystem()
     // TODO: Machine.declareSystem()
-    Player.declareSystem()
 
     Camera.camera2d.setCenterSize(new Vec2d(0, 0), new Vec2d(32, 18))
 

@@ -7,42 +7,42 @@ private object Gate extends Enumeration {
   /**
    * The X, or NOT, logic gate.
    */
-  val X: Gate.Value = Value
+  val X: Value = Value
 
   /**
    * The Z logic gate.
    */
-  val Z: Gate.Value = Value
+  val Z: Value = Value
 
   /**
    * The T logic gate.
    */
-  val T: Gate.Value = Value
+  val T: Value = Value
 
   /**
    * The Hadamard logic gate.
    */
-  val H: Gate.Value = Value
+  val H: Value = Value
 
   /**
    * The "move up" position gate.
    */
-  val Up: Gate.Value = Value
+  val Up: Value = Value
 
   /**
    * The "move down" position gate.
    */
-  val Down: Gate.Value = Value
+  val Down: Value = Value
 
   /**
    * The "move left" position gate.
    */
-  val Left: Gate.Value = Value
+  val Left: Value = Value
 
   /**
    * The "move right" position gate.
    */
-  val Right: Gate.Value = Value
+  val Right: Value = Value
 }
 
 /**

@@ -3,10 +3,9 @@ package superposition
 import engine.core.Behavior.Entity
 import engine.core.Game.dt
 import engine.core.{Game, Input}
-import engine.graphics.Graphics.drawRectangleOutline
 import engine.graphics.sprites.Sprite
 import engine.util.Color.{BLACK, WHITE}
-import engine.util.math.{Transformation, Vec2d}
+import engine.util.math.Vec2d
 import extras.physics.PositionComponent
 import org.lwjgl.glfw.GLFW._
 
@@ -14,15 +13,6 @@ import org.lwjgl.glfw.GLFW._
  * Contains settings and initialization for the player.
  */
 private object Player {
-  private val Speed: Double = 7.5
-
-  private val WalkKeys: List[(Int, Vec2d)] = List(
-    (GLFW_KEY_W, new Vec2d(0, 1)),
-    (GLFW_KEY_A, new Vec2d(-1, 0)),
-    (GLFW_KEY_S, new Vec2d(0, -1)),
-    (GLFW_KEY_D, new Vec2d(1, 0))
-  )
-
   private val WalkGates: List[(Int, Gate.Value)] = List(
     (GLFW_KEY_W, Gate.Up),
     (GLFW_KEY_A, Gate.Left),
@@ -35,13 +25,6 @@ private object Player {
    */
   def declareSystem(): Unit =
     Game.declareSystem(classOf[Player], (_: Player).step())
-
-  private def walkVelocity(): Vec2d = {
-    val direction = WalkKeys.foldLeft(new Vec2d(0, 0)) {
-      case (acc, (key, direction)) => if (Input.keyDown(key)) acc.add(direction) else acc
-    }
-    if (direction.length() == 0) direction else direction.setLength(Speed)
-  }
 }
 
 /**
@@ -57,8 +40,7 @@ private final class Player(universe: Universe,
 
   import Player._
 
-  private val position: PositionComponent =
-    add(new PositionComponent(this, new Vec2d(cell.column + 0.5, cell.row + 0.5)))
+  add(new PositionComponent(this, new Vec2d(cell.column + 0.5, cell.row + 0.5)))
 
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell))
 
