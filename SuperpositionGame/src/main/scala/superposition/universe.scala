@@ -2,7 +2,6 @@ package superposition
 
 import engine.core.Behavior.{Component, Entity}
 import engine.core.Game
-import engine.util.math.Vec2d
 import extras.physics.PositionComponent
 
 import scala.collection.immutable.HashMap
@@ -139,6 +138,6 @@ private final class UniverseObject(entity: Entity with Copyable[_ <: Entity] wit
 
   def cell_=(value: Cell): Unit = {
     _cell = value
-    position.value = new Vec2d(value.column + 0.5, value.row + 0.5)
+    // position.value = new Vec2d(value.column + 0.5, value.row + 0.5)
   }
 }

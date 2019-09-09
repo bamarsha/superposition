@@ -1,5 +1,7 @@
 package superposition
 
+import engine.util.math.Vec2d
+
 /**
  * A cell in a grid.
  *
@@ -26,4 +28,11 @@ private final case class Cell(row: Long, column: Long) {
    * The cell to the right of this one.
    */
   def right: Cell = Cell(row, column + 1)
+
+  /**
+   * Returns a new Vec2d representing the lower-left corner of this cell.
+   *
+   * @return The Vec2d with this cell's position.
+   */
+  def toVec2d: Vec2d = new Vec2d(column, row);
 }

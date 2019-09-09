@@ -35,6 +35,7 @@ private final class DrawableSprite(entity: Entity,
                                    val scale: Vec2d = new Vec2d(1, 1),
                                    var color: Color = WHITE) extends Component(entity) with Drawable {
   private val position: PositionComponent = get(classOf[PositionComponent])
+  private val universe: UniverseObject = get(classOf[UniverseObject])
 
   /**
    * Draws this sprite.
@@ -42,7 +43,7 @@ private final class DrawableSprite(entity: Entity,
   override def draw(): Unit = {
     sprite.draw(Transformation.create(position.value, 0, scale), color)
     // TODO: Remove this outline.
-    drawRectangleOutline(Transformation.create(new Vec2d(position.value.x - 0.5, position.value.y - 0.5), 0, 1), BLACK)
+    drawRectangleOutline(Transformation.create(universe.cell.toVec2d, 0, 1), BLACK)
   }
 }
 
