@@ -86,17 +86,18 @@ private object Player {
     }
 
     if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
-      val carryIds = players.flatMap(player => {
+      val carryableIds = players.flatMap(player => {
         val universe = player.universeObject.universe
         universe
           .bitsInCell(player.universeObject.cell)
           .filter(otherId => otherId != id && universe.bits(otherId).state.contains("carried"))
       }).toSet
-      for (carryId <- carryIds; cell <- players.map(_.universeObject.cell).toSet[Cell]) {
+      for (carryableId <- carryableIds; cell <- players.map(_.universeObject.cell).toSet[Cell]) {
         multiverse.applyGate(
-          Gate.X, carryId, Some("carried"),
+          Gate.X, carryableId, Some("carried"),
           BitControl(id, "alive" -> true),
-          PositionControl(carryId, cell)
+          PositionControl(id, cell),
+          PositionControl(carryableId, cell),
         )
       }
     }
