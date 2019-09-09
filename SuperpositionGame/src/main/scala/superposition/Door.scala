@@ -34,10 +34,14 @@ private final class Door(universe: Universe,
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell, true))
 
   private val sprite: DrawableSprite =
-    add(new DrawableSprite(this, Sprite.load(getClass.getResource("sprites/roof_right.png")), color = BLACK))
+    add(new DrawableSprite(this, Sprite.load(getClass.getResource("sprites/roof_right.png"))))
 
-  override def copy(): Door =
-    new Door(universeObject.universe, universeObject.id, universeObject.cell, control)
+  override def copy(): Door = {
+    val door = new Door(universeObject.universe, universeObject.id, universeObject.cell, control)
+    door.universeObject.collision = universeObject.collision
+    door.sprite.color = sprite.color
+    door
+  }
 
   override def draw(): Unit = sprite.draw()
 
