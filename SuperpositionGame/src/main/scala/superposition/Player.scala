@@ -22,15 +22,36 @@ private object Player {
     (GLFW_KEY_D, Gate.Right)
   )
 
+  private var fractionalPos = new Vec2d(.5, .5)
+
   /**
    * Declares the player system.
    */
   def declareSystem(): Unit =
     Multiverse.declareSubsystem(classOf[Player], step)
 
-  var fractionalPos = new Vec2d(.5, .5)
-
   private def step(multiverse: Multiverse, id: UniversalId, players: Iterable[Player]): Unit = {
+    move(multiverse, id, players)
+
+    if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
+      val carryableIds = players.flatMap(player => {
+        val universe = player.universeObject.universe
+        universe
+          .bitsInCell(player.universeObject.cell)
+          .filter(otherId => otherId != id && universe.bits(otherId).state.contains("carried"))
+      }).toSet
+      for (carryableId <- carryableIds; cell <- players.map(_.universeObject.cell).toSet[Cell]) {
+        multiverse.applyGate(
+          Gate.X, carryableId, Some("carried"),
+          BitControl(id, "alive" -> true),
+          PositionControl(id, cell),
+          PositionControl(carryableId, cell),
+        )
+      }
+    }
+  }
+
+  private def move(multiverse: Multiverse, id: UniversalId, players: Iterable[Player]): Unit = {
     var diff = new Vec2d(0, 0)
     if (Input.keyDown(GLFW_KEY_A)) {
       diff = diff.add(new Vec2d(-1, 0))
@@ -43,6 +64,9 @@ private object Player {
     }
     if (Input.keyDown(GLFW_KEY_W)) {
       diff = diff.add(new Vec2d(0, 1))
+    }
+    if (diff.length != 0) {
+      diff = diff.normalize()
     }
     fractionalPos = fractionalPos.add(diff.mul(6.5 * dt()))
 
@@ -84,22 +108,6 @@ private object Player {
       val newPos = o.universeObject.cell.toVec2d.add(if (o.state("carried")) fractionalPos else new Vec2d(.5, .5))
       o.universeObject.position.value = o.universeObject.position.value.lerp(newPos, 10 * dt);
     }
-
-    if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
-      val carryIds = players.flatMap(player => {
-        val universe = player.universeObject.universe
-        universe
-          .bitsInCell(player.universeObject.cell)
-          .filter(otherId => otherId != id && universe.bits(otherId).state.contains("carried"))
-      }).toSet
-      for (carryId <- carryIds; cell <- players.map(_.universeObject.cell).toSet[Cell]) {
-        multiverse.applyGate(
-          Gate.X, carryId, Some("carried"),
-          BitControl(id, "alive" -> true),
-          PositionControl(carryId, cell)
-        )
-      }
-    }
   }
 
   private def walk(multiverse: Multiverse, id: UniversalId, gate: Gate.Value, players: Iterable[Player]): Boolean = {
@@ -136,11 +144,11 @@ private object Player {
 private final class Player(universe: Universe,
                            id: UniversalId,
                            cell: Cell) extends Entity with Copyable[Player] with Drawable {
-  val position: PositionComponent = add(new PositionComponent(this, cell.toVec2d.add(.5)))
+  private val position: PositionComponent = add(new PositionComponent(this, cell.toVec2d.add(.5)))
 
-  val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell))
+  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell))
 
-  val sprite: DrawableSprite = add(new DrawableSprite(
+  private val sprite: DrawableSprite = add(new DrawableSprite(
     entity = this,
     sprite = Sprite.load(getClass.getResource("sprites/cat.png")),
     scale = new Vec2d(2, 2),

@@ -1,39 +1,49 @@
 package superposition
 
 import engine.core.Behavior.Entity
+import engine.core.Game
 import engine.graphics.sprites.Sprite
 import engine.util.Color.{BLACK, WHITE}
-import engine.util.math.Vec2d
 import extras.physics.PositionComponent
 
 /**
- * A door is an object with a qubit that other objects can pass through if the qubit is off, but not if the qubit is on.
- *
- * @param universe  the universe this door belongs to
- * @param id        the universe object ID for this door
- * @param _position the position of this door
+ * Contains initialization for doors.
  */
-// TODO
-//private final class Door(universe: Universe,
-//                         id: UniversalId,
-//                         _position: Vec2d) extends Entity with Copyable[Door] with Drawable {
-//  private val position: PositionComponent = add(new PositionComponent(this, _position))
-//
-//  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, new Vec2d(1, 1)))
-//
-//  private val sprite: DrawableSprite =
-//    add(new DrawableSprite(this, Sprite.load(getClass.getResource("sprites/roof_right.png")), color = BLACK))
-//
-//  private val qubit: Qubit = add(new Qubit(this, on => {
-//    universeObject.collidesWithObjects = on
-//    sprite.color = if (on) WHITE else BLACK
-//  }))
-//
-//  override def copy(): Door = {
-//    val door = new Door(universeObject.universe, universeObject.id, position.value)
-//    door.qubit.on = qubit.on
-//    door
-//  }
-//
-//  override def draw(): Unit = sprite.draw()
-//}
+private object Door {
+  /**
+   * Declares the door system.
+   */
+  def declareSystem(): Unit =
+    Game.declareSystem(classOf[Door], (_: Door).step())
+}
+
+/**
+ * A door blocks movement unless the door's control cell has a bit in the on state.
+ *
+ * @param universe the universe this door belongs to
+ * @param id       the universe object ID for this door
+ * @param cell     the position of this door
+ * @param control  the control cell for this door
+ */
+private final class Door(universe: Universe,
+                         id: UniversalId,
+                         cell: Cell,
+                         control: Cell) extends Entity with Copyable[Door] with Drawable {
+  add(new PositionComponent(this, cell.toVec2d.add(0.5)))
+
+  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell, true))
+
+  private val sprite: DrawableSprite =
+    add(new DrawableSprite(this, Sprite.load(getClass.getResource("sprites/roof_right.png")), color = BLACK))
+
+  override def copy(): Door =
+    new Door(universeObject.universe, universeObject.id, universeObject.cell, control)
+
+  override def draw(): Unit = sprite.draw()
+
+  private def step(): Unit = {
+    universeObject.collision = !universeObject.universe.bitsInCell(control)
+      .exists(universeObject.universe.bits(_).state.get("on").contains(true))
+    sprite.color = if (universeObject.collision) WHITE else BLACK
+  }
+}

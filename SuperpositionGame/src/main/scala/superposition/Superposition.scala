@@ -24,6 +24,7 @@ object Superposition {
     Game.init()
     Multiverse.declareSystem()
     Laser.declareSystem()
+    Door.declareSystem()
     Player.declareSystem()
     Draw.declareSystem()
 

@@ -88,6 +88,15 @@ private final class Universe(val multiverse: Multiverse) extends Entity with Cop
       .toSet
 
   /**
+   * Returns true if the cell is open for movement (i.e., does not contain any objects with collision).
+   *
+   * @param cell the cell to test for movement
+   * @return true if the cell is open for movement
+   */
+  def cellOpen(cell: Cell): Boolean =
+    !multiverse.walls.contains(cell) && objects.values.filter(_.collision).forall(_.cell != cell)
+
+  /**
    * Returns a copy of this universe and all of its objects.
    *
    * @return a copy of this universe
