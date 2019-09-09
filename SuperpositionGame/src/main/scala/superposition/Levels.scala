@@ -1,7 +1,6 @@
 package superposition
 
 import engine.core.Game
-import engine.util.math.Vec2d
 import extras.tiles.Tilemap
 
 /**
@@ -14,13 +13,14 @@ private object Levels {
   def createLevel1(): Unit = {
     lazy val multiverse: Multiverse = new Multiverse(List(universe), Tilemap.load(getClass.getResource("level1.tmx")))
     lazy val universe = new Universe(multiverse)
-    for (i <- 0 until 2) {
-      universe.add(new Quball(universe, UniversalId(i), new Vec2d(1 + i, 1)))
-    }
-    universe.add(new Door(universe, UniversalId(2), new Vec2d(4, 1)))
-    universe.add(new Player(universe, UniversalId(3), new Vec2d(0, 0)))
-    universe.add(new Laser(universe, UniversalId(4), new Vec2d(-2, -2), new Vec2d(0, -1)))
-    Game.create(new Machine(multiverse, UniversalId(2), new Vec2d(6, 1)))
+    universe.add(new Player(universe, UniversalId(0), Cell(-5, -5)))
+    universe.add(new Quball(universe, UniversalId(1), Cell(-5, 0)))
+    universe.add(new Laser(universe, UniversalId(2), Cell(-5, 4), "sprites/laser_up.png", Gate.X, Direction.Up, Some(Cell(-6, 4))))
+    universe.add(new Laser(universe, UniversalId(3), Cell(-2, 7), "sprites/laser_left.png", Gate.X, Direction.Left, None))
+    universe.add(new Door(universe, UniversalId(4), Cell(-2, -12), Cell(-4, -12)))
+    universe.add(new Door(universe, UniversalId(5), Cell(0, 3), Cell(-2, 3)))
+    universe.add(new Quball(universe, UniversalId(6), Cell(2, -12)))
     Game.create(multiverse)
+    multiverse.applyGate(Gate.H, UniversalId(1), None)
   }
 }
