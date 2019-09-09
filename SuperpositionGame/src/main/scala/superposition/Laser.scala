@@ -24,6 +24,7 @@ private object Laser {
 
     val laser = lasers.head
     if (lasers.exists(_.justFired)) {
+      // TODO: Search the laser beam for each universe because the target cells might be different.
       val targetCell = laser.beam.take(50).find(cell =>
         multiverse.walls.contains(cell) ||
           lasers.exists(_.universeObject.universe.objects.values.exists(_.cell == cell))
@@ -34,6 +35,7 @@ private object Laser {
           if (laser.control.isEmpty) {
             multiverse.applyGate(laser.gate, targetId, None, PositionControl(targetId, targetCell.get))
           } else {
+            // TODO: Make sure the target and control aren't the same.
             val controlId = multiverse.bitsInCell(laser.control.get).head
             multiverse.applyGate(
               laser.gate, targetId, None,

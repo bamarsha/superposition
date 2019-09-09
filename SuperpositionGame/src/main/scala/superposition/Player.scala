@@ -51,6 +51,7 @@ private object Player {
     }
   }
 
+  // TODO: Refactor this method.
   private def move(multiverse: Multiverse, id: UniversalId, players: Iterable[Player]): Unit = {
     var diff = new Vec2d(0, 0)
     if (Input.keyDown(GLFW_KEY_A)) {

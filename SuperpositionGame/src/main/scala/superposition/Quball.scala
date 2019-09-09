@@ -32,7 +32,7 @@ private final class Quball(universe: Universe,
     this,
     HashMap("on" -> false, "carried" -> false),
     "on",
-    map => sprite.color = if (map("on")) WHITE else BLACK
+    state => sprite.color = if (state("on")) WHITE else BLACK
   ))
 
   override def copy(): Quball = {
