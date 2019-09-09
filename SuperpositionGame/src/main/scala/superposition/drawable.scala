@@ -31,8 +31,8 @@ private trait Drawable {
  * @param color  the color of the sprite
  */
 private final class DrawableSprite(entity: Entity,
-                                   val sprite: Sprite,
-                                   val scale: Vec2d = new Vec2d(1, 1),
+                                   var sprite: Sprite,
+                                   var scale: Vec2d = new Vec2d(1, 1),
                                    var color: Color = WHITE) extends Component(entity) with Drawable {
   private val position: PositionComponent = get(classOf[PositionComponent])
   private val universe: UniverseObject = get(classOf[UniverseObject])

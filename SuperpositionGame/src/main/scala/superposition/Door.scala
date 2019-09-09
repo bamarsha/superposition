@@ -3,7 +3,6 @@ package superposition
 import engine.core.Behavior.Entity
 import engine.core.Game
 import engine.graphics.sprites.Sprite
-import engine.util.Color.{BLACK, WHITE}
 import extras.physics.PositionComponent
 
 /**
@@ -34,7 +33,7 @@ private final class Door(universe: Universe,
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell, true))
 
   private val sprite: DrawableSprite =
-    add(new DrawableSprite(this, Sprite.load(getClass.getResource("sprites/roof_right.png"))))
+    add(new DrawableSprite(this, Sprite.load(getClass.getResource("sprites/door_closed.png"))))
 
   override def copy(): Door = {
     val door = new Door(universeObject.universe, universeObject.id, universeObject.cell, control)
@@ -48,6 +47,7 @@ private final class Door(universe: Universe,
   private def step(): Unit = {
     universeObject.collision = !universeObject.universe.bitsInCell(control)
       .exists(universeObject.universe.bits(_).state.get("on").contains(true))
-    sprite.color = if (universeObject.collision) WHITE else BLACK
+    val filename = if (universeObject.collision) "door_closed.png" else "door_open.png"
+    sprite.sprite = Sprite.load(getClass.getResource("sprites/" + filename))
   }
 }
