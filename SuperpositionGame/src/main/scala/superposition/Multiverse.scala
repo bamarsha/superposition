@@ -121,10 +121,10 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
   def canApplyGate(gate: Gate.Value, target: UniversalId, controls: Control*): Boolean = {
     val controlled = withControls(controls: _*)
     gate match {
-      case Gate.Up => controlled.forall(u => cellOpen(u.objects(target).cell.up))
-      case Gate.Down => controlled.forall(u => cellOpen(u.objects(target).cell.down))
-      case Gate.Left => controlled.forall(u => cellOpen(u.objects(target).cell.left))
-      case Gate.Right => controlled.forall(u => cellOpen(u.objects(target).cell.right))
+      case Gate.Up => controlled.forall(u => u.cellOpen(u.objects(target).cell.up))
+      case Gate.Down => controlled.forall(u => u.cellOpen(u.objects(target).cell.down))
+      case Gate.Left => controlled.forall(u => u.cellOpen(u.objects(target).cell.left))
+      case Gate.Right => controlled.forall(u => u.cellOpen(u.objects(target).cell.right))
       case _ => true
     }
   }
@@ -179,11 +179,6 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
       combine()
     }
   }
-
-  private def cellOpen(cell: Cell): Boolean =
-    !walls.contains(cell) &&
-      // TODO: This will prevent some valid moves if a cell is open for some copies of the player.
-      universes.forall(u => u.objects.values.filter(_.collision).forall(_.cell != cell))
 
   private def step(): Unit = {
     val cell = Cell(Input.mouse().y.floor.toLong, Input.mouse().x.floor.toLong)
