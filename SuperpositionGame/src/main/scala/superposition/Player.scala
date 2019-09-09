@@ -65,6 +65,9 @@ private object Player {
     if (Input.keyDown(GLFW_KEY_W)) {
       diff = diff.add(new Vec2d(0, 1))
     }
+    if (diff.length != 0) {
+      diff = diff.normalize()
+    }
     fractionalPos = fractionalPos.add(diff.mul(6.5 * dt()))
 
     if (fractionalPos.x < -1e-3) {
