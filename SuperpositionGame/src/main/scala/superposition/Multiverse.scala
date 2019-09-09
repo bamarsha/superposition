@@ -1,19 +1,19 @@
 package superposition
 
+import java.util
+
 import engine.core.Behavior.Entity
 import engine.core.Game.dt
-import engine.core.{Game, Input}
+import engine.core.{Behavior, Game, Input}
 import engine.graphics.Camera
 import engine.graphics.Camera.Camera2d
 import engine.graphics.opengl.{Framebuffer, Shader, Texture}
 import engine.util.Color
 import engine.util.Color.CLEAR
-import engine.util.math.{Transformation, Vec2d}
-import extras.physics.Rectangle
+import engine.util.math.{Transformation, Vec2d, Vec4d}
 import extras.tiles.{Tilemap, TilemapRenderer}
 import org.lwjgl.glfw.GLFW._
 
-import scala.collection.immutable.Queue
 import scala.jdk.CollectionConverters._
 import scala.math.{Pi, sqrt}
 
@@ -36,6 +36,25 @@ private object Multiverse {
    */
   def declareSystem(): Unit =
     Game.declareSystem(classOf[Multiverse], (_: Multiverse).step())
+
+  /**
+   * Declares a subsystem of the multiverse.
+   * <p>
+   * Subsystems group behaviors by their universal ID, so all copies of a behavior can be processed at the same time.
+   *
+   * @param cls the behavior class
+   * @param f   the system
+   * @tparam T the type of the behavior
+   */
+  def declareSubsystem[T <: Behavior](cls: Class[T], f: (Multiverse, UniversalId, Iterable[T]) => Unit): Unit = {
+    Game.declareGroupSystem(cls, (behaviors: util.Collection[T]) => behaviors.asScala
+      .groupBy(b => {
+        val u = b.get(classOf[UniverseObject])
+        (u.multiverse, u.id)
+      })
+      .foreachEntry { case ((multiverse, id), behaviors) => f(multiverse, id, behaviors) }
+    )
+  }
 }
 
 /**
@@ -52,21 +71,21 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
   import Multiverse._
 
   /**
-   * The list of walls in the multiverse.
+   * The walls in the multiverse.
    */
-  val walls: List[Rectangle] =
+  val walls: Set[Cell] =
     (for (layer <- tiles.layers.asScala
           if layer.properties.asScala.exists(p => p.name == "collision" && p.value.toBoolean);
           x <- 0 until layer.width;
           y <- 0 until layer.height
           if layer.data.tiles(x)(y) != 0) yield {
-      val absoluteX = x - 16 + layer.offsetX.toDouble / tiles.tileWidth
-      val absoluteY = y - 9 + layer.offsetY.toDouble / tiles.tileHeight
-      new Rectangle(new Vec2d(absoluteX, absoluteY), new Vec2d(absoluteX + 1, absoluteY + 1))
-    }).toList
+      Cell(
+        (y - 9 + layer.offsetY.toDouble / tiles.tileHeight).round,
+        (x - 16 + layer.offsetX.toDouble / tiles.tileWidth).round
+      )
+    }).toSet
 
   private var universes: List[Universe] = _
-  private var gateBuffer: Queue[(Gate.Value, UniversalId, Set[UniversalId])] = Queue()
 
   private var frameBuffer: Framebuffer = _
   private var colorBuffer: Texture = _
@@ -83,69 +102,101 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
   }
 
   /**
-   * Returns the set of qubits that are within 1 unit of the position.
+   * Returns the bits that are in the cell in all universes.
    *
-   * @param position the position from which to look for nearby qubits
-   * @return the set of qubits that are within 1 unit of the position
+   * @param cell the cell to find bits in
+   * @return the bits that are in the cell in all universes
    */
-  def qubitsNear(position: Vec2d): Set[UniversalId] = universes
-    .flatMap(_.qubits.values)
-    .filter(_.universeObject.position.value.sub(position).length() < 1)
-    .map(_.universeObject.id)
-    .toSet
+  def bitsInCell(cell: Cell): Set[UniversalId] =
+    universes.flatMap(_.bitsInCell(cell)).toSet
 
   /**
-   * Applies the quantum logic gate to the target qubit controlled by the control qubits, if any.
-   * <p>
-   * Gates are buffered for one frame to avoid duplicate gate applications when an object that exists in multiple
-   * universes tries to apply a gate to the same qubit from multiple universes.
+   * Returns true if it is valid to apply the quantum gate to the target object with the controls.
    *
    * @param gate     the gate to apply
    * @param target   the target qubit
-   * @param controls the control qubits
+   * @param controls the controls
+   * @return true if it is valid to apply the quantum gate to the target object with the controls
    */
-  def applyGate(gate: Gate.Value, target: UniversalId, controls: UniversalId*): Unit =
-    gateBuffer :+= (gate, target, controls.toSet)
-
-  private def step(): Unit = {
-    val selected = qubitsNear(Input.mouse())
-    for ((key, gate) <- GateKeys) {
-      if (Input.keyJustPressed(key)) {
-        selected.foreach(applyGate(gate, _))
-      }
+  def canApplyGate(gate: Gate.Value, target: UniversalId, controls: Control*): Boolean = {
+    val controlled = withControls(controls: _*)
+    gate match {
+      case Gate.Up => controlled.forall(u => u.cellOpen(u.objects(target).cell.up))
+      case Gate.Down => controlled.forall(u => u.cellOpen(u.objects(target).cell.down))
+      case Gate.Left => controlled.forall(u => u.cellOpen(u.objects(target).cell.left))
+      case Gate.Right => controlled.forall(u => u.cellOpen(u.objects(target).cell.right))
+      case _ => true
     }
-    flushGates()
-    combine()
-    normalize()
-    draw()
   }
 
-  private def flushGates(): Unit = {
-    for ((gate, target, controls) <- gateBuffer.distinct;
-         u <- universes if controls.forall(u.qubits(_).on)) {
+  /**
+   * Applies the quantum gate to the target object with optional controls.
+   *
+   * @param gate     the gate to apply
+   * @param target   the target object
+   * @param key      the target key in the object's bit map, or None to use the default key
+   * @param controls the controls
+   */
+  def applyGate(gate: Gate.Value, target: UniversalId, key: Option[String], controls: Control*): Unit = {
+    require(canApplyGate(gate, target, controls: _*), "Invalid gate")
+    require(
+      controls.forall({
+        case BitControl(id, _) if id == target => !Gate.logicGate(gate)
+        case PositionControl(id, _) if id == target => !Gate.positionGate(gate)
+        case _ => true
+      }),
+      "Controlling using the same ID and type as the target"
+    )
+
+    for (u <- withControls(controls: _*)) {
+      val k = key.getOrElse(u.bits(target).defaultKey)
       gate match {
-        case Gate.X => u.qubits(target).flip()
+        case Gate.X => u.bits(target).state += k -> !u.bits(target).state(k)
         case Gate.Z =>
-          if (u.qubits(target).on) {
+          if (u.bits(target).state(k)) {
             u.amplitude *= Complex(-1)
           }
         case Gate.T =>
-          if (u.qubits(target).on) {
+          if (u.bits(target).state(k)) {
             u.amplitude *= Complex.polar(1, Pi / 4)
           }
         case Gate.H =>
           u.amplitude /= Complex(sqrt(2))
           val copy = u.copy()
           Game.create(copy)
-          if (u.qubits(target).on) {
+          if (u.bits(target).state(k)) {
             u.amplitude *= Complex(-1)
           }
-          copy.qubits(target).flip()
+          copy.bits(target).state += k -> !copy.bits(target).state(k)
           universes = copy :: universes
+        case Gate.Up => u.objects(target).cell = u.objects(target).cell.up
+        case Gate.Down => u.objects(target).cell = u.objects(target).cell.down
+        case Gate.Left => u.objects(target).cell = u.objects(target).cell.left
+        case Gate.Right => u.objects(target).cell = u.objects(target).cell.right
       }
     }
-    gateBuffer = Queue()
+    if (gate == Gate.H) {
+      combine()
+    }
   }
+
+  private def step(): Unit = {
+    val cell = Cell(Input.mouse().y.floor.toLong, Input.mouse().x.floor.toLong)
+    val selected = bitsInCell(cell)
+    for ((key, gate) <- GateKeys) {
+      if (Input.keyJustPressed(key)) {
+        selected.foreach(id => applyGate(gate, id, None, PositionControl(id, cell)))
+      }
+    }
+    normalize()
+    draw()
+  }
+
+  private def withControls(controls: Control*): List[Universe] =
+    universes.filter(u => controls.forall {
+      case BitControl(id, key -> state) => u.bits(id).state.get(key).contains(state)
+      case PositionControl(id, cell) => u.objects(id).cell == cell
+    })
 
   private def combine(): Unit = {
     val (combined, removed) = universes
@@ -183,13 +234,20 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
       val camera = new Camera2d()
       camera.lowerLeft = new Vec2d(-1, -1)
       Camera.current = camera
-      UniverseShader.setMVP(Transformation.IDENTITY)
-      UniverseShader.setUniform("minVal", minValue.asInstanceOf[Float])
-      UniverseShader.setUniform("maxVal", maxValue.asInstanceOf[Float])
-      UniverseShader.setUniform("hue", (u.amplitude.phase / (2 * Pi)).asInstanceOf[Float])
-      Framebuffer.drawToWindow(colorBuffer, UniverseShader)
-      Camera.current = Camera.camera2d
 
+      UniverseShader.setMVP(Transformation.IDENTITY)
+      UniverseShader.setUniform("minVal", minValue.toFloat)
+      UniverseShader.setUniform("maxVal", maxValue.toFloat)
+      UniverseShader.setUniform("hue", (u.amplitude.phase / (2 * Pi)).toFloat)
+      UniverseShader.setUniform("color", new Vec4d(1, 1, 1, 1))
+      Framebuffer.drawToWindow(colorBuffer, UniverseShader)
+
+      UniverseShader.setUniform("minVal", 0f)
+      UniverseShader.setUniform("maxVal", 1f)
+      UniverseShader.setUniform("color", new Vec4d(1, 1, 1, 0.1))
+      Framebuffer.drawToWindow(colorBuffer, UniverseShader)
+
+      Camera.current = Camera.camera2d
       minValue = maxValue
     }
   }

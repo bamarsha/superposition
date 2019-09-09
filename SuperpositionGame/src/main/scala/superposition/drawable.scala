@@ -2,9 +2,10 @@ package superposition
 
 import engine.core.Behavior.{Component, Entity}
 import engine.core.Game
+import engine.graphics.Graphics.drawRectangleOutline
 import engine.graphics.sprites.Sprite
 import engine.util.Color
-import engine.util.Color.WHITE
+import engine.util.Color.{BLACK, WHITE}
 import engine.util.math.{Transformation, Vec2d}
 import extras.physics.PositionComponent
 
@@ -30,16 +31,20 @@ private trait Drawable {
  * @param color  the color of the sprite
  */
 private final class DrawableSprite(entity: Entity,
-                                   val sprite: Sprite,
-                                   val scale: Vec2d = new Vec2d(1, 1),
+                                   var sprite: Sprite,
+                                   var scale: Vec2d = new Vec2d(1, 1),
                                    var color: Color = WHITE) extends Component(entity) with Drawable {
   private val position: PositionComponent = get(classOf[PositionComponent])
+  private val universe: UniverseObject = get(classOf[UniverseObject])
 
   /**
    * Draws this sprite.
    */
-  override def draw(): Unit =
+  override def draw(): Unit = {
     sprite.draw(Transformation.create(position.value, 0, scale), color)
+    // TODO: Remove this outline.
+    drawRectangleOutline(Transformation.create(universe.cell.toVec2d, 0, 1), BLACK)
+  }
 }
 
 /**

@@ -24,6 +24,7 @@ private object Laser {
 
     val laser = lasers.head
     if (lasers.exists(_.justFired)) {
+      // TODO: Search the laser beam for each universe because the target cells might be different.
       val targetCell = laser.beam.take(50).find(cell =>
         multiverse.walls.contains(cell) ||
           lasers.exists(_.universeObject.universe.objects.values.exists(_.cell == cell))
@@ -34,6 +35,7 @@ private object Laser {
           if (laser.control.isEmpty) {
             multiverse.applyGate(laser.gate, targetId, None, PositionControl(targetId, targetCell.get))
           } else {
+            // TODO: Make sure the target and control aren't the same.
             val controlId = multiverse.bitsInCell(laser.control.get).head
             multiverse.applyGate(
               laser.gate, targetId, None,
@@ -64,7 +66,6 @@ private object Laser {
 private final class Laser(universe: Universe,
                           id: UniversalId,
                           cell: Cell,
-                          spriteName: String,
                           private val gate: Gate.Value,
                           direction: Direction.Value,
                           private val control: Option[Cell]) extends Entity with Copyable[Laser] with Drawable {
@@ -74,12 +75,12 @@ private final class Laser(universe: Universe,
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell, true))
 
   private val sprite: DrawableSprite =
-    add(new DrawableSprite(this, Sprite.load(getClass.getResource(spriteName))))
+    add(new DrawableSprite(this, Sprite.load(getClass.getResource("sprites/cat.png"))))
 
   private var targetCell: Option[Cell] = None
   private var elapsedTime: Double = 0
 
-  override def copy(): Laser = new Laser(universeObject.universe, id, universeObject.cell, spriteName, gate, direction, control)
+  override def copy(): Laser = new Laser(universeObject.universe, id, universeObject.cell, gate, direction, control)
 
   override def draw(): Unit = {
     sprite.draw()
