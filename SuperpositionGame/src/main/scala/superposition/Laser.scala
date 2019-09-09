@@ -66,6 +66,7 @@ private object Laser {
 private final class Laser(universe: Universe,
                           id: UniversalId,
                           cell: Cell,
+                          spriteName: String,
                           private val gate: Gate.Value,
                           direction: Direction.Value,
                           private val control: Option[Cell]) extends Entity with Copyable[Laser] with Drawable {
@@ -75,12 +76,12 @@ private final class Laser(universe: Universe,
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell, true))
 
   private val sprite: DrawableSprite =
-    add(new DrawableSprite(this, Sprite.load(getClass.getResource("sprites/cat.png"))))
+    add(new DrawableSprite(this, Sprite.load(getClass.getResource(spriteName))))
 
   private var targetCell: Option[Cell] = None
   private var elapsedTime: Double = 0
 
-  override def copy(): Laser = new Laser(universeObject.universe, id, universeObject.cell, gate, direction, control)
+  override def copy(): Laser = new Laser(universeObject.universe, id, universeObject.cell, spriteName, gate, direction, control)
 
   override def draw(): Unit = {
     sprite.draw()
