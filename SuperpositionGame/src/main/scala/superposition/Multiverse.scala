@@ -111,12 +111,12 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
     universes.flatMap(_.bitsInCell(cell)).toSet
 
   /**
-   * Returns true if it is valid to apply the quantum gate to the target qubit with the controls.
+   * Returns true if it is valid to apply the quantum gate to the target object with the controls.
    *
    * @param gate     the gate to apply
    * @param target   the target qubit
    * @param controls the controls
-   * @return true if it is valid to apply the quantum gate to the target qubit with the controls
+   * @return true if it is valid to apply the quantum gate to the target object with the controls
    */
   def canApplyGate(gate: Gate.Value, target: UniversalId, controls: Control*): Boolean = {
     val controlled = withControls(controls: _*)
@@ -130,13 +130,14 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
   }
 
   /**
-   * Applies the quantum gate to the target qubit with optional controls.
+   * Applies the quantum gate to the target object with optional controls.
    *
    * @param gate     the gate to apply
-   * @param target   the target qubit
+   * @param target   the target object
+   * @param key      the target key in the object's bit map, or None to use the default key
    * @param controls the controls
    */
-  def applyGate(gate: Gate.Value, target: UniversalId, controls: Control*): Unit = {
+  def applyGate(gate: Gate.Value, target: UniversalId, key: Option[String], controls: Control*): Unit = {
     require(canApplyGate(gate, target, controls: _*), "Invalid gate")
     require(
       controls.forall({
@@ -148,24 +149,25 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
     )
 
     for (u <- withControls(controls: _*)) {
+      val k = key.getOrElse(u.bits(target).defaultKey)
       gate match {
-        case Gate.X => u.bits(target).on = !u.bits(target).on
+        case Gate.X => u.bits(target).state += k -> !u.bits(target).state(k)
         case Gate.Z =>
-          if (u.bits(target).on) {
+          if (u.bits(target).state(k)) {
             u.amplitude *= Complex(-1)
           }
         case Gate.T =>
-          if (u.bits(target).on) {
+          if (u.bits(target).state(k)) {
             u.amplitude *= Complex.polar(1, Pi / 4)
           }
         case Gate.H =>
           u.amplitude /= Complex(sqrt(2))
           val copy = u.copy()
           Game.create(copy)
-          if (u.bits(target).on) {
+          if (u.bits(target).state(k)) {
             u.amplitude *= Complex(-1)
           }
-          copy.bits(target).on = !copy.bits(target).on
+          copy.bits(target).state += k -> !copy.bits(target).state(k)
           universes = copy :: universes
         case Gate.Up => u.objects(target).cell = u.objects(target).cell.up
         case Gate.Down => u.objects(target).cell = u.objects(target).cell.down
@@ -185,7 +187,7 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
     val selected = bitsInCell(cell)
     for ((key, gate) <- GateKeys) {
       if (Input.keyJustPressed(key)) {
-        selected.foreach(id => applyGate(gate, id, PositionControl(id, cell)))
+        selected.foreach(id => applyGate(gate, id, None, PositionControl(id, cell)))
       }
     }
     combine()
@@ -195,7 +197,7 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
 
   private def withControls(controls: Control*): List[Universe] =
     universes.filter(u => controls.forall {
-      case BitControl(id, on) => u.bits(id).on == on
+      case BitControl(id, key -> state) => u.bits(id).state.get(key).contains(state)
       case PositionControl(id, cell) => u.objects(id).cell == cell
     })
 

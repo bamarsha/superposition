@@ -30,16 +30,15 @@ private object Laser {
       )
       lasers.foreach(_.targetCell = targetCell)
       if (targetCell.isDefined) {
-        for (id <- multiverse.bitsInCell(targetCell.get)) {
+        for (targetId <- multiverse.bitsInCell(targetCell.get)) {
           if (laser.control.isEmpty) {
-            multiverse.applyGate(laser.gate, id, PositionControl(id, targetCell.get))
+            multiverse.applyGate(laser.gate, targetId, None, PositionControl(targetId, targetCell.get))
           } else {
             val controlId = multiverse.bitsInCell(laser.control.get).head
             multiverse.applyGate(
-              laser.gate,
-              id,
-              PositionControl(id, targetCell.get),
-              BitControl(controlId, on = true),
+              laser.gate, targetId, None,
+              PositionControl(targetId, targetCell.get),
+              BitControl(controlId, "on" -> true),
               PositionControl(controlId, laser.control.get)
             )
           }
@@ -100,7 +99,7 @@ private final class Laser(universe: Universe,
 
   private def controlBitIsOn: Boolean =
     control.isEmpty || (universeObject.universe.bitsInCell(control.get).headOption match {
-      case Some(id) => universeObject.universe.bits(id).on
+      case Some(id) => universeObject.universe.bits(id).state.get("on").contains(true)
       case _ => false
     })
 

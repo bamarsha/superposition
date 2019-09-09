@@ -33,7 +33,7 @@ private final class Universe(val multiverse: Multiverse) extends Entity with Cop
 
   private var _objects: Map[UniversalId, UniverseObject] = new HashMap()
 
-  private var _bits: Map[UniversalId, Bit] = new HashMap()
+  private var _bits: Map[UniversalId, BitMap] = new HashMap()
 
   override protected def onCreate(): Unit = objects.values.foreach(o => Game.create(o.entity))
 
@@ -45,16 +45,16 @@ private final class Universe(val multiverse: Multiverse) extends Entity with Cop
   def objects: Map[UniversalId, UniverseObject] = _objects
 
   /**
-   * The bits in this universe.
+   * The bit maps in this universe.
    */
-  def bits: Map[UniversalId, Bit] = _bits
+  def bits: Map[UniversalId, BitMap] = _bits
 
   /**
    * An opaque representation of this universe's state that can be compared for equality with the state of other
    * universes.
    */
   def state: Equals =
-    bits.view.mapValues(q => (q.on, q.universeObject.cell)).toMap
+    bits.view.mapValues(q => (q.state, q.universeObject.cell)).toMap
 
   /**
    * Adds the entity to this universe.
@@ -70,9 +70,9 @@ private final class Universe(val multiverse: Multiverse) extends Entity with Cop
     require(universeObject.universe == this, "Entity is not a part of this universe")
     require(!objects.contains(universeObject.id), "ID has already been used")
 
-    _objects += (universeObject.id -> universeObject)
-    if (entity.has(classOf[Bit])) {
-      _bits += (universeObject.id -> entity.get(classOf[Bit]))
+    _objects += universeObject.id -> universeObject
+    if (entity.has(classOf[BitMap])) {
+      _bits += universeObject.id -> entity.get(classOf[BitMap])
     }
   }
 
@@ -133,7 +133,7 @@ private final class UniverseObject(entity: Entity with Copyable[_ <: Entity] wit
   val multiverse: Multiverse = universe.multiverse
 
   /**
-   * The grid cell of this obejct.
+   * The grid cell of this object.
    */
   def cell: Cell = _cell
 

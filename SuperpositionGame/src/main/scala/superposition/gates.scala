@@ -69,12 +69,12 @@ private object Gate extends Enumeration {
 private sealed trait Control
 
 /**
- * Controls a gate based on an object's bit.
+ * Controls a gate based on a bit in an object's bit map.
  *
- * @param id the object's ID
- * @param on the necessary state of the object's bit
+ * @param id    the object's ID
+ * @param entry the entry that must be contained in the bit map
  */
-private final case class BitControl(id: UniversalId, on: Boolean) extends Control
+private final case class BitControl(id: UniversalId, entry: (String, Boolean)) extends Control
 
 /**
  * Controls a gate based on an object's position.

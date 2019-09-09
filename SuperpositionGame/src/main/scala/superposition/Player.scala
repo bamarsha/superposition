@@ -9,6 +9,8 @@ import engine.util.math.Vec2d
 import extras.physics.PositionComponent
 import org.lwjgl.glfw.GLFW._
 
+import scala.collection.immutable.HashMap
+
 /**
  * Contains settings and initialization for the player.
  */
@@ -34,24 +36,39 @@ private object Player {
       }
     }
     if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
-      players.foreach(_.toggleCarrying())
+      val carryIds = players.flatMap(player => {
+        val universe = player.universeObject.universe
+        universe
+          .bitsInCell(player.universeObject.cell)
+          .filter(otherId => otherId != id && universe.bits(otherId).state.contains("carried"))
+      }).toSet
+      for (carryId <- carryIds; cell <- players.map(_.universeObject.cell).toSet[Cell]) {
+        multiverse.applyGate(
+          Gate.X, carryId, Some("carried"),
+          BitControl(id, "alive" -> true),
+          PositionControl(carryId, cell)
+        )
+      }
     }
   }
 
   private def walk(multiverse: Multiverse, id: UniversalId, gate: Gate.Value, players: Iterable[Player]): Unit = {
-    val allCarried = players.map(p => (p.universeObject.cell, p.carrying)).collect {
-      case (cell, Some(carrying)) => (cell, carrying)
-    }.toSet
-    val playersCanWalk = multiverse.canApplyGate(gate, id, BitControl(id, on = true))
-    val carriedCanMove = allCarried.forall {
-      case (cell, carrying) =>
-        multiverse.canApplyGate(gate, carrying, BitControl(id, on = true), PositionControl(id, cell))
-    }
+    val allOtherBits = players.flatMap(_.universeObject.universe.bits.keySet).filter(_ != id).toSet
+    val playersCanWalk = multiverse.canApplyGate(gate, id, BitControl(id, "alive" -> true))
+    val carriedCanMove = allOtherBits.forall(otherId => multiverse.canApplyGate(
+      gate, otherId,
+      BitControl(id, "alive" -> true),
+      BitControl(otherId, "carried" -> true)
+    ))
     if (playersCanWalk && carriedCanMove) {
-      for ((cell, carrying) <- allCarried) {
-        multiverse.applyGate(gate, carrying, BitControl(id, on = true), PositionControl(id, cell))
+      for (otherId <- allOtherBits) {
+        multiverse.applyGate(
+          gate, otherId, None,
+          BitControl(id, "alive" -> true),
+          BitControl(otherId, "carried" -> true)
+        )
       }
-      multiverse.applyGate(gate, id, BitControl(id, on = true))
+      multiverse.applyGate(gate, id, None, BitControl(id, "alive" -> true))
       players.foreach(_.timeSinceLastWalk = 0)
     }
   }
@@ -78,24 +95,18 @@ private final class Player(universe: Universe,
     color = WHITE
   ))
 
-  private val bit: Bit = add(new Bit(this, true, on => sprite.color = if (on) WHITE else BLACK))
-
-  private var carrying: Option[UniversalId] = None
+  private val bits: BitMap = add(new BitMap(
+    this,
+    HashMap("alive" -> true),
+    "alive",
+    state => sprite.color = if (state("alive")) WHITE else BLACK
+  ))
 
   private var timeSinceLastWalk = Double.PositiveInfinity
 
-  private def toggleCarrying(): Unit =
-    if (carrying.isEmpty)
-      carrying = universeObject.universe.objects
-        .find(o => o._2.entity != this && o._2.cell == universeObject.cell)
-        .map(_._1)
-    else
-      carrying = None
-
   override def copy(): Player = {
     val player = new Player(universeObject.universe, universeObject.id, universeObject.cell)
-    player.bit.on = bit.on
-    player.carrying = carrying
+    player.bits.state = bits.state
     player
   }
 
