@@ -38,7 +38,7 @@ public class PhysicsComponent extends Component<Entity> {
     }
 
     private boolean moveToWall(Vec2d dir) {
-        for (var i = 1; i <= 10; i++) {
+        for (var i = 1; i <= 20; i++) {
             var newPos = position.value.add(dir.mul(Math.pow(.5, i)));
             if (!collider.test(newPos)) {
                 position.value = newPos;
