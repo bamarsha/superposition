@@ -10,7 +10,7 @@ import engine.graphics.Camera.Camera2d
 import engine.graphics.opengl.{Framebuffer, Shader, Texture}
 import engine.util.Color
 import engine.util.Color.CLEAR
-import engine.util.math.{Transformation, Vec2d}
+import engine.util.math.{Transformation, Vec2d, Vec4d}
 import extras.tiles.{Tilemap, TilemapRenderer}
 import org.lwjgl.glfw.GLFW._
 
@@ -234,13 +234,20 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
       val camera = new Camera2d()
       camera.lowerLeft = new Vec2d(-1, -1)
       Camera.current = camera
-      UniverseShader.setMVP(Transformation.IDENTITY)
-      UniverseShader.setUniform("minVal", minValue.asInstanceOf[Float])
-      UniverseShader.setUniform("maxVal", maxValue.asInstanceOf[Float])
-      UniverseShader.setUniform("hue", (u.amplitude.phase / (2 * Pi)).asInstanceOf[Float])
-      Framebuffer.drawToWindow(colorBuffer, UniverseShader)
-      Camera.current = Camera.camera2d
 
+      UniverseShader.setMVP(Transformation.IDENTITY)
+      UniverseShader.setUniform("minVal", minValue.toFloat)
+      UniverseShader.setUniform("maxVal", maxValue.toFloat)
+      UniverseShader.setUniform("hue", (u.amplitude.phase / (2 * Pi)).toFloat)
+      UniverseShader.setUniform("color", new Vec4d(1, 1, 1, 1))
+      Framebuffer.drawToWindow(colorBuffer, UniverseShader)
+
+      UniverseShader.setUniform("minVal", 0f)
+      UniverseShader.setUniform("maxVal", 1f)
+      UniverseShader.setUniform("color", new Vec4d(1, 1, 1, 0.1))
+      Framebuffer.drawToWindow(colorBuffer, UniverseShader)
+
+      Camera.current = Camera.camera2d
       minValue = maxValue
     }
   }

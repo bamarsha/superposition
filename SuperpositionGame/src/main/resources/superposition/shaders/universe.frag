@@ -8,6 +8,7 @@ uniform float minVal;
 uniform float maxVal;
 uniform float time;
 uniform float hue;
+uniform vec4 color;
 
 uniform sampler2D tex;
 
@@ -131,14 +132,14 @@ vec3 hsv2rgb(vec3 c)
 void main() {
     float noise = .5;
     float scale = 1;
-    for (int i = 0; i < 2; i++) {
-        noise += snoise(vec3(TexCoords.xy * scale * 20, time * 2)) / scale;
+    for (int i = 0; i < 1; i++) {
+        noise += snoise(vec3(TexCoords.xy * scale * 20, time * .25)) / scale;
         scale *= 2;
     }
     noise = fract(noise);
     if (noise < minVal || noise > maxVal) {
         discard;
     }
-    vec4 color = texture(tex, TexCoords);
-    FragColor = mix(vec4(hsv2rgb(vec3(hue, 1, 1)), color.a), color, .8);
+    vec4 texColor = texture(tex, TexCoords);
+    FragColor = mix(vec4(hsv2rgb(vec3(hue, 1, 1)), texColor.a), texColor, .9) * color;
 }
