@@ -175,6 +175,9 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
         case Gate.Right => u.objects(target).cell = u.objects(target).cell.right
       }
     }
+    if (gate == Gate.H) {
+      combine()
+    }
   }
 
   private def cellOpen(cell: Cell): Boolean =
@@ -190,7 +193,6 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
         selected.foreach(id => applyGate(gate, id, None, PositionControl(id, cell)))
       }
     }
-    combine()
     normalize()
     draw()
   }
