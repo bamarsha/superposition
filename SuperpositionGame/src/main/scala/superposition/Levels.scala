@@ -18,6 +18,9 @@ private object Levels {
     universe.add(new Laser(universe, UniversalId(2), Cell(-5, 4), Gate.X, Direction.Up, Some(Cell(-6, 4))))
     universe.add(new Laser(universe, UniversalId(3), Cell(-2, 7), Gate.X, Direction.Left, None))
     universe.add(new Door(universe, UniversalId(4), Cell(-2, -12), Cell(-4, -12)))
+    universe.add(new Door(universe, UniversalId(5), Cell(0, 3), Cell(-2, 3)))
+    universe.add(new Quball(universe, UniversalId(6), Cell(2, -12)))
     Game.create(multiverse)
+    multiverse.applyGate(Gate.H, UniversalId(1), None)
   }
 }
