@@ -21,9 +21,9 @@ private object Laser {
     Direction.Left -> getClass.getResource("sprites/laser_left.png")
   )
 
-  private val BeamDuration: Double = 1
+  private val BeamDuration: Double = 0.2
 
-  private val FadeDuration: Double = 0.2
+  private val FadeDuration: Double = 0.3
 
   /**
    * Declares the laser system.
