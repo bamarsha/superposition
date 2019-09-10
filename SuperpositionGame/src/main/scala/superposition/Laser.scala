@@ -1,5 +1,7 @@
 package superposition
 
+import java.net.URL
+
 import engine.core.Behavior.Entity
 import engine.core.Game.dt
 import engine.core.Input
@@ -13,6 +15,11 @@ import extras.physics.PositionComponent
  * Contains initialization for lasers.
  */
 private object Laser {
+  private val Sprites: Map[Direction.Value, URL] = Map(
+    Direction.Up -> getClass.getResource("sprites/laser_up.png"),
+    Direction.Left -> getClass.getResource("sprites/laser_left.png")
+  )
+
   /**
    * Declares the laser system.
    */
@@ -66,22 +73,23 @@ private object Laser {
 private final class Laser(universe: Universe,
                           id: UniversalId,
                           cell: Cell,
-                          spriteName: String,
                           private val gate: Gate.Value,
                           direction: Direction.Value,
                           private val control: Option[Cell]) extends Entity with Copyable[Laser] with Drawable {
+
+  import Laser._
+
   private val position: PositionComponent =
     add(new PositionComponent(this, new Vec2d(cell.column + 0.5, cell.row + 0.5)))
 
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell, true))
 
-  private val sprite: DrawableSprite =
-    add(new DrawableSprite(this, Sprite.load(getClass.getResource(spriteName))))
+  private val sprite: DrawableSprite = add(new DrawableSprite(this, Sprite.load(Sprites(direction))))
 
   private var targetCell: Option[Cell] = None
   private var elapsedTime: Double = 0
 
-  override def copy(): Laser = new Laser(universeObject.universe, id, universeObject.cell, spriteName, gate, direction, control)
+  override def copy(): Laser = new Laser(universeObject.universe, id, universeObject.cell, gate, direction, control)
 
   override def draw(): Unit = {
     sprite.draw()

@@ -6,8 +6,6 @@ import engine.util.Color.{BLACK, WHITE}
 import engine.util.math.Vec2d
 import extras.physics.PositionComponent
 
-import scala.collection.immutable.HashMap
-
 /**
  * A quball is a ball that can be either on or off.
  *
@@ -30,7 +28,7 @@ private final class Quball(universe: Universe,
 
   private val bits: BitMap = add(new BitMap(
     this,
-    HashMap("on" -> false, "carried" -> false),
+    Map("on" -> false, "carried" -> false),
     "on",
     state => sprite.color = if (state("on")) WHITE else BLACK
   ))

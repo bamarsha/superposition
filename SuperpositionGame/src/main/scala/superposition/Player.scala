@@ -9,8 +9,6 @@ import engine.util.math.Vec2d
 import extras.physics.PositionComponent
 import org.lwjgl.glfw.GLFW._
 
-import scala.collection.immutable.HashMap
-
 /**
  * Contains settings and initialization for the player.
  */
@@ -158,7 +156,7 @@ private final class Player(universe: Universe,
 
   private val bits: BitMap = add(new BitMap(
     this,
-    HashMap("alive" -> true),
+    Map("alive" -> true),
     "alive",
     state => sprite.color = if (state("alive")) WHITE else BLACK
   ))
