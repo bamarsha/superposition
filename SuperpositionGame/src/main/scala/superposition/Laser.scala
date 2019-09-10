@@ -27,35 +27,31 @@ private object Laser {
     Multiverse.declareSubsystem(classOf[Laser], step)
 
   private def step(multiverse: Multiverse, id: UniversalId, lasers: Iterable[Laser]): Unit = {
-    lasers.foreach(_.elapsedTime += dt)
-
-    val laser = lasers.head
-    if (lasers.exists(_.justFired)) {
-      // TODO: Search the laser beam for each universe because the target cells might be different.
-      val targetCell = laser.beam.take(50).find(cell =>
-        multiverse.walls.contains(cell) ||
-          lasers.exists(_.universeObject.universe.objects.values.exists(_.cell == cell))
-      )
-      lasers.foreach(_.targetCell = targetCell)
-      if (targetCell.isDefined) {
-        for (targetId <- multiverse.bitsInCell(targetCell.get)) {
-          if (laser.control.isEmpty) {
-            multiverse.applyGate(laser.gate, targetId, None, PositionControl(targetId, targetCell.get))
-          } else {
-            // TODO: Make sure the target and control aren't the same.
-            val controlId = multiverse.bitsInCell(laser.control.get).head
-            multiverse.applyGate(
-              laser.gate, targetId, None,
-              PositionControl(targetId, targetCell.get),
-              BitControl(controlId, "on" -> true),
-              PositionControl(controlId, laser.control.get)
-            )
-          }
-        }
+    for (laser <- lasers) {
+      if (laser.justClicked) {
+        laser.fire()
+        laser.elapsedTime = 0
+      } else {
+        laser.elapsedTime += dt
       }
-      lasers.foreach(_.elapsedTime = 0)
-    } else if (laser.targetCell.isDefined && laser.elapsedTime >= 1) {
-      lasers.foreach(_.targetCell = None)
+    }
+
+    val hits = for (laser <- lasers if laser.justClicked && laser.targetCell.isDefined;
+                    targetId <- laser.universeObject.universe.bitsInCell(laser.targetCell.get)) yield {
+      laser.elapsedTime = 0
+      (laser.targetCell.get, targetId, laser.controlId)
+    }
+    for ((targetCell, targetId, controlId) <- hits.toSet) {
+      controlId match {
+        case Some(controlId) =>
+          multiverse.applyGate(
+            lasers.head.gate, targetId, None,
+            PositionControl(targetId, targetCell),
+            BitControl(controlId, "on" -> true),
+            PositionControl(controlId, lasers.head.control.get)
+          )
+        case None => multiverse.applyGate(lasers.head.gate, targetId, None, PositionControl(targetId, targetCell))
+      }
     }
   }
 }
@@ -87,16 +83,30 @@ private final class Laser(universe: Universe,
   private val sprite: DrawableSprite = add(new DrawableSprite(this, Sprite.load(Sprites(direction))))
 
   private var targetCell: Option[Cell] = None
-  private var elapsedTime: Double = 0
+
+  private var elapsedTime: Double = Double.PositiveInfinity
 
   override def copy(): Laser = new Laser(universeObject.universe, id, universeObject.cell, gate, direction, control)
 
   override def draw(): Unit = {
     sprite.draw()
-    if (targetCell.isDefined && controlBitIsOn) {
+    if (targetCell.isDefined && elapsedTime <= 1) {
       drawWideLine(position.value, new Vec2d(targetCell.get.column + 0.5, targetCell.get.row + 0.5), 0.25, Color.RED)
     }
   }
+
+  private def fire(): Set[UniversalId] =
+    if (control.isEmpty || controlId.isDefined && universeObject.universe.bits(controlId.get).state("on")) {
+      targetCell = beam.take(50).find(cell =>
+        universeObject.multiverse.walls.contains(cell)
+          || universeObject.universe.objects.values.exists(_.cell == cell)
+      )
+      assert(targetCell.isDefined, "Missing wall in front of laser")
+      universeObject.universe.bitsInCell(targetCell.get)
+    } else {
+      targetCell = None
+      Set.empty
+    }
 
   private def beam: LazyList[Cell] =
     LazyList.iterate(universeObject.cell)(cell =>
@@ -108,15 +118,14 @@ private final class Laser(universe: Universe,
       }
     ).tail
 
-  private def controlBitIsOn: Boolean =
-    control.isEmpty || (universeObject.universe.bitsInCell(control.get).headOption match {
-      case Some(id) => universeObject.universe.bits(id).state.get("on").contains(true)
-      case _ => false
-    })
+  private def controlId: Option[UniversalId] =
+    control.flatMap(
+      universeObject.universe
+        .bitsInCell(_)
+        .find(universeObject.universe.bits(_).state.contains("on"))
+    )
 
-  private def justFired: Boolean =
-    targetCell.isEmpty &&
-      Input.mouseJustPressed(0) &&
-      Cell(Input.mouse().y.floor.toLong, Input.mouse().x.floor.toLong) == universeObject.cell &&
-      controlBitIsOn
+  private def justClicked: Boolean =
+    Input.mouseJustPressed(0) &&
+      Cell(Input.mouse().y.floor.toLong, Input.mouse().x.floor.toLong) == universeObject.cell
 }
