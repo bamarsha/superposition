@@ -1,5 +1,6 @@
 package superposition
 
+import java.lang.Math.min
 import java.net.URL
 
 import engine.core.Behavior.Entity
@@ -19,6 +20,10 @@ private object Laser {
     Direction.Up -> getClass.getResource("sprites/laser_up.png"),
     Direction.Left -> getClass.getResource("sprites/laser_left.png")
   )
+
+  private val BeamDuration: Double = 1
+
+  private val FadeDuration: Double = 0.2
 
   /**
    * Declares the laser system.
@@ -90,8 +95,13 @@ private final class Laser(universe: Universe,
 
   override def draw(): Unit = {
     sprite.draw()
-    if (targetCell.isDefined && elapsedTime <= 1) {
-      drawWideLine(position.value, new Vec2d(targetCell.get.column + 0.5, targetCell.get.row + 0.5), 0.25, Color.RED)
+    if (targetCell.isDefined && elapsedTime <= BeamDuration + FadeDuration) {
+      drawWideLine(
+        position.value,
+        new Vec2d(targetCell.get.column + 0.5, targetCell.get.row + 0.5),
+        0.25,
+        new Color(255, 0, 0, min(FadeDuration, BeamDuration + FadeDuration - elapsedTime) / FadeDuration)
+      )
     }
   }
 
