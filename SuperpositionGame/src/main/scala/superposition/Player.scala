@@ -13,14 +13,14 @@ import org.lwjgl.glfw.GLFW._
  * Contains settings and initialization for the player.
  */
 private object Player {
-  private val WalkGates: List[(Int, Gate.Value)] = List(
-    (GLFW_KEY_W, Gate.Up),
-    (GLFW_KEY_A, Gate.Left),
-    (GLFW_KEY_S, Gate.Down),
-    (GLFW_KEY_D, Gate.Right)
+  private val WalkKeys: Map[Int, Vec2d] = Map(
+    GLFW_KEY_W -> new Vec2d(0, 1),
+    GLFW_KEY_A -> new Vec2d(-1, 0),
+    GLFW_KEY_S -> new Vec2d(0, -1),
+    GLFW_KEY_D -> new Vec2d(1, 0)
   )
 
-  private var fractionalPos = new Vec2d(.5, .5)
+  private var relativePosition = new Vec2d(0.5, 0.5)
 
   /**
    * Declares the player system.
@@ -51,60 +51,48 @@ private object Player {
 
   // TODO: Refactor this method.
   private def move(multiverse: Multiverse, id: UniversalId, players: Iterable[Player]): Unit = {
-    var diff = new Vec2d(0, 0)
-    if (Input.keyDown(GLFW_KEY_A)) {
-      diff = diff.add(new Vec2d(-1, 0))
+    val delta = WalkKeys.foldLeft(new Vec2d(0, 0)) {
+      case (delta, (key, direction)) => if (Input.keyDown(key)) delta add direction else delta
     }
-    if (Input.keyDown(GLFW_KEY_D)) {
-      diff = diff.add(new Vec2d(1, 0))
-    }
-    if (Input.keyDown(GLFW_KEY_S)) {
-      diff = diff.add(new Vec2d(0, -1))
-    }
-    if (Input.keyDown(GLFW_KEY_W)) {
-      diff = diff.add(new Vec2d(0, 1))
-    }
-    if (diff.length != 0) {
-      diff = diff.normalize()
-    }
-    fractionalPos = fractionalPos.add(diff.mul(6.5 * dt()))
+    relativePosition = relativePosition add (if (delta.length == 0) new Vec2d(0, 0) else delta.normalize mul 6.5 * dt)
 
-    if (fractionalPos.x < -1e-3) {
+    if (relativePosition.x < -1e-3) {
       if (walk(multiverse, id, Gate.Left, players)) {
-        fractionalPos = fractionalPos.add(new Vec2d(1, 0))
+        relativePosition = relativePosition.add(new Vec2d(1, 0))
       } else {
-        fractionalPos = fractionalPos.setX(0)
+        relativePosition = relativePosition.setX(0)
       }
     }
-    if (fractionalPos.x > 1 + 1e-3) {
+    if (relativePosition.x > 1 + 1e-3) {
       if (walk(multiverse, id, Gate.Right, players)) {
-        fractionalPos = fractionalPos.add(new Vec2d(-1, 0))
+        relativePosition = relativePosition.add(new Vec2d(-1, 0))
       } else {
-        fractionalPos = fractionalPos.setX(1)
+        relativePosition = relativePosition.setX(1)
       }
     }
-    if (fractionalPos.y < -1e-3) {
+    if (relativePosition.y < -1e-3) {
       if (walk(multiverse, id, Gate.Down, players)) {
-        fractionalPos = fractionalPos.add(new Vec2d(0, 1))
+        relativePosition = relativePosition.add(new Vec2d(0, 1))
       } else {
-        fractionalPos = fractionalPos.setY(0)
+        relativePosition = relativePosition.setY(0)
       }
     }
-    if (fractionalPos.y > 1 + 1e-3) {
+    if (relativePosition.y > 1 + 1e-3) {
       if (walk(multiverse, id, Gate.Up, players)) {
-        fractionalPos = fractionalPos.add(new Vec2d(0, -1))
+        relativePosition = relativePosition.add(new Vec2d(0, -1))
       } else {
-        fractionalPos = fractionalPos.setY(1)
+        relativePosition = relativePosition.setY(1)
       }
     }
+
     for (p <- players) {
-      val newPos = p.universeObject.cell.toVec2d.add(if (p.bits.state("alive")) fractionalPos else new Vec2d(.5, .5))
+      val newPos = p.universeObject.cell.toVec2d.add(if (p.bits.state("alive")) relativePosition else new Vec2d(.5, .5))
       if (p.bits.state("alive")) {
         p.position.value = p.position.value.lerp(newPos, 10 * dt);
       }
     }
     for (o <- players.flatMap(_.universeObject.universe.bits.values.filter(_.state.contains("carried")))) {
-      val newPos = o.universeObject.cell.toVec2d.add(if (o.state("carried")) fractionalPos else new Vec2d(.5, .5))
+      val newPos = o.universeObject.cell.toVec2d.add(if (o.state("carried")) relativePosition else new Vec2d(.5, .5))
       o.universeObject.position.value = o.universeObject.position.value.lerp(newPos, 10 * dt);
     }
   }
@@ -117,6 +105,7 @@ private object Player {
       BitControl(id, "alive" -> true),
       BitControl(otherId, "carried" -> true)
     ))
+
     if (playersCanWalk && carriedCanMove) {
       for (otherId <- allOtherBits) {
         multiverse.applyGate(
@@ -126,10 +115,10 @@ private object Player {
         )
       }
       multiverse.applyGate(gate, id, None, BitControl(id, "alive" -> true))
-      players.foreach(_.timeSinceLastWalk = 0)
-      return true
+      true
+    } else {
+      false
     }
-    false
   }
 }
 
@@ -160,8 +149,6 @@ private final class Player(universe: Universe,
     "alive",
     state => sprite.color = if (state("alive")) WHITE else BLACK
   ))
-
-  private var timeSinceLastWalk = Double.PositiveInfinity
 
   override def copy(): Player = {
     val player = new Player(universeObject.universe, universeObject.id, universeObject.cell)
