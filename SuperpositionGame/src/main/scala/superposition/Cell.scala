@@ -30,9 +30,7 @@ private final case class Cell(row: Long, column: Long) {
   def right: Cell = Cell(row, column + 1)
 
   /**
-   * Returns a new Vec2d representing the lower-left corner of this cell.
-   *
-   * @return The Vec2d with this cell's position.
+   * A vector corresponding to the lower-left corner of this cell.
    */
-  def toVec2d: Vec2d = new Vec2d(column, row);
+  def toVec2d: Vec2d = new Vec2d(column, row)
 }
