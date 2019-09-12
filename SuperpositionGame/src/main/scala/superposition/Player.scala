@@ -75,13 +75,17 @@ private object Player {
 
   private def updateAbsolutePositions(players: Iterable[Player]): Unit = {
     val livePlayers = players.filter(_.bits.state("alive"))
-    for (p <- livePlayers) {
-      p.position.value = p.position.value.lerp(p.universeObject.cell.toVec2d.add(cellPosition), 10 * dt)
+    for (player <- livePlayers) {
+      val position = player.position
+      val cell = player.universeObject.cell
+      position.value = position.value.lerp(cell.toVec2d add cellPosition, 10 * dt)
     }
-    for (b <- livePlayers.flatMap(_.universeObject.universe.bits.values)
-         if b.state.get("carried").contains(true)) {
-      val o = b.universeObject
-      o.position.value = o.position.value.lerp(o.cell.toVec2d.add(cellPosition), 10 * dt)
+    for (bits <- livePlayers.flatMap(_.universeObject.universe.bits.values)
+         if bits.state.contains("carried")) {
+      val position = bits.universeObject.position
+      val target = if (bits.state("carried")) cellPosition else new Vec2d(0.5, 0.5)
+      val cell = bits.universeObject.cell
+      position.value = position.value.lerp(cell.toVec2d add target, 10 * dt)
     }
   }
 
