@@ -75,7 +75,7 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
    */
   val walls: Set[Cell] =
     (for (layer <- tiles.layers.asScala
-          if layer.properties.asScala.exists(p => p.name == "collision" && p.value.toBoolean);
+          if layer.properties.asScala.exists(p => p.name == "Collision" && p.value.toBoolean);
           x <- 0 until layer.width;
           y <- 0 until layer.height
           if layer.data.tiles(x)(y) != 0) yield {
