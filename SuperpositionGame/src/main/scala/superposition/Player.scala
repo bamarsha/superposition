@@ -29,8 +29,7 @@ private object Player {
     Multiverse.declareSubsystem(classOf[Player], step)
 
   private def step(multiverse: Multiverse, id: UniversalId, players: Iterable[Player]): Unit = {
-    val inputPosition = cellPositionFromInput
-    cellPosition = walkGates(inputPosition).foldLeft(inputPosition)(
+    cellPosition = walkGates(cellPositionFromInput).foldLeft(cellPositionFromInput)(
       (position, gate) => cellPositionFromGate(position, gate, walk(multiverse, id, gate, players))
     )
     updateAbsolutePositions(players)
@@ -74,17 +73,15 @@ private object Player {
     x ++ y
   }
 
-  // TODO: Refactor this method.
   private def updateAbsolutePositions(players: Iterable[Player]): Unit = {
-    for (p <- players) {
-      val newPos = p.universeObject.cell.toVec2d.add(if (p.bits.state("alive")) cellPosition else new Vec2d(.5, .5))
-      if (p.bits.state("alive")) {
-        p.position.value = p.position.value.lerp(newPos, 10 * dt)
-      }
+    val livePlayers = players.filter(_.bits.state("alive"))
+    for (p <- livePlayers) {
+      p.position.value = p.position.value.lerp(p.universeObject.cell.toVec2d.add(cellPosition), 10 * dt)
     }
-    for (o <- players.flatMap(_.universeObject.universe.bits.values.filter(_.state.contains("carried")))) {
-      val newPos = o.universeObject.cell.toVec2d.add(if (o.state("carried")) cellPosition else new Vec2d(.5, .5))
-      o.universeObject.position.value = o.universeObject.position.value.lerp(newPos, 10 * dt)
+    for (b <- livePlayers.flatMap(_.universeObject.universe.bits.values)
+         if b.state.get("carried").contains(true)) {
+      val o = b.universeObject
+      o.position.value = o.position.value.lerp(o.cell.toVec2d.add(cellPosition), 10 * dt)
     }
   }
 
