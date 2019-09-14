@@ -63,10 +63,10 @@ private object Multiverse {
  * Multiple universes represent qubits in superposition. The multiverse can apply quantum gates to qubits by changing
  * the amplitude of a universe or creating a copy of a universe.
  *
- * @param _universes the initial universes in the multiverse
- * @param tiles      the tiles in the multiverse
+ * @param universe the initial universe
+ * @param tiles    the tiles in the multiverse
  */
-private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) extends Entity {
+private final class Multiverse(universe: => Universe, tiles: Tilemap) extends Entity {
 
   import Multiverse._
 
@@ -85,7 +85,7 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
       )
     }).toSet
 
-  private var universes: List[Universe] = _
+  private var _universes: Option[List[Universe]] = None
 
   private var frameBuffer: Framebuffer = _
   private var colorBuffer: Texture = _
@@ -94,12 +94,25 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
   private val tileRenderer: TilemapRenderer =
     new TilemapRenderer(tiles, source => Texture.load(getClass.getResource(source)))
 
+  private def universes: List[Universe] =
+    _universes match {
+      case Some(us) => us
+      case None =>
+        _universes = Some(List(universe))
+        _universes.get
+    }
+
+  //noinspection ScalaUnusedSymbol
+  private def universes_=(value: List[Universe]): Unit =
+    _universes = Some(value)
+
   override protected def onCreate(): Unit = {
-    universes = _universes
-    universes.foreach(Game.create(_))
+    universes.foreach(Game.create)
     frameBuffer = new Framebuffer()
     colorBuffer = frameBuffer.attachColorBuffer()
   }
+
+  override protected def onDestroy(): Unit = universes.foreach(Game.destroy)
 
   /**
    * Returns the bits that are in the cell in all universes.
@@ -163,7 +176,9 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
         case Gate.H =>
           u.amplitude /= Complex(sqrt(2))
           val copy = u.copy()
-          Game.create(copy)
+          if (isCreated) {
+            Game.create(copy)
+          }
           if (u.bits(target).state(k)) {
             u.amplitude *= Complex(-1)
           }
@@ -221,7 +236,7 @@ private final class Multiverse(_universes: => List[Universe], tiles: Tilemap) ex
   private def draw(): Unit = {
     tileRenderer.draw(Transformation.create(new Vec2d(-16, -9), 0, 1), Color.WHITE)
 
-    time += dt()
+    time += dt
     UniverseShader.setUniform("time", time.asInstanceOf[Float])
 
     var minValue = 0.0
