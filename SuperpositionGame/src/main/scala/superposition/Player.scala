@@ -42,7 +42,7 @@ private object Player {
     val delta = WalkKeys.foldLeft(new Vec2d(0, 0)) {
       case (delta, (key, direction)) => if (Input.keyDown(key)) delta add direction else delta
     }
-    cellPosition add (if (delta.length == 0) new Vec2d(0, 0) else delta.normalize mul 6.5 * dt)
+    cellPosition add (if (delta.length == 0) new Vec2d(0, 0) else delta.setLength(6.5 * dt))
   }
 
   private def cellPositionFromGate(cellPosition: Vec2d, gate: Gate.Value, success: Boolean): Vec2d = {
