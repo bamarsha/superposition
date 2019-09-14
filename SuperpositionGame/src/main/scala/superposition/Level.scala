@@ -2,7 +2,7 @@ package superposition
 
 import engine.core.{Game, Input}
 import extras.tiles.Tilemap
-import org.lwjgl.glfw.GLFW.GLFW_KEY_R
+import org.lwjgl.glfw.GLFW.{GLFW_KEY_1, GLFW_KEY_2, GLFW_KEY_R}
 
 /**
  * Manages game levels.
@@ -21,6 +21,10 @@ private object Level {
         multiverse foreach Game.destroy
         multiverse = supplier()
         multiverse foreach Game.create
+      } else if (Input.keyJustPressed(GLFW_KEY_1)) {
+        load(level1())
+      } else if (Input.keyJustPressed(GLFW_KEY_2)) {
+        load(level2())
       }
     )
 
@@ -30,6 +34,7 @@ private object Level {
    * @param level the level to load
    */
   def load(level: => Multiverse): Unit = {
+    multiverse foreach Game.destroy
     supplier = () => Some(level)
     val current = level
     Game.create(current)
@@ -50,6 +55,20 @@ private object Level {
     universe.add(new Door(universe, UniversalId(5), Cell(0, 3), Cell(-2, 3)))
     universe.add(new Quball(universe, UniversalId(6), Cell(2, -12)))
     multiverse.applyGate(Gate.H, UniversalId(1), None)
+    multiverse
+  }
+
+
+  /**
+   * A new instance of level 2.
+   */
+  def level2(): Multiverse = {
+    lazy val multiverse: Multiverse = new Multiverse(universe, Tilemap.load(getClass.getResource("level1.tmx")))
+    lazy val universe = new Universe(multiverse)
+    universe.add(new Player(universe, UniversalId(0), Cell(-5, -5)))
+    universe.add(new Quball(universe, UniversalId(1), Cell(-5, 0)))
+    universe.add(new Laser(universe, UniversalId(3), Cell(-2, 7), Gate.X, Direction.Left, None))
+    universe.add(new Door(universe, UniversalId(5), Cell(0, 3), Cell(-2, 3)))
     multiverse
   }
 }
