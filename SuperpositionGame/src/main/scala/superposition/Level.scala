@@ -38,31 +38,47 @@ private object Level {
   }
 
   /**
-   * A new instance of level 1.
+   * A new instance of level 1: X.
    */
   def level1(): Multiverse = {
-    lazy val multiverse: Multiverse = new Multiverse(universe, Tilemap.load(getClass.getResource("level1.tmx")))
+    lazy val multiverse: Multiverse = new Multiverse(universe, Tilemap.load(getClass.getResource("level3.tmx")))
     lazy val universe = new Universe(multiverse)
     universe.add(new Player(universe, UniversalId(0), Cell(-5, -5)))
     universe.add(new Quball(universe, UniversalId(1), Cell(-5, 0)))
     universe.add(new Laser(universe, UniversalId(3), Cell(-2, 7), Gate.X, Direction.Left, None))
-    universe.add(new Door(universe, UniversalId(5), Cell(0, 3), Cell(-2, 3)))
+    universe.add(new Door(universe, UniversalId(5), Cell(0, 3), Seq(Cell(-2, 3))))
     universe.add(new Goal(universe, UniversalId(7), Cell(2, 3), UniversalId(0), () => load(level2())))
     multiverse
   }
 
   /**
-   * A new instance of level 2.
+   * A new instance of level 2: CNOT.
    */
   def level2(): Multiverse = {
-    lazy val multiverse: Multiverse = new Multiverse(universe, Tilemap.load(getClass.getResource("level1.tmx")))
+    lazy val multiverse: Multiverse = new Multiverse(universe, Tilemap.load(getClass.getResource("level2.tmx")))
+    lazy val universe = new Universe(multiverse)
+    universe.add(new Player(universe, UniversalId(0), Cell(-5, -5)))
+    universe.add(new Quball(universe, UniversalId(1), Cell(-5, 0)))
+    universe.add(new Quball(universe, UniversalId(2), Cell(-5, -1)))
+    universe.add(new Laser(universe, UniversalId(3), Cell(-5, 4), Gate.X, Direction.Up, Some(Cell(-6, 4))))
+    universe.add(new Door(universe, UniversalId(4), Cell(0, 3), Seq(Cell(-2, 2), Cell(-2, 4))))
+    universe.add(new Goal(universe, UniversalId(5), Cell(2, 3), UniversalId(0), () => load(level3())))
+    multiverse.applyGate(Gate.X, UniversalId(1), None)
+    multiverse
+  }
+
+  /**
+   * A new instance of level 3: SWAP.
+   */
+  def level3(): Multiverse = {
+    lazy val multiverse: Multiverse = new Multiverse(universe, Tilemap.load(getClass.getResource("level3.tmx")))
     lazy val universe = new Universe(multiverse)
     universe.add(new Player(universe, UniversalId(0), Cell(-5, -5)))
     universe.add(new Quball(universe, UniversalId(1), Cell(-5, 0)))
     universe.add(new Laser(universe, UniversalId(2), Cell(-5, 4), Gate.X, Direction.Up, Some(Cell(-6, 4))))
     universe.add(new Laser(universe, UniversalId(3), Cell(-2, 7), Gate.X, Direction.Left, None))
-    universe.add(new Door(universe, UniversalId(4), Cell(-2, -12), Cell(-4, -12)))
-    universe.add(new Door(universe, UniversalId(5), Cell(0, 3), Cell(-2, 3)))
+    universe.add(new Door(universe, UniversalId(4), Cell(-2, -12), Seq(Cell(-4, -12))))
+    universe.add(new Door(universe, UniversalId(5), Cell(0, 3), Seq(Cell(-2, 3))))
     universe.add(new Quball(universe, UniversalId(6), Cell(2, -12)))
     universe.add(new Goal(universe, UniversalId(7), Cell(2, 3), UniversalId(0), () => load(level1())))
     multiverse.applyGate(Gate.H, UniversalId(1), None)
