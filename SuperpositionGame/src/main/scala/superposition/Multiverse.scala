@@ -94,7 +94,10 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
   private val tileRenderer: TilemapRenderer =
     new TilemapRenderer(tiles, source => Texture.load(getClass.getResource(source)))
 
-  private def universes: List[Universe] =
+  /**
+   * The universes in the multiverse.
+   */
+  def universes: List[Universe] =
     _universes match {
       case Some(us) => us
       case None =>
@@ -153,11 +156,11 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
   def applyGate(gate: Gate.Value, target: UniversalId, key: Option[String], controls: Control*): Unit = {
     require(canApplyGate(gate, target, controls: _*), "Invalid gate")
     require(
-      controls.forall({
+      controls.forall {
         case BitControl(id, _) if id == target => !Gate.logicGate(gate)
         case PositionControl(id, _) if id == target => !Gate.positionGate(gate)
         case _ => true
-      }),
+      },
       "Controlling using the same ID and type as the target"
     )
 

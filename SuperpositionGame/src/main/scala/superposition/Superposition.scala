@@ -28,6 +28,7 @@ object Superposition {
     Player.declareSystem()
     Draw.declareSystem()
     Level.declareSystem()
+    Goal.declareSystem()
 
     Camera.camera2d.setCenterSize(new Vec2d(0, 0), new Vec2d(32, 18))
 
