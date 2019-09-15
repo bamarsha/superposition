@@ -35,6 +35,7 @@ public abstract class Window {
             Configuration.DEBUG.set(true);
         }
 
+        glfwSetErrorCallback(GLFWErrorCallback.createPrint(System.err));
         if (!glfwInit()) {
             throw new RuntimeException("Failed to initialize GLFW");
         }
