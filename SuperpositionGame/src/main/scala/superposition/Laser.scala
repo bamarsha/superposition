@@ -137,5 +137,5 @@ private final class Laser(universe: Universe,
 
   private def justClicked: Boolean =
     Input.mouseJustPressed(0) &&
-      Cell(Input.mouse().y.floor.toLong, Input.mouse().x.floor.toLong) == universeObject.cell
+      Cell(Input.mouse().y.floor.toInt, Input.mouse().x.floor.toInt) == universeObject.cell
 }

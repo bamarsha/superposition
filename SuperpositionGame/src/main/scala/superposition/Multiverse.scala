@@ -81,8 +81,8 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
           y <- 0 until layer.height
           if layer.data.tiles(x)(y) != 0) yield {
       Cell(
-        (y + layer.offsetY.toDouble / tiles.tileHeight).round,
-        (x + layer.offsetX.toDouble / tiles.tileWidth).round
+        (y + layer.offsetY.toDouble / tiles.tileHeight).round.toInt,
+        (x + layer.offsetX.toDouble / tiles.tileWidth).round.toInt
       )
     }).toSet
 
@@ -205,7 +205,7 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
   }
 
   private def step(): Unit = {
-    val cell = Cell(Input.mouse().y.floor.toLong, Input.mouse().x.floor.toLong)
+    val cell = Cell(Input.mouse().y.floor.toInt, Input.mouse().x.floor.toInt)
     val selected = bitsInCell(cell)
     for ((key, gate) <- GateKeys) {
       if (Input.keyJustPressed(key)) {

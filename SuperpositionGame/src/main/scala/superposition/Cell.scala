@@ -8,7 +8,7 @@ import engine.util.math.Vec2d
  * @param row    the row number of this cell
  * @param column the column number of this cell
  */
-private final case class Cell(row: Long, column: Long) {
+private final case class Cell(row: Int, column: Int) {
   /**
    * The cell above this one.
    */
