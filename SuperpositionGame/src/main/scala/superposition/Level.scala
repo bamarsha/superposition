@@ -1,6 +1,7 @@
 package superposition
 
 import engine.core.{Game, Input}
+import engine.graphics.Camera
 import extras.tiles.Tilemap
 import org.lwjgl.glfw.GLFW.GLFW_KEY_R
 
@@ -30,11 +31,15 @@ private object Level {
    * @param level the level to load
    */
   def load(level: => Multiverse): Unit = {
-    multiverse foreach Game.destroy
+    this.multiverse foreach Game.destroy
     supplier = () => Some(level)
-    val current = level
-    Game.create(current)
-    multiverse = Some(current)
+
+    val multiverse = level
+    Camera.camera2d.lowerLeft = multiverse.boundingBox.lowerLeft
+    Camera.camera2d.upperRight = multiverse.boundingBox.upperRight
+    Game.create(multiverse)
+
+    this.multiverse = Some(multiverse)
   }
 
   /**
@@ -43,11 +48,11 @@ private object Level {
   def level1(): Multiverse = {
     lazy val multiverse: Multiverse = new Multiverse(universe, Tilemap.load(getClass.getResource("level3.tmx")))
     lazy val universe = new Universe(multiverse)
-    universe.add(new Player(universe, UniversalId(0), Cell(-5, -5)))
-    universe.add(new Quball(universe, UniversalId(1), Cell(-5, 0)))
-    universe.add(new Laser(universe, UniversalId(3), Cell(-2, 7), Gate.X, Direction.Left, None))
-    universe.add(new Door(universe, UniversalId(5), Cell(0, 3), Seq(Cell(-2, 3))))
-    universe.add(new Goal(universe, UniversalId(7), Cell(2, 3), UniversalId(0), () => load(level2())))
+    universe.add(new Player(universe, UniversalId(0), Cell(4, 11)))
+    universe.add(new Quball(universe, UniversalId(1), Cell(4, 16)))
+    universe.add(new Laser(universe, UniversalId(2), Cell(7, 23), Gate.X, Direction.Left, None))
+    universe.add(new Door(universe, UniversalId(3), Cell(9, 19), Seq(Cell(7, 19))))
+    universe.add(new Goal(universe, UniversalId(4), Cell(11, 19), UniversalId(0), () => load(level2())))
     multiverse
   }
 
@@ -57,12 +62,12 @@ private object Level {
   def level2(): Multiverse = {
     lazy val multiverse: Multiverse = new Multiverse(universe, Tilemap.load(getClass.getResource("level2.tmx")))
     lazy val universe = new Universe(multiverse)
-    universe.add(new Player(universe, UniversalId(0), Cell(-5, -5)))
-    universe.add(new Quball(universe, UniversalId(1), Cell(-5, 0)))
-    universe.add(new Quball(universe, UniversalId(2), Cell(-5, -1)))
-    universe.add(new Laser(universe, UniversalId(3), Cell(-5, 4), Gate.X, Direction.Up, Some(Cell(-6, 4))))
-    universe.add(new Door(universe, UniversalId(4), Cell(0, 3), Seq(Cell(-2, 2), Cell(-2, 4))))
-    universe.add(new Goal(universe, UniversalId(5), Cell(2, 3), UniversalId(0), () => load(level3())))
+    universe.add(new Player(universe, UniversalId(0), Cell(4, 11)))
+    universe.add(new Quball(universe, UniversalId(1), Cell(4, 16)))
+    universe.add(new Quball(universe, UniversalId(2), Cell(4, 15)))
+    universe.add(new Laser(universe, UniversalId(3), Cell(4, 20), Gate.X, Direction.Up, Some(Cell(3, 20))))
+    universe.add(new Door(universe, UniversalId(4), Cell(9, 19), Seq(Cell(7, 18), Cell(7, 20))))
+    universe.add(new Goal(universe, UniversalId(5), Cell(11, 19), UniversalId(0), () => load(level3())))
     multiverse.applyGate(Gate.X, UniversalId(1), None)
     multiverse
   }
@@ -73,14 +78,14 @@ private object Level {
   def level3(): Multiverse = {
     lazy val multiverse: Multiverse = new Multiverse(universe, Tilemap.load(getClass.getResource("level3.tmx")))
     lazy val universe = new Universe(multiverse)
-    universe.add(new Player(universe, UniversalId(0), Cell(-5, -5)))
-    universe.add(new Quball(universe, UniversalId(1), Cell(-5, 0)))
-    universe.add(new Laser(universe, UniversalId(2), Cell(-5, 4), Gate.X, Direction.Up, Some(Cell(-6, 4))))
-    universe.add(new Laser(universe, UniversalId(3), Cell(-2, 7), Gate.X, Direction.Left, None))
-    universe.add(new Door(universe, UniversalId(4), Cell(-2, -12), Seq(Cell(-4, -12))))
-    universe.add(new Door(universe, UniversalId(5), Cell(0, 3), Seq(Cell(-2, 3))))
-    universe.add(new Quball(universe, UniversalId(6), Cell(2, -12)))
-    universe.add(new Goal(universe, UniversalId(7), Cell(2, 3), UniversalId(0), () => load(level1())))
+    universe.add(new Player(universe, UniversalId(0), Cell(4, 11)))
+    universe.add(new Quball(universe, UniversalId(1), Cell(4, 16)))
+    universe.add(new Laser(universe, UniversalId(2), Cell(4, 20), Gate.X, Direction.Up, Some(Cell(3, 20))))
+    universe.add(new Laser(universe, UniversalId(3), Cell(7, 23), Gate.X, Direction.Left, None))
+    universe.add(new Door(universe, UniversalId(4), Cell(7, 4), Seq(Cell(5, 4))))
+    universe.add(new Door(universe, UniversalId(5), Cell(9, 19), Seq(Cell(7, 19))))
+    universe.add(new Quball(universe, UniversalId(6), Cell(11, 4)))
+    universe.add(new Goal(universe, UniversalId(7), Cell(11, 19), UniversalId(0), () => load(level1())))
     multiverse.applyGate(Gate.H, UniversalId(1), None)
     multiverse
   }

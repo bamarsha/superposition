@@ -11,6 +11,7 @@ import engine.graphics.opengl.{Framebuffer, Shader, Texture}
 import engine.util.Color
 import engine.util.Color.CLEAR
 import engine.util.math.{Transformation, Vec2d, Vec4d}
+import extras.physics.Rectangle
 import extras.tiles.{Tilemap, TilemapRenderer}
 import org.lwjgl.glfw.GLFW._
 
@@ -80,10 +81,15 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
           y <- 0 until layer.height
           if layer.data.tiles(x)(y) != 0) yield {
       Cell(
-        (y - 9 + layer.offsetY.toDouble / tiles.tileHeight).round,
-        (x - 16 + layer.offsetX.toDouble / tiles.tileWidth).round
+        (y + layer.offsetY.toDouble / tiles.tileHeight).round,
+        (x + layer.offsetX.toDouble / tiles.tileWidth).round
       )
     }).toSet
+
+  /**
+   * The bounding box of the multiverse's tile map.
+   */
+  val boundingBox: Rectangle = new Rectangle(new Vec2d(0, 0), new Vec2d(tiles.width, tiles.height))
 
   private var _universes: Option[List[Universe]] = None
 
@@ -237,8 +243,7 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
   }
 
   private def draw(): Unit = {
-    tileRenderer.draw(Transformation.create(new Vec2d(-16, -9), 0, 1), Color.WHITE)
-
+    tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
     time += dt
     UniverseShader.setUniform("time", time.asInstanceOf[Float])
 

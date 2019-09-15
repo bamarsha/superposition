@@ -1,9 +1,6 @@
 package superposition
 
 import engine.core.{Game, Settings}
-import engine.graphics.Camera
-import engine.util.Color
-import engine.util.math.Vec2d
 import extras.behaviors.{FPSBehavior, QuitOnEscapeBehavior}
 import superposition.Level.level1
 
@@ -19,7 +16,6 @@ object Superposition {
   def main(args: Array[String]): Unit = {
     Settings.WINDOW_WIDTH = 1280
     Settings.WINDOW_HEIGHT = 720
-    Settings.BACKGROUND_COLOR = Color.GRAY
 
     Game.init()
     Multiverse.declareSystem()
@@ -29,8 +25,6 @@ object Superposition {
     Draw.declareSystem()
     Level.declareSystem()
     Goal.declareSystem()
-
-    Camera.camera2d.setCenterSize(new Vec2d(0, 0), new Vec2d(32, 18))
 
     Game.create(new FPSBehavior())
     Game.create(new QuitOnEscapeBehavior())
