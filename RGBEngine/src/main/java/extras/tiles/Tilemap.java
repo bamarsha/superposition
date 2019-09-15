@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 public class Tilemap extends XMLElement {
 
@@ -25,16 +26,6 @@ public class Tilemap extends XMLElement {
         var doc = Resources.loadXML(url);
         var root = doc.getDocumentElement();
         return new Tilemap(root);
-    }
-
-    public static void main(String[] args) {
-        try {
-            var url = Paths.get("C:/Users/t-rosoif/Desktop/untitled.tmx").toUri().toURL();
-            var tilemap = Tilemap.load(url);
-            System.out.println(tilemap);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
     }
 
     public class Tileset extends XMLElement {
@@ -65,7 +56,7 @@ public class Tilemap extends XMLElement {
         public final int height = intAttr("height");
         public final int offsetX = intAttrDefault("offsetx", 0);
         public final int offsetY = intAttrDefault("offsety", 0);
-        public final List<Property> properties = elementListIndirect("properties", "property", Property::new);
+        public final Map<String, Property> properties = elementMap("properties", "property", Property::new, p -> p.name);
         public final Data data = elementSingle("data", Data::new);
 
         private Layer(Element element) {
@@ -106,6 +97,38 @@ public class Tilemap extends XMLElement {
                     }
                 } else {
                     throw new IllegalArgumentException(String.format("Unknown encoding %s", encoding));
+                }
+            }
+        }
+    }
+
+    public class ObjectGroup extends XMLElement {
+        public final int id = intAttr("id");
+        public final String name = stringAttr("name");
+        public final List<Object> objects = elementList("object", Object::new);
+
+        private ObjectGroup(Element element) {
+            super(element);
+        }
+
+        public class Object extends XMLElement {
+            public final int id = intAttr("id");
+            public final String name = stringAttr("name");
+            public final String type = stringAttr("type");
+            public final double x = doubleAttr("x");
+            public final double y = doubleAttr("y");
+            public final Map<String, Property> properties = elementMap("properties", "property", Property::new, p -> p.name);
+
+            private Object(Element element) {
+                super(element);
+            }
+
+            public class Property extends XMLElement {
+                public final String name = stringAttr("name");
+                public final String value = stringAttr("value");
+
+                private Property(Element element) {
+                    super(element);
                 }
             }
         }
