@@ -17,6 +17,7 @@ public class Tilemap extends XMLElement {
     public final int tileHeight = intAttr("tileheight");
     public final List<Tileset> tilesets = elementList("tileset", Tileset::new);
     public final List<Layer> layers = elementList("layer", Layer::new);
+    public final List<ObjectGroup> objectGroups = elementList("objectgroup", ObjectGroup::new);
 
     private Tilemap(Element element) {
         super(element);
