@@ -25,18 +25,18 @@ private object Goal {
 }
 
 /**
- * A goal activates a callback when the object with the target ID has reached the goal in every universe.
+ * A goal activates a callback when the required object has reached the goal in every universe.
  *
  * @param universe the universe this goal belongs to
  * @param id       the universe object ID for this goal
  * @param cell     the position of this goal
- * @param target   the target ID that must reach this goal
+ * @param requires the ID of the object that must reach this goal
  * @param callback the callback to activate when the goal is reached
  */
 private final class Goal(universe: Universe,
                          id: UniversalId,
                          cell: Cell,
-                         target: UniversalId,
+                         requires: UniversalId,
                          private val callback: () => Unit) extends Entity with Copyable[Goal] with Drawable {
   add(new PositionComponent(this, new Vec2d(cell.column + 0.5, cell.row + 0.5)))
 
@@ -48,10 +48,10 @@ private final class Goal(universe: Universe,
   private var allSatisfied: Boolean = false
 
   private def satisfied: Boolean =
-    universeObject.universe.objects(target).cell == cell
+    universeObject.universe.objects(requires).cell == cell
 
   override def copy(): Goal =
-    new Goal(universeObject.universe, universeObject.id, universeObject.cell, target, callback)
+    new Goal(universeObject.universe, universeObject.id, universeObject.cell, requires, callback)
 
   override def draw(): Unit = sprite.draw()
 }

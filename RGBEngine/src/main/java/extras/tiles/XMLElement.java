@@ -1,10 +1,15 @@
 package extras.tiles;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class XMLElement {
 
@@ -41,14 +46,14 @@ public class XMLElement {
     }
 
     public <T extends XMLElement, U> Map<U, T> elementMap(String name1, String name2, Function<Element, T> func, Function<T, U> keyFunc) {
-        var list1 = element.getElementsByTagName(name1);
-        if (list1.getLength() == 0) {
+        var list1 = directChildrenWithTagName(element, name1);
+        if (list1.size() == 0) {
             return new HashMap<>();
         }
-        if (list1.getLength() != 1) {
+        if (list1.size() != 1) {
             throw new IllegalArgumentException(String.format("Too many subelements with tag %s", name1));
         }
-        var child = (Element) list1.item(0);
+        var child = (Element) list1.get(0);
         var list2 = child.getElementsByTagName(name2);
         var r = new HashMap<U, T>();
         for (int i = 0; i < list2.getLength(); i++) {
@@ -118,5 +123,35 @@ public class XMLElement {
             throw new IllegalArgumentException("Child node is not text");
         }
         return child.getNodeValue();
+    }
+
+    private List<Node> directChildrenWithTagName(Element element, String name) {
+        return nodeStream(element.getChildNodes())
+                .filter(node -> node.getNodeName().equals(name))
+                .collect(Collectors.toList());
+    }
+
+    private Stream<Node> nodeStream(NodeList nodeList) {
+        return StreamSupport.stream(nodeIterable(nodeList).spliterator(), false);
+    }
+
+    private Iterable<Node> nodeIterable(NodeList nodeList) {
+        return () -> nodeIterator(nodeList);
+    }
+
+    private Iterator<Node> nodeIterator(NodeList nodeList) {
+        return new Iterator<>() {
+            private int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                return index < nodeList.getLength();
+            }
+
+            @Override
+            public Node next() {
+                return nodeList.item(index++);
+            }
+        };
     }
 }

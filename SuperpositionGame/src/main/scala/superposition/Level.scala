@@ -29,21 +29,29 @@ private object Level {
     )
 
   /**
-   * Loads the level.
+   * Loads the multiverse as a new level.
    *
-   * @param level the level to load
+   * @param multiverse the multiverse to load
    */
-  def load(level: => Multiverse): Unit = {
+  def load(multiverse: => Multiverse): Unit = {
     this.multiverse foreach Game.destroy
-    supplier = () => Some(level)
+    supplier = () => Some(multiverse)
 
-    val multiverse = level
-    Camera.camera2d.lowerLeft = multiverse.boundingBox.lowerLeft
-    Camera.camera2d.upperRight = multiverse.boundingBox.upperRight
-    Game.create(multiverse)
+    val current = multiverse
+    Camera.camera2d.lowerLeft = current.boundingBox.lowerLeft
+    Camera.camera2d.upperRight = current.boundingBox.upperRight
+    Game.create(current)
 
-    this.multiverse = Some(multiverse)
+    this.multiverse = Some(current)
   }
+
+  /**
+   * Loads the tilemap as a new level.
+   *
+   * @param tilemap the tilemap to load
+   */
+  def load(tilemap: Tilemap): Unit =
+    throw new NotImplementedError
 
   /**
    * A new instance of level 1: X.
@@ -85,9 +93,10 @@ private object Level {
     for (group <- tilemap.objectGroups.asScala; obj <- group.objects.asScala) {
       universe.add(entityFromObject(tilemap, obj, universe))
     }
-    // TODO: Add the goal to the TMX file.
-    universe.add(new Goal(universe, UniversalId(0), Cell(11, 19), UniversalId(5), () => load(level1())))
-    multiverse.applyGate(Gate.H, UniversalId(5), None)
+    val gates = tilemap.properties.asScala.get("Gates")
+    for (Array(gate, target) <- gates.iterator.flatMap(_.value.split('\n')).map(_.split(' '))) {
+      multiverse.applyGate(Gate.withName(gate), UniversalId(target.toInt), None)
+    }
     multiverse
   }
 
@@ -109,6 +118,10 @@ private object Level {
       case "Door" =>
         val control = cellFromString(tilemap, properties("Control").value)
         new Door(universe, id, cell, Seq(control))
+      case "Goal" =>
+        val requires = UniversalId(properties("Requires").value.toInt)
+        val next = properties("Next Level").value
+        new Goal(universe, id, cell, requires, () => load(Tilemap.load(getClass.getResource(next))))
     }
   }
 

@@ -3,9 +3,7 @@ package extras.tiles;
 import engine.util.Resources;
 import org.w3c.dom.Element;
 
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +13,7 @@ public class Tilemap extends XMLElement {
     public final int height = intAttr("height");
     public final int tileWidth = intAttr("tilewidth");
     public final int tileHeight = intAttr("tileheight");
+    public final Map<String, Property> properties = elementMap("properties", "property", Property::new, p -> p.name);
     public final List<Tileset> tilesets = elementList("tileset", Tileset::new);
     public final List<Layer> layers = elementList("layer", Layer::new);
     public final List<ObjectGroup> objectGroups = elementList("objectgroup", ObjectGroup::new);
@@ -62,16 +61,6 @@ public class Tilemap extends XMLElement {
 
         private Layer(Element element) {
             super(element);
-        }
-
-        public class Property extends XMLElement {
-            public final String name = stringAttr("name");
-            public final String type = stringAttr("type");
-            public final String value = stringAttr("value");
-
-            private Property(Element element) {
-                super(element);
-            }
         }
 
         public class Data extends XMLElement {
@@ -123,15 +112,16 @@ public class Tilemap extends XMLElement {
             private Object(Element element) {
                 super(element);
             }
+        }
+    }
 
-            public class Property extends XMLElement {
-                public final String name = stringAttr("name");
-                public final String value = stringAttr("value");
+    public static class Property extends XMLElement {
+        public final String name = stringAttr("name");
+        public final String type = element.hasAttribute("type") ? stringAttr("type") : "string";
+        public final String value = stringAttr("value");
 
-                private Property(Element element) {
-                    super(element);
-                }
-            }
+        private Property(Element element) {
+            super(element);
         }
     }
 }

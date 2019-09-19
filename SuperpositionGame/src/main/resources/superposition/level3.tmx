@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="18">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="19">
+ <properties>
+  <property name="Gates" value="H 5"/>
+ </properties>
  <tileset firstgid="1" name="spritesheet" tilewidth="16" tileheight="16" tilecount="16" columns="4">
   <image source="sprites/spritesheet.png" width="64" height="64"/>
  </tileset>
@@ -106,7 +109,14 @@
    </properties>
    <point/>
   </object>
-  <object id="17" name="Player" type="Player" x="184" y="220">
+  <object id="17" name="Player" type="Player" x="183.5" y="218">
+   <point/>
+  </object>
+  <object id="18" name="Goal" type="Goal" x="311.5" y="104">
+   <properties>
+    <property name="Next Level" type="file" value="level1.tmx"/>
+    <property name="Requires" type="int" value="17"/>
+   </properties>
    <point/>
   </object>
  </objectgroup>
