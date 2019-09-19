@@ -22,12 +22,11 @@ import scala.math.{Pi, sqrt}
  * Contains settings and initialization for the multiverse.
  */
 private object Multiverse {
-
-  private val GateKeys: List[(Int, Gate.Value)] = List(
-    (GLFW_KEY_X, Gate.X),
-    (GLFW_KEY_Z, Gate.Z),
-    (GLFW_KEY_T, Gate.T),
-    (GLFW_KEY_H, Gate.H)
+  private val GateKeys: Map[Int, Gate.Value] = Map(
+    GLFW_KEY_X -> Gate.X,
+    GLFW_KEY_Z -> Gate.Z,
+    GLFW_KEY_H -> Gate.H,
+    GLFW_KEY_T -> Gate.T
   )
 
   private val UniverseShader: Shader = Shader.load(classOf[Multiverse].getResource(_), "shaders/universe")
@@ -76,7 +75,7 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
    */
   val walls: Set[Cell] =
     (for (layer <- tiles.layers.asScala
-          if layer.properties.asScala get "Collision" exists {_.value.toBoolean};
+          if layer.properties.asScala.get("Collision").exists(_.value.toBoolean);
           x <- 0 until layer.width;
           y <- 0 until layer.height
           if layer.data.tiles(x)(y) != 0) yield {
