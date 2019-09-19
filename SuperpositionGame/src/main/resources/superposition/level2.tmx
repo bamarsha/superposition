@@ -20,7 +20,7 @@
 0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
 0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
 0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
+0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,16,8,8,8,8,8,8,8,8,8,8,8,0,
 0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
 0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
 0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
@@ -54,10 +54,10 @@
 </data>
  </layer>
  <objectgroup id="5" name="Environment">
-  <object id="7" name="CNOT" type="Laser" x="247.5" y="219">
+  <object id="7" name="CNOT" type="Laser" x="311.5" y="188">
    <properties>
-    <property name="Control" value="(15, 12)"/>
-    <property name="Direction" value="Down"/>
+    <property name="Control" value="(19, 12)"/>
+    <property name="Direction" value="Up"/>
     <property name="Gate" value="X"/>
    </properties>
    <point/>
@@ -78,15 +78,15 @@
   </object>
  </objectgroup>
  <objectgroup id="7" name="Player">
-  <object id="3" name="Player" type="Player" x="246.5" y="154">
+  <object id="3" name="Player" type="Player" x="184.5" y="188.5">
    <point/>
   </object>
  </objectgroup>
  <objectgroup id="6" name="Quballs">
-  <object id="5" name="Quball |1&gt;" type="Quball" x="248" y="185.5">
+  <object id="5" name="Quball |1&gt;" type="Quball" x="312" y="235">
    <point/>
   </object>
-  <object id="6" name="Quball |0&gt;" type="Quball" x="249" y="252">
+  <object id="6" name="Quball |0&gt;" type="Quball" x="310.5" y="141.5">
    <point/>
   </object>
  </objectgroup>
