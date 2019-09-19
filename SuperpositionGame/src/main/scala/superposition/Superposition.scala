@@ -22,7 +22,6 @@ object Superposition {
     Laser.declareSystem()
     Door.declareSystem()
     Player.declareSystem()
-    Draw.declareSystem()
     Level.declareSystem()
     Goal.declareSystem()
 

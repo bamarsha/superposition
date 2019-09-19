@@ -42,8 +42,8 @@ private final class Goal(universe: Universe,
 
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell))
 
-  private val sprite: DrawableSprite =
-    add(new DrawableSprite(this, Sprite.load(getClass.getResource("sprites/key.png"))))
+  private val sprite: SpriteComponent =
+    add(new SpriteComponent(this, Sprite.load(getClass.getResource("sprites/key.png"))))
 
   private var allSatisfied: Boolean = false
 

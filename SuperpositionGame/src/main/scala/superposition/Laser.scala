@@ -86,7 +86,7 @@ private final class Laser(universe: Universe,
 
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell, true))
 
-  private val sprite: DrawableSprite = add(new DrawableSprite(this, Sprite.load(Sprites(direction))))
+  private val sprite: SpriteComponent = add(new SpriteComponent(this, Sprite.load(Sprites(direction))))
 
   private var targetCell: Option[Cell] = None
 

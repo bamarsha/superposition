@@ -32,8 +32,8 @@ private final class Door(universe: Universe,
 
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell, true))
 
-  private val sprite: DrawableSprite =
-    add(new DrawableSprite(this, Sprite.load(getClass.getResource("sprites/door_closed.png"))))
+  private val sprite: SpriteComponent =
+    add(new SpriteComponent(this, Sprite.load(getClass.getResource("sprites/door_closed.png"))))
 
   override def copy(): Door = {
     val door = new Door(universeObject.universe, universeObject.id, universeObject.cell, controls)

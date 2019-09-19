@@ -20,7 +20,7 @@ private final class Quball(universe: Universe,
 
   private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell))
 
-  private val sprite: DrawableSprite = add(new DrawableSprite(
+  private val sprite: SpriteComponent = add(new SpriteComponent(
     entity = this,
     sprite = Sprite.load(getClass.getResource("sprites/ball.png")),
     color = BLACK
