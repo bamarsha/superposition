@@ -16,6 +16,8 @@ import extras.physics.PositionComponent
  * Contains initialization for lasers.
  */
 private object Laser {
+  private val MaxNumUniverses: Int = 2
+
   private val Sprites: Map[Direction.Value, URL] = Map(
     Direction.Up -> getClass.getResource("sprites/laser_up.png"),
     Direction.Down -> getClass.getResource("sprites/laser_down.png"),
@@ -43,24 +45,34 @@ private object Laser {
       }
     }
 
-    val hits = for (laser <- lasers if laser.justClicked && laser.targetCell.isDefined;
-                    targetId <- laser.obj.universe.bitsInCell(laser.targetCell.get)) yield {
-      laser.elapsedTime = 0
-      (laser.targetCell.get, targetId, laser.controlId)
-    }
-    for ((targetCell, targetId, controlId) <- hits.toSet) {
-      controlId match {
-        case Some(controlId) =>
-          multiverse.applyGate(
-            lasers.head.gate, targetId, None,
-            PositionControl(targetId, targetCell),
-            BitControl(controlId, "on" -> true),
-            PositionControl(controlId, lasers.head.control.get)
-          )
-        case None => multiverse.applyGate(lasers.head.gate, targetId, None, PositionControl(targetId, targetCell))
-      }
+    val hits =
+      (for (laser <- lasers if laser.justClicked && laser.targetCell.isDefined;
+            targetId <- laser.obj.universe.bitsInCell(laser.targetCell.get)) yield {
+        laser.elapsedTime = 0
+        (laser.targetCell.get, targetId, laser.controlId)
+      }).toSet
+
+    hits.foreach((applyGate(multiverse, lasers.head.gate, lasers.head.control) _).tupled)
+    if (multiverse.universes.length > MaxNumUniverses) {
+      // TODO: Assumes gates are self-adjoint.
+      hits.foreach((applyGate(multiverse, lasers.head.gate, lasers.head.control) _).tupled)
+      // TODO: Show some effect to indicate why the laser isn't working.
+      lasers.withFilter(_.justClicked).foreach(_.targetCell = None)
     }
   }
+
+  private def applyGate(multiverse: Multiverse, gate: Gate.Value, controlCell: Option[Cell])
+                       (targetCell: Cell, targetId: ObjectId, controlId: Option[ObjectId]): Unit =
+    controlId match {
+      case Some(controlId) =>
+        multiverse.applyGate(
+          gate, targetId, None,
+          PositionControl(targetId, targetCell),
+          BitControl(controlId, "on" -> true),
+          PositionControl(controlId, controlCell.get)
+        )
+      case None => multiverse.applyGate(gate, targetId, None, PositionControl(targetId, targetCell))
+    }
 }
 
 /**
@@ -95,6 +107,8 @@ private final class Laser(universe: Universe,
 
   override def copy(): Laser = {
     val laser = new Laser(obj.universe, id, obj.cell, gate, direction, control)
+    laser.targetCell = targetCell
+    laser.elapsedTime = elapsedTime
     laser.layer = layer
     laser
   }
