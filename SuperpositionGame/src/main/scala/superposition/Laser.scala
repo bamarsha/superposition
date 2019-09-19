@@ -18,6 +18,7 @@ import extras.physics.PositionComponent
 private object Laser {
   private val Sprites: Map[Direction.Value, URL] = Map(
     Direction.Up -> getClass.getResource("sprites/laser_up.png"),
+    Direction.Down -> getClass.getResource("sprites/laser_down.png"),
     Direction.Left -> getClass.getResource("sprites/laser_left.png")
   )
 
