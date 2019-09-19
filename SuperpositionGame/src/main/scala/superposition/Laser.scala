@@ -91,7 +91,11 @@ private final class Laser(universe: Universe,
 
   private var elapsedTime: Double = Double.PositiveInfinity
 
-  override def copy(): Laser = new Laser(universeObject.universe, id, universeObject.cell, gate, direction, control)
+  override def copy(): Laser = {
+    val laser = new Laser(universeObject.universe, id, universeObject.cell, gate, direction, control)
+    laser.layer = layer
+    laser
+  }
 
   override def draw(): Unit = {
     sprite.draw()

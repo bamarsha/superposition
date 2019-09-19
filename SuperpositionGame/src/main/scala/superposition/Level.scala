@@ -53,8 +53,10 @@ private object Level {
   def load(tilemap: Tilemap): Unit = {
     lazy val multiverse: Multiverse = new Multiverse(universe, tilemap)
     lazy val universe = new Universe(multiverse)
-    for (group <- tilemap.objectGroups.asScala; obj <- group.objects.asScala) {
-      universe.add(entityFromObject(tilemap, obj, universe))
+    for ((group, layer) <- tilemap.objectGroups.asScala.zipWithIndex; obj <- group.objects.asScala) {
+      val entity = entityFromObject(tilemap, obj, universe)
+      entity.layer = layer
+      universe.add(entity)
     }
     val gates = tilemap.properties.asScala.get("Gates")
     for (Array(gate, target) <- gates.iterator.flatMap(_.value.linesIterator).map(_.split(' '))) {
@@ -63,7 +65,9 @@ private object Level {
     load(multiverse)
   }
 
-  private def entityFromObject(tilemap: Tilemap, obj: Tilemap#ObjectGroup#Object, universe: Universe): Entity = {
+  private def entityFromObject(tilemap: Tilemap,
+                               obj: Tilemap#ObjectGroup#Object,
+                               universe: Universe): Entity with Drawable = {
     val id = UniversalId(obj.id)
     val cell = Cell(
       tilemap.height - (obj.y / tilemap.tileHeight).floor.toInt - 1,

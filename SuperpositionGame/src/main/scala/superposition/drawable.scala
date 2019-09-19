@@ -14,6 +14,11 @@ import extras.physics.PositionComponent
  */
 private trait Drawable {
   /**
+   * The layer to which this object belongs.
+   */
+  var layer: Int = 0
+
+  /**
    * Draws this object.
    */
   def draw(): Unit
@@ -33,14 +38,15 @@ private trait Drawable {
 private final class DrawableSprite(entity: Entity,
                                    var sprite: Sprite,
                                    var scale: Vec2d = new Vec2d(1, 1),
-                                   var color: Color = WHITE) extends Component(entity) with Drawable {
+                                   var color: Color = WHITE) extends Component(entity) {
   private val position: PositionComponent = get(classOf[PositionComponent])
+
   private val universe: UniverseObject = get(classOf[UniverseObject])
 
   /**
    * Draws this sprite.
    */
-  override def draw(): Unit = {
+  def draw(): Unit = {
     sprite.draw(Transformation.create(position.value, 0, scale), color)
     // TODO: Remove this outline.
     drawRectangleOutline(Transformation.create(universe.cell.toVec2d, 0, 1), BLACK)

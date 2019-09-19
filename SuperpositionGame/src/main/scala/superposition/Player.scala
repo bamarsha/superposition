@@ -165,6 +165,7 @@ private final class Player(universe: Universe,
     val player = new Player(universeObject.universe, universeObject.id, universeObject.cell)
     player.position.value = position.value
     player.bits.state = bits.state
+    player.layer = layer
     player
   }
 

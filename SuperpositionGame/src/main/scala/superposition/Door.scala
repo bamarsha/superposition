@@ -39,6 +39,7 @@ private final class Door(universe: Universe,
     val door = new Door(universeObject.universe, universeObject.id, universeObject.cell, controls)
     door.universeObject.collision = universeObject.collision
     door.sprite.color = sprite.color
+    door.layer = layer
     door
   }
 

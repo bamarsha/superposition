@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="17">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="17">
  <properties>
   <property name="Gates" value="X 5"/>
  </properties>
@@ -28,39 +28,6 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="5" name="Objects">
-  <object id="3" name="Player" type="Player" x="184" y="218">
-   <point/>
-  </object>
-  <object id="5" name="Quball |1&gt;" type="Quball" x="263" y="218.5">
-   <point/>
-  </object>
-  <object id="6" name="Quball |0&gt;" type="Quball" x="247.5" y="218.5">
-   <point/>
-  </object>
-  <object id="7" name="CNOT" type="Laser" x="327" y="216.5">
-   <properties>
-    <property name="Control" value="20, 14"/>
-    <property name="Direction" value="Up"/>
-    <property name="Gate" value="X"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="10" name="Door" type="Door" x="312.5" y="137.5">
-   <properties>
-    <property name="Controls">(18, 10)
-(20, 10)</property>
-   </properties>
-   <point/>
-  </object>
-  <object id="15" name="Goal" type="Goal" x="312" y="104">
-   <properties>
-    <property name="Next Level" type="file" value="level3.tmx"/>
-    <property name="Requires" type="int" value="3"/>
-   </properties>
-   <point/>
-  </object>
- </objectgroup>
  <layer id="2" name="Walls" width="32" height="18">
   <properties>
    <property name="Collision" type="bool" value="true"/>
@@ -108,4 +75,41 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <objectgroup id="5" name="Environment">
+  <object id="7" name="CNOT" type="Laser" x="327" y="216.5">
+   <properties>
+    <property name="Control" value="20, 14"/>
+    <property name="Direction" value="Up"/>
+    <property name="Gate" value="X"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="10" name="Door" type="Door" x="312.5" y="137.5">
+   <properties>
+    <property name="Controls">(18, 10)
+(20, 10)</property>
+   </properties>
+   <point/>
+  </object>
+  <object id="15" name="Goal" type="Goal" x="312" y="104">
+   <properties>
+    <property name="Next Level" type="file" value="level3.tmx"/>
+    <property name="Requires" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="7" name="Player">
+  <object id="3" name="Player" type="Player" x="184" y="218">
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="6" name="Quballs">
+  <object id="5" name="Quball |1&gt;" type="Quball" x="263" y="218.5">
+   <point/>
+  </object>
+  <object id="6" name="Quball |0&gt;" type="Quball" x="247.5" y="218.5">
+   <point/>
+  </object>
+ </objectgroup>
 </map>

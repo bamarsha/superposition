@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="20">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="20">
  <tileset firstgid="1" name="spritesheet" tilewidth="16" tileheight="16" tilecount="16" columns="4">
   <image source="sprites/spritesheet.png" width="64" height="64"/>
  </tileset>
@@ -72,10 +72,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="5" name="Objects">
-  <object id="6" name="Quball |0&gt;" type="Quball" x="264.5" y="219">
-   <point/>
-  </object>
+ <objectgroup id="5" name="Environment">
   <object id="8" name="X" type="Laser" x="376.5" y="168.5">
    <properties>
     <property name="Direction" value="Left"/>
@@ -89,14 +86,21 @@
    </properties>
    <point/>
   </object>
-  <object id="17" name="Player" type="Player" x="183.5" y="218">
-   <point/>
-  </object>
   <object id="18" name="Goal" type="Goal" x="311.5" y="104">
    <properties>
     <property name="Next Level" type="file" value="level2.tmx"/>
     <property name="Requires" type="int" value="17"/>
    </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="7" name="Player">
+  <object id="17" name="Player" type="Player" x="183.5" y="218">
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="8" name="Quballs">
+  <object id="6" name="Quball |0&gt;" type="Quball" x="264.5" y="219">
    <point/>
   </object>
  </objectgroup>

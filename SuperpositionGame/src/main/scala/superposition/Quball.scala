@@ -36,6 +36,7 @@ private final class Quball(universe: Universe,
   override def copy(): Quball = {
     val quball = new Quball(universeObject.universe, universeObject.id, universeObject.cell)
     quball.bits.state = bits.state
+    quball.layer = layer
     quball
   }
 

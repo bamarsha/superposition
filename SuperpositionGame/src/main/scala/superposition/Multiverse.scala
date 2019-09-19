@@ -252,7 +252,7 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
       val maxValue = minValue + u.amplitude.squaredMagnitude
 
       frameBuffer.clear(CLEAR)
-      u.objects.values.foreach(_.entity.draw())
+      u.objects.values.map(_.entity).toSeq.sortBy(_.layer).foreach(_.draw())
 
       val camera = new Camera2d()
       camera.lowerLeft = new Vec2d(-1, -1)
