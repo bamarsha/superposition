@@ -48,8 +48,8 @@
   </object>
   <object id="10" name="Door" type="Door" x="312.5" y="137.5">
    <properties>
-    <property name="Controls">18, 10
-20, 10</property>
+    <property name="Controls">(18, 10)
+(20, 10)</property>
    </properties>
    <point/>
   </object>

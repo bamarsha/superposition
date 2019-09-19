@@ -99,13 +99,13 @@
   </object>
   <object id="9" name="Door 1" type="Door" x="72" y="170">
    <properties>
-    <property name="Controls" value="4, 12"/>
+    <property name="Controls" value="(4, 12)"/>
    </properties>
    <point/>
   </object>
   <object id="10" name="Door 2" type="Door" x="312.5" y="137.5">
    <properties>
-    <property name="Controls" value="19, 10"/>
+    <property name="Controls" value="(19, 10)"/>
    </properties>
    <point/>
   </object>

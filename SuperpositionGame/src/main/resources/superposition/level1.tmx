@@ -85,7 +85,7 @@
   </object>
   <object id="10" name="Door" type="Door" x="312.5" y="137.5">
    <properties>
-    <property name="Controls" value="19, 10"/>
+    <property name="Controls" value="(19, 10)"/>
    </properties>
    <point/>
   </object>

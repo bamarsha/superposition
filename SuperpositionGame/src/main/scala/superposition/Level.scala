@@ -57,7 +57,7 @@ private object Level {
       universe.add(entityFromObject(tilemap, obj, universe))
     }
     val gates = tilemap.properties.asScala.get("Gates")
-    for (Array(gate, target) <- gates.iterator.flatMap(_.value.split('\n')).map(_.split(' '))) {
+    for (Array(gate, target) <- gates.iterator.flatMap(_.value.linesIterator).map(_.split(' '))) {
       multiverse.applyGate(Gate.withName(gate), UniversalId(target.toInt), None)
     }
     load(multiverse)
@@ -76,7 +76,7 @@ private object Level {
       case "Laser" =>
         val gate = Gate.withName(properties("Gate").value)
         val direction = Direction.withName(properties("Direction").value)
-        val control = properties.get("Control").map(p => cellFromString(tilemap, p.value))
+        val control = properties.get("Control").flatMap(c => cellFromString(tilemap, c.value))
         new Laser(universe, id, cell, gate, direction, control)
       case "Door" =>
         val controls = cellsFromString(tilemap, properties("Controls").value)
@@ -88,11 +88,12 @@ private object Level {
     }
   }
 
-  private def cellFromString(tilemap: Tilemap, string: String): Cell = {
-    val Array(column, row) = string.split(',')
-    Cell(tilemap.height - row.trim.toInt - 1, column.trim.toInt)
-  }
+  private def cellFromString(tilemap: Tilemap, string: String): Option[Cell] =
+    """\((\d+),\s*(\d+)\)"""
+      .r("column", "row")
+      .findFirstMatchIn(string)
+      .map(m => Cell(tilemap.height - m.group("row").trim.toInt - 1, m.group("column").trim.toInt))
 
   private def cellsFromString(tilemap: Tilemap, string: String): Seq[Cell] =
-    string.linesIterator.map(cellFromString(tilemap, _)).toSeq
+    string.linesIterator.flatMap(cellFromString(tilemap, _)).toSeq
 }
