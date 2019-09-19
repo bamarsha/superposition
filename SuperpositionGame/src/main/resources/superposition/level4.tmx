@@ -66,7 +66,7 @@
   </object>
   <object id="18" name="Goal" type="Goal" x="248.5" y="45">
    <properties>
-    <property name="Next Level" type="file" value="level1.tmx"/>
+    <property name="Next Level" type="file" value="win.tmx"/>
     <property name="Requires" type="int" value="17"/>
    </properties>
    <point/>
