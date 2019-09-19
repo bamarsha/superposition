@@ -6,10 +6,10 @@ import java.net.URL
 import engine.core.Behavior.Entity
 import engine.core.Game.dt
 import engine.core.Input
-import engine.graphics.Graphics
-import engine.graphics.Graphics.drawWideLine
+import engine.graphics.Graphics.{drawRectangleOutline, drawWideLine}
 import engine.graphics.sprites.Sprite
 import engine.util.Color
+import engine.util.Color.RED
 import engine.util.math.{Transformation, Vec2d}
 import extras.physics.PositionComponent
 
@@ -65,13 +65,12 @@ private object Laser {
   private def applyGate(multiverse: Multiverse, gate: Gate.Value, controlCell: Option[Cell])
                        (targetCell: Cell, targetId: ObjectId, controlId: Option[ObjectId]): Unit =
     controlId match {
-      case Some(controlId) =>
-        multiverse.applyGate(
-          gate, targetId, None,
-          PositionControl(targetId, targetCell),
-          BitControl(controlId, "on" -> true),
-          PositionControl(controlId, controlCell.get)
-        )
+      case Some(controlId) => multiverse.applyGate(
+        gate, targetId, None,
+        PositionControl(targetId, targetCell),
+        BitControl(controlId, "on" -> true),
+        PositionControl(controlId, controlCell.get)
+      )
       case None => multiverse.applyGate(gate, targetId, None, PositionControl(targetId, targetCell))
     }
 }
@@ -117,14 +116,14 @@ private final class Laser(universe: Universe,
   override def draw(): Unit = {
     sprite.draw()
     if (selected) {
-      Graphics.drawRectangleOutline(Transformation.create(cell.toVec2d, 0, 1), Color.RED)
+      drawRectangleOutline(Transformation.create(cell.toVec2d, 0, 1), RED)
     }
     if (targetCell.isDefined && elapsedTime <= BeamDuration + FadeDuration) {
       drawWideLine(
         position.value,
         new Vec2d(targetCell.get.column + 0.5, targetCell.get.row + 0.5),
         0.25,
-        new Color(255, 0, 0, min(FadeDuration, BeamDuration + FadeDuration - elapsedTime) / FadeDuration)
+        new Color(1, 0, 0, min(FadeDuration, BeamDuration + FadeDuration - elapsedTime) / FadeDuration)
       )
     }
   }
