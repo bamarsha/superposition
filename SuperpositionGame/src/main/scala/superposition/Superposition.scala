@@ -2,7 +2,7 @@ package superposition
 
 import engine.core.{Game, Settings}
 import extras.behaviors.{FPSBehavior, QuitOnEscapeBehavior}
-import superposition.Level.level1
+import extras.tiles.Tilemap
 
 /**
  * The main class for the Superposition game.
@@ -29,7 +29,7 @@ object Superposition {
     Game.create(new FPSBehavior())
     Game.create(new QuitOnEscapeBehavior())
 
-    Level.load(level1())
+    Level.load(Tilemap.load(getClass.getResource("level1.tmx")))
     Game.run()
   }
 }

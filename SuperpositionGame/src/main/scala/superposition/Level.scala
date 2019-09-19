@@ -50,44 +50,7 @@ private object Level {
    *
    * @param tilemap the tilemap to load
    */
-  def load(tilemap: Tilemap): Unit =
-    throw new NotImplementedError
-
-  /**
-   * A new instance of level 1: X.
-   */
-  def level1(): Multiverse = {
-    lazy val multiverse: Multiverse = new Multiverse(universe, Tilemap.load(getClass.getResource("level3.tmx")))
-    lazy val universe = new Universe(multiverse)
-    universe.add(new Player(universe, UniversalId(0), Cell(4, 11)))
-    universe.add(new Quball(universe, UniversalId(1), Cell(4, 16)))
-    universe.add(new Laser(universe, UniversalId(2), Cell(7, 23), Gate.X, Direction.Left, None))
-    universe.add(new Door(universe, UniversalId(3), Cell(9, 19), Seq(Cell(7, 19))))
-    universe.add(new Goal(universe, UniversalId(4), Cell(11, 19), UniversalId(0), () => load(level2())))
-    multiverse
-  }
-
-  /**
-   * A new instance of level 2: CNOT.
-   */
-  def level2(): Multiverse = {
-    lazy val multiverse: Multiverse = new Multiverse(universe, Tilemap.load(getClass.getResource("level2.tmx")))
-    lazy val universe = new Universe(multiverse)
-    universe.add(new Player(universe, UniversalId(0), Cell(4, 11)))
-    universe.add(new Quball(universe, UniversalId(1), Cell(4, 16)))
-    universe.add(new Quball(universe, UniversalId(2), Cell(4, 15)))
-    universe.add(new Laser(universe, UniversalId(3), Cell(4, 20), Gate.X, Direction.Up, Some(Cell(3, 20))))
-    universe.add(new Door(universe, UniversalId(4), Cell(9, 19), Seq(Cell(7, 18), Cell(7, 20))))
-    universe.add(new Goal(universe, UniversalId(5), Cell(11, 19), UniversalId(0), () => load(level3())))
-    multiverse.applyGate(Gate.X, UniversalId(1), None)
-    multiverse
-  }
-
-  /**
-   * A new instance of level 3: SWAP.
-   */
-  def level3(): Multiverse = {
-    val tilemap = Tilemap.load(getClass.getResource("level3.tmx"))
+  def load(tilemap: Tilemap): Unit = {
     lazy val multiverse: Multiverse = new Multiverse(universe, tilemap)
     lazy val universe = new Universe(multiverse)
     for (group <- tilemap.objectGroups.asScala; obj <- group.objects.asScala) {
@@ -97,7 +60,7 @@ private object Level {
     for (Array(gate, target) <- gates.iterator.flatMap(_.value.split('\n')).map(_.split(' '))) {
       multiverse.applyGate(Gate.withName(gate), UniversalId(target.toInt), None)
     }
-    multiverse
+    load(multiverse)
   }
 
   private def entityFromObject(tilemap: Tilemap, obj: Tilemap#ObjectGroup#Object, universe: Universe): Entity = {
@@ -116,8 +79,8 @@ private object Level {
         val control = properties.get("Control").map(p => cellFromString(tilemap, p.value))
         new Laser(universe, id, cell, gate, direction, control)
       case "Door" =>
-        val control = cellFromString(tilemap, properties("Control").value)
-        new Door(universe, id, cell, Seq(control))
+        val controls = cellsFromString(tilemap, properties("Controls").value)
+        new Door(universe, id, cell, controls)
       case "Goal" =>
         val requires = UniversalId(properties("Requires").value.toInt)
         val next = properties("Next Level").value
@@ -125,8 +88,11 @@ private object Level {
     }
   }
 
-  private def cellFromString(tilemap: Tilemap, s: String): Cell = {
-    val Array(column, row) = s.split(',')
+  private def cellFromString(tilemap: Tilemap, string: String): Cell = {
+    val Array(column, row) = string.split(',')
     Cell(tilemap.height - row.trim.toInt - 1, column.trim.toInt)
   }
+
+  private def cellsFromString(tilemap: Tilemap, string: String): Seq[Cell] =
+    string.linesIterator.map(cellFromString(tilemap, _)).toSeq
 }

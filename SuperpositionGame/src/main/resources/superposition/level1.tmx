@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="19">
- <properties>
-  <property name="Gates" value="H 5"/>
- </properties>
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="20">
  <tileset firstgid="1" name="spritesheet" tilewidth="16" tileheight="16" tilecount="16" columns="4">
   <image source="sprites/spritesheet.png" width="64" height="64"/>
  </tileset>
@@ -76,18 +73,7 @@
 </data>
  </layer>
  <objectgroup id="5" name="Objects">
-  <object id="5" name="Quball |+&gt;" type="Quball" x="263.5" y="218">
-   <point/>
-  </object>
-  <object id="6" name="Quball |0&gt;" type="Quball" x="71.5" y="105.5">
-   <point/>
-  </object>
-  <object id="7" name="CNOT" type="Laser" x="327" y="216.5">
-   <properties>
-    <property name="Control" value="20, 14"/>
-    <property name="Direction" value="Up"/>
-    <property name="Gate" value="X"/>
-   </properties>
+  <object id="6" name="Quball |0&gt;" type="Quball" x="264.5" y="219">
    <point/>
   </object>
   <object id="8" name="X" type="Laser" x="376.5" y="168.5">
@@ -97,13 +83,7 @@
    </properties>
    <point/>
   </object>
-  <object id="9" name="Door 1" type="Door" x="72" y="170">
-   <properties>
-    <property name="Controls" value="4, 12"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="10" name="Door 2" type="Door" x="312.5" y="137.5">
+  <object id="10" name="Door" type="Door" x="312.5" y="137.5">
    <properties>
     <property name="Controls" value="19, 10"/>
    </properties>
@@ -114,7 +94,7 @@
   </object>
   <object id="18" name="Goal" type="Goal" x="311.5" y="104">
    <properties>
-    <property name="Next Level" type="file" value="level1.tmx"/>
+    <property name="Next Level" type="file" value="level2.tmx"/>
     <property name="Requires" type="int" value="17"/>
    </properties>
    <point/>

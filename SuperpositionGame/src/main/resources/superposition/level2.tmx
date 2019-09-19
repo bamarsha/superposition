@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="15">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="17">
+ <properties>
+  <property name="Gates" value="X 5"/>
+ </properties>
  <tileset firstgid="1" name="spritesheet" tilewidth="16" tileheight="16" tilecount="16" columns="4">
   <image source="sprites/spritesheet.png" width="64" height="64"/>
  </tileset>
@@ -29,10 +32,10 @@
   <object id="3" name="Player" type="Player" x="184" y="218">
    <point/>
   </object>
-  <object id="5" name="Quball |+&gt;" type="Quball" x="263.5" y="218">
+  <object id="5" name="Quball |1&gt;" type="Quball" x="263" y="218.5">
    <point/>
   </object>
-  <object id="6" name="Quball |0&gt;" type="Quball" x="71.5" y="105.5">
+  <object id="6" name="Quball |0&gt;" type="Quball" x="247.5" y="218.5">
    <point/>
   </object>
   <object id="7" name="CNOT" type="Laser" x="327" y="216.5">
@@ -43,22 +46,17 @@
    </properties>
    <point/>
   </object>
-  <object id="8" name="X" type="Laser" x="376.5" y="168.5">
+  <object id="10" name="Door" type="Door" x="312.5" y="137.5">
    <properties>
-    <property name="Direction" value="Left"/>
-    <property name="Gate" value="X"/>
+    <property name="Controls">18, 10
+20, 10</property>
    </properties>
    <point/>
   </object>
-  <object id="9" name="Door 1" type="Door" x="72" y="170">
+  <object id="15" name="Goal" type="Goal" x="312" y="104">
    <properties>
-    <property name="Control" value="4, 12"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="10" name="Door 2" type="Door" x="312.5" y="137.5">
-   <properties>
-    <property name="Control" value="19, 10"/>
+    <property name="Next Level" type="file" value="level3.tmx"/>
+    <property name="Requires" type="int" value="3"/>
    </properties>
    <point/>
   </object>

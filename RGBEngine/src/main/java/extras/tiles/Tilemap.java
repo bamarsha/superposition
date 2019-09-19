@@ -118,7 +118,7 @@ public class Tilemap extends XMLElement {
     public static class Property extends XMLElement {
         public final String name = stringAttr("name");
         public final String type = element.hasAttribute("type") ? stringAttr("type") : "string";
-        public final String value = stringAttr("value");
+        public final String value = element.hasAttribute("value") ? stringAttr("value") : element.getTextContent();
 
         private Property(Element element) {
             super(element);
