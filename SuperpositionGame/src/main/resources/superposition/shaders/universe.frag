@@ -133,7 +133,7 @@ void main() {
     float noise = .5;
     float scale = 1;
     for (int i = 0; i < 1; i++) {
-        noise += snoise(vec3(TexCoords.xy * scale * 20, time * .25)) / scale;
+        noise += snoise(vec3(TexCoords.xy * scale * 15, time / 15)) / scale;
         scale *= 2;
     }
     noise = fract(noise);
