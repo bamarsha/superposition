@@ -7,6 +7,7 @@ import engine.core.Game.dt
 import engine.core.{Behavior, Game}
 import engine.graphics.Camera
 import engine.graphics.Camera.Camera2d
+import engine.graphics.Graphics.drawRectangle
 import engine.graphics.opengl.{Framebuffer, Shader, Texture}
 import engine.util.Color
 import engine.util.Color.CLEAR
@@ -219,9 +220,17 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
 
   private def draw(): Unit = {
     tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
+
+    val activeCells = universes.flatMap(_.bits.values)
+      .withFilter(bitMap => bitMap.state.contains("alive") || bitMap.state.contains("carried"))
+      .map(_.universeObject.cell)
+      .toSet
+    for (cell <- activeCells) {
+      drawRectangle(Transformation.create(cell.toVec2d, 0, 1), new Color(1, 1, 1, 0.3))
+    }
+
     time += dt
     UniverseShader.setUniform("time", time.asInstanceOf[Float])
-
     var minValue = 0.0
     for (u <- universes) {
       val maxValue = minValue + u.amplitude.squaredMagnitude

@@ -1,10 +1,9 @@
 package superposition
 
 import engine.core.Behavior.{Component, Entity}
-import engine.graphics.Graphics.drawRectangleOutline
 import engine.graphics.sprites.Sprite
 import engine.util.Color
-import engine.util.Color.{BLACK, WHITE}
+import engine.util.Color.WHITE
 import engine.util.math.{Transformation, Vec2d}
 import extras.physics.PositionComponent
 
@@ -25,14 +24,9 @@ private final class SpriteComponent(entity: Entity,
                                     var color: Color = WHITE) extends Component(entity) {
   private val position: PositionComponent = get(classOf[PositionComponent])
 
-  private val universe: UniverseObject = get(classOf[UniverseObject])
-
   /**
    * Draws this sprite.
    */
-  def draw(): Unit = {
+  def draw(): Unit =
     sprite.draw(Transformation.create(position.value, 0, scale), color)
-    // TODO: Remove this outline.
-    drawRectangleOutline(Transformation.create(universe.cell.toVec2d, 0, 1), BLACK)
-  }
 }
