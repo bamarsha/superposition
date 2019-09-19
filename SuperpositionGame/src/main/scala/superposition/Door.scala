@@ -48,7 +48,7 @@ private final class Door(universe: Universe,
   private def step(): Unit = {
     universeObject.collision = !controls.forall(
       universeObject.universe.bitsInCell(_).exists(
-        universeObject.universe.bits(_).state.get("on").contains(true)
+        universeObject.universe.bitMaps(_).state.get("on").contains(true)
       )
     )
     val url =

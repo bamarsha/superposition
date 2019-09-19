@@ -112,7 +112,7 @@ private final class Laser(universe: Universe,
   }
 
   private def fire(): Set[UniversalId] =
-    if (control.isEmpty || controlId.isDefined && universeObject.universe.bits(controlId.get).state("on")) {
+    if (control.isEmpty || controlId.isDefined && universeObject.universe.bitMaps(controlId.get).state("on")) {
       targetCell = beam.take(50).find(cell =>
         universeObject.multiverse.walls.contains(cell)
           || universeObject.universe.objects.values.exists(_.cell == cell)
@@ -138,7 +138,7 @@ private final class Laser(universe: Universe,
     control.flatMap(
       universeObject.universe
         .bitsInCell(_)
-        .find(universeObject.universe.bits(_).state.contains("on"))
+        .find(universeObject.universe.bitMaps(_).state.contains("on"))
     )
 
   private def justClicked: Boolean =

@@ -19,9 +19,9 @@ private final class Universe(val multiverse: Multiverse) extends Entity with Cop
    */
   var amplitude: Complex = Complex(1)
 
-  private var _objects: Map[UniversalId, UniverseObject] = new HashMap()
+  private var _objects: Map[UniversalId, UniverseObject] = new HashMap
 
-  private var _bits: Map[UniversalId, BitMap] = new HashMap()
+  private var _bitMaps: Map[UniversalId, BitMap] = new HashMap
 
   override protected def onCreate(): Unit = objects.values.foreach(o => Game.create(o.entity))
 
@@ -35,14 +35,14 @@ private final class Universe(val multiverse: Multiverse) extends Entity with Cop
   /**
    * The bit maps in this universe.
    */
-  def bits: Map[UniversalId, BitMap] = _bits
+  def bitMaps: Map[UniversalId, BitMap] = _bitMaps
 
   /**
    * An opaque representation of this universe's state that can be compared for equality with the state of other
    * universes.
    */
   def state: Equals =
-    bits.view.mapValues(q => (q.state, q.universeObject.cell)).toMap
+    bitMaps.view.mapValues(q => (q.state, q.universeObject.cell)).toMap
 
   /**
    * Adds the entity to this universe.
@@ -60,18 +60,18 @@ private final class Universe(val multiverse: Multiverse) extends Entity with Cop
 
     _objects += universeObject.id -> universeObject
     if (entity.has(classOf[BitMap])) {
-      _bits += universeObject.id -> entity.get(classOf[BitMap])
+      _bitMaps += universeObject.id -> entity.get(classOf[BitMap])
     }
   }
 
   /**
-   * Returns the bits that are in the cell in this universe.
+   * Returns the IDs of objects with bit maps that are in the cell in this universe.
    *
-   * @param cell the cell to find bits in
-   * @return the bits that are in the cell in this universe
+   * @param cell the cell in which to find objects with bit maps
+   * @return the IDs of objects with bit maps that are in the cell in this universe
    */
   def bitsInCell(cell: Cell): Set[UniversalId] =
-    bits.values
+    bitMaps.values
       .filter(_.universeObject.cell == cell)
       .map(_.universeObject.id)
       .toSet

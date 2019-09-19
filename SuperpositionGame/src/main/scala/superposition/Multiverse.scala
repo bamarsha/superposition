@@ -154,15 +154,15 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
     )
 
     for (u <- withControls(controls: _*)) {
-      val k = key.getOrElse(u.bits(target).defaultKey)
+      val k = key.getOrElse(u.bitMaps(target).defaultKey)
       gate match {
-        case Gate.X => u.bits(target).state += k -> !u.bits(target).state(k)
+        case Gate.X => u.bitMaps(target).state += k -> !u.bitMaps(target).state(k)
         case Gate.Z =>
-          if (u.bits(target).state(k)) {
+          if (u.bitMaps(target).state(k)) {
             u.amplitude *= Complex(-1)
           }
         case Gate.T =>
-          if (u.bits(target).state(k)) {
+          if (u.bitMaps(target).state(k)) {
             u.amplitude *= Complex.polar(1, Pi / 4)
           }
         case Gate.H =>
@@ -171,10 +171,10 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
           if (isCreated) {
             Game.create(copy)
           }
-          if (u.bits(target).state(k)) {
+          if (u.bitMaps(target).state(k)) {
             u.amplitude *= Complex(-1)
           }
-          copy.bits(target).state += k -> !copy.bits(target).state(k)
+          copy.bitMaps(target).state += k -> !copy.bitMaps(target).state(k)
           universes = copy :: universes
         case Gate.Up => u.objects(target).cell = u.objects(target).cell.up
         case Gate.Down => u.objects(target).cell = u.objects(target).cell.down
@@ -194,7 +194,7 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
 
   private def withControls(controls: Control*): List[Universe] =
     universes.filter(u => controls.forall {
-      case BitControl(id, key -> state) => u.bits(id).state.get(key).contains(state)
+      case BitControl(id, key -> state) => u.bitMaps(id).state.get(key).contains(state)
       case PositionControl(id, cell) => u.objects(id).cell == cell
     })
 
@@ -221,7 +221,7 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
   private def draw(): Unit = {
     tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
 
-    val activeCells = universes.flatMap(_.bits.values)
+    val activeCells = universes.flatMap(_.bitMaps.values)
       .withFilter(bitMap => bitMap.state.contains("alive") || bitMap.state.contains("carried"))
       .map(_.universeObject.cell)
       .toSet

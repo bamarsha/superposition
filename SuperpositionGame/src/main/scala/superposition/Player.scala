@@ -80,7 +80,7 @@ private object Player {
       val cell = player.universeObject.cell
       position.value = position.value.lerp(cell.toVec2d add cellPosition, 10 * dt)
     }
-    for (bits <- livePlayers.flatMap(_.universeObject.universe.bits.values)
+    for (bits <- livePlayers.flatMap(_.universeObject.universe.bitMaps.values)
          if bits.state.contains("carried")) {
       val position = bits.universeObject.position
       val target = if (bits.state("carried")) cellPosition else new Vec2d(0.5, 0.5)
@@ -92,7 +92,7 @@ private object Player {
   private def walk(multiverse: Multiverse, id: UniversalId, gate: Gate.Value, players: Iterable[Player]): Boolean = {
     require(Gate.positionGate(gate), "Gate is not a position gate")
 
-    val allOtherBits = players.flatMap(_.universeObject.universe.bits.keySet).filter(_ != id).toSet
+    val allOtherBits = players.flatMap(_.universeObject.universe.bitMaps.keySet).filter(_ != id).toSet
     val playersCanWalk = multiverse.canApplyGate(gate, id, BitControl(id, "alive" -> true))
     val carriedCanMove = allOtherBits.forall(otherId => multiverse.canApplyGate(
       gate, otherId,
@@ -120,7 +120,7 @@ private object Player {
       val universe = player.universeObject.universe
       universe
         .bitsInCell(player.universeObject.cell)
-        .filter(otherId => otherId != id && universe.bits(otherId).state.contains("carried"))
+        .filter(otherId => otherId != id && universe.bitMaps(otherId).state.contains("carried"))
     }).toSet
     for (carryableId <- carryableIds; cell <- players.map(_.universeObject.cell).toSet[Cell]) {
       multiverse.applyGate(
