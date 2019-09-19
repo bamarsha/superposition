@@ -9,6 +9,10 @@ import extras.physics.PositionComponent
  * Contains initialization for doors.
  */
 private object Door {
+  private val ClosedSprite: Sprite = Sprite.load(getClass.getResource("sprites/door_closed.png"))
+
+  private val OpenSprite: Sprite = Sprite.load(getClass.getResource("sprites/door_open.png"))
+
   /**
    * Declares the door system.
    */
@@ -28,6 +32,9 @@ private final class Door(universe: Universe,
                          id: ObjectId,
                          cell: Cell,
                          controls: Iterable[Cell]) extends Entity with Copyable[Door] with Drawable {
+
+  import Door._
+
   add(new PositionComponent(this, cell.toVec2d.add(0.5)))
 
   private val obj: UniverseObject = add(new UniverseObject(this, universe, id, cell, true))
@@ -51,11 +58,6 @@ private final class Door(universe: Universe,
         obj.universe.bitMaps(_).state.get("on").contains(true)
       )
     )
-    val url =
-      if (obj.collision)
-        getClass.getResource("sprites/door_closed.png")
-      else
-        getClass.getResource("sprites/door_open.png")
-    sprite.sprite = Sprite.load(url)
+    sprite.sprite = if (obj.collision) ClosedSprite else OpenSprite
   }
 }
