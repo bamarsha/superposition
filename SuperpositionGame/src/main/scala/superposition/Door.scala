@@ -25,19 +25,19 @@ private object Door {
  * @param controls the control cells for this door
  */
 private final class Door(universe: Universe,
-                         id: UniversalId,
+                         id: ObjectId,
                          cell: Cell,
                          controls: Iterable[Cell]) extends Entity with Copyable[Door] with Drawable {
   add(new PositionComponent(this, cell.toVec2d.add(0.5)))
 
-  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell, true))
+  private val obj: UniverseObject = add(new UniverseObject(this, universe, id, cell, true))
 
   private val sprite: SpriteComponent =
     add(new SpriteComponent(this, Sprite.load(getClass.getResource("sprites/door_closed.png"))))
 
   override def copy(): Door = {
-    val door = new Door(universeObject.universe, universeObject.id, universeObject.cell, controls)
-    door.universeObject.collision = universeObject.collision
+    val door = new Door(obj.universe, obj.id, obj.cell, controls)
+    door.obj.collision = obj.collision
     door.sprite.color = sprite.color
     door.layer = layer
     door
@@ -46,13 +46,13 @@ private final class Door(universe: Universe,
   override def draw(): Unit = sprite.draw()
 
   private def step(): Unit = {
-    universeObject.collision = !controls.forall(
-      universeObject.universe.bitsInCell(_).exists(
-        universeObject.universe.bitMaps(_).state.get("on").contains(true)
+    obj.collision = !controls.forall(
+      obj.universe.bitsInCell(_).exists(
+        obj.universe.bitMaps(_).state.get("on").contains(true)
       )
     )
     val url =
-      if (universeObject.collision)
+      if (obj.collision)
         getClass.getResource("sprites/door_closed.png")
       else
         getClass.getResource("sprites/door_open.png")

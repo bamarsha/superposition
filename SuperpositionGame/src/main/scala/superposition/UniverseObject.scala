@@ -17,7 +17,7 @@ import extras.physics.PositionComponent
  */
 private final class UniverseObject(entity: Entity with Copyable[_ <: Entity] with Drawable,
                                    var universe: Universe,
-                                   val id: UniversalId,
+                                   val id: ObjectId,
                                    var cell: Cell,
                                    var collision: Boolean = false) extends Component(entity) {
   /**

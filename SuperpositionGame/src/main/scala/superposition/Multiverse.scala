@@ -39,7 +39,7 @@ private object Multiverse {
    * @param f   the system
    * @tparam T the type of the behavior
    */
-  def declareSubsystem[T <: Behavior](cls: Class[T], f: (Multiverse, UniversalId, Iterable[T]) => Unit): Unit = {
+  def declareSubsystem[T <: Behavior](cls: Class[T], f: (Multiverse, ObjectId, Iterable[T]) => Unit): Unit = {
     Game.declareGroupSystem(cls, (behaviors: util.Collection[T]) => behaviors.asScala
       .groupBy(b => {
         val u = b.get(classOf[UniverseObject])
@@ -123,7 +123,7 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
    * @param controls the controls
    * @return true if it is valid to apply the quantum gate to the target object with the controls
    */
-  def canApplyGate(gate: Gate.Value, target: UniversalId, controls: Control*): Boolean = {
+  def canApplyGate(gate: Gate.Value, target: ObjectId, controls: Control*): Boolean = {
     val controlled = withControls(controls: _*)
     gate match {
       case Gate.Up => controlled.forall(u => u.cellOpen(u.objects(target).cell.up))
@@ -142,7 +142,7 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
    * @param key      the target key in the object's bit map, or None to use the default key
    * @param controls the controls
    */
-  def applyGate(gate: Gate.Value, target: UniversalId, key: Option[String], controls: Control*): Unit = {
+  def applyGate(gate: Gate.Value, target: ObjectId, key: Option[String], controls: Control*): Unit = {
     require(canApplyGate(gate, target, controls: _*), "Invalid gate")
     require(
       controls.forall {
@@ -223,7 +223,7 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
 
     val activeCells = universes.flatMap(_.bitMaps.values)
       .withFilter(bitMap => bitMap.state.contains("alive") || bitMap.state.contains("carried"))
-      .map(_.universeObject.cell)
+      .map(_.obj.cell)
       .toSet
     for (cell <- activeCells) {
       drawRectangle(Transformation.create(cell.toVec2d, 0, 1), new Color(1, 1, 1, 0.3))

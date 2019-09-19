@@ -33,7 +33,7 @@ private object Laser {
   def declareSystem(): Unit =
     Multiverse.declareSubsystem(classOf[Laser], step)
 
-  private def step(multiverse: Multiverse, id: UniversalId, lasers: Iterable[Laser]): Unit = {
+  private def step(multiverse: Multiverse, id: ObjectId, lasers: Iterable[Laser]): Unit = {
     for (laser <- lasers) {
       if (laser.justClicked) {
         laser.fire()
@@ -44,7 +44,7 @@ private object Laser {
     }
 
     val hits = for (laser <- lasers if laser.justClicked && laser.targetCell.isDefined;
-                    targetId <- laser.universeObject.universe.bitsInCell(laser.targetCell.get)) yield {
+                    targetId <- laser.obj.universe.bitsInCell(laser.targetCell.get)) yield {
       laser.elapsedTime = 0
       (laser.targetCell.get, targetId, laser.controlId)
     }
@@ -74,7 +74,7 @@ private object Laser {
  * @param control   the cell that controls this laser if it contains a bit, or None if the laser is not controlled
  */
 private final class Laser(universe: Universe,
-                          id: UniversalId,
+                          id: ObjectId,
                           cell: Cell,
                           private val gate: Gate.Value,
                           direction: Direction.Value,
@@ -85,7 +85,7 @@ private final class Laser(universe: Universe,
   private val position: PositionComponent =
     add(new PositionComponent(this, new Vec2d(cell.column + 0.5, cell.row + 0.5)))
 
-  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell, true))
+  private val obj: UniverseObject = add(new UniverseObject(this, universe, id, cell, true))
 
   private val sprite: SpriteComponent = add(new SpriteComponent(this, Sprite.load(Sprites(direction))))
 
@@ -94,7 +94,7 @@ private final class Laser(universe: Universe,
   private var elapsedTime: Double = Double.PositiveInfinity
 
   override def copy(): Laser = {
-    val laser = new Laser(universeObject.universe, id, universeObject.cell, gate, direction, control)
+    val laser = new Laser(obj.universe, id, obj.cell, gate, direction, control)
     laser.layer = layer
     laser
   }
@@ -111,21 +111,21 @@ private final class Laser(universe: Universe,
     }
   }
 
-  private def fire(): Set[UniversalId] =
-    if (control.isEmpty || controlId.isDefined && universeObject.universe.bitMaps(controlId.get).state("on")) {
+  private def fire(): Set[ObjectId] =
+    if (control.isEmpty || controlId.isDefined && obj.universe.bitMaps(controlId.get).state("on")) {
       targetCell = beam.take(50).find(cell =>
-        universeObject.multiverse.walls.contains(cell)
-          || universeObject.universe.objects.values.exists(_.cell == cell)
+        obj.multiverse.walls.contains(cell)
+          || obj.universe.objects.values.exists(_.cell == cell)
       )
       assert(targetCell.isDefined, "Missing wall in front of laser")
-      universeObject.universe.bitsInCell(targetCell.get)
+      obj.universe.bitsInCell(targetCell.get)
     } else {
       targetCell = None
       Set.empty
     }
 
   private def beam: LazyList[Cell] =
-    LazyList.iterate(universeObject.cell)(cell =>
+    LazyList.iterate(obj.cell)(cell =>
       direction match {
         case Direction.Up => cell.up
         case Direction.Down => cell.down
@@ -134,14 +134,14 @@ private final class Laser(universe: Universe,
       }
     ).tail
 
-  private def controlId: Option[UniversalId] =
+  private def controlId: Option[ObjectId] =
     control.flatMap(
-      universeObject.universe
+      obj.universe
         .bitsInCell(_)
-        .find(universeObject.universe.bitMaps(_).state.contains("on"))
+        .find(obj.universe.bitMaps(_).state.contains("on"))
     )
 
   private def justClicked: Boolean =
     Input.mouseJustPressed(0) &&
-      Cell(Input.mouse().y.floor.toInt, Input.mouse().x.floor.toInt) == universeObject.cell
+      Cell(Input.mouse().y.floor.toInt, Input.mouse().x.floor.toInt) == obj.cell
 }

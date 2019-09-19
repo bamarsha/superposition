@@ -28,7 +28,7 @@ private object Player {
   def declareSystem(): Unit =
     Multiverse.declareSubsystem(classOf[Player], step)
 
-  private def step(multiverse: Multiverse, id: UniversalId, players: Iterable[Player]): Unit = {
+  private def step(multiverse: Multiverse, id: ObjectId, players: Iterable[Player]): Unit = {
     cellPosition = walkGates(cellPositionFromInput).foldLeft(cellPositionFromInput)(
       (position, gate) => cellPositionFromGate(position, gate, walk(multiverse, id, gate, players))
     )
@@ -77,22 +77,22 @@ private object Player {
     val livePlayers = players.filter(_.bits.state("alive"))
     for (player <- livePlayers) {
       val position = player.position
-      val cell = player.universeObject.cell
+      val cell = player.obj.cell
       position.value = position.value.lerp(cell.toVec2d add cellPosition, 10 * dt)
     }
-    for (bits <- livePlayers.flatMap(_.universeObject.universe.bitMaps.values)
+    for (bits <- livePlayers.flatMap(_.obj.universe.bitMaps.values)
          if bits.state.contains("carried")) {
-      val position = bits.universeObject.position
+      val position = bits.obj.position
       val target = if (bits.state("carried")) cellPosition else new Vec2d(0.5, 0.5)
-      val cell = bits.universeObject.cell
+      val cell = bits.obj.cell
       position.value = position.value.lerp(cell.toVec2d add target, 10 * dt)
     }
   }
 
-  private def walk(multiverse: Multiverse, id: UniversalId, gate: Gate.Value, players: Iterable[Player]): Boolean = {
+  private def walk(multiverse: Multiverse, id: ObjectId, gate: Gate.Value, players: Iterable[Player]): Boolean = {
     require(Gate.positionGate(gate), "Gate is not a position gate")
 
-    val allOtherBits = players.flatMap(_.universeObject.universe.bitMaps.keySet).filter(_ != id).toSet
+    val allOtherBits = players.flatMap(_.obj.universe.bitMaps.keySet).filter(_ != id).toSet
     val playersCanWalk = multiverse.canApplyGate(gate, id, BitControl(id, "alive" -> true))
     val carriedCanMove = allOtherBits.forall(otherId => multiverse.canApplyGate(
       gate, otherId,
@@ -115,14 +115,14 @@ private object Player {
     }
   }
 
-  private def toggleCarrying(multiverse: Multiverse, id: UniversalId, players: Iterable[Player]): Unit = {
+  private def toggleCarrying(multiverse: Multiverse, id: ObjectId, players: Iterable[Player]): Unit = {
     val carryableIds = players.flatMap(player => {
-      val universe = player.universeObject.universe
+      val universe = player.obj.universe
       universe
-        .bitsInCell(player.universeObject.cell)
+        .bitsInCell(player.obj.cell)
         .filter(otherId => otherId != id && universe.bitMaps(otherId).state.contains("carried"))
     }).toSet
-    for (carryableId <- carryableIds; cell <- players.map(_.universeObject.cell).toSet[Cell]) {
+    for (carryableId <- carryableIds; cell <- players.map(_.obj.cell).toSet[Cell]) {
       multiverse.applyGate(
         Gate.X, carryableId, Some("carried"),
         BitControl(id, "alive" -> true),
@@ -141,11 +141,11 @@ private object Player {
  * @param cell     the initial position for this player
  */
 private final class Player(universe: Universe,
-                           id: UniversalId,
+                           id: ObjectId,
                            cell: Cell) extends Entity with Copyable[Player] with Drawable {
   private val position: PositionComponent = add(new PositionComponent(this, cell.toVec2d.add(0.5)))
 
-  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell))
+  private val obj: UniverseObject = add(new UniverseObject(this, universe, id, cell))
 
   private val sprite: SpriteComponent = add(new SpriteComponent(
     entity = this,
@@ -162,7 +162,7 @@ private final class Player(universe: Universe,
   ))
 
   override def copy(): Player = {
-    val player = new Player(universeObject.universe, universeObject.id, universeObject.cell)
+    val player = new Player(obj.universe, obj.id, obj.cell)
     player.position.value = position.value
     player.bits.state = bits.state
     player.layer = layer

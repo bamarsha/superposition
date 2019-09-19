@@ -15,7 +15,7 @@ private object Goal {
   def declareSystem(): Unit =
     Multiverse.declareSubsystem(classOf[Goal], step)
 
-  private def step(multiverse: Multiverse, id: UniversalId, goals: Iterable[Goal]): Unit = {
+  private def step(multiverse: Multiverse, id: ObjectId, goals: Iterable[Goal]): Unit = {
     val allSatisfied = goals.forall(_.satisfied)
     if (allSatisfied && !goals.head.allSatisfied) {
       goals.head.callback()
@@ -34,13 +34,13 @@ private object Goal {
  * @param callback the callback to activate when the goal is reached
  */
 private final class Goal(universe: Universe,
-                         id: UniversalId,
+                         id: ObjectId,
                          cell: Cell,
-                         requires: UniversalId,
+                         requires: ObjectId,
                          private val callback: () => Unit) extends Entity with Copyable[Goal] with Drawable {
   add(new PositionComponent(this, new Vec2d(cell.column + 0.5, cell.row + 0.5)))
 
-  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell))
+  private val obj: UniverseObject = add(new UniverseObject(this, universe, id, cell))
 
   private val sprite: SpriteComponent =
     add(new SpriteComponent(this, Sprite.load(getClass.getResource("sprites/key.png"))))
@@ -48,10 +48,10 @@ private final class Goal(universe: Universe,
   private var allSatisfied: Boolean = false
 
   private def satisfied: Boolean =
-    universeObject.universe.objects(requires).cell == cell
+    obj.universe.objects(requires).cell == cell
 
   override def copy(): Goal =
-    new Goal(universeObject.universe, universeObject.id, universeObject.cell, requires, callback)
+    new Goal(obj.universe, obj.id, obj.cell, requires, callback)
 
   override def draw(): Unit = sprite.draw()
 }

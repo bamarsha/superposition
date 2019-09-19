@@ -19,9 +19,9 @@ private final class Universe(val multiverse: Multiverse) extends Entity with Cop
    */
   var amplitude: Complex = Complex(1)
 
-  private var _objects: Map[UniversalId, UniverseObject] = new HashMap
+  private var _objects: Map[ObjectId, UniverseObject] = new HashMap
 
-  private var _bitMaps: Map[UniversalId, BitMap] = new HashMap
+  private var _bitMaps: Map[ObjectId, BitMap] = new HashMap
 
   override protected def onCreate(): Unit = objects.values.foreach(o => Game.create(o.entity))
 
@@ -30,19 +30,19 @@ private final class Universe(val multiverse: Multiverse) extends Entity with Cop
   /**
    * The objects in this universe.
    */
-  def objects: Map[UniversalId, UniverseObject] = _objects
+  def objects: Map[ObjectId, UniverseObject] = _objects
 
   /**
    * The bit maps in this universe.
    */
-  def bitMaps: Map[UniversalId, BitMap] = _bitMaps
+  def bitMaps: Map[ObjectId, BitMap] = _bitMaps
 
   /**
    * An opaque representation of this universe's state that can be compared for equality with the state of other
    * universes.
    */
   def state: Equals =
-    bitMaps.view.mapValues(q => (q.state, q.universeObject.cell)).toMap
+    bitMaps.view.mapValues(q => (q.state, q.obj.cell)).toMap
 
   /**
    * Adds the entity to this universe.
@@ -54,13 +54,13 @@ private final class Universe(val multiverse: Multiverse) extends Entity with Cop
    */
   def add(entity: Entity): Unit = {
     require(entity.has(classOf[UniverseObject]), "Entity is not a universe object")
-    val universeObject = entity.get(classOf[UniverseObject])
-    require(universeObject.universe == this, "Entity is not a part of this universe")
-    require(!objects.contains(universeObject.id), "ID has already been used")
+    val obj = entity.get(classOf[UniverseObject])
+    require(obj.universe == this, "Entity is not a part of this universe")
+    require(!objects.contains(obj.id), "ID has already been used")
 
-    _objects += universeObject.id -> universeObject
+    _objects += obj.id -> obj
     if (entity.has(classOf[BitMap])) {
-      _bitMaps += universeObject.id -> entity.get(classOf[BitMap])
+      _bitMaps += obj.id -> entity.get(classOf[BitMap])
     }
   }
 
@@ -70,10 +70,10 @@ private final class Universe(val multiverse: Multiverse) extends Entity with Cop
    * @param cell the cell in which to find objects with bit maps
    * @return the IDs of objects with bit maps that are in the cell in this universe
    */
-  def bitsInCell(cell: Cell): Set[UniversalId] =
+  def bitsInCell(cell: Cell): Set[ObjectId] =
     bitMaps.values
-      .filter(_.universeObject.cell == cell)
-      .map(_.universeObject.id)
+      .filter(_.obj.cell == cell)
+      .map(_.obj.id)
       .toSet
 
   /**

@@ -64,7 +64,7 @@ private object Level {
 
       val gates = tilemap.properties.asScala.get("Gates")
       for (Array(gate, target) <- gates.iterator.flatMap(_.value.linesIterator).map(_.split(' '))) {
-        multiverse.applyGate(Gate.withName(gate), UniversalId(target.toInt), None)
+        multiverse.applyGate(Gate.withName(gate), ObjectId(target.toInt), None)
       }
 
       multiverse
@@ -74,7 +74,7 @@ private object Level {
   private def entityFromObject(tilemap: Tilemap,
                                obj: Tilemap#ObjectGroup#Object,
                                universe: Universe): Entity with Drawable = {
-    val id = UniversalId(obj.id)
+    val id = ObjectId(obj.id)
     val cell = Cell(
       tilemap.height - (obj.y / tilemap.tileHeight).floor.toInt - 1,
       (obj.x / tilemap.tileWidth).floor.toInt
@@ -92,7 +92,7 @@ private object Level {
         val controls = cellsFromString(tilemap, properties("Controls").value)
         new Door(universe, id, cell, controls)
       case "Goal" =>
-        val requires = UniversalId(properties("Requires").value.toInt)
+        val requires = ObjectId(properties("Requires").value.toInt)
         val next = properties("Next Level").value
         new Goal(universe, id, cell, requires, () => load(Tilemap.load(getClass.getResource(next))))
     }

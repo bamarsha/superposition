@@ -14,11 +14,11 @@ import extras.physics.PositionComponent
  * @param cell     the initial position of this quball
  */
 private final class Quball(universe: Universe,
-                           id: UniversalId,
+                           id: ObjectId,
                            cell: Cell) extends Entity with Copyable[Quball] with Drawable {
   add(new PositionComponent(this, new Vec2d(cell.column + 0.5, cell.row + 0.5)))
 
-  private val universeObject: UniverseObject = add(new UniverseObject(this, universe, id, cell))
+  private val obj: UniverseObject = add(new UniverseObject(this, universe, id, cell))
 
   private val sprite: SpriteComponent = add(new SpriteComponent(
     entity = this,
@@ -34,7 +34,7 @@ private final class Quball(universe: Universe,
   ))
 
   override def copy(): Quball = {
-    val quball = new Quball(universeObject.universe, universeObject.id, universeObject.cell)
+    val quball = new Quball(obj.universe, obj.id, obj.cell)
     quball.bits.state = bits.state
     quball.layer = layer
     quball

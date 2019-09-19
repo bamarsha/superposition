@@ -21,7 +21,7 @@ private final class BitMap(entity: Entity,
   /**
    * The universe object for this bit map.
    */
-  lazy val universeObject: UniverseObject = get(classOf[UniverseObject])
+  lazy val obj: UniverseObject = get(classOf[UniverseObject])
 
   /**
    * The state of this bit map.
