@@ -4,7 +4,7 @@ import java.util
 
 import engine.core.Behavior.Entity
 import engine.core.Game.dt
-import engine.core.{Behavior, Game, Input}
+import engine.core.{Behavior, Game}
 import engine.graphics.Camera
 import engine.graphics.Camera.Camera2d
 import engine.graphics.opengl.{Framebuffer, Shader, Texture}
@@ -13,7 +13,6 @@ import engine.util.Color.CLEAR
 import engine.util.math.{Transformation, Vec2d, Vec4d}
 import extras.physics.Rectangle
 import extras.tiles.{Tilemap, TilemapRenderer}
-import org.lwjgl.glfw.GLFW._
 
 import scala.jdk.CollectionConverters._
 import scala.math.{Pi, sqrt}
@@ -22,13 +21,6 @@ import scala.math.{Pi, sqrt}
  * Contains settings and initialization for the multiverse.
  */
 private object Multiverse {
-  private val GateKeys: Map[Int, Gate.Value] = Map(
-    GLFW_KEY_X -> Gate.X,
-    GLFW_KEY_Z -> Gate.Z,
-    GLFW_KEY_H -> Gate.H,
-    GLFW_KEY_T -> Gate.T
-  )
-
   private val UniverseShader: Shader = Shader.load(classOf[Multiverse].getResource(_), "shaders/universe")
 
   /**
@@ -123,15 +115,6 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
   override protected def onDestroy(): Unit = universes.foreach(Game.destroy)
 
   /**
-   * Returns the bits that are in the cell in all universes.
-   *
-   * @param cell the cell to find bits in
-   * @return the bits that are in the cell in all universes
-   */
-  def bitsInCell(cell: Cell): Set[UniversalId] =
-    universes.flatMap(_.bitsInCell(cell)).toSet
-
-  /**
    * Returns true if it is valid to apply the quantum gate to the target object with the controls.
    *
    * @param gate     the gate to apply
@@ -204,13 +187,6 @@ private final class Multiverse(universe: => Universe, tiles: Tilemap) extends En
   }
 
   private def step(): Unit = {
-    val cell = Cell(Input.mouse().y.floor.toInt, Input.mouse().x.floor.toInt)
-    val selected = bitsInCell(cell)
-    for ((key, gate) <- GateKeys) {
-      if (Input.keyJustPressed(key)) {
-        selected.foreach(id => applyGate(gate, id, None, PositionControl(id, cell)))
-      }
-    }
     normalize()
     draw()
   }
