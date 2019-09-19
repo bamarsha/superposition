@@ -31,7 +31,7 @@ private object Level {
   /**
    * Loads the multiverse as a new level.
    *
-   * @param multiverse the multiverse to load
+   * @param multiverse an expression that creates a new multiverse to load
    */
   def load(multiverse: => Multiverse): Unit = {
     this.multiverse foreach Game.destroy
@@ -51,18 +51,24 @@ private object Level {
    * @param tilemap the tilemap to load
    */
   def load(tilemap: Tilemap): Unit = {
-    lazy val multiverse: Multiverse = new Multiverse(universe, tilemap)
-    lazy val universe = new Universe(multiverse)
-    for ((group, layer) <- tilemap.objectGroups.asScala.zipWithIndex; obj <- group.objects.asScala) {
-      val entity = entityFromObject(tilemap, obj, universe)
-      entity.layer = layer
-      universe.add(entity)
+    load {
+      lazy val multiverse: Multiverse = new Multiverse(universe, tilemap)
+      lazy val universe = new Universe(multiverse)
+
+      for ((group, layer) <- tilemap.objectGroups.asScala.zipWithIndex;
+           obj <- group.objects.asScala) {
+        val entity = entityFromObject(tilemap, obj, universe)
+        entity.layer = layer
+        universe.add(entity)
+      }
+
+      val gates = tilemap.properties.asScala.get("Gates")
+      for (Array(gate, target) <- gates.iterator.flatMap(_.value.linesIterator).map(_.split(' '))) {
+        multiverse.applyGate(Gate.withName(gate), UniversalId(target.toInt), None)
+      }
+
+      multiverse
     }
-    val gates = tilemap.properties.asScala.get("Gates")
-    for (Array(gate, target) <- gates.iterator.flatMap(_.value.linesIterator).map(_.split(' '))) {
-      multiverse.applyGate(Gate.withName(gate), UniversalId(target.toInt), None)
-    }
-    load(multiverse)
   }
 
   private def entityFromObject(tilemap: Tilemap,
