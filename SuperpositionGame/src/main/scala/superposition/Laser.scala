@@ -6,10 +6,11 @@ import java.net.URL
 import engine.core.Behavior.Entity
 import engine.core.Game.dt
 import engine.core.Input
+import engine.graphics.Graphics
 import engine.graphics.Graphics.drawWideLine
 import engine.graphics.sprites.Sprite
 import engine.util.Color
-import engine.util.math.Vec2d
+import engine.util.math.{Transformation, Vec2d}
 import extras.physics.PositionComponent
 
 /**
@@ -37,7 +38,7 @@ private object Laser {
 
   private def step(multiverse: Multiverse, id: ObjectId, lasers: Iterable[Laser]): Unit = {
     for (laser <- lasers) {
-      if (laser.justClicked) {
+      if (laser.justActivated) {
         laser.fire()
         laser.elapsedTime = 0
       } else {
@@ -46,7 +47,7 @@ private object Laser {
     }
 
     val hits =
-      (for (laser <- lasers if laser.justClicked && laser.targetCell.isDefined;
+      (for (laser <- lasers if laser.justActivated && laser.targetCell.isDefined;
             targetId <- laser.obj.universe.bitsInCell(laser.targetCell.get)) yield {
         laser.elapsedTime = 0
         (laser.targetCell.get, targetId, laser.controlId)
@@ -57,7 +58,7 @@ private object Laser {
       // TODO: Assumes gates are self-adjoint.
       hits.foreach((applyGate(multiverse, lasers.head.gate, lasers.head.control) _).tupled)
       // TODO: Show some effect to indicate why the laser isn't working.
-      lasers.withFilter(_.justClicked).foreach(_.targetCell = None)
+      lasers.withFilter(_.justActivated).foreach(_.targetCell = None)
     }
   }
 
@@ -115,6 +116,9 @@ private final class Laser(universe: Universe,
 
   override def draw(): Unit = {
     sprite.draw()
+    if (selected) {
+      Graphics.drawRectangleOutline(Transformation.create(cell.toVec2d, 0, 1), Color.RED)
+    }
     if (targetCell.isDefined && elapsedTime <= BeamDuration + FadeDuration) {
       drawWideLine(
         position.value,
@@ -155,7 +159,9 @@ private final class Laser(universe: Universe,
         .find(obj.universe.bitMaps(_).state.contains("on"))
     )
 
-  private def justClicked: Boolean =
-    Input.mouseJustPressed(0) &&
-      Cell(Input.mouse().y.floor.toInt, Input.mouse().x.floor.toInt) == obj.cell
+  private def selected: Boolean =
+    Cell(Input.mouse().y.floor.toInt, Input.mouse().x.floor.toInt) == obj.cell
+
+  private def justActivated: Boolean =
+    Input.mouseJustPressed(0) && selected
 }
