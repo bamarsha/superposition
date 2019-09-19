@@ -19,7 +19,8 @@ private object Laser {
   private val Sprites: Map[Direction.Value, URL] = Map(
     Direction.Up -> getClass.getResource("sprites/laser_up.png"),
     Direction.Down -> getClass.getResource("sprites/laser_down.png"),
-    Direction.Left -> getClass.getResource("sprites/laser_left.png")
+    Direction.Left -> getClass.getResource("sprites/laser_left.png"),
+    Direction.Right -> getClass.getResource("sprites/laser_right.png")
   )
 
   private val BeamDuration: Double = 0.2
