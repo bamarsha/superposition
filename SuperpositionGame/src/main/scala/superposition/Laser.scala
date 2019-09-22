@@ -128,17 +128,15 @@ private final class Laser(universe: Universe,
     }
   }
 
-  private def fire(): Set[ObjectId] =
+  private def fire(): Unit =
     if (control.isEmpty || controlId.isDefined && obj.universe.bitMaps(controlId.get).state("on")) {
       targetCell = beam.take(50).find(cell =>
         obj.multiverse.walls.contains(cell)
           || obj.universe.objects.values.exists(_.cell == cell)
       )
       assert(targetCell.isDefined, "Missing wall in front of laser")
-      obj.universe.bitsInCell(targetCell.get)
     } else {
       targetCell = None
-      Set.empty
     }
 
   private def beam: LazyList[Cell] =
