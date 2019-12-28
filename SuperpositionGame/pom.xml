@@ -41,7 +41,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.3.2</version>
+                <version>4.3.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -49,10 +49,6 @@
                         </goals>
                         <configuration>
                             <args>
-                                <arg>-dependencyfile</arg>
-                                <arg>${project.build.directory}/.scala_dependencies</arg>
-                                <arg>-opt:l:inline</arg>
-                                <arg>-opt-inline-from:**</arg>
                                 <arg>-deprecation</arg>
                             </args>
                         </configuration>
@@ -77,7 +73,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifest>
