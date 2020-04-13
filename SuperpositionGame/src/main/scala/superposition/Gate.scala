@@ -2,11 +2,6 @@ package superposition
 
 import scala.math.sqrt
 
-trait Gate[T] {
-  def forward(t: T)(u: Universe): List[Universe]
-  def adjoint: Gate[T]
-}
-
 object Gate {
 
   def compose[T](gates: List[Gate[T]]): Gate[T] = new Gate[T] {
@@ -14,7 +9,7 @@ object Gate {
       case List() => List(u)
       case gate :: rest => gate.forward(t)(u).flatMap(compose(rest).forward(t))
     }
-    override def adjoint: Gate[T] = compose(gates.reverse.map(g => g.adjoint))
+    override def adjoint: Gate[T] = compose(gates.reverse.map(_.adjoint))
   }
 
   def multi[T](gate: Gate[T]): Gate[List[T]] = new Gate[List[T]] {
@@ -66,7 +61,7 @@ object Gate {
 
   def translate: Gate[(ObjectId, Int, Int)] = new Gate[(ObjectId, Int, Int)] {
     override def forward(t: (ObjectId, Int, Int))(u: Universe): List[Universe] = {
-      (o, x, y) = t
+      val (o, x, y) = t
 
     }
   }
