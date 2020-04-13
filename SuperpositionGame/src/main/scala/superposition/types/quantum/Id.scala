@@ -7,7 +7,7 @@ trait Id[T2] {
 }
 
 class IdMap private (m: Map[Id[_], Object]) {
-  def get(key: Id[_]): key.T = m.get(key).asInstanceOf[key.T]
+  def get(key: Id[_]): key.T = m.get(key).get.asInstanceOf[key.T]
   def set(key: Id[_])(value: key.T): IdMap = new IdMap(m + (key -> value.asInstanceOf[Object]))
 }
 

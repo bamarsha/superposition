@@ -21,7 +21,7 @@ object Superposition {
     Multiverse.declareSystem()
     // Laser.declareSystem()
     // Door.declareSystem()
-    // Player.declareSystem()
+     Player.declareSystem()
     Level.declareSystem()
     // Goal.declareSystem()
 

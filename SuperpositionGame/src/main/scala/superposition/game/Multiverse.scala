@@ -12,7 +12,7 @@ import engine.util.math.{Transformation, Vec2d, Vec4d}
 import extras.physics.Rectangle
 import extras.tiles.{Tilemap, TilemapRenderer}
 import superposition.types.math.{Cell, Complex}
-import superposition.types.quantum.{Gate, Universe}
+import superposition.types.quantum.{Gate, Id, Universe}
 
 import scala.jdk.CollectionConverters._
 import scala.math.{Pi, sqrt}
@@ -86,9 +86,20 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
    * @param gate     the gate to apply
    * @param t        the target object
    */
-  def applyGate[T](gate: Gate[T], t: T): Unit = {
-    universes = Gate.applyToAll(t)(gate)(universes)
-    combine()
+  def applyGate[T](gate: Gate[T], t: T): Boolean = {
+    val newUniverses = Gate.applyToAll(t)(gate)(universes)
+    val success = newUniverses.forall(_.isValid)
+    if (success) {
+      universes = newUniverses
+      combine()
+    }
+    success
+  }
+
+  def createId[T](t: T): Id[T] = {
+    val i = new Id[T] {}
+    universes = universes.map(_.set(i)(t))
+    i
   }
 
   private def step(): Unit = {
@@ -129,6 +140,7 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
 
       frameBuffer.clear(CLEAR)
 //      u.objects.values.map(_.entity).toSeq.sortBy(_.layer).foreach(_.draw())
+      SpriteComponent.All.foreach(_.draw())
 
       val camera = new Camera2d()
       camera.lowerLeft = new Vec2d(-1, -1)

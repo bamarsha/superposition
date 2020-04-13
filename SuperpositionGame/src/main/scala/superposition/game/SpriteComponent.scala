@@ -1,11 +1,17 @@
 package superposition.game
 
 import engine.core.Behavior.{Component, Entity}
+import engine.core.Game.track
 import engine.graphics.sprites.Sprite
 import engine.util.Color
 import engine.util.Color.WHITE
 import engine.util.math.{Transformation, Vec2d}
 import extras.physics.PositionComponent
+import scala.jdk.CollectionConverters._
+
+object SpriteComponent {
+  val All: Iterable[SpriteComponent] = track(classOf[SpriteComponent]).asScala
+}
 
 /**
  * Adds a sprite to an entity.
@@ -18,7 +24,7 @@ import extras.physics.PositionComponent
  * @param scale  the scale of the sprite
  * @param color  the color of the sprite
  */
-private final class SpriteComponent(entity: Entity,
+final class SpriteComponent(entity: Entity,
                                     var sprite: Sprite,
                                     var scale: Vec2d = new Vec2d(1, 1),
                                     var color: Color = WHITE) extends Component(entity) {
