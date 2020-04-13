@@ -1,4 +1,4 @@
-package superposition
+package superposition.game
 
 import engine.core.Behavior.{Component, Entity}
 import engine.graphics.sprites.Sprite
@@ -10,7 +10,7 @@ import extras.physics.PositionComponent
 /**
  * Adds a sprite to an entity.
  * <p>
- * Note that having this component by itself does nothing; it also needs a [[superposition.UniverseObject]] component to
+ * Note that having this component by itself does nothing; it also needs a [[UniverseObject]] component to
  * be drawn.
  *
  * @param entity the entity for this component

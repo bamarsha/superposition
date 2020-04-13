@@ -1,9 +1,14 @@
-package superposition
+package superposition.game_old
 
 import engine.core.Behavior.Entity
 import engine.core.Game
 import engine.graphics.sprites.Sprite
 import extras.physics.PositionComponent
+import superposition.game.SpriteComponent
+import superposition.types.math.Cell
+import superposition.quantum_types.{ObjectId, UniverseObject}
+import superposition.types.Drawable
+import superposition.types.quantum.Universe
 
 /**
  * Contains initialization for doors.

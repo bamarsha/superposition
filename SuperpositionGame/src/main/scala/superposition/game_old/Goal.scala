@@ -1,9 +1,14 @@
-package superposition
+package superposition.game_old
 
 import engine.core.Behavior.Entity
 import engine.graphics.sprites.Sprite
 import engine.util.math.Vec2d
 import extras.physics.PositionComponent
+import superposition.game.SpriteComponent
+import superposition.types.math.Cell
+import superposition.quantum_types.{Multiverse, ObjectId, UniverseObject}
+import superposition.types.Drawable
+import superposition.types.quantum.Universe
 
 /**
  * Contains initialization for goals.

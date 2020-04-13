@@ -1,10 +1,11 @@
-package superposition
+package superposition.game
 
-import engine.core.Behavior.Entity
 import engine.core.{Game, Input}
 import engine.graphics.Camera
 import extras.tiles.Tilemap
 import org.lwjgl.glfw.GLFW.GLFW_KEY_R
+import superposition.types.math.Cell
+import superposition.types.quantum.Universe
 
 import scala.jdk.CollectionConverters._
 
@@ -53,50 +54,50 @@ private object Level {
   def load(tilemap: Tilemap): Unit = {
     load {
       lazy val multiverse: Multiverse = new Multiverse(universe, tilemap)
-      lazy val universe = new Universe(multiverse)
+      lazy val universe = Universe()
 
       for ((group, layer) <- tilemap.objectGroups.asScala.zipWithIndex;
            obj <- group.objects.asScala) {
-        val entity = entityFromObject(tilemap, obj, universe)
-        entity.layer = layer
-        universe.add(entity)
+//        val entity = entityFromObject(tilemap, obj, universe)
+//        entity.layer = layer
+//         universe.add(entity)
       }
 
       val gates = tilemap.properties.asScala.get("Gates")
       for (Array(gate, target) <- gates.iterator.flatMap(_.value.linesIterator).map(_.split(' '))) {
-        multiverse.applyGate(Gate.withName(gate), ObjectId(target.toInt), None)
+        // multiverse.applyGate(gate, target)
       }
 
       multiverse
     }
   }
 
-  private def entityFromObject(tilemap: Tilemap,
-                               obj: Tilemap#ObjectGroup#Object,
-                               universe: Universe): Entity with Drawable = {
-    val id = ObjectId(obj.id)
-    val cell = Cell(
-      tilemap.height - (obj.y / tilemap.tileHeight).floor.toInt - 1,
-      (obj.x / tilemap.tileWidth).floor.toInt
-    )
-    val properties = obj.properties.asScala
-    obj.`type` match {
-      case "Player" => new Player(universe, id, cell)
-      case "Quball" => new Quball(universe, id, cell)
-      case "Laser" =>
-        val gate = Gate.withName(properties("Gate").value)
-        val direction = Direction.withName(properties("Direction").value)
-        val control = properties.get("Control").flatMap(c => cellFromString(tilemap, c.value))
-        new Laser(universe, id, cell, gate, direction, control)
-      case "Door" =>
-        val controls = cellsFromString(tilemap, properties("Controls").value)
-        new Door(universe, id, cell, controls)
-      case "Goal" =>
-        val requires = ObjectId(properties("Requires").value.toInt)
-        val next = properties("Next Level").value
-        new Goal(universe, id, cell, requires, () => load(Tilemap.load(getClass.getResource(next))))
-    }
-  }
+//  private def entityFromObject(tilemap: Tilemap,
+//                               obj: Tilemap#ObjectGroup#Object,
+//                               universe: Universe): Entity with Drawable = {
+//    val id = ObjectId(obj.id)
+//    val cell = Cell(
+//      tilemap.height - (obj.y / tilemap.tileHeight).floor.toInt - 1,
+//      (obj.x / tilemap.tileWidth).floor.toInt
+//    )
+//    val properties = obj.properties.asScala
+//    obj.`type` match {
+//      case "Player" => new Player(universe, id, cell)
+//      case "Quball" => new Quball(universe, id, cell)
+//      case "Laser" =>
+//        val gate = Gate.withName(properties("Gate").value)
+//        val direction = Direction.withName(properties("Direction").value)
+//        val control = properties.get("Control").flatMap(c => cellFromString(tilemap, c.value))
+//        new Laser(universe, id, cell, gate, direction, control)
+//      case "Door" =>
+//        val controls = cellsFromString(tilemap, properties("Controls").value)
+//        new Door(universe, id, cell, controls)
+//      case "Goal" =>
+//        val requires = ObjectId(properties("Requires").value.toInt)
+//        val next = properties("Next Level").value
+//        new Goal(universe, id, cell, requires, () => load(Tilemap.load(getClass.getResource(next))))
+//    }
+//  }
 
   private def cellFromString(tilemap: Tilemap, string: String): Option[Cell] =
     """\((\d+),\s*(\d+)\)"""

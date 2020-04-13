@@ -1,9 +1,9 @@
-package superposition
+package superposition.types
 
 /**
  * An object that can be drawn.
  */
-private trait Drawable {
+trait Drawable {
   /**
    * The layer to which this object belongs.
    */

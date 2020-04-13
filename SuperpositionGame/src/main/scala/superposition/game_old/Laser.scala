@@ -1,4 +1,4 @@
-package superposition
+package superposition.game_old
 
 import java.lang.Math.min
 import java.net.URL
@@ -12,6 +12,11 @@ import engine.util.Color
 import engine.util.Color.RED
 import engine.util.math.{Transformation, Vec2d}
 import extras.physics.PositionComponent
+import superposition.game.SpriteComponent
+import superposition.types.math.{Cell, Direction}
+import superposition.quantum_types.{Multiverse, ObjectId, UniverseObject}
+import superposition.types.Drawable
+import superposition.types.quantum.{Gate, PositionControl, Universe}
 
 /**
  * Contains initialization for lasers.

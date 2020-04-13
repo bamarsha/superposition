@@ -1,4 +1,4 @@
-package superposition
+package superposition.game
 
 import engine.core.{Game, Settings}
 import extras.behaviors.{FPSBehavior, QuitOnEscapeBehavior}
@@ -19,11 +19,11 @@ object Superposition {
 
     Game.init()
     Multiverse.declareSystem()
-    Laser.declareSystem()
-    Door.declareSystem()
-    Player.declareSystem()
+    // Laser.declareSystem()
+    // Door.declareSystem()
+    // Player.declareSystem()
     Level.declareSystem()
-    Goal.declareSystem()
+    // Goal.declareSystem()
 
     Game.create(new FPSBehavior())
     Game.create(new QuitOnEscapeBehavior())

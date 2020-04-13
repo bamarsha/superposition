@@ -1,4 +1,4 @@
-package superposition
+package superposition.game_old
 
 import engine.core.Behavior.Entity
 import engine.core.Game.dt
@@ -8,6 +8,11 @@ import engine.util.Color.{BLACK, WHITE}
 import engine.util.math.Vec2d
 import extras.physics.PositionComponent
 import org.lwjgl.glfw.GLFW._
+import superposition.game.SpriteComponent
+import superposition.types.math.Cell
+import superposition.quantum_types.{Multiverse, ObjectId, UniverseObject}
+import superposition.types.Drawable
+import superposition.types.quantum.{BitControl, BitMap, Gate, PositionControl, Universe}
 
 /**
  * Contains settings and initialization for the player.

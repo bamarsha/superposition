@@ -1,10 +1,15 @@
-package superposition
+package superposition.game_old
 
 import engine.core.Behavior.Entity
 import engine.graphics.sprites.Sprite
 import engine.util.Color.{BLACK, WHITE}
 import engine.util.math.Vec2d
 import extras.physics.PositionComponent
+import superposition.game.SpriteComponent
+import superposition.types.math.Cell
+import superposition.quantum_types.{ObjectId, UniverseObject}
+import superposition.types.Drawable
+import superposition.types.quantum.{BitMap, Universe}
 
 /**
  * A quball is a ball that can be either on or off.

@@ -1,9 +1,9 @@
-package superposition
+package superposition.types.math
 
 /**
  * The cardinal directions.
  */
-private object Direction extends Enumeration {
+object Direction extends Enumeration {
   /**
    * The up direction.
    */

@@ -1,4 +1,4 @@
-package superposition
+package superposition.game_old
 
 import java.util
 
@@ -14,6 +14,8 @@ import engine.util.Color.CLEAR
 import engine.util.math.{Transformation, Vec2d, Vec4d}
 import extras.physics.Rectangle
 import extras.tiles.{Tilemap, TilemapRenderer}
+import superposition.types.math.{Cell, Complex}
+import superposition.types.quantum.{Gate, Universe}
 
 import scala.jdk.CollectionConverters._
 import scala.math.{Pi, sqrt}
@@ -38,7 +40,7 @@ private object Multiverse {
    * @param cls the behavior class
    * @param f   the system
    * @tparam T the type of the behavior
-   */
+  */
   def declareSubsystem[T <: Behavior](cls: Class[T], f: (Multiverse, ObjectId, Iterable[T]) => Unit): Unit = {
     Game.declareGroupSystem(cls, (behaviors: util.Collection[T]) => behaviors.asScala
       .groupBy(b => {

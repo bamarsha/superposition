@@ -1,11 +1,11 @@
-package superposition
+package superposition.types.math
 
 import scala.math.{atan2, cos, sin, sqrt}
 
 /**
- * Factory for [[superposition.Complex]] instances.
+ * Factory for [[Complex]] instances.
  */
-private object Complex {
+object Complex {
   /**
    * Creates a complex number from its polar form re^iθ^.
    *
@@ -22,7 +22,7 @@ private object Complex {
  * @param real the real part
  * @param imag the imaginary part
  */
-private final case class Complex(real: Double, imag: Double = 0) {
+final case class Complex(real: Double, imag: Double = 0) {
   /**
    * Adds two complex numbers.
    *
