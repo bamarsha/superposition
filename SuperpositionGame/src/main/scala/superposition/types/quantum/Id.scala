@@ -1,6 +1,6 @@
 package superposition.types.quantum
 
-import scala.collection.immutable.{Map, TreeMap}
+import scala.collection.immutable.{Map, HashMap}
 
 trait Id[T2] {
   type T = T2
@@ -12,5 +12,5 @@ class IdMap private (m: Map[Id[_], Object]) {
 }
 
 object IdMap {
-  val empty = new IdMap(new TreeMap[Id[_], Object]())
+  val empty = new IdMap(new HashMap[Id[_], Object]())
 }

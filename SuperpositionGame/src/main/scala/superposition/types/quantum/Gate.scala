@@ -66,6 +66,6 @@ object Gate {
 
   def flatmap[S, T](f: S => List[T]): Gate[T] => Gate[S] = multi(_).map(f)
 
-  def filter[T](pred: T => Boolean): Gate[T] => Gate[T] = flatmap(if (pred(_)) List(_) else List())
+  def filter[T](pred: T => Boolean): Gate[T] => Gate[T] = flatmap(t => if (pred(t)) List(t) else List())
 
 }
