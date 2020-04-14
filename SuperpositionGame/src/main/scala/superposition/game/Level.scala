@@ -54,7 +54,7 @@ private object Level {
    */
   def load(tilemap: Tilemap): Unit = {
     load {
-      val universe = Universe()
+      val universe = Universe(walls = wallsInTilemap(tilemap))
       val multiverse = new Multiverse(universe, tilemap)
 
       for ((group, layer) <- tilemap.objectGroups.asScala.zipWithIndex;
@@ -115,4 +115,14 @@ private object Level {
 
   private def cellsFromString(tilemap: Tilemap, string: String): Seq[Cell] =
     string.linesIterator.flatMap(cellFromString(tilemap, _)).toSeq
+
+  private def wallsInTilemap(tilemap: Tilemap): Set[Cell] =
+    (for (layer <- tilemap.layers.asScala if layer.properties.asScala.get("Collision").exists(_.value.toBoolean);
+          x <- 0 until layer.width;
+          y <- 0 until layer.height if layer.data.tiles(x)(y) != 0) yield {
+      Cell(
+        (x + layer.offsetX.toDouble / tilemap.tileWidth).round.toInt,
+        (y + layer.offsetY.toDouble / tilemap.tileHeight).round.toInt
+      )
+    }).toSet
 }

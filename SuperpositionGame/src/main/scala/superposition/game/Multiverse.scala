@@ -44,21 +44,6 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
   import Multiverse._
 
   /**
-   * The walls in the multiverse.
-   */
-  val walls: Set[Cell] =
-    (for (layer <- tiles.layers.asScala
-          if layer.properties.asScala.get("Collision").exists(_.value.toBoolean);
-          x <- 0 until layer.width;
-          y <- 0 until layer.height
-          if layer.data.tiles(x)(y) != 0) yield {
-      Cell(
-        (y + layer.offsetY.toDouble / tiles.tileHeight).round.toInt,
-        (x + layer.offsetX.toDouble / tiles.tileWidth).round.toInt
-      )
-    }).toSet
-
-  /**
    * The bounding box of the multiverse's tile map.
    */
   val boundingBox: Rectangle = new Rectangle(new Vec2d(0, 0), new Vec2d(tiles.width, tiles.height))
