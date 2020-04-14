@@ -57,8 +57,11 @@ class Player(multiverse: Multiverse, cell: Cell) extends Entity {
   private def step(): Unit = {
     cellPosition = cellPositionFromInput
     val (x, y) = walkGates()
-    if (walk(x, y)) {
-      cellPosition = cellPosition.sub(new Vec2d(x, y))
+    if (walk(x, 0)) {
+      cellPosition = cellPosition.sub(new Vec2d(x, 0))
+    }
+    if (walk(0, y)) {
+      cellPosition = cellPosition.sub(new Vec2d(0, y))
     }
     cellPosition = cellPosition.clamp(0, 1)
 
