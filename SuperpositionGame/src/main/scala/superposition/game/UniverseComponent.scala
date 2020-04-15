@@ -1,8 +1,8 @@
 package superposition.game
 
 import engine.core.Behavior.{Component, Entity}
-import superposition.types.math.Cell
-import superposition.types.quantum.{Id, Universe}
+import superposition.math.Cell
+import superposition.quantum.{Id, Universe}
 import engine.core.Game.track
 import scala.jdk.CollectionConverters._
 

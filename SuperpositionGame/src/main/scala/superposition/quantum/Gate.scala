@@ -1,6 +1,6 @@
-package superposition.types.quantum
+package superposition.quantum
 
-import superposition.types.math.{Cell, Complex}
+import superposition.math.{Cell, Complex}
 
 import scala.math.sqrt
 

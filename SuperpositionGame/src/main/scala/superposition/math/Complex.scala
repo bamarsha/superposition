@@ -1,4 +1,4 @@
-package superposition.types.math
+package superposition.math
 
 import scala.math.{atan2, cos, sin, sqrt}
 

@@ -19,11 +19,10 @@ object Superposition {
 
     Game.init()
     Multiverse.declareSystem()
-    // Laser.declareSystem()
-    // Door.declareSystem()
-     Player.declareSystem()
+    Laser.declareSystem()
+    Player.declareSystem()
     Level.declareSystem()
-    // Goal.declareSystem()
+    Goal.declareSystem()
 
     Game.create(new FPSBehavior())
     Game.create(new QuitOnEscapeBehavior())

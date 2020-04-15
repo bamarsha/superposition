@@ -1,4 +1,4 @@
-package superposition.types.math
+package superposition.math
 
 /**
  * The cardinal directions.

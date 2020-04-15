@@ -1,4 +1,4 @@
-package superposition.types.math
+package superposition.math
 
 import engine.util.math.Vec2d
 

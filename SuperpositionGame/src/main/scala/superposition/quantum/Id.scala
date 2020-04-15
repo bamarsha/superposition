@@ -1,4 +1,4 @@
-package superposition.types.quantum
+package superposition.quantum
 
 import scala.collection.immutable.{Map, HashMap}
 

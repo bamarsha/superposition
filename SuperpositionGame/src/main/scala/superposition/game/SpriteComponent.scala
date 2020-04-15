@@ -6,7 +6,7 @@ import engine.graphics.sprites.Sprite
 import engine.util.Color
 import engine.util.Color.WHITE
 import engine.util.math.{Transformation, Vec2d}
-import superposition.types.quantum.Universe
+import superposition.quantum.Universe
 
 import scala.jdk.CollectionConverters._
 

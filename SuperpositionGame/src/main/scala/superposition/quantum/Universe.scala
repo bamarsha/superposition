@@ -1,7 +1,7 @@
-package superposition.types.quantum
+package superposition.quantum
 
 import superposition.game.{Player, UniverseComponent}
-import superposition.types.math.{Cell, Complex}
+import superposition.math.{Cell, Complex}
 
 /**
  * A game universe.

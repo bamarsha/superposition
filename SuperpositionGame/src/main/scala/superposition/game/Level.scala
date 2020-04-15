@@ -5,8 +5,8 @@ import engine.core.{Game, Input}
 import engine.graphics.Camera
 import extras.tiles.Tilemap
 import org.lwjgl.glfw.GLFW.GLFW_KEY_R
-import superposition.types.math.Cell
-import superposition.types.quantum.Universe
+import superposition.math.{Cell, Direction}
+import superposition.quantum.{Gate, Universe}
 
 import scala.jdk.CollectionConverters._
 
@@ -59,7 +59,7 @@ private object Level {
 
       for ((group, layer) <- tilemap.objectGroups.asScala.zipWithIndex;
            obj <- group.objects.asScala) {
-        val entity = entityFromObject(tilemap, obj, multiverse)
+        val (entity, id) = entityFromObject(tilemap, obj, multiverse)
         if (entity != null) {
           Game.create(entity)
         }
@@ -78,8 +78,8 @@ private object Level {
 
   private def entityFromObject(tilemap: Tilemap,
                                obj: Tilemap#ObjectGroup#Object,
-                               multiverse: Multiverse): Entity = {
-    // val id = ObjectId(obj.id)
+                               multiverse: Multiverse): (Entity, Int) = {
+     val id = obj.id
 //    val cell = Cell(
 //      tilemap.height - (obj.y / tilemap.tileHeight).floor.toInt - 1,
 //      (obj.x / tilemap.tileWidth).floor.toInt
@@ -88,30 +88,32 @@ private object Level {
       (obj.x / tilemap.tileWidth).floor.toInt,
       tilemap.height - (obj.y / tilemap.tileHeight).floor.toInt - 1)
     val properties = obj.properties.asScala
-    obj.`type` match {
+    println("Spawning " + obj.`type`)
+    (obj.`type` match {
       case "Player" => new Player(multiverse, cell)
       case "Quball" => new Quball(multiverse, cell)
-//      case "Laser" =>
-//        val gate = Gate.withName(properties("Gate").value)
-//        val direction = Direction.withName(properties("Direction").value)
-//        val control = properties.get("Control").flatMap(c => cellFromString(tilemap, c.value))
-//        new Laser(universe, id, cell, gate, direction, control)
+      case "Laser" =>
+        val gate = Gate.X // Gate.withName(properties("Gate").value)
+        val direction = Direction.withName(properties("Direction").value)
+        val control = properties.get("Control").flatMap(c => cellFromString(tilemap, c.value)).toList
+        new Laser(multiverse, cell, gate, direction, control)
       case "Door" =>
         val controls = cellsFromString(tilemap, properties("Controls").value).toList
         new Door(multiverse, cell, controls)
-//      case "Goal" =>
-//        val requires = ObjectId(properties("Requires").value.toInt)
-//        val next = properties("Next Level").value
-//        new Goal(universe, id, cell, requires, () => load(Tilemap.load(getClass.getResource(next))))
+      case "Goal" =>
+        // val requires = ObjectId(properties("Requires").value.toInt)
+        lazy val requires = Player.All.head.cell
+        val next = properties("Next Level").value
+        new Goal(multiverse, cell, requires, () => load(Tilemap.load(getClass.getResource(next))))
       case _ => null
-    }
+    }, id)
   }
 
   private def cellFromString(tilemap: Tilemap, string: String): Option[Cell] =
     """\((\d+),\s*(\d+)\)"""
       .r("column", "row")
       .findFirstMatchIn(string)
-      .map(m => Cell(tilemap.height - m.group("row").trim.toInt - 1, m.group("column").trim.toInt))
+      .map(m => Cell(m.group("column").trim.toInt, tilemap.height - m.group("row").trim.toInt - 1))
 
   private def cellsFromString(tilemap: Tilemap, string: String): Seq[Cell] =
     string.linesIterator.flatMap(cellFromString(tilemap, _)).toSeq

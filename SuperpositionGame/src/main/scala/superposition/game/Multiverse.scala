@@ -12,8 +12,8 @@ import engine.util.Color.CLEAR
 import engine.util.math.{Transformation, Vec2d, Vec4d}
 import extras.physics.Rectangle
 import extras.tiles.{Tilemap, TilemapRenderer}
-import superposition.types.math.{Cell, Complex}
-import superposition.types.quantum.{Gate, Id, Universe}
+import superposition.math.{Cell, Complex}
+import superposition.quantum.{Gate, Id, Universe}
 
 import scala.math.{Pi, sqrt}
 
@@ -126,6 +126,7 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
       frameBuffer.clear(CLEAR)
 //      u.objects.values.map(_.entity).toSeq.sortBy(_.layer).foreach(_.draw())
       SpriteComponent.All.toList.sortBy(_.layer).foreach(_.draw(u))
+      Laser.All.toList.foreach(_.draw(u))
 
       val camera = new Camera2d()
       camera.lowerLeft = new Vec2d(-1, -1)

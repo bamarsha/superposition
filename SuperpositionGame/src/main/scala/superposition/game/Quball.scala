@@ -5,8 +5,8 @@ import engine.core.Game._
 import engine.graphics.sprites.Sprite
 import engine.util.Color.{BLACK, WHITE}
 import engine.util.math.Vec2d
-import superposition.types.math.Cell
-import superposition.types.quantum.Id
+import superposition.math.Cell
+import superposition.quantum.Id
 
 import scala.jdk.CollectionConverters._
 

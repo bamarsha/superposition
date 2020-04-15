@@ -6,8 +6,9 @@ import engine.core.{Game, Input}
 import engine.graphics.sprites.Sprite
 import engine.util.math.Vec2d
 import org.lwjgl.glfw.GLFW._
-import superposition.types.math.Cell
-import superposition.types.quantum.{Gate, Id}
+import superposition.math.Cell
+import superposition.quantum.{Gate, Id}
+import engine.util.Color._
 
 import scala.jdk.CollectionConverters._
 
@@ -47,7 +48,7 @@ class Player(multiverse: Multiverse, initialCell: Cell) extends Entity {
   val position: Id[Vec2d] = multiverse.createIdMeta(initialCell.toVec2d.add(.5))
 
   val sprite: SpriteComponent = add(new SpriteComponent(this,
-    _ => Player.CatSprite, _.getMeta(position), _ => new Vec2d(2, 2)))
+    _ => Player.CatSprite, _.getMeta(position), _ => new Vec2d(2, 2), u => if (u.get(alive)) WHITE else BLACK))
 
   val universe: UniverseComponent = add(new UniverseComponent(this, multiverse))
   universe.primaryBit = Some(alive)
@@ -58,21 +59,17 @@ class Player(multiverse: Multiverse, initialCell: Cell) extends Entity {
   private def step(): Unit = {
     cellPosition = cellPositionFromInput
     val (x, y) = walkGates()
-    if (walk(x, 0)) {
-      cellPosition = cellPosition.sub(new Vec2d(x, 0))
-    }
-    if (walk(0, y)) {
-      cellPosition = cellPosition.sub(new Vec2d(0, y))
-    }
+    if (walk(x, 0)) cellPosition = cellPosition.sub(new Vec2d(x, 0))
+    if (walk(0, y)) cellPosition = cellPosition.sub(new Vec2d(0, y))
     cellPosition = cellPosition.clamp(0, 1)
 
-    if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
-      toggleCarrying()
-    }
+    if (Input.keyJustPressed(GLFW_KEY_SPACE)) toggleCarrying()
 
     multiverse.universes = multiverse.universes.map(u => {
-      val desiredPos = u.get(cell).toVec2d.add(if (u.get(alive)) cellPosition else new Vec2d(.5, .5))
-      u.setMeta(position)(u.getMeta(position).lerp(desiredPos, 10 * dt))
+      if (u.get(alive)) {
+        val desiredPos = u.get(cell).toVec2d.add(cellPosition)
+        u.setMeta(position)(u.getMeta(position).lerp(desiredPos, 10 * dt))
+      } else u
     })
 
     Quball.All.foreach(q => multiverse.universes = multiverse.universes.map(u => {
