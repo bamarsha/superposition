@@ -1,11 +1,10 @@
 package superposition.game
 
 import engine.core.Behavior.Entity
-import engine.core.Game.track
+import engine.core.Game._
 import engine.graphics.sprites.Sprite
-import engine.util.Color.BLACK
+import engine.util.Color.{BLACK, WHITE}
 import engine.util.math.Vec2d
-import extras.physics.PositionComponent
 import superposition.types.math.Cell
 import superposition.types.quantum.Id
 
@@ -20,19 +19,23 @@ private object Quball {
  * A quball is a ball that can be either on or off.
  *
  * @param multiverse the multiverse this quball belongs to
- * @param cell       the initial position of this quball
+ * @param initialCell       the initial position of this quball
  */
-private final class Quball(multiverse: Multiverse, cell: Cell) extends Entity {
+private final class Quball(multiverse: Multiverse, initialCell: Cell) extends Entity {
 
-  val position: PositionComponent = add(new PositionComponent(this, cell.toVec2d.add(.5)))
-
-  val sprite: SpriteComponent = add(new SpriteComponent(this, Quball.BallSprite, new Vec2d(1, 1), BLACK))
-
-  val qPosition: Id[Cell] = multiverse.createId(cell)
+  // Quantum state
+  val cell: Id[Cell] = multiverse.createId(initialCell)
   val onOff: Id[Boolean] = multiverse.createId(false)
   val carried: Id[Boolean] = multiverse.createId(false)
 
+  // Metadata
+  val position: Id[Vec2d] = multiverse.createIdMeta(initialCell.toVec2d.add(.5))
+
+  val sprite: SpriteComponent = add(new SpriteComponent(this, _ => Quball.BallSprite,
+    _.getMeta(position), _ => new Vec2d(1, 1), u => if (u.get(onOff)) WHITE else BLACK))
+  sprite.layer = 1
+
   val universe: UniverseComponent = add(new UniverseComponent(this, multiverse))
   universe.primaryBit = Some(onOff)
-  universe.position = Some(qPosition)
+  universe.position = Some(cell)
 }

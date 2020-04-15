@@ -5,6 +5,7 @@ import engine.core.Game
 import engine.core.Game.dt
 import engine.graphics.Camera
 import engine.graphics.Camera.Camera2d
+import engine.graphics.Graphics.drawRectangle
 import engine.graphics.opengl.{Framebuffer, Shader, Texture}
 import engine.util.Color
 import engine.util.Color.CLEAR
@@ -14,7 +15,6 @@ import extras.tiles.{Tilemap, TilemapRenderer}
 import superposition.types.math.{Cell, Complex}
 import superposition.types.quantum.{Gate, Id, Universe}
 
-import scala.jdk.CollectionConverters._
 import scala.math.{Pi, sqrt}
 
 /**
@@ -56,9 +56,7 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
   private val tileRenderer: TilemapRenderer =
     new TilemapRenderer(tiles, source => Texture.load(getClass.getResource(source)))
 
-  private var _universes: List[Universe] = List(universe)
-  def universes: List[Universe] = _universes
-  private def universes_=(value: List[Universe]): Unit = _universes = value
+  var universes: List[Universe] = List(universe)
 
   override protected def onCreate(): Unit = {
     frameBuffer = new Framebuffer()
@@ -87,6 +85,12 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
     i
   }
 
+  def createIdMeta[T](t: T): Id[T] = {
+    val i = new Id[T] {}
+    universes = universes.map(_.setMeta(i)(t))
+    i
+  }
+
   private def step(): Unit = {
     normalize()
     draw()
@@ -109,13 +113,9 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
   private def draw(): Unit = {
     tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
 
-//    val activeCells = universes.flatMap(_.bitMaps.values)
-//      .withFilter(bitMap => bitMap.state.contains("alive") || bitMap.state.contains("carried"))
-//      .map(_.obj.cell)
-//      .toSet
-//    for (cell <- activeCells) {
-//      drawRectangle(Transformation.create(cell.toVec2d, 0, 1), new Color(1, 1, 1, 0.3))
-//    }
+    universes.flatMap(u =>UniverseComponent.All.filter(_.position.isDefined).map(uc => u.get(uc.position.get)))
+      .toSet.foreach((cell: Cell) =>
+        drawRectangle(Transformation.create(cell.toVec2d, 0, 1), new Color(1, 1, 1, 0.3)))
 
     time += dt
     UniverseShader.setUniform("time", time.asInstanceOf[Float])
@@ -125,7 +125,7 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
 
       frameBuffer.clear(CLEAR)
 //      u.objects.values.map(_.entity).toSeq.sortBy(_.layer).foreach(_.draw())
-      SpriteComponent.All.foreach(_.draw())
+      SpriteComponent.All.toList.sortBy(_.layer).foreach(_.draw(u))
 
       val camera = new Camera2d()
       camera.lowerLeft = new Vec2d(-1, -1)

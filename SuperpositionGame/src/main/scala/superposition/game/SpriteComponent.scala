@@ -6,7 +6,8 @@ import engine.graphics.sprites.Sprite
 import engine.util.Color
 import engine.util.Color.WHITE
 import engine.util.math.{Transformation, Vec2d}
-import extras.physics.PositionComponent
+import superposition.types.quantum.Universe
+
 import scala.jdk.CollectionConverters._
 
 object SpriteComponent {
@@ -25,14 +26,14 @@ object SpriteComponent {
  * @param color  the color of the sprite
  */
 final class SpriteComponent(entity: Entity,
-                                    var sprite: Sprite,
-                                    var scale: Vec2d = new Vec2d(1, 1),
-                                    var color: Color = WHITE) extends Component(entity) {
-  private val position: PositionComponent = get(classOf[PositionComponent])
+                            val sprite: Universe => Sprite,
+                            val position: Universe => Vec2d,
+                            val scale: Universe => Vec2d = _ => new Vec2d(1, 1),
+                            val color: Universe => Color = _ => WHITE,
+                            var layer: Int = 0) extends Component(entity) {
 
   /**
    * Draws this sprite.
    */
-  def draw(): Unit =
-    sprite.draw(Transformation.create(position.value, 0, scale), color)
+  def draw(u: Universe): Unit = sprite(u).draw(Transformation.create(position(u), 0, scale(u)), color(u))
 }
