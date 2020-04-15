@@ -96,18 +96,23 @@ class Player(multiverse: Multiverse, initialCell: Cell) extends Entity {
   }
 
   private def walk(x: Int, y: Int): Boolean = {
+    if (x != 0 || y != 0) {
+      val translatePlayer: Gate[(Int, Int)] = Gate.control[(Int, Int), List[(Id[Cell], Int, Int)]](
+        { case (x: Int, y: Int) => u =>
+          if (u.get(alive))
+            List((cell, x, y)) else List()
+        })(Gate.multi(Gate.translate))
+      val translateQuballs: Gate[(Int, Int)] = Gate.control[(Int, Int), List[(Id[Cell], Int, Int)]](
+        { case (x, y) => u =>
+          if (u.get(alive))
+            Quball.All.filter(q => u.get(q.carried)).map(q => (q.cell, x, y)).toList
+          else List()
+        })(Gate.multi(Gate.translate))
 
-    val translatePlayer: Gate[(Int, Int)] = Gate.control[(Int, Int), List[(Id[Cell], Int, Int)]](
-      { case (x:Int, y:Int) => u => if (u.get(alive))
-      List((cell, x, y)) else List() } )(Gate.multi(Gate.translate))
-    val translateQuballs: Gate[(Int, Int)] = Gate.control[(Int, Int), List[(Id[Cell], Int, Int)]](
-      { case (x, y) => u => if (u.get(alive))
-      Quball.All.filter(q => u.get(q.carried)).map(q => (q.cell, x, y)).toList
-    else List() } )(Gate.multi(Gate.translate))
+      val endGate = Gate.compose(List(translatePlayer, translateQuballs))
 
-    val endGate = Gate.compose(List(translatePlayer, translateQuballs))
-
-    multiverse.applyGate(endGate, (x, y))
+      multiverse.applyGate(endGate, (x, y))
+    } else true
   }
 
   private def toggleCarrying(): Boolean = {

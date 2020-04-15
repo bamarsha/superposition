@@ -1,8 +1,9 @@
 package superposition.game
 
 import engine.core.Behavior.Entity
-import engine.core.Game
+import engine.core.{Game, Input}
 import engine.graphics.sprites.Sprite
+import org.lwjgl.glfw.GLFW
 import superposition.math.Cell
 import superposition.quantum.Id
 
@@ -33,5 +34,7 @@ private final class Goal(multiverse: Multiverse,
 
   val sprite: SpriteComponent = add(new SpriteComponent(this, _ => Goal.GoalSprite, _ => cell.toVec2d.add(.5)))
 
-  private def step(): Unit = if (multiverse.universes.forall(_.get(requires) == cell)) callback()
+  private def step(): Unit =
+    if (multiverse.universes.forall(_.get(requires) == cell) || Input.keyJustPressed(GLFW.GLFW_KEY_N))
+      callback()
 }

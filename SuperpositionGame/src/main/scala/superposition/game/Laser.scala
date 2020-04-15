@@ -87,9 +87,7 @@ private final class Laser(multiverse: Multiverse,
     })).tail
 
   private def targetCell(u: Universe): Option[Cell] =
-    if (controls.forall(u.getPrimaryBits(_).exists(u.get(_))))
-      beam.take(50).find(cell => u.isBlocked(cell) || u.allInCell(cell).nonEmpty)
-    else None
+    if (u.allOn(controls)) beam.take(50).find(cell => u.isBlocked(cell) || u.allInCell(cell).nonEmpty) else None
 
   private def hits(u: Universe): List[Id[Boolean]] = targetCell(u).toList.flatMap(u.getPrimaryBits)
 

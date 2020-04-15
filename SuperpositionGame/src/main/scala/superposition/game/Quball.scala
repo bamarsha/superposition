@@ -10,7 +10,7 @@ import superposition.quantum.Id
 
 import scala.jdk.CollectionConverters._
 
-private object Quball {
+object Quball {
   val All: Iterable[Quball] = track(classOf[Quball]).asScala
   private val BallSprite = Sprite.load(getClass.getResource("sprites/ball.png"))
 }
@@ -21,7 +21,7 @@ private object Quball {
  * @param multiverse the multiverse this quball belongs to
  * @param initialCell       the initial position of this quball
  */
-private final class Quball(multiverse: Multiverse, initialCell: Cell) extends Entity {
+final class Quball(multiverse: Multiverse, initialCell: Cell) extends Entity {
 
   // Quantum state
   val cell: Id[Cell] = multiverse.createId(initialCell)

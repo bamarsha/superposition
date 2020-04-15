@@ -3,7 +3,6 @@ package superposition.game
 import engine.core.Behavior.Entity
 import engine.graphics.sprites.Sprite
 import superposition.math.Cell
-import superposition.quantum.Universe
 
 /**
  * Contains initialization for doors.
@@ -22,13 +21,9 @@ private object Door {
 private final class Door(multiverse: Multiverse, cell: Cell, controls: List[Cell]) extends Entity {
 
   val sprite: SpriteComponent = add(new SpriteComponent(this,
-    u => if (isOpen(u)) Door.OpenSprite else Door.ClosedSprite, _ => cell.toVec2d.add(0.5)))
+    u => if (u.allOn(controls)) Door.OpenSprite else Door.ClosedSprite, _ => cell.toVec2d.add(0.5)))
   sprite.layer = -1
 
   val universe: UniverseComponent = add(new UniverseComponent(this, multiverse))
-  universe.blockingCells = u => if (isOpen(u)) List() else List(cell)
-
-  private def isOpen(u: Universe): Boolean = controls.forall(c =>
-    Quball.All.exists(q => u.get(q.cell) == c && u.get(q.onOff)))
-
+  universe.blockingCells = u => if (u.allOn(controls)) List() else List(cell)
 }

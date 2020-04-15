@@ -8,6 +8,7 @@ import org.lwjgl.glfw.GLFW.GLFW_KEY_R
 import superposition.math.{Cell, Direction}
 import superposition.quantum.{Gate, Universe}
 
+import scala.collection.immutable.HashMap
 import scala.jdk.CollectionConverters._
 
 /**
@@ -56,12 +57,15 @@ private object Level {
     load {
       val universe = Universe(walls = wallsInTilemap(tilemap))
       val multiverse = new Multiverse(universe, tilemap)
+      var entityMap = new HashMap[Int, Entity]()
 
       for ((group, layer) <- tilemap.objectGroups.asScala.zipWithIndex;
            obj <- group.objects.asScala) {
         val (entity, id) = entityFromObject(tilemap, obj, multiverse)
         if (entity != null) {
           Game.create(entity)
+          multiverse.entities ::= entity
+          entityMap += id -> entity
         }
 //        entity.layer = layer
 //         universe.add(entity)
@@ -69,7 +73,13 @@ private object Level {
 
       val gates = tilemap.properties.asScala.get("Gates")
       for (Array(gate, target) <- gates.iterator.flatMap(_.value.linesIterator).map(_.split(' '))) {
+        println("Applying gate " + gate + " on " + target)
         // multiverse.applyGate(gate, target)
+        val targetBit = entityMap.get(target.toInt).map(_.get(classOf[UniverseComponent])).flatMap(_.primaryBit)
+        gate match {
+          case "X" => multiverse.applyGate(Gate.X, targetBit.get)
+          case "H" => multiverse.applyGate(Gate.H, targetBit.get)
+        }
       }
 
       multiverse

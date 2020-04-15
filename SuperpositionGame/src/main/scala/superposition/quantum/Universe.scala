@@ -1,6 +1,6 @@
 package superposition.quantum
 
-import superposition.game.{Player, UniverseComponent}
+import superposition.game.{Player, Quball, UniverseComponent}
 import superposition.math.{Cell, Complex}
 
 /**
@@ -26,6 +26,8 @@ final case class Universe(amplitude: Complex = Complex(1), state: IdMap = IdMap.
   def getPrimaryBits(c: Cell): Iterable[Id[Boolean]] = allInCell(c).flatMap(_.primaryBit.toList)
   def isBlocked(c: Cell): Boolean =
     walls.contains(c) || UniverseComponent.All.exists(_.blockingCells(this).contains(c))
+  def allOn(controls: List[Cell]): Boolean =
+    controls.forall(c => Quball.All.exists(q => get(q.cell) == c && get(q.onOff)))
 
   def isValid: Boolean = Player.All.forall(p => !isBlocked(this.get(p.cell)))
 }

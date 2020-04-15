@@ -57,10 +57,16 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
     new TilemapRenderer(tiles, source => Texture.load(getClass.getResource(source)))
 
   var universes: List[Universe] = List(universe)
+  var entities: List[Entity] = List()
+  var stateIDs: List[Id[_]] = List()
 
   override protected def onCreate(): Unit = {
     frameBuffer = new Framebuffer()
     colorBuffer = frameBuffer.attachColorBuffer()
+  }
+
+  override protected def onDestroy(): Unit = {
+    entities.foreach(Game.destroy)
   }
 
   /**
@@ -82,6 +88,7 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
   def createId[T](t: T): Id[T] = {
     val i = new Id[T] {}
     universes = universes.map(_.set(i)(t))
+    stateIDs ::= i
     i
   }
 
@@ -97,11 +104,14 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
   }
 
   private def combine(): Unit = {
+    // def sort[A : Ordering](coll: Seq[Iterable[A]]) = coll.sorted
+    import Ordering.Implicits._
     universes = universes
-      .groupMapReduce(_.state)(identity)((u1, u2) => u1 + u2.amplitude)
-      .values
-      .filter(_.amplitude.squaredMagnitude > 1e-6)
-      .toList
+        .groupMapReduce(_.state)(identity)((u1, u2) => u1 + u2.amplitude)
+        .values
+        .filter(_.amplitude.squaredMagnitude > 1e-6)
+        .toList
+        .sortBy(u => stateIDs.reverse.map(u.get(_).toString))
     normalize()
   }
 
@@ -113,7 +123,7 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
   private def draw(): Unit = {
     tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
 
-    universes.flatMap(u =>UniverseComponent.All.filter(_.position.isDefined).map(uc => u.get(uc.position.get)))
+    universes.flatMap(u => UniverseComponent.All.filter(_.position.isDefined).map(uc => u.get(uc.position.get)))
       .toSet.foreach((cell: Cell) =>
         drawRectangle(Transformation.create(cell.toVec2d, 0, 1), new Color(1, 1, 1, 0.3)))
 
