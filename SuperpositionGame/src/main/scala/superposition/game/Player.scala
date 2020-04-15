@@ -4,11 +4,11 @@ import engine.core.Behavior.Entity
 import engine.core.Game.{dt, track}
 import engine.core.{Game, Input}
 import engine.graphics.sprites.Sprite
+import engine.util.Color._
 import engine.util.math.Vec2d
 import org.lwjgl.glfw.GLFW._
 import superposition.math.Cell
-import superposition.quantum.{Gate, Id}
-import engine.util.Color._
+import superposition.quantum.{Gate, Id, Translate, X}
 
 import scala.jdk.CollectionConverters._
 
@@ -95,30 +95,32 @@ class Player(multiverse: Multiverse, initialCell: Cell) extends Entity {
     (x, y)
   }
 
-  private def walk(x: Int, y: Int): Boolean = {
-    if (x != 0 || y != 0) {
-      val translatePlayer: Gate[(Int, Int)] = Gate.control[(Int, Int), List[(Id[Cell], Int, Int)]](
-        { case (x: Int, y: Int) => u =>
-          if (u.get(alive))
-            List((cell, x, y)) else List()
-        })(Gate.multi(Gate.translate))
-      val translateQuballs: Gate[(Int, Int)] = Gate.control[(Int, Int), List[(Id[Cell], Int, Int)]](
-        { case (x, y) => u =>
-          if (u.get(alive))
-            Quball.All.filter(q => u.get(q.carried)).map(q => (q.cell, x, y)).toList
+  private def walk(x: Int, y: Int): Boolean =
+    if (x == 0 && y == 0) {
+      true
+    } else {
+      val translatePlayer: Gate[(Int, Int)] = Translate.multi control {
+        case (x, y) => universe =>
+          if (universe.get(alive)) List((cell, x, y)) else List()
+      }
+      val translateQuballs: Gate[(Int, Int)] = Translate.multi control {
+        case (x, y) => universe =>
+          if (universe.get(alive))
+            (Quball.All
+              filter { quball => universe.get(quball.carried) }
+              map { quball => (quball.cell, x, y) })
+              .toList
           else List()
-        })(Gate.multi(Gate.translate))
+      }
+      multiverse.applyGate(translatePlayer andThen translateQuballs, (x, y))
+    }
 
-      val endGate = Gate.compose(List(translatePlayer, translateQuballs))
-
-      multiverse.applyGate(endGate, (x, y))
-    } else true
-  }
-
-  private def toggleCarrying(): Boolean = {
-    val gate: Gate[Unit] = Gate.control(
-      (_: Unit) => u => Quball.All.filter(q => u.get(alive) && u.get(cell) == u.get(q.cell))
-      .map(_.carried).toList)(Gate.multi(Gate.X))
-    multiverse.applyGate(gate, ())
-  }
+  private def toggleCarrying(): Boolean =
+    multiverse.applyGate[Unit](X.multi control {
+      _ => universe =>
+        (Quball.All
+          filter { quball => universe.get(alive) && universe.get(cell) == universe.get(quball.cell) }
+          map (_.carried))
+          .toList
+    }, ())
 }

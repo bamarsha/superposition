@@ -76,7 +76,7 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
    * @param t        the target object
    */
   def applyGate[T](gate: Gate[T], t: T): Boolean = {
-    val newUniverses = Gate.applyToAll(t)(gate)(universes)
+    val newUniverses = gate.applyToAll(t)(universes)
     val success = newUniverses.forall(_.isValid)
     if (success) {
       universes = newUniverses

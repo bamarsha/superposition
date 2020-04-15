@@ -13,8 +13,9 @@ import superposition.math.{Cell, Direction}
 import superposition.quantum.{Gate, Id, Universe}
 import Laser._
 import engine.graphics.Graphics._
-import scala.jdk.CollectionConverters._
 
+import scala.Function.const
+import scala.jdk.CollectionConverters._
 
 /**
  * Contains initialization for lasers.
@@ -91,7 +92,7 @@ private final class Laser(multiverse: Multiverse,
 
   private def hits(u: Universe): List[Id[Boolean]] = targetCell(u).toList.flatMap(u.getPrimaryBits)
 
-  private val actualGate = Gate.control((_: Unit) => hits)(Gate.multi(gate))
+  private val actualGate = gate.multi control const(hits)
 
   private def selected(): Boolean = Cell(Input.mouse().x.floor.toInt, Input.mouse().y.floor.toInt) == cell
 

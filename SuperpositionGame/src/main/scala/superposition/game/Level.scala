@@ -6,7 +6,7 @@ import engine.graphics.Camera
 import extras.tiles.Tilemap
 import org.lwjgl.glfw.GLFW.GLFW_KEY_R
 import superposition.math.{Cell, Direction}
-import superposition.quantum.{Gate, Universe}
+import superposition.quantum.{H, Universe, X}
 
 import scala.collection.immutable.HashMap
 import scala.jdk.CollectionConverters._
@@ -77,8 +77,8 @@ private object Level {
         // multiverse.applyGate(gate, target)
         val targetBit = entityMap.get(target.toInt).map(_.get(classOf[UniverseComponent])).flatMap(_.primaryBit)
         gate match {
-          case "X" => multiverse.applyGate(Gate.X, targetBit.get)
-          case "H" => multiverse.applyGate(Gate.H, targetBit.get)
+          case "X" => multiverse.applyGate(X, targetBit.get)
+          case "H" => multiverse.applyGate(H, targetBit.get)
         }
       }
 
@@ -103,7 +103,7 @@ private object Level {
       case "Player" => new Player(multiverse, cell)
       case "Quball" => new Quball(multiverse, cell)
       case "Laser" =>
-        val gate = Gate.X // Gate.withName(properties("Gate").value)
+        val gate = X // Gate.withName(properties("Gate").value)
         val direction = Direction.withName(properties("Direction").value)
         val control = properties.get("Control").flatMap(c => cellFromString(tilemap, c.value)).toList
         new Laser(multiverse, cell, gate, direction, control)
