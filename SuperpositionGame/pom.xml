@@ -28,6 +28,11 @@
       <version>${scala.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.scalaz</groupId>
+      <artifactId>scalaz-core_sjs1_2.13</artifactId>
+      <version>7.3.0-M32</version>
+    </dependency>
+    <dependency>
       <groupId>Superposition</groupId>
       <artifactId>RGBEngine</artifactId>
       <version>1.0-SNAPSHOT</version>

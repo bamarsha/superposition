@@ -1,5 +1,6 @@
 package superposition.quantum
 
+import scalaz.Divisible
 import superposition.math.{Cell, Complex}
 
 import scala.math.sqrt
@@ -10,6 +11,8 @@ import scala.math.sqrt
  * @tparam A The type of the gate's argument.
  */
 sealed trait Gate[A] {
+  import Gate.divisible.divisibleSyntax._
+
   /**
    * Applies a value to the gate within a universe.
    * @param value The value to apply.
@@ -26,22 +29,7 @@ sealed trait Gate[A] {
   def applyToAll(value: A)(universes: List[Universe]): List[Universe] =
     universes flatMap this(value)
 
-  def andThen(gate: Gate[A]): Gate[A] = divide2(gate)(value => (value, value))
-
-  def contramap[B](f: B => A): Gate[B] = new Gate[B] {
-    override def apply(b: B)(universe: Universe): List[Universe] = Gate.this(f(b))(universe)
-
-    override def adjoint: Gate[B] = Gate.this.adjoint contramap f
-  }
-
-  def divide2[B, C](gate: Gate[B])(f: C => (A, B)): Gate[C] = new Gate[C] {
-    override def apply(value: C)(universe: Universe): List[Universe] = {
-      val (a, b) = f(value)
-      Gate.this(a)(universe) flatMap gate(b)
-    }
-
-    override def adjoint: Gate[C] = /*_*/ gate.adjoint.divide2(Gate.this.adjoint)(f(_).swap) /*_*/
-  }
+  def andThen(gate: Gate[A]): Gate[A] = Divisible[Gate].divide(this, gate) { value => (value, value) }
 
   def multi: Gate[List[A]] = new Gate[List[A]] {
     override def apply(values: List[A])(universe: Universe): List[Universe] = values match {
@@ -69,6 +57,31 @@ sealed trait Gate[A] {
   def filter(predicate: A => Boolean): Gate[A] = flatMap(List(_) filter predicate)
 }
 
+object Gate {
+  implicit val divisible: Divisible[Gate] = new Divisible[Gate] {
+    override def conquer[A]: Gate[A] = Identity
+
+    override def divide2[A, B, C](gate1: => Gate[A], gate2: => Gate[B])(f: C => (A, B)): Gate[C] = new Gate[C] {
+      override def apply(value: C)(universe: Universe): List[Universe] = {
+        val (a, b) = f(value)
+        gate1(a)(universe) flatMap gate2(b)
+      }
+
+      override def adjoint: Gate[C] = divide2(gate2.adjoint, gate1.adjoint)(f(_).swap)
+    }
+  }
+}
+
+object Identity extends Gate[Nothing] {
+  import scala.language.implicitConversions
+
+  override def apply(value: Nothing)(universe: Universe) = List(universe)
+
+  override def adjoint: Gate[Nothing] = this
+
+  implicit def asGate[A](id: Identity.type): Gate[A] = id.asInstanceOf[Gate[A]]
+}
+
 object X extends Gate[Id[Boolean]] {
   override def apply(id: Id[Boolean])(universe: Universe): List[Universe] =
     List(universe.set(id)(!universe.get(id)))
@@ -86,6 +99,8 @@ object H extends Gate[Id[Boolean]] {
 }
 
 object Translate extends Gate[(Id[Cell], Int, Int)] {
+  import Gate.divisible.divisibleSyntax._
+
   override def apply(value: (Id[Cell], Int, Int))(universe: Universe): List[Universe] = value match {
     case (id, x, y) => List(universe.set(id)(universe.get(id).translate(x, y)))
   }
