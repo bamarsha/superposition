@@ -11,11 +11,13 @@ import scala.math.sqrt
  * @tparam A The type of the gate's argument.
  */
 sealed trait Gate[A] {
-  import Gate.divisible.divisibleSyntax._
+
+  import Gate.Divisible.divisibleSyntax._
 
   /**
    * Applies a value to the gate within a universe.
-   * @param value The value to apply.
+   *
+   * @param value    The value to apply.
    * @param universe The universe in which to apply the value.
    * @return The universes produced by the gate.
    */
@@ -58,7 +60,8 @@ sealed trait Gate[A] {
 }
 
 object Gate {
-  implicit val divisible: Divisible[Gate] = new Divisible[Gate] {
+
+  implicit object Divisible extends Divisible[Gate] {
     override def conquer[A]: Gate[A] = Identity
 
     override def divide2[A, B, C](gate1: => Gate[A], gate2: => Gate[B])(f: C => (A, B)): Gate[C] = new Gate[C] {
@@ -70,9 +73,11 @@ object Gate {
       override def adjoint: Gate[C] = divide2(gate2.adjoint, gate1.adjoint)(f(_).swap)
     }
   }
+
 }
 
 object Identity extends Gate[Nothing] {
+
   import scala.language.implicitConversions
 
   override def apply(value: Nothing)(universe: Universe) = List(universe)
@@ -99,7 +104,8 @@ object H extends Gate[Id[Boolean]] {
 }
 
 object Translate extends Gate[(Id[Cell], Int, Int)] {
-  import Gate.divisible.divisibleSyntax._
+
+  import Gate.Divisible.divisibleSyntax._
 
   override def apply(value: (Id[Cell], Int, Int))(universe: Universe): List[Universe] = value match {
     case (id, x, y) => List(universe.set(id)(universe.get(id).translate(x, y)))
