@@ -35,6 +35,6 @@ private final class Goal(multiverse: Multiverse,
   val sprite: SpriteComponent = add(new SpriteComponent(this, _ => Goal.GoalSprite, _ => cell.toVec2d.add(.5)))
 
   private def step(): Unit =
-    if (multiverse.universes.forall(_.get(requires) == cell) || Input.keyJustPressed(GLFW.GLFW_KEY_N))
+    if (multiverse.universes.forall(_.state(requires) == cell) || Input.keyJustPressed(GLFW.GLFW_KEY_N))
       callback()
 }

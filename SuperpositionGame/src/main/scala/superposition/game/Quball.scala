@@ -32,7 +32,7 @@ final class Quball(multiverse: Multiverse, initialCell: Cell) extends Entity {
   val position: Id[Vec2d] = multiverse.createIdMeta(initialCell.toVec2d.add(.5))
 
   val sprite: SpriteComponent = add(new SpriteComponent(this, _ => Quball.BallSprite,
-    _.getMeta(position), _ => new Vec2d(1, 1), u => if (u.get(onOff)) WHITE else BLACK))
+    _.meta(position), _ => new Vec2d(1, 1), u => if (u.state(onOff)) WHITE else BLACK))
   sprite.layer = 1
 
   val universe: UniverseComponent = add(new UniverseComponent(this, multiverse))

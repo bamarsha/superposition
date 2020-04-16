@@ -10,6 +10,7 @@ import org.lwjgl.glfw.GLFW._
 import superposition.math.Cell
 import superposition.quantum.{Gate, Id, Translate, X}
 
+import scala.Function.const
 import scala.jdk.CollectionConverters._
 
 /**
@@ -48,7 +49,7 @@ class Player(multiverse: Multiverse, initialCell: Cell) extends Entity {
   val position: Id[Vec2d] = multiverse.createIdMeta(initialCell.toVec2d.add(.5))
 
   val sprite: SpriteComponent = add(new SpriteComponent(this,
-    _ => Player.CatSprite, _.getMeta(position), _ => new Vec2d(2, 2), u => if (u.get(alive)) WHITE else BLACK))
+    _ => Player.CatSprite, _.meta(position), _ => new Vec2d(2, 2), u => if (u.state(alive)) WHITE else BLACK))
 
   val universe: UniverseComponent = add(new UniverseComponent(this, multiverse))
   universe.primaryBit = Some(alive)
@@ -66,15 +67,15 @@ class Player(multiverse: Multiverse, initialCell: Cell) extends Entity {
     if (Input.keyJustPressed(GLFW_KEY_SPACE)) toggleCarrying()
 
     multiverse.universes = multiverse.universes.map(u => {
-      if (u.get(alive)) {
-        val desiredPos = u.get(cell).toVec2d.add(cellPosition)
-        u.setMeta(position)(u.getMeta(position).lerp(desiredPos, 10 * dt))
+      if (u.state(alive)) {
+        val desiredPos = u.state(cell).toVec2d.add(cellPosition)
+        u.updatedMetaWith(position)(_.lerp(desiredPos, 10 * dt))
       } else u
     })
 
     Quball.All.foreach(q => multiverse.universes = multiverse.universes.map(u => {
-      val desiredPos = u.get(q.cell).toVec2d.add(if (u.get(q.carried)) cellPosition else new Vec2d(.5, .5))
-      u.setMeta(q.position)(u.getMeta(q.position).lerp(desiredPos, 10 * dt))
+      val desiredPos = u.state(q.cell).toVec2d.add(if (u.state(q.carried)) cellPosition else new Vec2d(.5, .5))
+      u.updatedMetaWith(q.position)(_.lerp(desiredPos, 10 * dt))
     }))
   }
 
@@ -101,14 +102,14 @@ class Player(multiverse: Multiverse, initialCell: Cell) extends Entity {
     } else {
       val translatePlayer: Gate[(Int, Int)] = Translate.multi control {
         case (x, y) => universe =>
-          if (universe.get(alive)) List((cell, x, y)) else List()
+          if (universe.state(alive)) List((cell, x, y)) else List()
       }
       val translateQuballs: Gate[(Int, Int)] = Translate.multi control {
         case (x, y) => universe =>
-          if (universe.get(alive))
+          if (universe.state(alive))
             (Quball.All
-              filter { quball => universe.get(quball.carried) }
-              map { quball => (quball.cell, x, y) })
+              filter (quball => universe.state(quball.carried))
+              map (quball => (quball.cell, x, y)))
               .toList
           else List()
       }
@@ -116,10 +117,10 @@ class Player(multiverse: Multiverse, initialCell: Cell) extends Entity {
     }
 
   private def toggleCarrying(): Boolean =
-    multiverse.applyGate[Unit](X.multi control {
-      _ => universe =>
+    multiverse.applyGate[Unit](X.multi control const {
+      universe =>
         (Quball.All
-          filter { quball => universe.get(alive) && universe.get(cell) == universe.get(quball.cell) }
+          filter (quball => universe.state(alive) && universe.state(cell) == universe.state(quball.cell))
           map (_.carried))
           .toList
     }, ())

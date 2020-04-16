@@ -89,15 +89,15 @@ object Identity extends Gate[Nothing] {
 
 object X extends Gate[Id[Boolean]] {
   override def apply(id: Id[Boolean])(universe: Universe): List[Universe] =
-    List(universe.set(id)(!universe.get(id)))
+    List(universe.updatedStateWith(id)(!_))
 
   override def adjoint: Gate[Id[Boolean]] = this
 }
 
 object H extends Gate[Id[Boolean]] {
   override def apply(id: Id[Boolean])(universe: Universe): List[Universe] = List(
-    universe / Complex((if (universe.get(id)) -1 else 1) * sqrt(2)),
-    universe.set(id)(!universe.get(id)) / Complex(sqrt(2))
+    universe / Complex((if (universe.state(id)) -1 else 1) * sqrt(2)),
+    universe.updatedStateWith(id)(!_) / Complex(sqrt(2))
   )
 
   override def adjoint: Gate[Id[Boolean]] = this
@@ -108,7 +108,7 @@ object Translate extends Gate[(Id[Cell], Int, Int)] {
   import Gate.Divisible.divisibleSyntax._
 
   override def apply(value: (Id[Cell], Int, Int))(universe: Universe): List[Universe] = value match {
-    case (id, x, y) => List(universe.set(id)(universe.get(id).translate(x, y)))
+    case (id, x, y) => List(universe.updatedStateWith(id)(_.translate(x, y)))
   }
 
   override def adjoint: Gate[(Id[Cell], Int, Int)] =

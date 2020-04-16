@@ -86,15 +86,15 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
   }
 
   def createId[T](t: T): Id[T] = {
-    val i = new Id[T] {}
-    universes = universes.map(_.set(i)(t))
+    val i = new Id[T]
+    universes = universes map (_.updatedState(i)(t))
     stateIDs ::= i
     i
   }
 
   def createIdMeta[T](t: T): Id[T] = {
-    val i = new Id[T] {}
-    universes = universes.map(_.setMeta(i)(t))
+    val i = new Id[T]
+    universes = universes map (_.updatedMeta(i)(t))
     i
   }
 
@@ -111,7 +111,7 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
         .values
         .filter(_.amplitude.squaredMagnitude > 1e-6)
         .toList
-        .sortBy(u => stateIDs.reverse.map(u.get(_).toString))
+        .sortBy(u => stateIDs.reverse.map(u.state(_).toString))
     normalize()
   }
 
@@ -123,7 +123,7 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
   private def draw(): Unit = {
     tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
 
-    universes.flatMap(u => UniverseComponent.All.filter(_.position.isDefined).map(uc => u.get(uc.position.get)))
+    universes.flatMap(u => UniverseComponent.All.filter(_.position.isDefined).map(uc => u.state(uc.position.get)))
       .toSet.foreach((cell: Cell) =>
         drawRectangle(Transformation.create(cell.toVec2d, 0, 1), new Color(1, 1, 1, 0.3)))
 

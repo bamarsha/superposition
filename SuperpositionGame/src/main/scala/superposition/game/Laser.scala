@@ -5,14 +5,14 @@ import java.net.URL
 import engine.core.Behavior.Entity
 import engine.core.Game.{dt, track}
 import engine.core.{Game, Input}
+import engine.graphics.Graphics._
 import engine.graphics.sprites.Sprite
 import engine.util.Color
 import engine.util.Color._
 import engine.util.math.{Transformation, Vec2d}
+import superposition.game.Laser._
 import superposition.math.{Cell, Direction}
 import superposition.quantum.{Gate, Id, Universe}
-import Laser._
-import engine.graphics.Graphics._
 
 import scala.Function.const
 import scala.jdk.CollectionConverters._
@@ -67,8 +67,8 @@ private final class Laser(multiverse: Multiverse,
     if (selected()) {
       drawRectangleOutline(Transformation.create(cell.toVec2d, 0, 1), RED)
     }
-    val tc = u.getMeta(targetCell)
-    val et = u.getMeta(elapsedTime)
+    val tc = u.meta(targetCell)
+    val et = u.meta(elapsedTime)
     if (tc.isDefined && et <= BeamDuration + FadeDuration) {
       drawWideLine(
         cell.toVec2d.add(.5),
@@ -99,10 +99,11 @@ private final class Laser(multiverse: Multiverse,
   private def step(): Unit = {
     if (Input.mouseJustPressed(0) && selected()) {
       multiverse.applyGate(actualGate, ())
-      multiverse.universes = multiverse.universes.map(u => u.setMeta(targetCell)(targetCell(u)))
-      multiverse.universes = multiverse.universes.map(u => if (targetCell(u).isEmpty) u else u.setMeta(elapsedTime)(0))
+      multiverse.universes = multiverse.universes map (u => u.updatedMeta(targetCell)(targetCell(u)))
+      multiverse.universes = multiverse.universes.map {
+        u => if (targetCell(u).isEmpty) u else u.updatedMeta(elapsedTime)(0)
+      }
     }
-
-    multiverse.universes = multiverse.universes.map(u => u.setMeta(elapsedTime)(u.getMeta(elapsedTime) + dt))
+    multiverse.universes = multiverse.universes map (_.updatedMetaWith(elapsedTime)(_ + dt))
   }
 }
