@@ -87,30 +87,30 @@ object Identity extends Gate[Nothing] {
   implicit def asGate[A](id: Identity.type): Gate[A] = id.asInstanceOf[Gate[A]]
 }
 
-object X extends Gate[Id[Boolean]] {
-  override def apply(id: Id[Boolean])(universe: Universe): List[Universe] =
+object X extends Gate[StateId[Boolean]] {
+  override def apply(id: StateId[Boolean])(universe: Universe): List[Universe] =
     List(universe.updatedStateWith(id)(!_))
 
-  override def adjoint: Gate[Id[Boolean]] = this
+  override def adjoint: Gate[StateId[Boolean]] = this
 }
 
-object H extends Gate[Id[Boolean]] {
-  override def apply(id: Id[Boolean])(universe: Universe): List[Universe] = List(
+object H extends Gate[StateId[Boolean]] {
+  override def apply(id: StateId[Boolean])(universe: Universe): List[Universe] = List(
     universe / Complex((if (universe.state(id)) -1 else 1) * sqrt(2)),
     universe.updatedStateWith(id)(!_) / Complex(sqrt(2))
   )
 
-  override def adjoint: Gate[Id[Boolean]] = this
+  override def adjoint: Gate[StateId[Boolean]] = this
 }
 
-object Translate extends Gate[(Id[Cell], Int, Int)] {
+object Translate extends Gate[(StateId[Cell], Int, Int)] {
 
   import Gate.Divisible.divisibleSyntax._
 
-  override def apply(value: (Id[Cell], Int, Int))(universe: Universe): List[Universe] = value match {
+  override def apply(value: (StateId[Cell], Int, Int))(universe: Universe): List[Universe] = value match {
     case (id, x, y) => List(universe.updatedStateWith(id)(_.translate(x, y)))
   }
 
-  override def adjoint: Gate[(Id[Cell], Int, Int)] =
+  override def adjoint: Gate[(StateId[Cell], Int, Int)] =
     this contramap { case (id, x, y) => (id, -x, -y) }
 }

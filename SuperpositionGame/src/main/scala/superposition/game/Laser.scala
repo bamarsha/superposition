@@ -12,7 +12,7 @@ import engine.util.Color._
 import engine.util.math.{Transformation, Vec2d}
 import superposition.game.Laser._
 import superposition.math.{Cell, Direction}
-import superposition.quantum.{Gate, Id, Universe}
+import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
 import scala.Function.const
 import scala.jdk.CollectionConverters._
@@ -49,13 +49,13 @@ private object Laser {
  */
 private final class Laser(multiverse: Multiverse,
                           cell: Cell,
-                          gate: Gate[Id[Boolean]],
+                          gate: Gate[StateId[Boolean]],
                           direction: Direction.Value,
                           controls: List[Cell]) extends Entity {
 
   // Metadata
-  val targetCell: Id[Option[Cell]] = multiverse.createIdMeta(None)
-  val elapsedTime: Id[Double] = multiverse.createIdMeta(0)
+  val targetCell: MetaId[Option[Cell]] = multiverse.createIdMeta(None)
+  val elapsedTime: MetaId[Double] = multiverse.createIdMeta(0)
 
   val sprite: SpriteComponent = add(new SpriteComponent(this,
     _ => Sprite.load(Laser.Sprites(direction)), _ => cell.toVec2d.add(.5)))
@@ -90,7 +90,7 @@ private final class Laser(multiverse: Multiverse,
   private def targetCell(u: Universe): Option[Cell] =
     if (u.allOn(controls)) beam.take(50).find(cell => u.isBlocked(cell) || u.allInCell(cell).nonEmpty) else None
 
-  private def hits(u: Universe): List[Id[Boolean]] = targetCell(u).toList.flatMap(u.getPrimaryBits)
+  private def hits(u: Universe): List[StateId[Boolean]] = targetCell(u).toList.flatMap(u.getPrimaryBits)
 
   private val actualGate = gate.multi control const(hits)
 

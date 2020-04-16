@@ -8,7 +8,7 @@ import engine.util.Color._
 import engine.util.math.Vec2d
 import org.lwjgl.glfw.GLFW._
 import superposition.math.Cell
-import superposition.quantum.{Gate, Id, Translate, X}
+import superposition.quantum._
 
 import scala.Function.const
 import scala.jdk.CollectionConverters._
@@ -42,11 +42,11 @@ object Player {
 class Player(multiverse: Multiverse, initialCell: Cell) extends Entity {
 
   // Quantum state
-  val alive: Id[Boolean] = multiverse.createId(true)
-  val cell: Id[Cell] = multiverse.createId(initialCell)
+  val alive: StateId[Boolean] = multiverse.createId(true)
+  val cell: StateId[Cell] = multiverse.createId(initialCell)
 
   // Metadata
-  val position: Id[Vec2d] = multiverse.createIdMeta(initialCell.toVec2d.add(.5))
+  val position: MetaId[Vec2d] = multiverse.createIdMeta(initialCell.toVec2d.add(.5))
 
   val sprite: SpriteComponent = add(new SpriteComponent(this,
     _ => Player.CatSprite, _.meta(position), _ => new Vec2d(2, 2), u => if (u.state(alive)) WHITE else BLACK))

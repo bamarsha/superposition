@@ -5,7 +5,7 @@ import engine.core.{Game, Input}
 import engine.graphics.sprites.Sprite
 import org.lwjgl.glfw.GLFW
 import superposition.math.Cell
-import superposition.quantum.Id
+import superposition.quantum.StateId
 
 /**
  * Contains initialization for goals.
@@ -29,7 +29,7 @@ private object Goal {
  */
 private final class Goal(multiverse: Multiverse,
                          cell: Cell,
-                         requires: => Id[Cell],
+                         requires: => StateId[Cell],
                          private val callback: () => Unit) extends Entity {
 
   val sprite: SpriteComponent = add(new SpriteComponent(this, _ => Goal.GoalSprite, _ => cell.toVec2d.add(.5)))

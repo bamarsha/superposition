@@ -6,7 +6,7 @@ import engine.graphics.sprites.Sprite
 import engine.util.Color.{BLACK, WHITE}
 import engine.util.math.Vec2d
 import superposition.math.Cell
-import superposition.quantum.Id
+import superposition.quantum.{MetaId, StateId}
 
 import scala.jdk.CollectionConverters._
 
@@ -24,12 +24,12 @@ object Quball {
 final class Quball(multiverse: Multiverse, initialCell: Cell) extends Entity {
 
   // Quantum state
-  val cell: Id[Cell] = multiverse.createId(initialCell)
-  val onOff: Id[Boolean] = multiverse.createId(false)
-  val carried: Id[Boolean] = multiverse.createId(false)
+  val cell: StateId[Cell] = multiverse.createId(initialCell)
+  val onOff: StateId[Boolean] = multiverse.createId(false)
+  val carried: StateId[Boolean] = multiverse.createId(false)
 
   // Metadata
-  val position: Id[Vec2d] = multiverse.createIdMeta(initialCell.toVec2d.add(.5))
+  val position: MetaId[Vec2d] = multiverse.createIdMeta(initialCell.toVec2d.add(.5))
 
   val sprite: SpriteComponent = add(new SpriteComponent(this, _ => Quball.BallSprite,
     _.meta(position), _ => new Vec2d(1, 1), u => if (u.state(onOff)) WHITE else BLACK))

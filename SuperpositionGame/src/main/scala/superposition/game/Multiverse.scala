@@ -13,7 +13,7 @@ import engine.util.math.{Transformation, Vec2d, Vec4d}
 import extras.physics.Rectangle
 import extras.tiles.{Tilemap, TilemapRenderer}
 import superposition.math.{Cell, Complex}
-import superposition.quantum.{Gate, Id, Universe}
+import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
 import scala.math.{Pi, sqrt}
 
@@ -58,7 +58,7 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
 
   var universes: List[Universe] = List(universe)
   var entities: List[Entity] = List()
-  var stateIDs: List[Id[_]] = List()
+  var stateIDs: List[StateId[_]] = List()
 
   override protected def onCreate(): Unit = {
     frameBuffer = new Framebuffer()
@@ -85,15 +85,15 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
     success
   }
 
-  def createId[T](t: T): Id[T] = {
-    val i = new Id[T]
+  def createId[T](t: T): StateId[T] = {
+    val i = new StateId[T]
     universes = universes map (_.updatedState(i)(t))
     stateIDs ::= i
     i
   }
 
-  def createIdMeta[T](t: T): Id[T] = {
-    val i = new Id[T]
+  def createIdMeta[T](t: T): MetaId[T] = {
+    val i = new MetaId[T]
     universes = universes map (_.updatedMeta(i)(t))
     i
   }
