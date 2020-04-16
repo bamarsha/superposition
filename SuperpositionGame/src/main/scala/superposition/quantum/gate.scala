@@ -31,7 +31,7 @@ sealed trait Gate[A] {
   def applyToAll(value: A)(universes: List[Universe]): List[Universe] =
     universes flatMap this(value)
 
-  def andThen(gate: Gate[A]): Gate[A] = Divisible[Gate].divide(this, gate) { value => (value, value) }
+  def andThen(gate: Gate[A]): Gate[A] = Divisible[Gate].divide(this, gate)(value => (value, value))
 
   def multi: Gate[List[A]] = new Gate[List[A]] {
     override def apply(values: List[A])(universe: Universe): List[Universe] = values match {
