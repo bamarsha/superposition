@@ -1,9 +1,9 @@
 package superposition.quantum
 
-import scalaz.Functor
 import scalaz.std.option._
+import scalaz.syntax.functor._
 import superposition.game.{Player, Quball, UniverseComponent}
-import superposition.math.{Cell, Complex, DependentHashMap, DependentKey, DependentMap}
+import superposition.math._
 
 /**
  * A game universe.
@@ -27,13 +27,13 @@ final case class Universe(amplitude: Complex = Complex(1),
     copy(state = state.updated(id)(value))
 
   def updatedStateWith(id: StateId[_])(updater: id.Value => id.Value): Universe =
-    copy(state = state.updatedWith(id)(Functor[Option].lift(updater)))
+    copy(state = state.updatedWith(id)(updater.lift))
 
   def updatedMeta(id: MetaId[_])(value: id.Value): Universe =
     copy(meta = meta.updated(id)(value))
 
   def updatedMetaWith(id: MetaId[_])(updater: id.Value => id.Value): Universe =
-    copy(meta = meta.updatedWith(id)(Functor[Option].lift(updater)))
+    copy(meta = meta.updatedWith(id)(updater.lift))
 
   def allInCell(cell: Cell): Iterable[UniverseComponent] =
     UniverseComponent.All filter (_.position map (state(_)) contains cell)
