@@ -11,6 +11,7 @@ import engine.util.Color
 import engine.util.Color._
 import engine.util.math.{Transformation, Vec2d}
 import superposition.game.Laser._
+import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math.{Direction, Vec2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
@@ -23,11 +24,11 @@ import scala.jdk.CollectionConverters._
 private object Laser {
   val All: Iterable[Laser] = track(classOf[Laser]).asScala
 
-  private val Sprites: Map[Direction.Value, URL] = Map(
-    Direction.Up -> getClass.getResource("sprites/laser_up.png"),
-    Direction.Down -> getClass.getResource("sprites/laser_down.png"),
-    Direction.Left -> getClass.getResource("sprites/laser_left.png"),
-    Direction.Right -> getClass.getResource("sprites/laser_right.png")
+  private val Sprites: Map[Direction, URL] = Map(
+    Up -> getClass.getResource("sprites/laser_up.png"),
+    Down -> getClass.getResource("sprites/laser_down.png"),
+    Left -> getClass.getResource("sprites/laser_left.png"),
+    Right -> getClass.getResource("sprites/laser_right.png")
   )
   private val BeamDuration: Double = 0.2
   private val FadeDuration: Double = 0.3
@@ -50,7 +51,7 @@ private object Laser {
 private final class Laser(multiverse: Multiverse,
                           cell: Vec2i,
                           gate: Gate[StateId[Boolean]],
-                          direction: Direction.Value,
+                          direction: Direction,
                           controls: List[Vec2i]) extends Entity {
 
   // Metadata
@@ -79,16 +80,13 @@ private final class Laser(multiverse: Multiverse,
     }
   }
 
-  private def beam: LazyList[Vec2i] =
-    LazyList.iterate(cell)(_ + (direction match {
-      case Direction.Up => Vec2i(0, 1)
-      case Direction.Down => Vec2i(0, -1)
-      case Direction.Left => Vec2i(-1, 0)
-      case Direction.Right => Vec2i(1, 0)
-    })).tail
+  private def beam: LazyList[Vec2i] = LazyList.iterate(cell)(_ + direction.toVec2i).tail
 
   private def targetCell(u: Universe): Option[Vec2i] =
-    if (u.allOn(controls)) beam.take(50).find(cell => u.isBlocked(cell) || u.allInCell(cell).nonEmpty) else None
+    if (u.allOn(controls))
+      beam.take(50) find (cell => u.isBlocked(cell) || u.allInCell(cell).nonEmpty)
+    else
+      None
 
   private def hits(u: Universe): List[StateId[Boolean]] = targetCell(u).toList.flatMap(u.getPrimaryBits)
 

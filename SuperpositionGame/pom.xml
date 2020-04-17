@@ -33,6 +33,11 @@
       <version>7.3.0-M32</version>
     </dependency>
     <dependency>
+      <groupId>com.beachape</groupId>
+      <artifactId>enumeratum_2.13</artifactId>
+      <version>1.5.15</version>
+    </dependency>
+    <dependency>
       <groupId>Superposition</groupId>
       <artifactId>RGBEngine</artifactId>
       <version>1.0-SNAPSHOT</version>
