@@ -45,8 +45,8 @@ final case class Universe(amplitude: Complex = Complex(1),
     (walls contains cell) || (UniverseComponent.All exists (_.blockingCells(this) contains cell))
 
   def allOn(controls: Iterable[Vec2i]): Boolean =
-    controls forall {
-      control => Quball.All exists (quball => state(quball.cell) == control && state(quball.onOff))
+    controls forall { control =>
+      Quball.All exists (quball => state(quball.cell) == control && state(quball.onOff))
     }
 
   def isValid: Boolean = Player.All forall (player => !isBlocked(state(player.cell)))
