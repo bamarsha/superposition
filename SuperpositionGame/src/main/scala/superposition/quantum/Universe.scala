@@ -51,11 +51,3 @@ final case class Universe(amplitude: Complex = Complex(1),
 
   def isValid: Boolean = Player.All forall (player => !isBlocked(state(player.cell)))
 }
-
-final class StateId[A] extends DependentKey {
-  type Value = A
-}
-
-final class MetaId[A] extends DependentKey {
-  type Value = A
-}
