@@ -2,13 +2,14 @@ package superposition.game
 
 import engine.core.Behavior.Entity
 import engine.graphics.sprites.Sprite
+import superposition.game.Door.{ClosedSprite, OpenSprite}
 import superposition.math.Vec2i
 
-/**
- * Contains initialization for doors.
- */
+import scala.Function.const
+
 private object Door {
   private val ClosedSprite = Sprite.load(getClass.getResource("sprites/door_closed.png"))
+
   private val OpenSprite = Sprite.load(getClass.getResource("sprites/door_open.png"))
 }
 
@@ -18,12 +19,12 @@ private object Door {
  * @param cell     the position of this door
  * @param controls the control cells for this door
  */
-private final class Door(multiverse: Multiverse, cell: Vec2i, controls: List[Vec2i]) extends Entity {
+private final class Door(multiverse: Multiverse, cell: Vec2i, controls: Iterable[Vec2i]) extends Entity {
+  add(new SpriteComponent(this,
+    sprite = universe => if (universe.allOn(controls)) OpenSprite else ClosedSprite,
+    position = const(cell.toVec2d add 0.5),
+    layer = -1))
 
-  val sprite: SpriteComponent = add(new SpriteComponent(this,
-    u => if (u.allOn(controls)) Door.OpenSprite else Door.ClosedSprite, _ => cell.toVec2d.add(0.5)))
-  sprite.layer = -1
-
-  val universe: UniverseComponent = add(new UniverseComponent(this, multiverse))
-  universe.blockingCells = u => if (u.allOn(controls)) List() else List(cell)
+  private val universe: UniverseComponent = add(new UniverseComponent(this, multiverse))
+  universe.blockingCells = universe => if (universe.allOn(controls)) List() else List(cell)
 }
