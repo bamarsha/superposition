@@ -11,12 +11,6 @@ import superposition.quantum.StateId
 
 import scala.Function.const
 
-private object Goal {
-  def declareSystem(): Unit = Game.declareSystem(classOf[Goal], (_: Goal).step())
-
-  private val GoalSprite = Sprite.load(getClass.getResource("sprites/key.png"))
-}
-
 /**
  * A goal activates an action when the required object has reached the goal in every universe.
  *
@@ -35,4 +29,10 @@ private final class Goal(multiverse: Multiverse,
     if ((multiverse.universes forall (_.state(required) == cell)) || keyJustPressed(GLFW_KEY_N)) {
       action()
     }
+}
+
+private object Goal {
+  def declareSystem(): Unit = Game.declareSystem(classOf[Goal], (_: Goal).step())
+
+  private val GoalSprite = Sprite.load(getClass.getResource("sprites/key.png"))
 }

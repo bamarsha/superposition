@@ -7,12 +7,6 @@ import superposition.math.Vec2i
 
 import scala.Function.const
 
-private object Door {
-  private val ClosedSprite = Sprite.load(getClass.getResource("sprites/door_closed.png"))
-
-  private val OpenSprite = Sprite.load(getClass.getResource("sprites/door_open.png"))
-}
-
 /**
  * A door blocks movement unless all of the door's control cells have a bit in the on state.
  *
@@ -27,4 +21,10 @@ private final class Door(multiverse: Multiverse, cell: Vec2i, controls: Iterable
 
   private val universe: UniverseComponent = add(new UniverseComponent(this, multiverse))
   universe.blockingCells = universe => if (universe.allOn(controls)) List() else List(cell)
+}
+
+private object Door {
+  private val ClosedSprite = Sprite.load(getClass.getResource("sprites/door_closed.png"))
+
+  private val OpenSprite = Sprite.load(getClass.getResource("sprites/door_open.png"))
 }
