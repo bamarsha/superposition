@@ -5,7 +5,7 @@ import engine.core.{Game, Input}
 import engine.graphics.Camera
 import extras.tiles.Tilemap
 import org.lwjgl.glfw.GLFW.GLFW_KEY_R
-import superposition.math.{Cell, Direction}
+import superposition.math.{Direction, Vec2i}
 import superposition.quantum.{H, Universe, X}
 
 import scala.collection.immutable.HashMap
@@ -94,7 +94,7 @@ private object Level {
 //      tilemap.height - (obj.y / tilemap.tileHeight).floor.toInt - 1,
 //      (obj.x / tilemap.tileWidth).floor.toInt
 //    )
-    val cell = Cell(
+    val cell = Vec2i(
       (obj.x / tilemap.tileWidth).floor.toInt,
       tilemap.height - (obj.y / tilemap.tileHeight).floor.toInt - 1)
     val properties = obj.properties.asScala
@@ -119,20 +119,20 @@ private object Level {
     }, id)
   }
 
-  private def cellFromString(tilemap: Tilemap, string: String): Option[Cell] =
+  private def cellFromString(tilemap: Tilemap, string: String): Option[Vec2i] =
     """\((\d+),\s*(\d+)\)"""
       .r("column", "row")
       .findFirstMatchIn(string)
-      .map(m => Cell(m.group("column").trim.toInt, tilemap.height - m.group("row").trim.toInt - 1))
+      .map(m => Vec2i(m.group("column").trim.toInt, tilemap.height - m.group("row").trim.toInt - 1))
 
-  private def cellsFromString(tilemap: Tilemap, string: String): Seq[Cell] =
+  private def cellsFromString(tilemap: Tilemap, string: String): Seq[Vec2i] =
     string.linesIterator.flatMap(cellFromString(tilemap, _)).toSeq
 
-  private def wallsInTilemap(tilemap: Tilemap): Set[Cell] =
+  private def wallsInTilemap(tilemap: Tilemap): Set[Vec2i] =
     (for (layer <- tilemap.layers.asScala if layer.properties.asScala.get("Collision").exists(_.value.toBoolean);
           x <- 0 until layer.width;
           y <- 0 until layer.height if layer.data.tiles(x)(y) != 0) yield {
-      Cell(
+      Vec2i(
         (x + layer.offsetX.toDouble / tilemap.tileWidth).round.toInt,
         (y + layer.offsetY.toDouble / tilemap.tileHeight).round.toInt
       )

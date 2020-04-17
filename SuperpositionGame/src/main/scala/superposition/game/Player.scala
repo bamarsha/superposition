@@ -7,7 +7,7 @@ import engine.graphics.sprites.Sprite
 import engine.util.Color._
 import engine.util.math.Vec2d
 import org.lwjgl.glfw.GLFW._
-import superposition.math.Cell
+import superposition.math.Vec2i
 import superposition.quantum._
 
 import scala.Function.const
@@ -39,11 +39,11 @@ object Player {
  * @param multiverse  the multiverse this player belongs to
  * @param initialCell the initial position for this player
  */
-class Player(multiverse: Multiverse, initialCell: Cell) extends Entity {
+class Player(multiverse: Multiverse, initialCell: Vec2i) extends Entity {
 
   // Quantum state
   val alive: StateId[Boolean] = multiverse.createId(true)
-  val cell: StateId[Cell] = multiverse.createId(initialCell)
+  val cell: StateId[Vec2i] = multiverse.createId(initialCell)
 
   // Metadata
   val position: MetaId[Vec2d] = multiverse.createIdMeta(initialCell.toVec2d.add(.5))
@@ -100,20 +100,19 @@ class Player(multiverse: Multiverse, initialCell: Cell) extends Entity {
     if (x == 0 && y == 0) {
       true
     } else {
-      val translatePlayer: Gate[(Int, Int)] = Translate.multi control {
-        case (x, y) => universe =>
-          if (universe.state(alive)) List((cell, x, y)) else List()
+      val translatePlayer: Gate[Vec2i] = Translate.multi control {
+        delta => universe => if (universe.state(alive)) List((cell, delta)) else List()
       }
-      val translateQuballs: Gate[(Int, Int)] = Translate.multi control {
-        case (x, y) => universe =>
+      val translateQuballs: Gate[Vec2i] = Translate.multi control {
+        delta => universe =>
           if (universe.state(alive))
             (Quball.All
               filter (quball => universe.state(quball.carried))
-              map (quball => (quball.cell, x, y)))
+              map (quball => (quball.cell, delta)))
               .toList
           else List()
       }
-      multiverse.applyGate(translatePlayer andThen translateQuballs, (x, y))
+      multiverse.applyGate(translatePlayer andThen translateQuballs, Vec2i(x, y))
     }
 
   private def toggleCarrying(): Boolean =

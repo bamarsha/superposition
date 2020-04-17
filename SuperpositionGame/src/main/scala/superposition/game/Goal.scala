@@ -4,7 +4,7 @@ import engine.core.Behavior.Entity
 import engine.core.{Game, Input}
 import engine.graphics.sprites.Sprite
 import org.lwjgl.glfw.GLFW
-import superposition.math.Cell
+import superposition.math.Vec2i
 import superposition.quantum.StateId
 
 /**
@@ -28,8 +28,8 @@ private object Goal {
  * @param callback   the callback to activate when the goal is reached
  */
 private final class Goal(multiverse: Multiverse,
-                         cell: Cell,
-                         requires: => StateId[Cell],
+                         cell: Vec2i,
+                         requires: => StateId[Vec2i],
                          private val callback: () => Unit) extends Entity {
 
   val sprite: SpriteComponent = add(new SpriteComponent(this, _ => Goal.GoalSprite, _ => cell.toVec2d.add(.5)))

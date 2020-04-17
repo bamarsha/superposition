@@ -12,7 +12,7 @@ import engine.util.Color.CLEAR
 import engine.util.math.{Transformation, Vec2d, Vec4d}
 import extras.physics.Rectangle
 import extras.tiles.{Tilemap, TilemapRenderer}
-import superposition.math.{Cell, Complex}
+import superposition.math.{Complex, Vec2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
 import scala.math.{Pi, sqrt}
@@ -124,7 +124,7 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
     tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
 
     universes.flatMap(u => UniverseComponent.All.filter(_.position.isDefined).map(uc => u.state(uc.position.get)))
-      .toSet.foreach((cell: Cell) =>
+      .toSet.foreach((cell: Vec2i) =>
         drawRectangle(Transformation.create(cell.toVec2d, 0, 1), new Color(1, 1, 1, 0.3)))
 
     time += dt

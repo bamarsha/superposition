@@ -11,7 +11,7 @@ import engine.util.Color
 import engine.util.Color._
 import engine.util.math.{Transformation, Vec2d}
 import superposition.game.Laser._
-import superposition.math.{Cell, Direction}
+import superposition.math.{Direction, Vec2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
 import scala.Function.const
@@ -48,13 +48,13 @@ private object Laser {
  * @param controls   the cell that controls this laser if it contains a bit, or None if the laser is not controlled
  */
 private final class Laser(multiverse: Multiverse,
-                          cell: Cell,
+                          cell: Vec2i,
                           gate: Gate[StateId[Boolean]],
                           direction: Direction.Value,
-                          controls: List[Cell]) extends Entity {
+                          controls: List[Vec2i]) extends Entity {
 
   // Metadata
-  val targetCell: MetaId[Option[Cell]] = multiverse.createIdMeta(None)
+  val targetCell: MetaId[Option[Vec2i]] = multiverse.createIdMeta(None)
   val elapsedTime: MetaId[Double] = multiverse.createIdMeta(0)
 
   val sprite: SpriteComponent = add(new SpriteComponent(this,
@@ -79,22 +79,22 @@ private final class Laser(multiverse: Multiverse,
     }
   }
 
-  private def beam: LazyList[Cell] =
-    LazyList.iterate(cell)(cell => cell.translate _ tupled (direction match {
-      case Direction.Up => (0, 1)
-      case Direction.Down => (0, -1)
-      case Direction.Left => (-1, 0)
-      case Direction.Right => (1, 0)
+  private def beam: LazyList[Vec2i] =
+    LazyList.iterate(cell)(_ + (direction match {
+      case Direction.Up => Vec2i(0, 1)
+      case Direction.Down => Vec2i(0, -1)
+      case Direction.Left => Vec2i(-1, 0)
+      case Direction.Right => Vec2i(1, 0)
     })).tail
 
-  private def targetCell(u: Universe): Option[Cell] =
+  private def targetCell(u: Universe): Option[Vec2i] =
     if (u.allOn(controls)) beam.take(50).find(cell => u.isBlocked(cell) || u.allInCell(cell).nonEmpty) else None
 
   private def hits(u: Universe): List[StateId[Boolean]] = targetCell(u).toList.flatMap(u.getPrimaryBits)
 
   private val actualGate = gate.multi control const(hits)
 
-  private def selected(): Boolean = Cell(Input.mouse().x.floor.toInt, Input.mouse().y.floor.toInt) == cell
+  private def selected(): Boolean = Vec2i(Input.mouse().x.floor.toInt, Input.mouse().y.floor.toInt) == cell
 
   private def step(): Unit = {
     if (Input.mouseJustPressed(0) && selected()) {

@@ -3,20 +3,6 @@ package superposition.math
 import scala.math.{atan2, cos, sin, sqrt}
 
 /**
- * Factory for [[Complex]] instances.
- */
-object Complex {
-  /**
-   * Creates a complex number from its polar form re^iθ^.
-   *
-   * @param r     the radius r
-   * @param theta the angle θ
-   * @return the complex number re^iθ^
-   */
-  def polar(r: Double, theta: Double) = Complex(r * cos(theta), r * sin(theta))
-}
-
-/**
  * A complex number.
  *
  * @param real the real part
@@ -47,8 +33,7 @@ final case class Complex(real: Double, imag: Double = 0) {
    */
   def *(that: Complex): Complex = Complex(
     real * that.real - imag * that.imag,
-    real * that.imag + imag * that.real
-  )
+    real * that.imag + imag * that.real)
 
   /**
    * Divides two complex numbers.
@@ -58,8 +43,7 @@ final case class Complex(real: Double, imag: Double = 0) {
    */
   def /(that: Complex): Complex = Complex(
     (real * that.real + imag * that.imag) / that.squaredMagnitude,
-    (imag * that.real - real * that.imag) / that.squaredMagnitude
-  )
+    (imag * that.real - real * that.imag) / that.squaredMagnitude)
 
   /**
    * The magnitude, or absolute value, of this complex number.
@@ -75,4 +59,18 @@ final case class Complex(real: Double, imag: Double = 0) {
    * The phase angle θ when this complex number is written in the polar form re^iθ^.
    */
   def phase: Double = atan2(imag, real)
+}
+
+/**
+ * Operations for creating complex numbers.
+ */
+object Complex {
+  /**
+   * Creates a complex number from its polar form re^iθ^.
+   *
+   * @param r     the radius r
+   * @param theta the angle θ
+   * @return the complex number re^iθ^
+   */
+  def polar(r: Double, theta: Double): Complex = Complex(r * cos(theta), r * sin(theta))
 }

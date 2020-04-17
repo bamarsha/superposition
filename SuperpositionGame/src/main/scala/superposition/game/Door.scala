@@ -2,7 +2,7 @@ package superposition.game
 
 import engine.core.Behavior.Entity
 import engine.graphics.sprites.Sprite
-import superposition.math.Cell
+import superposition.math.Vec2i
 
 /**
  * Contains initialization for doors.
@@ -18,7 +18,7 @@ private object Door {
  * @param cell     the position of this door
  * @param controls the control cells for this door
  */
-private final class Door(multiverse: Multiverse, cell: Cell, controls: List[Cell]) extends Entity {
+private final class Door(multiverse: Multiverse, cell: Vec2i, controls: List[Vec2i]) extends Entity {
 
   val sprite: SpriteComponent = add(new SpriteComponent(this,
     u => if (u.allOn(controls)) Door.OpenSprite else Door.ClosedSprite, _ => cell.toVec2d.add(0.5)))
