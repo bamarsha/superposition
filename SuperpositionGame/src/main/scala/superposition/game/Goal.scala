@@ -1,40 +1,38 @@
 package superposition.game
 
 import engine.core.Behavior.Entity
-import engine.core.{Game, Input}
+import engine.core.Game
+import engine.core.Input.keyJustPressed
 import engine.graphics.sprites.Sprite
-import org.lwjgl.glfw.GLFW
+import org.lwjgl.glfw.GLFW.GLFW_KEY_N
+import superposition.game.Goal.GoalSprite
 import superposition.math.Vec2i
 import superposition.quantum.StateId
 
-/**
- * Contains initialization for goals.
- */
+import scala.Function.const
+
 private object Goal {
-  /**
-   * Declares the goal system.
-   */
   def declareSystem(): Unit = Game.declareSystem(classOf[Goal], (_: Goal).step())
 
   private val GoalSprite = Sprite.load(getClass.getResource("sprites/key.png"))
 }
 
 /**
- * A goal activates a callback when the required object has reached the goal in every universe.
+ * A goal activates an action when the required object has reached the goal in every universe.
  *
  * @param multiverse the multiverse this goal belongs to
  * @param cell       the position of this goal
- * @param requires   the ID of the object that must reach this goal
- * @param callback   the callback to activate when the goal is reached
+ * @param required   the position of the object that must reach this goal
+ * @param action     the action to activate when the goal is reached
  */
 private final class Goal(multiverse: Multiverse,
                          cell: Vec2i,
-                         requires: => StateId[Vec2i],
-                         private val callback: () => Unit) extends Entity {
-
-  val sprite: SpriteComponent = add(new SpriteComponent(this, _ => Goal.GoalSprite, _ => cell.toVec2d.add(.5)))
+                         required: => StateId[Vec2i],
+                         action: () => Unit) extends Entity {
+  add(new SpriteComponent(this, sprite = const(GoalSprite), position = const(cell.toVec2d add 0.5)))
 
   private def step(): Unit =
-    if (multiverse.universes.forall(_.state(requires) == cell) || Input.keyJustPressed(GLFW.GLFW_KEY_N))
-      callback()
+    if ((multiverse.universes forall (_.state(required) == cell)) || keyJustPressed(GLFW_KEY_N)) {
+      action()
+    }
 }
