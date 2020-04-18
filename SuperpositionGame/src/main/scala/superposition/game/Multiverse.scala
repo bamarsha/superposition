@@ -36,7 +36,7 @@ private final class Multiverse(initialUniverse: Universe, tileMap: Tilemap) exte
 
   var universes: List[Universe] = List(initialUniverse)
 
-  var entities: List[Entity] = List()
+  private var entities: List[Entity] = List()
 
   private var stateIds: List[StateId[_]] = List()
 
@@ -87,6 +87,11 @@ private final class Multiverse(initialUniverse: Universe, tileMap: Tilemap) exte
     val id = new MetaId[A]
     universes = universes map (_.updatedMeta(id)(initialValue))
     id
+  }
+
+  def addEntity(entity: Entity): Unit = {
+    Game.create(entity)
+    entities ::= entity
   }
 
   private def step(): Unit = {

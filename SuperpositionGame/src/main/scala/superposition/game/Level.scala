@@ -65,8 +65,7 @@ private object Level {
            obj <- group.objects.asScala) {
         val entity = entityFromObject(tileMap, obj, multiverse)
         println("Spawning " + obj.`type` + ".")
-        Game.create(entity)
-        multiverse.entities ::= entity
+        multiverse.addEntity(entity)
         entities += obj.id -> entity
         // TODO: entity.layer = layer
       }
