@@ -76,13 +76,13 @@ object Gate {
 
 }
 
-object Identity extends Gate[Nothing] {
+object Identity extends Gate[Any] {
 
   import scala.language.implicitConversions
 
-  override def apply(value: Nothing)(universe: Universe) = List(universe)
+  override def apply(value: Any)(universe: Universe) = List(universe)
 
-  override def adjoint: Gate[Nothing] = this
+  override def adjoint: Gate[Any] = this
 
   implicit def asGate[A](id: Identity.type): Gate[A] = id.asInstanceOf[Gate[A]]
 }
