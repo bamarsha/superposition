@@ -7,7 +7,7 @@ import extras.tiles.Tilemap
 /**
  * The main class for the Superposition game.
  */
-object Superposition {
+private object Superposition {
   /**
    * Runs the Superposition game.
    *
@@ -18,11 +18,11 @@ object Superposition {
     Settings.WINDOW_HEIGHT = 720
 
     Game.init()
-    Multiverse.declareSystem()
-    Laser.declareSystem()
-    Player.declareSystem()
-    Level.declareSystem()
     Goal.declareSystem()
+    Laser.declareSystem()
+    Level.declareSystem()
+    Multiverse.declareSystem()
+    Player.declareSystem()
 
     Game.create(new FPSBehavior())
     Game.create(new QuitOnEscapeBehavior())
