@@ -12,23 +12,12 @@ import engine.util.Color.CLEAR
 import engine.util.math.{Transformation, Vec2d, Vec4d}
 import extras.physics.Rectangle
 import extras.tiles.{Tilemap, TilemapRenderer}
-import superposition.math.{Complex, Vec2i}
+import superposition.game.Multiverse.UniverseShader
+import superposition.math.Complex
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
+import scala.Ordering.Implicits._
 import scala.math.{Pi, sqrt}
-
-/**
- * Contains settings and initialization for the multiverse.
- */
-private object Multiverse {
-  private val UniverseShader: Shader = Shader.load(classOf[Multiverse].getResource(_), "shaders/universe")
-
-  /**
-   * Declares the multiverse system.
-   */
-  def declareSystem(): Unit =
-    Game.declareSystem(classOf[Multiverse], (_: Multiverse).step())
-}
 
 /**
  * The multiverse is a collection of universes.
@@ -36,66 +25,68 @@ private object Multiverse {
  * Multiple universes represent qubits in superposition. The multiverse can apply quantum gates to qubits by changing
  * the amplitude of a universe or creating a copy of a universe.
  *
- * @param universe the initial universe
- * @param tiles    the tiles in the multiverse
+ * @param initialUniverse the initial universe
+ * @param tileMap         the tile map for the multiverse
  */
-private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entity {
-
-  import Multiverse._
-
+private final class Multiverse(initialUniverse: Universe, tileMap: Tilemap) extends Entity {
   /**
    * The bounding box of the multiverse's tile map.
    */
-  val boundingBox: Rectangle = new Rectangle(new Vec2d(0, 0), new Vec2d(tiles.width, tiles.height))
+  val boundingBox: Rectangle = new Rectangle(new Vec2d(0, 0), new Vec2d(tileMap.width, tileMap.height))
 
+  var universes: List[Universe] = List(initialUniverse)
 
-  private var frameBuffer: Framebuffer = _
-  private var colorBuffer: Texture = _
+  var entities: List[Entity] = List()
+
+  private var stateIds: List[StateId[_]] = List()
+
   private var time: Double = 0
 
   private val tileRenderer: TilemapRenderer =
-    new TilemapRenderer(tiles, source => Texture.load(getClass.getResource(source)))
+    new TilemapRenderer(tileMap, source => Texture.load(getClass.getResource(source)))
 
-  var universes: List[Universe] = List(universe)
-  var entities: List[Entity] = List()
-  var stateIDs: List[StateId[_]] = List()
+  private var frameBuffer: Framebuffer = _
+
+  private var colorBuffer: Texture = _
 
   override protected def onCreate(): Unit = {
     frameBuffer = new Framebuffer()
     colorBuffer = frameBuffer.attachColorBuffer()
   }
 
-  override protected def onDestroy(): Unit = {
-    entities.foreach(Game.destroy)
-  }
+  override protected def onDestroy(): Unit = entities.foreach(Game.destroy)
 
   /**
-   * Applies the quantum gate to the target object with optional controls.
+   * Applies a gate to the multiverse.
    *
-   * @param gate     the gate to apply
-   * @param t        the target object
+   * If the gate produces any universe that is in an invalid state, no changes are made.
+   *
+   * @param gate  the gate to apply
+   * @param value the value to give the gate
+   * @return whether the gate was successfully applied
    */
-  def applyGate[T](gate: Gate[T], t: T): Boolean = {
-    val newUniverses = gate.applyToAll(t)(universes)
-    val success = newUniverses.forall(_.isValid)
-    if (success) {
+  def applyGate[A](gate: Gate[A], value: A): Boolean = {
+    val newUniverses = gate.applyToAll(value)(universes)
+    if (newUniverses forall (_.isValid)) {
       universes = newUniverses
       combine()
+      true
+    } else {
+      false
     }
-    success
   }
 
-  def createId[T](t: T): StateId[T] = {
-    val i = new StateId[T]
-    universes = universes map (_.updatedState(i)(t))
-    stateIDs ::= i
-    i
+  def allocate[A](initialValue: A): StateId[A] = {
+    val id = new StateId[A]
+    universes = universes map (_.updatedState(id)(initialValue))
+    stateIds ::= id
+    id
   }
 
-  def createIdMeta[T](t: T): MetaId[T] = {
-    val i = new MetaId[T]
-    universes = universes map (_.updatedMeta(i)(t))
-    i
+  def allocateMeta[A](initialValue: A): MetaId[A] = {
+    val id = new MetaId[A]
+    universes = universes map (_.updatedMeta(id)(initialValue))
+    id
   }
 
   private def step(): Unit = {
@@ -104,39 +95,45 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
   }
 
   private def combine(): Unit = {
-    // def sort[A : Ordering](coll: Seq[Iterable[A]]) = coll.sorted
-    import Ordering.Implicits._
     universes = universes
-        .groupMapReduce(_.state)(identity)((u1, u2) => u1 + u2.amplitude)
-        .values
-        .filter(_.amplitude.squaredMagnitude > 1e-6)
-        .toList
-        .sortBy(u => stateIDs.reverse.map(u.state(_).toString))
+      .groupMapReduce(_.state)(identity)((u1, u2) => u1 + u2.amplitude)
+      .values
+      .filter(_.amplitude.squaredMagnitude > 1e-6)
+      .toList
+      .sortBy(universe => stateIds.reverse.map(universe.state(_).toString))
     normalize()
   }
 
   private def normalize(): Unit = {
-    val sum = universes.map(_.amplitude.squaredMagnitude).sum
-    universes = universes.map(_ / Complex(sqrt(sum)))
+    val sum = (universes map (_.amplitude.squaredMagnitude)).sum
+    universes = universes map (_ / Complex(sqrt(sum)))
   }
 
   private def draw(): Unit = {
     tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
+    highlightOccupiedCells()
+    drawShader()
+  }
 
-    universes.flatMap(u => UniverseComponent.All.filter(_.position.isDefined).map(uc => u.state(uc.position.get)))
-      .toSet.foreach((cell: Vec2i) =>
-        drawRectangle(Transformation.create(cell.toVec2d, 0, 1), new Color(1, 1, 1, 0.3)))
+  private def highlightOccupiedCells(): Unit = {
+    def allStates[A](id: StateId[A]) = universes map (_.state(id))
 
+    val occupiedCells = (UniverseComponent.All flatMap (_.position map allStates)).flatten.toSet
+    for (cell <- occupiedCells) {
+      drawRectangle(Transformation.create(cell.toVec2d, 0, 1), new Color(1, 1, 1, 0.3))
+    }
+  }
+
+  private def drawShader(): Unit = {
     time += dt
-    UniverseShader.setUniform("time", time.asInstanceOf[Float])
-    var minValue = 0.0
-    for (u <- universes) {
-      val maxValue = minValue + u.amplitude.squaredMagnitude
+    UniverseShader.setUniform("time", time.toFloat)
+    var minValue = 0d
+    for (universe <- universes) {
+      val maxValue = minValue + universe.amplitude.squaredMagnitude
 
       frameBuffer.clear(CLEAR)
-//      u.objects.values.map(_.entity).toSeq.sortBy(_.layer).foreach(_.draw())
-      SpriteComponent.All.toList.sortBy(_.layer).foreach(_.draw(u))
-      Laser.All.toList.foreach(_.draw(u))
+      (SpriteComponent.All.toList sortBy (_.layer)).foreach(_.draw(universe))
+      Laser.All.toList.foreach(_.draw(universe))
 
       val camera = new Camera2d()
       camera.lowerLeft = new Vec2d(-1, -1)
@@ -145,7 +142,7 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
       UniverseShader.setMVP(Transformation.IDENTITY)
       UniverseShader.setUniform("minVal", minValue.toFloat)
       UniverseShader.setUniform("maxVal", maxValue.toFloat)
-      UniverseShader.setUniform("hue", (u.amplitude.phase / (2 * Pi)).toFloat)
+      UniverseShader.setUniform("hue", (universe.amplitude.phase / (2 * Pi)).toFloat)
       UniverseShader.setUniform("color", new Vec4d(1, 1, 1, 1))
       Framebuffer.drawToWindow(colorBuffer, UniverseShader)
 
@@ -158,4 +155,10 @@ private final class Multiverse(universe: Universe, tiles: Tilemap) extends Entit
       minValue = maxValue
     }
   }
+}
+
+private object Multiverse {
+  private val UniverseShader: Shader = Shader.load(classOf[Multiverse].getResource(_), "shaders/universe")
+
+  def declareSystem(): Unit = Game.declareSystem(classOf[Multiverse], (_: Multiverse).step())
 }

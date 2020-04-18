@@ -24,12 +24,12 @@ object Quball {
 final class Quball(multiverse: Multiverse, initialCell: Vec2i) extends Entity {
 
   // Quantum state
-  val cell: StateId[Vec2i] = multiverse.createId(initialCell)
-  val onOff: StateId[Boolean] = multiverse.createId(false)
-  val carried: StateId[Boolean] = multiverse.createId(false)
+  val cell: StateId[Vec2i] = multiverse.allocate(initialCell)
+  val onOff: StateId[Boolean] = multiverse.allocate(false)
+  val carried: StateId[Boolean] = multiverse.allocate(false)
 
   // Metadata
-  val position: MetaId[Vec2d] = multiverse.createIdMeta(initialCell.toVec2d.add(.5))
+  val position: MetaId[Vec2d] = multiverse.allocateMeta(initialCell.toVec2d.add(.5))
 
   val sprite: SpriteComponent = add(new SpriteComponent(this, _ => Quball.BallSprite,
     _.meta(position), _ => new Vec2d(1, 1), u => if (u.state(onOff)) WHITE else BLACK))

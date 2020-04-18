@@ -42,11 +42,11 @@ object Player {
 class Player(multiverse: Multiverse, initialCell: Vec2i) extends Entity {
 
   // Quantum state
-  val alive: StateId[Boolean] = multiverse.createId(true)
-  val cell: StateId[Vec2i] = multiverse.createId(initialCell)
+  val alive: StateId[Boolean] = multiverse.allocate(true)
+  val cell: StateId[Vec2i] = multiverse.allocate(initialCell)
 
   // Metadata
-  val position: MetaId[Vec2d] = multiverse.createIdMeta(initialCell.toVec2d.add(.5))
+  val position: MetaId[Vec2d] = multiverse.allocateMeta(initialCell.toVec2d.add(.5))
 
   val sprite: SpriteComponent = add(new SpriteComponent(this,
     _ => Player.CatSprite, _.meta(position), _ => new Vec2d(2, 2), u => if (u.state(alive)) WHITE else BLACK))

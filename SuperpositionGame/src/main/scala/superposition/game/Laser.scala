@@ -34,9 +34,9 @@ private final class Laser(multiverse: Multiverse,
                           gate: Gate[StateId[Boolean]],
                           direction: Direction,
                           controls: Iterable[Vec2i]) extends Entity {
-  private val targetCell: MetaId[Option[Vec2i]] = multiverse.createIdMeta(None)
+  private val targetCell: MetaId[Option[Vec2i]] = multiverse.allocateMeta(None)
 
-  private val elapsedTime: MetaId[Double] = multiverse.createIdMeta(0)
+  private val elapsedTime: MetaId[Double] = multiverse.allocateMeta(0)
 
   add(new SpriteComponent(this,
     sprite = const(Sprite.load(Sprites(direction))),
