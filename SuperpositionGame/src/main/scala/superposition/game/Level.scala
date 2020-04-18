@@ -57,8 +57,7 @@ private object Level {
    */
   def load(tileMap: Tilemap): Unit =
     load {
-      val universe = Universe(walls = wallsInTileMap(tileMap))
-      val multiverse = new Multiverse(universe, tileMap)
+      val multiverse = new Multiverse(tileMap)
       var entities = new HashMap[Int, Entity]
 
       for ((group, layer) <- tileMap.objectGroups.asScala.zipWithIndex;
@@ -120,13 +119,4 @@ private object Level {
     case "H" => H
     case _ => error("Unsupported gate '" + name + "'.")
   }
-
-  private def wallsInTileMap(tileMap: Tilemap): Set[Vec2i] =
-    (for (layer <- tileMap.layers.asScala if layer.properties.asScala.get("Collision") exists (_.value.toBoolean);
-          x <- 0 until layer.width;
-          y <- 0 until layer.height if layer.data.tiles(x)(y) != 0) yield {
-      Vec2i(
-        (x + layer.offsetX.toDouble / tileMap.tileWidth).round.toInt,
-        (y + layer.offsetY.toDouble / tileMap.tileHeight).round.toInt)
-    }).toSet
 }

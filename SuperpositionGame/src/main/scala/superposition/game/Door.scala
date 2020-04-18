@@ -20,7 +20,7 @@ private final class Door(multiverse: Multiverse, cell: Vec2i, controls: Iterable
     layer = -1))
 
   private val universe: UniverseComponent = add(new UniverseComponent(this, multiverse))
-  universe.blockingCells = universe => if (universe.allOn(controls)) List() else List(cell)
+  universe.blockingCells = universe => if (universe.allOn(controls)) Set() else Set(cell)
 }
 
 private object Door {

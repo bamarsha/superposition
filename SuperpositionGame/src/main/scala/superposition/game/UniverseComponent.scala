@@ -16,6 +16,6 @@ class UniverseComponent(entity: Entity, multiverse: Multiverse) extends Componen
   var position: Option[StateId[Vec2i]] = None
   var primaryBit: Option[StateId[Boolean]] = None
 
-  var blockingCells: Universe => List[Vec2i] = _ => List()
+  var blockingCells: Universe => Set[Vec2i] = _ => Set()
 
 }

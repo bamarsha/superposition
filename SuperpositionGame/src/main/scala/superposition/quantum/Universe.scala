@@ -13,8 +13,7 @@ import superposition.math._
  */
 final case class Universe(amplitude: Complex = Complex(1),
                           state: DependentMap[StateId[_]] = DependentHashMap.empty,
-                          meta: DependentMap[MetaId[_]] = DependentHashMap.empty,
-                          walls: Set[Vec2i] = Set.empty) {
+                          meta: DependentMap[MetaId[_]] = DependentHashMap.empty) {
   def +(c: Complex): Universe = copy(amplitude = amplitude + c)
 
   def -(c: Complex): Universe = copy(amplitude = amplitude - c)
@@ -42,7 +41,7 @@ final case class Universe(amplitude: Complex = Complex(1),
     allInCell(cell) flatMap (_.primaryBit.toList)
 
   def isBlocked(cell: Vec2i): Boolean =
-    (walls contains cell) || (UniverseComponent.All exists (_.blockingCells(this) contains cell))
+    UniverseComponent.All exists (_.blockingCells(this) contains cell)
 
   def allOn(controls: Iterable[Vec2i]): Boolean =
     controls forall { control =>
