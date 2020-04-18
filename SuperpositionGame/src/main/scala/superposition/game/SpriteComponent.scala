@@ -8,17 +8,11 @@ import engine.util.Color.WHITE
 import engine.util.math.{Transformation, Vec2d}
 import superposition.quantum.Universe
 
+import scala.Function.const
 import scala.jdk.CollectionConverters._
-
-object SpriteComponent {
-  val All: Iterable[SpriteComponent] = track(classOf[SpriteComponent]).asScala
-}
 
 /**
  * Adds a sprite to an entity.
- * <p>
- * Note that having this component by itself does nothing; it also needs a [[UniverseObject]] component to
- * be drawn.
  *
  * @param entity the entity for this component
  * @param sprite the sprite for this entity
@@ -28,12 +22,20 @@ object SpriteComponent {
 final class SpriteComponent(entity: Entity,
                             val sprite: Universe => Sprite,
                             val position: Universe => Vec2d,
-                            val scale: Universe => Vec2d = _ => new Vec2d(1, 1),
-                            val color: Universe => Color = _ => WHITE,
-                            var layer: Int = 0) extends Component(entity) {
+                            val scale: Universe => Vec2d = const(new Vec2d(1, 1)),
+                            val color: Universe => Color = const(WHITE),
+                            val layer: Int = 0)
+  extends Component(entity) {
 
   /**
    * Draws this sprite.
    */
-  def draw(u: Universe): Unit = sprite(u).draw(Transformation.create(position(u), 0, scale(u)), color(u))
+  def draw(universe: Universe): Unit =
+    sprite(universe).draw(
+      Transformation.create(position(universe), 0, scale(universe)),
+      color(universe))
+}
+
+object SpriteComponent {
+  val All: Iterable[SpriteComponent] = track(classOf[SpriteComponent]).asScala
 }
