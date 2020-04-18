@@ -26,7 +26,7 @@ private final class Goal(multiverse: Multiverse,
   add(new SpriteComponent(this, sprite = const(GoalSprite), position = const(cell.toVec2d add 0.5)))
 
   private def step(): Unit =
-    if ((multiverse.universes forall (_.state(required) == cell)) || keyJustPressed(GLFW_KEY_N)) {
+    if ((multiverse forall (_.state(required) == cell)) || keyJustPressed(GLFW_KEY_N)) {
       action()
     }
 }

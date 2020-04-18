@@ -34,7 +34,7 @@ private final class Laser(multiverse: Multiverse,
                           gate: Gate[StateId[Boolean]],
                           direction: Direction,
                           controls: Iterable[Vec2i]) extends Entity {
-  private val targetCell: MetaId[Option[Vec2i]] = multiverse.allocateMeta(None)
+  private val lastTargetCell: MetaId[Option[Vec2i]] = multiverse.allocateMeta(None)
 
   private val elapsedTime: MetaId[Double] = multiverse.allocateMeta(0)
 
@@ -56,7 +56,7 @@ private final class Laser(multiverse: Multiverse,
     if (selected) {
       drawRectangleOutline(Transformation.create(cell.toVec2d, 0, 1), RED)
     }
-    universe.meta(targetCell) match {
+    universe.meta(lastTargetCell) match {
       case Some(targetCell) if universe.meta(elapsedTime) <= BeamDuration + FadeDuration =>
         drawWideLine(
           cell.toVec2d add 0.5,
@@ -83,16 +83,12 @@ private final class Laser(multiverse: Multiverse,
   private def step(): Unit = {
     if (mouseJustPressed(0) && selected) {
       multiverse.applyGate(gate.multi control const(hits), ())
-      multiverse.universes = multiverse.universes map { universe =>
-        if (targetCell(universe).isEmpty)
-          universe.updatedMeta(targetCell)(None)
-        else
-          universe
-            .updatedMeta(targetCell)(targetCell(universe))
-            .updatedMeta(elapsedTime)(0)
+      multiverse.updateMetaWith(lastTargetCell)(const(targetCell))
+      multiverse.updateMetaWith(elapsedTime) { time => universe =>
+        if (targetCell(universe).isEmpty) time else 0
       }
     }
-    multiverse.universes = multiverse.universes map (_.updatedMetaWith(elapsedTime)(_ + dt))
+    multiverse.updateMetaWith(elapsedTime)(time => const(time + dt))
   }
 }
 

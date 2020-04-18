@@ -64,19 +64,24 @@ class Player(multiverse: Multiverse, initialCell: Vec2i) extends Entity {
     if (walk(0, y)) cellPosition = cellPosition.sub(new Vec2d(0, y))
     cellPosition = cellPosition.clamp(0, 1)
 
-    if (Input.keyJustPressed(GLFW_KEY_SPACE)) toggleCarrying()
+    if (Input.keyJustPressed(GLFW_KEY_SPACE)) {
+      toggleCarrying()
+    }
 
-    multiverse.universes = multiverse.universes.map(u => {
-      if (u.state(alive)) {
-        val desiredPos = u.state(cell).toVec2d.add(cellPosition)
-        u.updatedMetaWith(position)(_.lerp(desiredPos, 10 * dt))
-      } else u
-    })
+    multiverse.updateMetaWith(position) { pos => universe =>
+      if (universe.state(alive)) {
+        val targetPosition = universe.state(cell).toVec2d add cellPosition
+        pos.lerp(targetPosition, 10 * dt)
+      } else pos
+    }
 
-    Quball.All.foreach(q => multiverse.universes = multiverse.universes.map(u => {
-      val desiredPos = u.state(q.cell).toVec2d.add(if (u.state(q.carried)) cellPosition else new Vec2d(.5, .5))
-      u.updatedMetaWith(q.position)(_.lerp(desiredPos, 10 * dt))
-    }))
+    for (quball <- Quball.All) {
+      multiverse.updateMetaWith(quball.position) { pos => universe =>
+        val relativePos = if (universe.state(quball.carried)) cellPosition else new Vec2d(0.5, 0.5)
+        val targetPos = universe.state(quball.cell).toVec2d add relativePos
+        if (universe.state(alive)) pos.lerp(targetPos, 10 * dt) else pos
+      }
+    }
   }
 
   private def cellPositionFromInput: Vec2d = {

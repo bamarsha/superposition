@@ -34,7 +34,7 @@ private final class Multiverse(initialUniverse: Universe, tileMap: Tilemap) exte
    */
   val boundingBox: Rectangle = new Rectangle(new Vec2d(0, 0), new Vec2d(tileMap.width, tileMap.height))
 
-  var universes: List[Universe] = List(initialUniverse)
+  private var universes: List[Universe] = List(initialUniverse)
 
   private var entities: List[Entity] = List()
 
@@ -71,9 +71,7 @@ private final class Multiverse(initialUniverse: Universe, tileMap: Tilemap) exte
       universes = newUniverses
       combine()
       true
-    } else {
-      false
-    }
+    } else false
   }
 
   def allocate[A](initialValue: A): StateId[A] = {
@@ -93,6 +91,11 @@ private final class Multiverse(initialUniverse: Universe, tileMap: Tilemap) exte
     Game.create(entity)
     entities ::= entity
   }
+
+  def forall(f: Universe => Boolean): Boolean = universes forall f
+
+  def updateMetaWith(id: MetaId[_])(updater: id.Value => Universe => id.Value): Unit =
+    universes = universes map (universe => universe.updatedMetaWith(id)(updater(_)(universe)))
 
   private def step(): Unit = {
     normalize()
