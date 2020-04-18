@@ -2,7 +2,6 @@ package superposition.quantum
 
 import scalaz.std.option._
 import scalaz.syntax.functor._
-import superposition.game.{Player, Quball, UniverseComponent}
 import superposition.math._
 
 /**
@@ -33,20 +32,4 @@ final case class Universe(amplitude: Complex = Complex(1),
 
   def updatedMetaWith(id: MetaId[_])(updater: id.Value => id.Value): Universe =
     copy(meta = meta.updatedWith(id)(updater.lift))
-
-  def allInCell(cell: Vec2i): Iterable[UniverseComponent] =
-    UniverseComponent.All filter (_.position map (state(_)) contains cell)
-
-  def getPrimaryBits(cell: Vec2i): Iterable[StateId[Boolean]] =
-    allInCell(cell) flatMap (_.primaryBit.toList)
-
-  def isBlocked(cell: Vec2i): Boolean =
-    UniverseComponent.All exists (_.blockingCells(this) contains cell)
-
-  def allOn(controls: Iterable[Vec2i]): Boolean =
-    controls forall { control =>
-      Quball.All exists (quball => state(quball.cell) == control && state(quball.onOff))
-    }
-
-  def isValid: Boolean = Player.All forall (player => !isBlocked(state(player.cell)))
 }

@@ -19,12 +19,12 @@ import scala.jdk.CollectionConverters._
  * @param scale  the scale of the sprite
  * @param color  the color of the sprite
  */
-final class SpriteComponent(entity: Entity,
-                            val sprite: Universe => Sprite,
-                            val position: Universe => Vec2d,
-                            val scale: Universe => Vec2d = const(new Vec2d(1, 1)),
-                            val color: Universe => Color = const(WHITE),
-                            val layer: Int = 0)
+private final class SpriteComponent(entity: Entity,
+                                    val sprite: Universe => Sprite,
+                                    val position: Universe => Vec2d,
+                                    val scale: Universe => Vec2d = const(new Vec2d(1, 1)),
+                                    val color: Universe => Color = const(WHITE),
+                                    val layer: Int = 0)
   extends Component(entity) {
 
   /**
@@ -36,6 +36,6 @@ final class SpriteComponent(entity: Entity,
       color(universe))
 }
 
-object SpriteComponent {
+private object SpriteComponent {
   val All: Iterable[SpriteComponent] = track(classOf[SpriteComponent]).asScala
 }

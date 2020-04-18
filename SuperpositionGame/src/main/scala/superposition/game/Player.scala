@@ -21,7 +21,7 @@ import scala.jdk.CollectionConverters._
  * @param multiverse  the multiverse this player belongs to
  * @param initialCell the initial position for this player
  */
-class Player(multiverse: Multiverse, initialCell: Vec2i) extends Entity {
+private final class Player(multiverse: Multiverse, initialCell: Vec2i) extends Entity {
   private val alive: StateId[Boolean] = multiverse.allocate(true)
 
   val cell: StateId[Vec2i] = multiverse.allocate(initialCell)
@@ -101,7 +101,7 @@ class Player(multiverse: Multiverse, initialCell: Vec2i) extends Entity {
   }
 }
 
-object Player {
+private object Player {
   val All: Iterable[Player] = track(classOf[Player]).asScala
 
   private val WalkKeys: Map[Int, Vec2d] = Map(

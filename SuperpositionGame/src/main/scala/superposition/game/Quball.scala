@@ -18,7 +18,7 @@ import scala.jdk.CollectionConverters._
  * @param multiverse  the multiverse this quball belongs to
  * @param initialCell the initial cell of this quball
  */
-final class Quball(multiverse: Multiverse, initialCell: Vec2i) extends Entity {
+private final class Quball(multiverse: Multiverse, initialCell: Vec2i) extends Entity {
   val cell: StateId[Vec2i] = multiverse.allocate(initialCell)
 
   val position: MetaId[Vec2d] = multiverse.allocateMeta(initialCell.toVec2d add 0.5)
@@ -37,7 +37,7 @@ final class Quball(multiverse: Multiverse, initialCell: Vec2i) extends Entity {
   add(new UniverseComponent(this, primaryBit = Some(onOff), position = Some(cell)))
 }
 
-object Quball {
+private object Quball {
   val All: Iterable[Quball] = track(classOf[Quball]).asScala
 
   private val BallSprite = Sprite.load(getClass.getResource("sprites/ball.png"))

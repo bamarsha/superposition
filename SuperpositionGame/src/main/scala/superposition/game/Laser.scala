@@ -12,6 +12,7 @@ import engine.util.Color
 import engine.util.Color._
 import engine.util.math.Transformation
 import superposition.game.Laser._
+import superposition.game.UniverseImplicits.GameUniverse
 import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math.{Direction, Vec2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
@@ -74,7 +75,7 @@ private final class Laser(multiverse: Multiverse,
       None
 
   private def hits(universe: Universe): List[StateId[Boolean]] =
-    targetCell(universe).toList flatMap universe.getPrimaryBits
+    targetCell(universe).toList flatMap universe.primaryBits
 
   private def selected: Boolean =
     cell == Vec2i(mouse().x.floor.toInt, mouse().y.floor.toInt)
