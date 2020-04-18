@@ -42,8 +42,7 @@ private final class Laser(multiverse: Multiverse,
     sprite = const(Sprite.load(Sprites(direction))),
     position = const(cell.toVec2d add 0.5)))
 
-  private val universe: UniverseComponent = add(new UniverseComponent(this, multiverse))
-  universe.blockingCells = const(Set(cell))
+  add(new UniverseComponent(this, blockingCells = const(Set(cell))))
 
   private val beam: LazyList[Vec2i] = LazyList.iterate(cell)(_ + direction.toVec2i).tail
 

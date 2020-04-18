@@ -19,8 +19,8 @@ private final class Door(multiverse: Multiverse, cell: Vec2i, controls: Iterable
     position = const(cell.toVec2d add 0.5),
     layer = -1))
 
-  private val universe: UniverseComponent = add(new UniverseComponent(this, multiverse))
-  universe.blockingCells = universe => if (universe.allOn(controls)) Set() else Set(cell)
+  add(new UniverseComponent(this,
+    blockingCells = universe => if (universe.allOn(controls)) Set.empty else Set(cell)))
 }
 
 private object Door {

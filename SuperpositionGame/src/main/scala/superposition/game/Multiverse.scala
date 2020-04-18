@@ -50,8 +50,7 @@ private final class Multiverse(tileMap: Tilemap) extends Entity {
 
   private var colorBuffer: Texture = _
 
-  private val universeComponent = add(new UniverseComponent(this, this))
-  universeComponent.blockingCells = const(walls(tileMap))
+  add(new UniverseComponent(this, blockingCells = const(walls(tileMap))))
 
   override protected def onCreate(): Unit = {
     frameBuffer = new Framebuffer()

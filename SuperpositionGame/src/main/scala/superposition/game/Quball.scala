@@ -34,9 +34,7 @@ final class Quball(multiverse: Multiverse, initialCell: Vec2i) extends Entity {
     color = universe => if (universe.state(onOff)) WHITE else BLACK,
     layer = 1))
 
-  private val universe: UniverseComponent = add(new UniverseComponent(this, multiverse))
-  universe.primaryBit = Some(onOff)
-  universe.position = Some(cell)
+  add(new UniverseComponent(this, primaryBit = Some(onOff), position = Some(cell)))
 }
 
 object Quball {

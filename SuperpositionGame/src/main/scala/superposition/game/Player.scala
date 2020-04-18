@@ -36,9 +36,7 @@ class Player(multiverse: Multiverse, initialCell: Vec2i) extends Entity {
     scale = const(new Vec2d(2, 2)),
     universe => if (universe.state(alive)) WHITE else BLACK))
 
-  private val universe: UniverseComponent = add(new UniverseComponent(this, multiverse))
-  universe.primaryBit = Some(alive)
-  universe.position = Some(cell)
+  add(new UniverseComponent(this, primaryBit = Some(alive), position = Some(cell)))
 
   private val walkGate: Gate[Vec2i] = {
     val movePlayer: Gate[Vec2i] = Translate.multi control { delta => universe =>
