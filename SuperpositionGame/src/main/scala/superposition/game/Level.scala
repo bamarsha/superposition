@@ -94,7 +94,7 @@ private object Level {
         new Laser(multiverse, cell, gate, direction, control)
       case "Door" =>
         val controls = cellsFromString(tileMap, properties("Controls").value).toList
-        new Door(multiverse, cell, controls)
+        new Door(cell, controls)
       case "Goal" =>
         // TODO: val requires = ObjectId(properties("Requires").value.toInt)
         val next = properties("Next Level").value

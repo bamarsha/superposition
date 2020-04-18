@@ -14,7 +14,7 @@ import scala.Function.const
  * @param cell     the position of this door
  * @param controls the control cells for this door
  */
-private final class Door(multiverse: Multiverse, cell: Vec2i, controls: Iterable[Vec2i]) extends Entity {
+private final class Door(cell: Vec2i, controls: Iterable[Vec2i]) extends Entity {
   add(new SpriteComponent(this,
     sprite = universe => if (universe.allOn(controls)) OpenSprite else ClosedSprite,
     position = const(cell.toVec2d add 0.5),
