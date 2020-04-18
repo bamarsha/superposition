@@ -33,3 +33,11 @@ final case class Universe(amplitude: Complex = Complex(1),
   def updatedMetaWith(id: MetaId[_])(updater: id.Value => id.Value): Universe =
     copy(meta = meta.updatedWith(id)(updater.lift))
 }
+
+final class StateId[A] extends DependentKey {
+  type Value = A
+}
+
+final class MetaId[A] extends DependentKey {
+  type Value = A
+}

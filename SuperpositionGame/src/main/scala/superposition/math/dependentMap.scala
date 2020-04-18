@@ -1,5 +1,11 @@
 package superposition.math
 
+trait DependentKey {
+  type Value
+}
+
+trait DependentMap[K <: DependentKey] extends DependentMapOps[K, DependentMap[K]]
+
 trait DependentMapOps[K <: DependentKey, +Self <: DependentMapOps[K, Self]] {
   this: Self =>
 
