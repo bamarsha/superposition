@@ -37,22 +37,6 @@ public abstract class Game {
     }
 
     /**
-     * Declares that the given code should be run every frame on the collection of all instances of the given behavior
-     * that currently exist in the game world
-     *
-     * @param c    The type of behavior to run the code on
-     * @param func The code to run on the collection of behaviors
-     */
-    public static <T extends Behavior> void declareGroupSystem(Class<T> c, Consumer<Collection<T>> func) {
-        var myBehaviors = Collections.unmodifiableCollection(track(c));
-        declareSystem(() -> {
-            if (!myBehaviors.isEmpty()) {
-                func.accept(myBehaviors);
-            }
-        });
-    }
-
-    /**
      * Adds the given entity to the game world.
      * Throws an IllegalStateException if the entity has already been created.
      * @param e The entity to create
