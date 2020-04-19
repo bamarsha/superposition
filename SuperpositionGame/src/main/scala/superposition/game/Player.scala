@@ -8,7 +8,7 @@ import engine.graphics.sprites.Sprite
 import engine.util.Color._
 import engine.util.math.Vec2d
 import org.lwjgl.glfw.GLFW._
-import superposition.game.Player.{CatSprite, deltaPosition, snapPosition}
+import superposition.game.Player._
 import superposition.math.Vec2i
 import superposition.quantum._
 
@@ -39,10 +39,10 @@ private final class Player(multiverse: Multiverse, initialCell: Vec2i) extends E
   add(new UniverseComponent(this, primaryBit = Some(alive), position = Some(cell)))
 
   private val walkGate: Gate[Vec2i] = {
-    val movePlayer: Gate[Vec2i] = Translate.multi control { delta => universe =>
+    val walkPlayer: Gate[Vec2i] = Translate.multi control { delta => universe =>
       if (universe.state(alive)) List((cell, delta)) else List()
     }
-    val moveQuballs: Gate[Vec2i] = Translate.multi control { delta => universe =>
+    val walkQuballs: Gate[Vec2i] = Translate.multi control { delta => universe =>
       if (universe.state(alive))
         Quball.All
           .filter(quball => universe.state(quball.carried))
@@ -50,32 +50,28 @@ private final class Player(multiverse: Multiverse, initialCell: Vec2i) extends E
           .toList
       else List()
     }
-    movePlayer andThen moveQuballs
+    walkPlayer andThen walkQuballs
   }
 
-  private val carryGate: Gate[Unit] = X.multi control const { universe =>
-    Quball.All
-      .filter(quball => universe.state(alive) && universe.state(cell) == universe.state(quball.cell))
-      .map(_.carried)
-      .toList
-  }
-
-  private def walkIntent(): Vec2i = {
-    val next = relativePosition add deltaPosition()
-    Vec2i(snapPosition(next.x), snapPosition(next.y))
-  }
+  private val carryGate: Gate[Unit] =
+    X.multi control const { universe =>
+      Quball.All
+        .filter(quball => universe.state(alive) && universe.state(cell) == universe.state(quball.cell))
+        .map(_.carried)
+        .toList
+    }
 
   private def walk(): Unit = {
     def applyGate(delta: Vec2i) = multiverse.applyGate(walkGate, delta)
 
-    val Vec2i(dx, dy) = walkIntent()
-    val delta = deltaPosition() add new Vec2d(
+    val Vec2i(dx, dy) = nextCell(relativePosition, deltaPosition)
+    val delta = deltaPosition add new Vec2d(
       if (dx != 0 && applyGate(Vec2i(dx, 0))) -dx else 0,
       if (dy != 0 && applyGate(Vec2i(0, dy))) -dy else 0)
     relativePosition = (relativePosition add delta).clamp(0, 1)
   }
 
-  private def updatePosition(): Unit = {
+  private def updatePlayerPosition(): Unit =
     multiverse.updateMetaWith(position) { pos => universe =>
       if (universe.state(alive)) {
         val targetPosition = universe.state(cell).toVec2d add relativePosition
@@ -83,6 +79,7 @@ private final class Player(multiverse: Multiverse, initialCell: Vec2i) extends E
       } else pos
     }
 
+  private def updateCarriedPositions(): Unit =
     for (quball <- Quball.All) {
       multiverse.updateMetaWith(quball.position) { pos => universe =>
         val relativePos = if (universe.state(quball.carried)) relativePosition else new Vec2d(0.5, 0.5)
@@ -90,14 +87,14 @@ private final class Player(multiverse: Multiverse, initialCell: Vec2i) extends E
         if (universe.state(alive)) pos.lerp(targetPos, 10 * dt) else pos
       }
     }
-  }
 
   private def step(): Unit = {
     walk()
     if (keyJustPressed(GLFW_KEY_SPACE)) {
       multiverse.applyGate(carryGate, ())
     }
-    updatePosition()
+    updatePlayerPosition()
+    updateCarriedPositions()
   }
 }
 
@@ -116,7 +113,7 @@ private object Player {
 
   def declareSystem(): Unit = Game.declareSystem(classOf[Player], (_: Player).step())
 
-  private def deltaPosition(): Vec2d = {
+  private def deltaPosition: Vec2d = {
     val delta = WalkKeys.foldLeft(new Vec2d(0, 0)) {
       case (delta, (key, direction)) => if (keyDown(key)) delta add direction else delta
     }
@@ -127,4 +124,9 @@ private object Player {
     if (delta < -1e-3) -1
     else if (delta > 1 + 1e-3) 1
     else 0
+
+  private def nextCell(start: Vec2d, delta: Vec2d): Vec2i = {
+    val next = start add delta
+    Vec2i(snapPosition(next.x), snapPosition(next.y))
+  }
 }
