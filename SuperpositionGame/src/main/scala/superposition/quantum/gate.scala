@@ -11,9 +11,6 @@ import scala.math.sqrt
  * @tparam A The type of the gate's argument.
  */
 sealed trait Gate[A] {
-
-  import Gate.Divisible.divisibleSyntax._
-
   /**
    * Applies a value to the gate within a universe.
    *
@@ -27,41 +24,11 @@ sealed trait Gate[A] {
    * The adjoint is the reverse of the gate.
    */
   def adjoint: Gate[A]
-
-  def applyToAll(value: A)(universes: Seq[Universe]): Seq[Universe] =
-    universes flatMap this(value)
-
-  def andThen(gate: Gate[A]): Gate[A] = Divisible[Gate].divide(this, gate)(value => (value, value))
-
-  def multi: Gate[Seq[A]] = new Gate[Seq[A]] {
-    override def apply(values: Seq[A])(universe: Universe): Seq[Universe] = values match {
-      case List() => List(universe)
-      case x :: xs => Gate.this(x)(universe) flatMap Gate.this.multi(xs)
-    }
-
-    override def adjoint: Gate[Seq[A]] = Gate.this.adjoint.multi contramap (_.reverse)
-  }
-
-  def control[B](f: B => Universe => A): Gate[B] = new Gate[B] {
-    override def apply(value: B)(universe: Universe): Seq[Universe] = {
-      val result = Gate.this(f(value)(universe))(universe)
-      for (newUniverse <- result) {
-        assert(f(value)(universe) == f(value)(newUniverse))
-      }
-      result
-    }
-
-    override def adjoint: Gate[B] = Gate.this.adjoint control f
-  }
-
-  def flatMap[B](f: B => Seq[A]): Gate[B] = multi contramap f
-
-  def filter(predicate: A => Boolean): Gate[A] = flatMap(List(_) filter predicate)
 }
 
 object Gate {
 
-  implicit object Divisible extends Divisible[Gate] {
+  implicit object GateDivisible extends Divisible[Gate] {
     override def conquer[A]: Gate[A] = Identity
 
     override def divide2[A, B, C](gate1: => Gate[A], gate2: => Gate[B])(f: C => (A, B)): Gate[C] = new Gate[C] {
@@ -74,9 +41,45 @@ object Gate {
     }
   }
 
+  final implicit class GateOps[A](val gate: Gate[A]) {
+
+    import Gate.GateDivisible.divisibleSyntax._
+
+    def applyToAll(value: A)(universes: Seq[Universe]): Seq[Universe] =
+      universes flatMap gate(value)
+
+    def andThen(other: Gate[A]): Gate[A] =
+      Divisible[Gate].divide(gate, other)(value => (value, value))
+
+    def multi: Gate[Seq[A]] = new Gate[Seq[A]] {
+      override def apply(values: Seq[A])(universe: Universe): Seq[Universe] = values match {
+        case List() => List(universe)
+        case x :: xs => gate(x)(universe) flatMap gate.multi(xs)
+      }
+
+      override def adjoint: Gate[Seq[A]] = gate.adjoint.multi contramap (_.reverse)
+    }
+
+    def controlled[B](f: B => Universe => A): Gate[B] = new Gate[B] {
+      override def apply(value: B)(universe: Universe): Seq[Universe] = {
+        val result = gate(f(value)(universe))(universe)
+        for (newUniverse <- result) {
+          assert(f(value)(universe) == f(value)(newUniverse))
+        }
+        result
+      }
+
+      override def adjoint: Gate[B] = gate.adjoint controlled f
+    }
+
+    def flatMap[B](f: B => Seq[A]): Gate[B] = multi contramap f
+
+    def filter(predicate: A => Boolean): Gate[A] = flatMap(List(_) filter predicate)
+  }
+
 }
 
-object Identity extends Gate[Any] {
+case object Identity extends Gate[Any] {
 
   import scala.language.implicitConversions
 
@@ -87,14 +90,14 @@ object Identity extends Gate[Any] {
   implicit def asGate[A](id: Identity.type): Gate[A] = id.asInstanceOf[Gate[A]]
 }
 
-object X extends Gate[StateId[Boolean]] {
+case object X extends Gate[StateId[Boolean]] {
   override def apply(id: StateId[Boolean])(universe: Universe): Seq[Universe] =
     List(universe.updatedStateWith(id)(!_))
 
   override def adjoint: Gate[StateId[Boolean]] = this
 }
 
-object H extends Gate[StateId[Boolean]] {
+case object H extends Gate[StateId[Boolean]] {
   override def apply(id: StateId[Boolean])(universe: Universe): Seq[Universe] = List(
     universe / Complex((if (universe.state(id)) -1 else 1) * sqrt(2)),
     universe.updatedStateWith(id)(!_) / Complex(sqrt(2))
@@ -103,9 +106,9 @@ object H extends Gate[StateId[Boolean]] {
   override def adjoint: Gate[StateId[Boolean]] = this
 }
 
-object Translate extends Gate[(StateId[Vec2i], Vec2i)] {
+case object Translate extends Gate[(StateId[Vec2i], Vec2i)] {
 
-  import Gate.Divisible.divisibleSyntax._
+  import Gate.GateDivisible.divisibleSyntax._
 
   override def apply(value: (StateId[Vec2i], Vec2i))(universe: Universe): Seq[Universe] = value match {
     case (id, delta) => List(universe.updatedStateWith(id)(_ + delta))

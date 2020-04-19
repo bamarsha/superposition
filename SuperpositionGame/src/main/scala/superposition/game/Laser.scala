@@ -78,7 +78,7 @@ private final class Laser(multiverse: Multiverse,
 
   private def step(): Unit = {
     if (mouseJustPressed(0) && isSelected(cell)) {
-      multiverse.applyGate(gate.multi control const(hits), ())
+      multiverse.applyGate(gate.multi controlled const(hits), ())
       multiverse.updateMetaWith(lastTarget)(const(target))
       multiverse.updateMetaWith(elapsedTime) { time => universe =>
         if (target(universe).isEmpty) time else 0

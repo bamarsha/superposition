@@ -39,10 +39,10 @@ private final class Player(multiverse: Multiverse, initialCell: Vec2i) extends E
   add(new UniverseComponent(this, primaryBit = Some(alive), position = Some(cell)))
 
   private val walkGate: Gate[Vec2i] = {
-    val walkPlayer: Gate[Vec2i] = Translate.multi control { delta => universe =>
+    val walkPlayer: Gate[Vec2i] = Translate.multi controlled { delta => universe =>
       if (universe.state(alive)) List((cell, delta)) else List()
     }
-    val walkQuballs: Gate[Vec2i] = Translate.multi control { delta => universe =>
+    val walkQuballs: Gate[Vec2i] = Translate.multi controlled { delta => universe =>
       if (universe.state(alive))
         Quball.All
           .filter(quball => universe.state(quball.carried))
@@ -54,7 +54,7 @@ private final class Player(multiverse: Multiverse, initialCell: Vec2i) extends E
   }
 
   private val carryGate: Gate[Unit] =
-    X.multi control const { universe =>
+    X.multi controlled const { universe =>
       Quball.All
         .filter(quball => universe.state(alive) && universe.state(cell) == universe.state(quball.cell))
         .map(_.carried)
