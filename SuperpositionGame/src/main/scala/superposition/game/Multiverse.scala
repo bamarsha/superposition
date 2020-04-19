@@ -103,9 +103,7 @@ private final class Multiverse(tileMap: Tilemap) extends Entity {
   def updateMetaWith(id: MetaId[_])(updater: id.Value => Universe => id.Value): Unit =
     universes = universes map (universe => universe.updatedMetaWith(id)(updater(_)(universe)))
 
-  private def step(): Unit = draw()
-
-  private def draw(): Unit = {
+  private def step(): Unit = {
     tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
     highlightOccupiedCells()
     drawShader()
