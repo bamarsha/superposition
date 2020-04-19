@@ -12,7 +12,8 @@ import engine.util.Color.CLEAR
 import engine.util.math.{Transformation, Vec2d, Vec4d}
 import extras.physics.Rectangle
 import extras.tiles.{Tilemap, TilemapRenderer}
-import superposition.game.Multiverse.{UniverseShader, walls}
+import scalaz.Scalaz._
+import superposition.game.Multiverse.{UniverseShader, combine, walls}
 import superposition.game.UniverseImplicits.GameUniverse
 import superposition.math.{Complex, Vec2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
@@ -72,8 +73,9 @@ private final class Multiverse(tileMap: Tilemap) extends Entity {
   def applyGate[A](gate: Gate[A], value: A): Boolean = {
     val newUniverses = gate.applyToAll(value)(universes)
     if (newUniverses forall (_.isValid)) {
-      universes = newUniverses
-      combine()
+      universes = newUniverses |>
+        combine |>
+        (_ sortBy (universe => stateIds.reverse map (universe.state(_).toString)))
       true
     } else false
   }
@@ -101,25 +103,7 @@ private final class Multiverse(tileMap: Tilemap) extends Entity {
   def updateMetaWith(id: MetaId[_])(updater: id.Value => Universe => id.Value): Unit =
     universes = universes map (universe => universe.updatedMetaWith(id)(updater(_)(universe)))
 
-  private def step(): Unit = {
-    normalize()
-    draw()
-  }
-
-  private def combine(): Unit = {
-    universes = universes
-      .groupMapReduce(_.state)(identity)((u1, u2) => u1 + u2.amplitude)
-      .values
-      .filter(_.amplitude.squaredMagnitude > 1e-6)
-      .toList
-      .sortBy(universe => stateIds.reverse.map(universe.state(_).toString))
-    normalize()
-  }
-
-  private def normalize(): Unit = {
-    val sum = (universes map (_.amplitude.squaredMagnitude)).sum
-    universes = universes map (_ / Complex(sqrt(sum)))
-  }
+  private def step(): Unit = draw()
 
   private def draw(): Unit = {
     tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
@@ -182,4 +166,17 @@ private object Multiverse {
         (x + layer.offsetX.toDouble / tileMap.tileWidth).round.toInt,
         (y + layer.offsetY.toDouble / tileMap.tileHeight).round.toInt)
     }).toSet
+
+  private def normalize(universes: List[Universe]): List[Universe] = {
+    val sum = (universes map (_.amplitude.squaredMagnitude)).sum
+    universes map (_ / Complex(sqrt(sum)))
+  }
+
+  private def combine(universes: List[Universe]): List[Universe] =
+    universes
+      .groupMapReduce(_.state)(identity)(_ + _.amplitude)
+      .values
+      .filter(_.amplitude.squaredMagnitude > 1e-6)
+      .toList |>
+      normalize
 }
