@@ -13,8 +13,8 @@ import engine.util.math.{Transformation, Vec2d, Vec4d}
 import extras.physics.Rectangle
 import extras.tiles.{Tilemap, TilemapRenderer}
 import scalaz.Scalaz._
+import superposition.game.GameUniverse.UniverseOps
 import superposition.game.Multiverse.{UniverseShader, combine, walls}
-import superposition.game.UniverseImplicits.GameUniverse
 import superposition.math.{Complex, Vec2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
