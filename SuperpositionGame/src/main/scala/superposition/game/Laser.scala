@@ -35,7 +35,7 @@ private final class Laser(multiverse: Multiverse,
                           gate: Gate[StateId[Boolean]],
                           direction: Direction,
                           controls: Iterable[Vec2i]) extends Entity {
-  private val lastTargetCell: MetaId[Option[Vec2i]] = multiverse.allocateMeta(None)
+  private val lastTarget: MetaId[Option[Vec2i]] = multiverse.allocateMeta(None)
 
   private val elapsedTime: MetaId[Double] = multiverse.allocateMeta(0)
 
@@ -53,14 +53,14 @@ private final class Laser(multiverse: Multiverse,
    * @param universe the universe to draw in
    */
   def draw(universe: Universe): Unit = {
-    if (selected) {
+    if (isSelected(cell)) {
       drawRectangleOutline(Transformation.create(cell.toVec2d, 0, 1), RED)
     }
-    universe.meta(lastTargetCell) match {
-      case Some(targetCell) if universe.meta(elapsedTime) <= BeamDuration + FadeDuration =>
+    universe.meta(lastTarget) match {
+      case Some(target) if universe.meta(elapsedTime) <= BeamDuration + FadeDuration =>
         drawWideLine(
           cell.toVec2d add 0.5,
-          targetCell.toVec2d add 0.5,
+          target.toVec2d add 0.5,
           0.25,
           new Color(1, 0, 0,
             min(FadeDuration, BeamDuration + FadeDuration - universe.meta(elapsedTime)) / FadeDuration))
@@ -68,24 +68,20 @@ private final class Laser(multiverse: Multiverse,
     }
   }
 
-  private def targetCell(universe: Universe): Option[Vec2i] =
+  private def target(universe: Universe): Option[Vec2i] =
     if (universe.allOn(controls))
-      beam.take(50) find (cell => universe.isBlocked(cell) || universe.allInCell(cell).nonEmpty)
-    else
-      None
+      beam.take(BeamLength) find (cell => universe.isBlocked(cell) || universe.allInCell(cell).nonEmpty)
+    else None
 
-  private def hits(universe: Universe): List[StateId[Boolean]] =
-    targetCell(universe).toList flatMap universe.primaryBits
-
-  private def selected: Boolean =
-    cell == Vec2i(mouse().x.floor.toInt, mouse().y.floor.toInt)
+  private def hits(universe: Universe): Seq[StateId[Boolean]] =
+    target(universe).iterator.to(Seq) flatMap universe.primaryBits
 
   private def step(): Unit = {
-    if (mouseJustPressed(0) && selected) {
+    if (mouseJustPressed(0) && isSelected(cell)) {
       multiverse.applyGate(gate.multi control const(hits), ())
-      multiverse.updateMetaWith(lastTargetCell)(const(targetCell))
+      multiverse.updateMetaWith(lastTarget)(const(target))
       multiverse.updateMetaWith(elapsedTime) { time => universe =>
-        if (targetCell(universe).isEmpty) time else 0
+        if (target(universe).isEmpty) time else 0
       }
     }
     multiverse.updateMetaWith(elapsedTime)(time => const(time + dt))
@@ -101,9 +97,14 @@ private object Laser {
     Left -> getClass.getResource("sprites/laser_left.png"),
     Right -> getClass.getResource("sprites/laser_right.png"))
 
+  private val BeamLength: Int = 25
+
   private val BeamDuration: Double = 0.2
 
   private val FadeDuration: Double = 0.3
 
   def declareSystem(): Unit = Game.declareSystem(classOf[Laser], (_: Laser).step())
+
+  private def isSelected(cell: Vec2i): Boolean =
+    cell == Vec2i(mouse.x.floor.toInt, mouse.y.floor.toInt)
 }

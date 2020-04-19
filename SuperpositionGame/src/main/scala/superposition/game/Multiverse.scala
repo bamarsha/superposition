@@ -37,7 +37,7 @@ private final class Multiverse(tileMap: Tilemap) extends Entity {
    */
   val boundingBox: Rectangle = new Rectangle(new Vec2d(0, 0), new Vec2d(tileMap.width, tileMap.height))
 
-  private var universes: List[Universe] = List(Universe())
+  private var universes: Seq[Universe] = Seq(Universe())
 
   private var entities: List[Entity] = List()
 
@@ -167,12 +167,12 @@ private object Multiverse {
         (y + layer.offsetY.toDouble / tileMap.tileHeight).round.toInt)
     }).toSet
 
-  private def normalize(universes: List[Universe]): List[Universe] = {
+  private def normalize(universes: Seq[Universe]): Seq[Universe] = {
     val sum = (universes map (_.amplitude.squaredMagnitude)).sum
     universes map (_ / Complex(sqrt(sum)))
   }
 
-  private def combine(universes: List[Universe]): List[Universe] =
+  private def combine(universes: Seq[Universe]): Seq[Universe] =
     universes
       .groupMapReduce(_.state)(identity)(_ + _.amplitude)
       .values
