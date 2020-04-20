@@ -41,7 +41,7 @@ object Gate {
     }
   }
 
-  final implicit class GateOps[A](val gate: Gate[A]) {
+  final implicit class Ops[A](val gate: Gate[A]) {
 
     import Gate.GateDivisible.divisibleSyntax._
 
