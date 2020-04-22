@@ -75,6 +75,7 @@ private final class Multiverse(tileMap: Tilemap) extends Entity {
     if (newUniverses forall (_.isValid)) {
       universes = newUniverses |>
         combine |>
+        (_.toSeq) |>
         (_ sortBy (universe => stateIds.reverse map (universe.state(_).toString)))
       true
     } else false
@@ -165,16 +166,15 @@ private object Multiverse {
         (y + layer.offsetY.toDouble / tileMap.tileHeight).round.toInt)
     }).toSet
 
-  private def normalize(universes: Seq[Universe]): Seq[Universe] = {
+  private def normalize(universes: Iterable[Universe]): Iterable[Universe] = {
     val sum = (universes map (_.amplitude.squaredMagnitude)).sum
     universes map (_ / Complex(sqrt(sum)))
   }
 
-  private def combine(universes: Seq[Universe]): Seq[Universe] =
+  private def combine(universes: Iterable[Universe]): Iterable[Universe] =
     universes
       .groupMapReduce(_.state)(identity)(_ + _.amplitude)
       .values
-      .filter(_.amplitude.squaredMagnitude > 1e-6)
-      .toList |>
+      .filter(_.amplitude.squaredMagnitude > 1e-6) |>
       normalize
 }
