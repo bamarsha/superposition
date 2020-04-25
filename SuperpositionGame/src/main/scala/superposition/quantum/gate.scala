@@ -41,7 +41,7 @@ object Gate {
     }
   }
 
-  final implicit class Ops[A](val gate: Gate[A]) {
+  final implicit class Ops[A](val gate: Gate[A]) extends AnyVal {
 
     import Gate.GateDivisible.divisibleSyntax._
 
