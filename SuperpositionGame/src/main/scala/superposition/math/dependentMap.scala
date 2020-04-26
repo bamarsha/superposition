@@ -2,7 +2,7 @@ package superposition.math
 
 import scala.collection.immutable.HashMap
 
-final class DependentMap[K <: DependentKey] private(map: HashMap[K, Any]) {
+final class DependentMap[K <: DependentKey] private(private val map: HashMap[K, Any]) {
   def apply(key: K): key.Value = get(key).get
 
   def get(key: K): Option[key.Value] = map.get(key).asInstanceOf[Option[key.Value]]
@@ -17,6 +17,15 @@ final class DependentMap[K <: DependentKey] private(map: HashMap[K, Any]) {
       case (Some(_), None) => removed(key)
       case (_, Some(value)) => updated(key)(value)
     }
+
+  override def toString: String = map.toString
+
+  override def equals(that: Any): Boolean = that match {
+    case thatMap: DependentMap[_] => thatMap.map.equals(map)
+    case _ => super.equals(that)
+  }
+
+  override def hashCode(): Int = map.hashCode()
 }
 
 object DependentMap {
