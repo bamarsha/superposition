@@ -29,7 +29,7 @@ sealed trait Gate[A] {
 object Gate {
 
   implicit object GateDivisible extends Divisible[Gate] {
-    override def conquer[A]: Gate[A] = Identity
+    override def conquer[A]: Gate[A] = Identity[A]()
 
     override def divide2[A, B, C](gate1: => Gate[A], gate2: => Gate[B])(f: C => (A, B)): Gate[C] = new Gate[C] {
       override def apply(value: C)(universe: Universe): NonEmptyList[Universe] = {
@@ -79,15 +79,10 @@ object Gate {
 
 }
 
-case object Identity extends Gate[Any] {
+case class Identity[A]() extends Gate[A] {
+  override def apply(value: A)(universe: Universe): NonEmptyList[Universe] = NonEmptyList(universe)
 
-  import scala.language.implicitConversions
-
-  override def apply(value: Any)(universe: Universe): NonEmptyList[Universe] = NonEmptyList(universe)
-
-  override def adjoint: Gate[Any] = this
-
-  implicit def asGate[A](id: Identity.type): Gate[A] = id.asInstanceOf[Gate[A]]
+  override def adjoint: Gate[A] = this
 }
 
 case object X extends Gate[StateId[Boolean]] {
