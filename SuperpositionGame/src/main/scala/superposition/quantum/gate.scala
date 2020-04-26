@@ -92,10 +92,18 @@ case object X extends Gate[StateId[Boolean]] {
   override def adjoint: Gate[StateId[Boolean]] = this
 }
 
+case object Z extends Gate[StateId[Boolean]] {
+  override def apply(id: StateId[Boolean])(universe: Universe): NonEmptyList[Universe] =
+    NonEmptyList(universe * Complex(if (universe.state(id)) -1 else 1))
+
+  override def adjoint: Gate[StateId[Boolean]] = this
+}
+
 case object H extends Gate[StateId[Boolean]] {
-  override def apply(id: StateId[Boolean])(universe: Universe): NonEmptyList[Universe] = NonEmptyList(
-    universe / Complex((if (universe.state(id)) -1 else 1) * sqrt(2)),
-    universe.updatedStateWith(id)(!_) / Complex(sqrt(2)))
+  override def apply(id: StateId[Boolean])(universe: Universe): NonEmptyList[Universe] =
+    NonEmptyList(
+      universe / Complex((if (universe.state(id)) -1 else 1) * sqrt(2)),
+      universe.updatedStateWith(id)(!_) / Complex(sqrt(2)))
 
   override def adjoint: Gate[StateId[Boolean]] = this
 }

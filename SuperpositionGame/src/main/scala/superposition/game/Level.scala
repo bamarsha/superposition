@@ -116,6 +116,7 @@ private object Level {
 
   private def gateFromName(name: String): Gate[StateId[Boolean]] = name match {
     case "X" => X
+    case "Z" => Z
     case "H" => H
     case _ => error("Unsupported gate '" + name + "'.")
   }
