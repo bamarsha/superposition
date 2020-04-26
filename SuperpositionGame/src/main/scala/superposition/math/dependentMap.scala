@@ -25,7 +25,7 @@ final class DependentMap[K <: DependentKey] private(private val map: HashMap[K, 
     case _ => super.equals(that)
   }
 
-  override def hashCode(): Int = map.hashCode()
+  override def hashCode: Int = map.hashCode
 }
 
 object DependentMap {
