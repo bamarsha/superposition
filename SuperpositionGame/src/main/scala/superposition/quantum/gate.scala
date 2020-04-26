@@ -53,7 +53,7 @@ object Gate {
 
     def multi: Gate[Seq[A]] = new Gate[Seq[A]] {
       override def apply(values: Seq[A])(universe: Universe): NonEmptyList[Universe] = values match {
-        case Seq() => NonEmptyList(universe)
+        case Nil => NonEmptyList(universe)
         case x :: xs => gate(x)(universe) flatMap gate.multi(xs)
       }
 
