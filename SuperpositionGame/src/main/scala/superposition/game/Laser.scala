@@ -11,7 +11,7 @@ import engine.graphics.sprites.Sprite
 import engine.util.Color
 import engine.util.Color._
 import engine.util.math.Transformation
-import superposition.game.GameUniverse.UniverseOps
+import superposition.game.GameUniverse.Ops
 import superposition.game.Laser._
 import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math.{Direction, Vec2i}

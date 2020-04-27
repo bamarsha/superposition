@@ -3,7 +3,7 @@ package superposition.game
 import engine.core.Behavior.Entity
 import engine.graphics.sprites.Sprite
 import superposition.game.Door.{ClosedSprite, OpenSprite}
-import superposition.game.GameUniverse.UniverseOps
+import superposition.game.GameUniverse.Ops
 import superposition.math.Vec2i
 
 import scala.Function.const

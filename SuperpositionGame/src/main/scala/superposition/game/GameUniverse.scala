@@ -5,7 +5,7 @@ import superposition.quantum.{StateId, Universe}
 
 private object GameUniverse {
 
-  final implicit class UniverseOps(val universe: Universe) extends AnyVal {
+  final implicit class Ops(val universe: Universe) extends AnyVal {
     def allInCell(cell: Vec2i): Iterable[UniverseComponent] =
       UniverseComponent.All filter (_.position map (universe.state(_)) contains cell)
 
