@@ -9,12 +9,12 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader
 private final class Superposition extends Game {
   private val engine: Engine = new Engine
 
-  private val levelManager: LevelManager = new LevelManager(engine)
+  private val levelLoader: LevelLoader = new LevelLoader(engine)
 
   override def create(): Unit = {
     engine.addSystem(new MapRenderer)
     engine.addSystem(new MultiverseRenderer)
-    levelManager.load(new TmxMapLoader(ResourceResolver).load("level1.tmx"))
+    levelLoader.load(new TmxMapLoader(ResourceResolver).load("level1.tmx"))
   }
 
   override def render(): Unit = {
@@ -29,16 +29,3 @@ private object Superposition extends App {
   config.setWindowedMode(1280, 720)
   new Lwjgl3Application(new Superposition, config)
 }
-
-//    Game.init()
-//    Goal.declareSystem()
-//    Laser.declareSystem()
-//    Level.declareSystem()
-//    Multiverse.declareSystem()
-//    Player.declareSystem()
-//
-//    Game.create(new FPSBehavior())
-//    Game.create(new QuitOnEscapeBehavior())
-//
-//    Level.load(Tilemap.load(getClass.getResource("level1.tmx")))
-//    Game.run()

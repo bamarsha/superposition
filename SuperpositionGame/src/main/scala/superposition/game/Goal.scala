@@ -17,12 +17,12 @@ import scala.Function.const
  * @param required   the position of the object that must reach this goal
  * @param action     the action to activate when the goal is reached
  */
-private final class Goal(multiverse: MultiverseComponent,
+private final class Goal(multiverse: Multiverse,
                          cell: Vector2i,
                          required: => StateId[Vector2i],
                          action: () => Unit)
     extends Entity {
-  add(new SpriteComponent(
+  add(new SpriteView(
     texture = const(GoalTexture),
     position = const(cell.toVector2d + Vector2d(0.5, 0.5))))
 }

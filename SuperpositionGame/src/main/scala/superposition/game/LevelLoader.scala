@@ -11,9 +11,9 @@ import scala.jdk.CollectionConverters._
 import scala.sys.error
 
 /**
- * Manages game levels.
+ * Loads game levels.
  */
-private final class LevelManager(engine: Engine) {
+private final class LevelLoader(engine: Engine) {
   private var makeMultiverse: () => Option[Level] = () => None
 
   private var currentMultiverse: Option[Level] = None
@@ -49,18 +49,18 @@ private final class LevelManager(engine: Engine) {
    * @param map the tile map to load
    */
   def load(map: TiledMap): Unit = load(() => {
-    val multiverse = new Level(engine, map)
+    val multiverse = new Level(map)
     var entities = new HashMap[Int, Entity]
 
     for (layer <- map.getLayers.asScala;
          obj <- layer.getObjects.asScala) {
       println(s"Spawning ${obj.getName} (${obj.getProperties.get("type")}).")
 
-      val entity = makeEntity(multiverse.getComponent(classOf[MultiverseComponent]), map, obj)
+      val entity = makeEntity(multiverse.getComponent(classOf[Multiverse]), map, obj)
       // todo entities shouldn't be null
       if (entity != null) {
         engine.addEntity(entity)
-        multiverse.getComponent(classOf[MultiverseComponent]).addEntity(entity)
+        multiverse.getComponent(classOf[Multiverse]).addEntity(entity)
       }
       entities += obj.getProperties.get("id", classOf[Int]) -> entity
       // TODO: entity.layer = layer
@@ -75,7 +75,7 @@ private final class LevelManager(engine: Engine) {
     multiverse
   })
 
-  private def makeEntity(multiverse: MultiverseComponent, map: TiledMap, obj: MapObject): Entity = {
+  private def makeEntity(multiverse: Multiverse, map: TiledMap, obj: MapObject): Entity = {
     val height = map.getProperties.get("height", classOf[Int])
     val tileWidth = map.getProperties.get("tilewidth", classOf[Int])
     val tileHeight = map.getProperties.get("tileheight", classOf[Int])

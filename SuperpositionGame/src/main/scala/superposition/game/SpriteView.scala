@@ -9,7 +9,7 @@ import superposition.quantum.Universe
 
 import scala.Function.const
 
-private final class SpriteComponent(
+private final class SpriteView(
     val texture: Universe => Texture,
     val position: Universe => Vector2d,
     val scale: Universe => Vector2d = const(Vector2d(1, 1)),
@@ -17,8 +17,12 @@ private final class SpriteComponent(
     val layer: Int = 0)
     extends Component {
   def draw(spriteBatch: SpriteBatch, universe: Universe): Unit = {
-    val scale2 = scale(universe)
-    val position2 = position(universe) - scale(universe) / 2
-    spriteBatch.draw(texture(universe), position2.x.toFloat, position2.y.toFloat, scale2.x.toFloat, scale2.y.toFloat)
+    val currentScale = scale(universe)
+    val currentPosition = position(universe) - currentScale / 2
+    spriteBatch.draw(texture(universe),
+                     currentPosition.x.toFloat,
+                     currentPosition.y.toFloat,
+                     currentScale.x.toFloat,
+                     currentScale.y.toFloat)
   }
 }

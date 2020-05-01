@@ -11,16 +11,17 @@ import scala.Function.const
 /**
  * A door blocks movement unless all of the door's control cells have a bit in the on state.
  *
- * @param cell     the position of this door
- * @param controls the control cells for this door
+ * @param multiverse the multiverse the door belongs to
+ * @param cell       the position of the door
+ * @param controls   the control cells for the door
  */
-private final class Door(multiverse: MultiverseComponent, cell: Vector2i, controls: Iterable[Vector2i]) extends Entity {
-  add(new SpriteComponent(
+private final class Door(multiverse: Multiverse, cell: Vector2i, controls: Iterable[Vector2i]) extends Entity {
+  add(new SpriteView(
     texture = universe => if (multiverse.allOn(universe, controls)) OpenTexture else ClosedTexture,
     position = const(cell.toVector2d + Vector2d(0.5, 0.5)),
     layer = -1))
 
-  add(new UniverseComponent(
+  add(new BasicState(
     blockingCells = universe => if (multiverse.allOn(universe, controls)) Set.empty else Set(cell)))
 }
 

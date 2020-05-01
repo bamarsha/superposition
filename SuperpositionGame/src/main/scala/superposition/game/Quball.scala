@@ -16,7 +16,7 @@ import scala.Function.const
  * @param multiverse  the multiverse this quball belongs to
  * @param initialCell the initial cell of this quball
  */
-private final class Quball(multiverse: MultiverseComponent, initialCell: Vector2i) extends Entity {
+private final class Quball(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
   val cell: StateId[Vector2i] = multiverse.allocate(initialCell)
 
   val position: MetaId[Vector2d] = multiverse.allocateMeta(initialCell.toVector2d + Vector2d(0.5, 0.5))
@@ -25,14 +25,14 @@ private final class Quball(multiverse: MultiverseComponent, initialCell: Vector2
 
   val carried: StateId[Boolean] = multiverse.allocate(false)
 
-  add(new SpriteComponent(
+  add(new SpriteView(
     texture = const(QuballTexture),
     position = _.meta(position),
     scale = const(Vector2d(1, 1)),
     color = universe => if (universe.state(onOff)) WHITE else BLACK,
     layer = 1))
 
-   add(new UniverseComponent(primaryBit = Some(onOff), position = Some(cell)))
+   add(new BasicState(primaryBit = Some(onOff), position = Some(cell)))
 }
 
 private object Quball {

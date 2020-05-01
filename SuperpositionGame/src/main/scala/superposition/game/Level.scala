@@ -10,19 +10,19 @@ import com.badlogic.gdx.maps.tiled.TiledMap
  * Multiple universes represent qubits in superposition. The multiverse can apply quantum gates to qubits by changing
  * the amplitude of a universe or creating a copy of a universe.
  */
-private final class Level(engine: Engine, map: TiledMap) extends Entity {
+private final class Level(map: TiledMap) extends Entity {
   locally {
     val camera = new OrthographicCamera(map.getProperties.get("width", classOf[Int]),
                                         map.getProperties.get("height", classOf[Int]))
     camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0)
     camera.update()
 
-    add(new MapComponent(map, camera))
-    add(new MultiverseComponent(camera))
+    add(new MapView(map, camera))
+    add(new Multiverse(camera))
   }
 
 //  private var time: Double = 0
-
+//
 //  private var frameBuffer: Framebuffer = _
 //
 //  private var colorBuffer: Texture = _
@@ -55,9 +55,7 @@ private final class Level(engine: Engine, map: TiledMap) extends Entity {
 //      true
 //    } else false
 //  }
-
-
-
+//
 //  def forall(f: Universe => Boolean): Boolean = universes forall f
 //
 //  def updateMetaWith(id: MetaId[_])(updater: id.Value => Universe => id.Value): Unit =
@@ -109,8 +107,8 @@ private final class Level(engine: Engine, map: TiledMap) extends Entity {
 //      minValue = maxValue
 //    }
 //  }
-//}
-//
+}
+
 //private object Multiverse {
 //  private val UniverseShader: Shader = Shader.load(classOf[Multiverse].getResource(_), "shaders/universe")
 //
@@ -136,4 +134,4 @@ private final class Level(engine: Engine, map: TiledMap) extends Entity {
 //      .values
 //      .filter(_.amplitude.squaredMagnitude > 1e-6) |>
 //      normalize
-}
+//}
