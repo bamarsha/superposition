@@ -7,11 +7,11 @@ import superposition.math.Direction.{Down, Left, Right, Up}
  * A cardinal direction.
  */
 sealed trait Direction extends EnumEntry {
-  def toVec2i: Vec2i = this match {
-    case Up => Vec2i(0, 1)
-    case Down => Vec2i(0, -1)
-    case Left => Vec2i(-1, 0)
-    case Right => Vec2i(1, 0)
+  def toVec2i: Vector2i = this match {
+    case Up => Vector2i(0, 1)
+    case Down => Vector2i(0, -1)
+    case Left => Vector2i(-1, 0)
+    case Right => Vector2i(1, 0)
   }
 }
 

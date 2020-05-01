@@ -1,12 +1,10 @@
 package superposition.game
 
-import engine.core.Behavior.Entity
-import engine.core.Game
-import engine.core.Input.keyJustPressed
-import engine.graphics.sprites.Sprite
-import org.lwjgl.glfw.GLFW.GLFW_KEY_N
-import superposition.game.Goal.GoalSprite
-import superposition.math.Vec2i
+import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.graphics.Texture
+import superposition.game.Goal.GoalTexture
+import superposition.game.ResourceResolver.resolve
+import superposition.math.{Vector2d, Vector2i}
 import superposition.quantum.StateId
 
 import scala.Function.const
@@ -19,20 +17,23 @@ import scala.Function.const
  * @param required   the position of the object that must reach this goal
  * @param action     the action to activate when the goal is reached
  */
-private final class Goal(multiverse: Multiverse,
-                         cell: Vec2i,
-                         required: => StateId[Vec2i],
-                         action: () => Unit) extends Entity {
-  add(new SpriteComponent(this, sprite = const(GoalSprite), position = const(cell.toVec2d add 0.5)))
-
-  private def step(): Unit =
-    if ((multiverse forall (_.state(required) == cell)) || keyJustPressed(GLFW_KEY_N)) {
-      action()
-    }
+private final class Goal(multiverse: MultiverseComponent,
+                         cell: Vector2i,
+                         required: => StateId[Vector2i],
+                         action: () => Unit)
+    extends Entity {
+  add(new SpriteComponent(
+    texture = const(GoalTexture),
+    position = const(cell.toVector2d + Vector2d(0.5, 0.5))))
 }
 
-private object Goal {
-  def declareSystem(): Unit = Game.declareSystem(classOf[Goal], (_: Goal).step())
+//  private def step(): Unit =
+//    if ((multiverse forall (_.state(required) == cell)) || keyJustPressed(GLFW_KEY_N)) {
+//      action()
+//    }
 
-  private val GoalSprite = Sprite.load(getClass.getResource("sprites/key.png"))
+private object Goal {
+  private val GoalTexture = new Texture(resolve("sprites/key.png"))
+
+  //  def declareSystem(): Unit = Game.declareSystem(classOf[Goal], (_: Goal).step())
 }

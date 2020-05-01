@@ -1,7 +1,7 @@
 package superposition.quantum
 
 import scalaz.{Divisible, NonEmptyList}
-import superposition.math.{Complex, Vec2i}
+import superposition.math.{Complex, Vector2i}
 
 import scala.math.sqrt
 
@@ -108,14 +108,14 @@ case object H extends Gate[StateId[Boolean]] {
   override def adjoint: Gate[StateId[Boolean]] = this
 }
 
-case object Translate extends Gate[(StateId[Vec2i], Vec2i)] {
+case object Translate extends Gate[(StateId[Vector2i], Vector2i)] {
 
   import Gate.GateDivisible.divisibleSyntax._
 
-  override def apply(value: (StateId[Vec2i], Vec2i))(universe: Universe): NonEmptyList[Universe] = value match {
+  override def apply(value: (StateId[Vector2i], Vector2i))(universe: Universe): NonEmptyList[Universe] = value match {
     case (id, delta) => NonEmptyList(universe.updatedStateWith(id)(_ + delta))
   }
 
-  override def adjoint: Gate[(StateId[Vec2i], Vec2i)] =
+  override def adjoint: Gate[(StateId[Vector2i], Vector2i)] =
     this contramap { case (id, delta) => (id, -delta) }
 }

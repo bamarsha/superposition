@@ -1,33 +1,44 @@
 package superposition.game
 
-import engine.core.{Game, Settings}
-import extras.behaviors.{FPSBehavior, QuitOnEscapeBehavior}
-import extras.tiles.Tilemap
+import com.badlogic.ashley.core.Engine
+import com.badlogic.gdx.Game
+import com.badlogic.gdx.Gdx.graphics
+import com.badlogic.gdx.backends.lwjgl3.{Lwjgl3Application, Lwjgl3ApplicationConfiguration}
+import com.badlogic.gdx.maps.tiled.TmxMapLoader
 
-/**
- * The main class for the Superposition game.
- */
-private object Superposition {
-  /**
-   * Runs the Superposition game.
-   *
-   * @param args the command-line arguments
-   */
-  def main(args: Array[String]): Unit = {
-    Settings.WINDOW_WIDTH = 1280
-    Settings.WINDOW_HEIGHT = 720
+private final class Superposition extends Game {
+  private val engine: Engine = new Engine
 
-    Game.init()
-    Goal.declareSystem()
-    Laser.declareSystem()
-    Level.declareSystem()
-    Multiverse.declareSystem()
-    Player.declareSystem()
+  private val levelManager: LevelManager = new LevelManager(engine)
 
-    Game.create(new FPSBehavior())
-    Game.create(new QuitOnEscapeBehavior())
+  override def create(): Unit = {
+    engine.addSystem(new MapRenderer)
+    engine.addSystem(new MultiverseRenderer)
+    levelManager.load(new TmxMapLoader(ResourceResolver).load("level1.tmx"))
+  }
 
-    Level.load(Tilemap.load(getClass.getResource("level1.tmx")))
-    Game.run()
+  override def render(): Unit = {
+    engine.update(graphics.getDeltaTime)
+    super.render()
   }
 }
+
+private object Superposition extends App {
+  val config = new Lwjgl3ApplicationConfiguration
+  config.setTitle("Superposition")
+  config.setWindowedMode(1280, 720)
+  new Lwjgl3Application(new Superposition, config)
+}
+
+//    Game.init()
+//    Goal.declareSystem()
+//    Laser.declareSystem()
+//    Level.declareSystem()
+//    Multiverse.declareSystem()
+//    Player.declareSystem()
+//
+//    Game.create(new FPSBehavior())
+//    Game.create(new QuitOnEscapeBehavior())
+//
+//    Level.load(Tilemap.load(getClass.getResource("level1.tmx")))
+//    Game.run()

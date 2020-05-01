@@ -1,10 +1,10 @@
 package superposition.game
 
-import engine.core.Behavior.Entity
-import engine.graphics.sprites.Sprite
-import superposition.game.Door.{ClosedSprite, OpenSprite}
-import superposition.game.GameUniverse.Ops
-import superposition.math.Vec2i
+import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.graphics.Texture
+import superposition.game.Door.{ClosedTexture, OpenTexture}
+import superposition.game.ResourceResolver.resolve
+import superposition.math.{Vector2d, Vector2i}
 
 import scala.Function.const
 
@@ -14,18 +14,18 @@ import scala.Function.const
  * @param cell     the position of this door
  * @param controls the control cells for this door
  */
-private final class Door(cell: Vec2i, controls: Iterable[Vec2i]) extends Entity {
-  add(new SpriteComponent(this,
-    sprite = universe => if (universe.allOn(controls)) OpenSprite else ClosedSprite,
-    position = const(cell.toVec2d add 0.5),
+private final class Door(multiverse: MultiverseComponent, cell: Vector2i, controls: Iterable[Vector2i]) extends Entity {
+  add(new SpriteComponent(
+    texture = universe => if (multiverse.allOn(universe, controls)) OpenTexture else ClosedTexture,
+    position = const(cell.toVector2d + Vector2d(0.5, 0.5)),
     layer = -1))
 
-  add(new UniverseComponent(this,
-    blockingCells = universe => if (universe.allOn(controls)) Set.empty else Set(cell)))
+  add(new UniverseComponent(
+    blockingCells = universe => if (multiverse.allOn(universe, controls)) Set.empty else Set(cell)))
 }
 
 private object Door {
-  private val ClosedSprite = Sprite.load(getClass.getResource("sprites/door_closed.png"))
+  private val ClosedTexture = new Texture(resolve("sprites/door_closed.png"))
 
-  private val OpenSprite = Sprite.load(getClass.getResource("sprites/door_open.png"))
+  private val OpenTexture = new Texture(resolve("sprites/door_open.png"))
 }
