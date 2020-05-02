@@ -67,7 +67,7 @@ private final class LevelLoader(engine: Engine) {
       val gates = map.getProperties.get("Gates", classOf[String])
       for (Array(name, target) <- gates.linesIterator map (_.split(' '))) {
         println(s"Applying gate $name on entity $target.")
-        val primary = entities(target.toInt).getComponent(classOf[BasicState]).primaryBit.get
+        val primary = entities(target.toInt).getComponent(classOf[Quantum]).primary
         multiverse.applyGate(makeGate(name), primary)
       }
     }

@@ -3,7 +3,7 @@ package superposition.game
 import com.badlogic.ashley.core._
 import com.badlogic.gdx.graphics.OrthographicCamera
 import scalaz.Scalaz._
-import superposition.game.Multiverse.{BasicStateMapper, combine}
+import superposition.game.Multiverse.{CollisionMapper, PositionMapper, QuantumMapper, combine}
 import superposition.math.{Complex, Vector2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
@@ -59,17 +59,21 @@ private final class Multiverse(val camera: OrthographicCamera) extends Component
     } else false
   }
 
-  def allInCell(universe: Universe, cell: Vector2i): Iterable[BasicState] =
-    entities
-      .filter(BasicStateMapper.has)
-      .map(BasicStateMapper.get)
-      .filter(_.position map (universe.state(_)) contains cell)
+  def allInCell(universe: Universe, cell: Vector2i): Iterable[Entity] =
+    entities filter { entity =>
+      PositionMapper.has(entity) && universe.state(PositionMapper.get(entity).cell) == cell
+    }
 
   def primaryBits(universe: Universe, cell: Vector2i): Iterable[StateId[Boolean]] =
-    allInCell(universe, cell) flatMap (_.primaryBit.toList)
+    allInCell(universe, cell) flatMap { entity =>
+      if (QuantumMapper.has(entity)) Some(QuantumMapper.get(entity).primary)
+      else None
+    }
 
   def isBlocked(universe: Universe, cell: Vector2i): Boolean =
-    entities filter BasicStateMapper.has map BasicStateMapper.get exists (_.blockingCells(universe) contains cell)
+    entities
+      .filter(CollisionMapper.has)
+      .exists(CollisionMapper.get(_).cells(universe).contains(cell))
 
   def allOn(universe: Universe, controls: Iterable[Vector2i]): Boolean =
     controls forall { control =>
@@ -79,13 +83,17 @@ private final class Multiverse(val camera: OrthographicCamera) extends Component
     }
 
   def isValid(universe: Universe): Boolean =
-    entities filter BasicStateMapper.has map BasicStateMapper.get forall { basicState =>
-      basicState.position.isEmpty || !isBlocked(universe, universe.state(basicState.position.get))
+    entities filter PositionMapper.has forall { entity =>
+      !isBlocked(universe, universe.state(PositionMapper.get(entity).cell))
     }
 }
 
 private object Multiverse {
-  private val BasicStateMapper: ComponentMapper[BasicState] = ComponentMapper.getFor(classOf[BasicState])
+  private val QuantumMapper: ComponentMapper[Quantum] = ComponentMapper.getFor(classOf[Quantum])
+
+  private val PositionMapper: ComponentMapper[Position] = ComponentMapper.getFor(classOf[Position])
+
+  private val CollisionMapper: ComponentMapper[Collision] = ComponentMapper.getFor(classOf[Collision])
 
   private def normalize(universes: Iterable[Universe]): Iterable[Universe] = {
     val sum = (universes map (_.amplitude.squaredMagnitude)).sum

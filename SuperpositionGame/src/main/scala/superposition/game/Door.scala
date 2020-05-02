@@ -21,8 +21,7 @@ private final class Door(multiverse: Multiverse, cell: Vector2i, controls: Itera
     position = const(cell.toVector2d + Vector2d(0.5, 0.5)),
     layer = -1))
 
-  add(new BasicState(
-    blockingCells = universe => if (multiverse.allOn(universe, controls)) Set.empty else Set(cell)))
+  add(new Collision(universe => if (multiverse.allOn(universe, controls)) Set.empty else Set(cell)))
 }
 
 private object Door {

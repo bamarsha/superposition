@@ -53,7 +53,7 @@ private final class Laser(multiverse: Multiverse,
     texture = const(Textures(direction)),
     position = const(cell.toVector2d + Vector2d(0.5, 0.5))))
 
-  add(new BasicState(blockingCells = const(Set(cell))))
+  add(new Collision(const(Set(cell))))
 
 //  private val beam: LazyList[Vec2i] = LazyList.iterate(cell)(_ + direction.toVec2i).tail
 //

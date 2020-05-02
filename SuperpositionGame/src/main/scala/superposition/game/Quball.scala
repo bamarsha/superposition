@@ -32,7 +32,8 @@ private final class Quball(multiverse: Multiverse, initialCell: Vector2i) extend
     color = universe => if (universe.state(onOff)) WHITE else BLACK,
     layer = 1))
 
-   add(new BasicState(primaryBit = Some(onOff), position = Some(cell)))
+  add(new Position(position, cell, Vector2d(0.5, 0.5)))
+  add(new Quantum(multiverse, onOff))
 }
 
 private object Quball {

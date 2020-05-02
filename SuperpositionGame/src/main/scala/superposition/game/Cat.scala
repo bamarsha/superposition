@@ -16,16 +16,15 @@ import scala.Function.const
  * @param initialCell the initial position for this player
  */
 private final class Cat(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
-  add(new Quantum(multiverse))
 
   locally {
     val alive = multiverse.allocate(true)
     val absolutePosition = multiverse.allocateMeta(initialCell.toVector2d + Vector2d(0.5, 0.5))
     val cell = multiverse.allocate(initialCell)
 
+    add(new Quantum(multiverse, alive))
     add(new Player(alive))
     add(new Position(absolutePosition, cell, Vector2d(0.5, 0.5)))
-    add(new BasicState(primaryBit = Some(alive), position = Some(cell)))
     add(new SpriteView(
       texture = const(CatTexture),
       position = _.meta(absolutePosition),
