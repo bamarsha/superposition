@@ -59,21 +59,11 @@ private final class Level(map: TiledMap) extends Entity {
 //  def forall(f: Universe => Boolean): Boolean = universes forall f
 //
 
-//
 //  private def step(): Unit = {
 //    tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
-//    highlightOccupiedCells()
 //    drawShader()
 //  }
-//
-//  private def highlightOccupiedCells(): Unit = {
-//    def allStates[A](id: StateId[A]) = universes map (_.state(id))
-//
-//    val occupiedCells = (UniverseComponent.All flatMap (_.position map allStates)).flatten.toSet
-//    for (cell <- occupiedCells) {
-//      drawRectangle(Transformation.create(cell.toVec2d, 0, 1), new Color(1, 1, 1, 0.3))
-//    }
-//  }
+
 //
 //  private def drawShader(): Unit = {
 //    time += dt

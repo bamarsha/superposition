@@ -9,11 +9,13 @@ import superposition.quantum.{MetaId, StateId, Universe}
 private final class Multiverse(val camera: OrthographicCamera) extends Component {
   private var _universes: Seq[Universe] = Seq(Universe())
 
-  private var entities: List[Entity] = List()
+  private var _entities: List[Entity] = List()
 
   private var stateIds: List[StateId[_]] = List()
 
   def universes: Seq[Universe] = _universes
+
+  def entities: Iterable[Entity] = _entities
 
   def allocate[A](initialValue: A): StateId[A] = {
     val id = new StateId[A]
@@ -31,26 +33,26 @@ private final class Multiverse(val camera: OrthographicCamera) extends Component
   def updateMetaWith(id: MetaId[_])(updater: id.Value => Universe => id.Value): Unit =
     _universes = _universes map (universe => universe.updatedMetaWith(id)(updater(_)(universe)))
 
-  def addEntity(entity: Entity): Unit = entities ::= entity
+  def addEntity(entity: Entity): Unit = _entities ::= entity
 
   def allInCell(universe: Universe, cell: Vector2i): Iterable[BasicState] =
-    entities map BasicStateMapper.get filter (_.position map (universe.state(_)) contains cell)
+    _entities map BasicStateMapper.get filter (_.position map (universe.state(_)) contains cell)
 
   def primaryBits(universe: Universe, cell: Vector2i): Iterable[StateId[Boolean]] =
     allInCell(universe, cell) flatMap (_.primaryBit.toList)
 
   def isBlocked(universe: Universe, cell: Vector2i): Boolean =
-    entities map BasicStateMapper.get exists (_.blockingCells(universe) contains cell)
+    _entities map BasicStateMapper.get exists (_.blockingCells(universe) contains cell)
 
   def allOn(universe: Universe, controls: Iterable[Vector2i]): Boolean =
     controls forall { control =>
-      entities filter (_.isInstanceOf[Quball]) exists { quball =>
+      _entities filter (_.isInstanceOf[Quball]) exists { quball =>
         universe.state(quball.asInstanceOf[Quball].cell) == control && universe.state(quball.asInstanceOf[Quball].onOff)
       }
     }
 
   def isValid(universe: Universe): Boolean =
-    entities map BasicStateMapper.get forall { basicState =>
+    _entities map BasicStateMapper.get forall { basicState =>
       basicState.position.isEmpty || !isBlocked(universe, universe.state(basicState.position.get))
     }
 }
