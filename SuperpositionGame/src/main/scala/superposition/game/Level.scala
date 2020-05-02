@@ -2,7 +2,12 @@ package superposition.game
 
 import com.badlogic.ashley.core._
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.maps.tiled.TiledMap
+import com.badlogic.gdx.maps.MapLayer
+import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
+import superposition.game.Level.walls
+import superposition.math.Vector2i
+
+import scala.jdk.CollectionConverters._
 
 /**
  * The multiverse is a collection of universes.
@@ -18,7 +23,7 @@ private final class Level(map: TiledMap) extends Entity {
     camera.update()
 
     add(new MapView(map, camera))
-    add(new Multiverse(camera))
+    add(new Multiverse(walls(map), camera))
   }
 
 //  private var time: Double = 0
@@ -27,8 +32,6 @@ private final class Level(map: TiledMap) extends Entity {
 //
 //  private var colorBuffer: Texture = _
 //
-//  add(new UniverseComponent(this, blockingCells = const(walls(tileMap))))
-//
 //  override protected def onCreate(): Unit = {
 //    frameBuffer = new Framebuffer()
 //    colorBuffer = frameBuffer.attachColorBuffer()
@@ -36,16 +39,12 @@ private final class Level(map: TiledMap) extends Entity {
 //
 //  override protected def onDestroy(): Unit = entities.foreach(Game.destroy)
 //
-
-//
 //  def forall(f: Universe => Boolean): Boolean = universes forall f
 //
-
 //  private def step(): Unit = {
 //    tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
 //    drawShader()
 //  }
-
 //
 //  private def drawShader(): Unit = {
 //    time += dt
@@ -80,21 +79,21 @@ private final class Level(map: TiledMap) extends Entity {
 //  }
 }
 
-//private object Multiverse {
-//  private val UniverseShader: Shader = Shader.load(classOf[Multiverse].getResource(_), "shaders/universe")
-//
-//  def declareSystem(): Unit = Game.declareSystem(classOf[Multiverse], (_: Multiverse).step())
-//
-//  private def walls(tileMap: Tilemap): Set[Vec2i] =
-//    (for (layer <- tileMap.layers.asScala if layer.properties.asScala.get("Collision") exists (_.value.toBoolean);
-//          x <- 0 until layer.width;
-//          y <- 0 until layer.height if layer.data.tiles(x)(y) != 0) yield {
-//      Vec2i(
-//        (x + layer.offsetX.toDouble / tileMap.tileWidth).round.toInt,
-//        (y + layer.offsetY.toDouble / tileMap.tileHeight).round.toInt)
-//    }).toSet
-//
+private object Level {
+  //  private val UniverseShader: Shader = Shader.load(classOf[Multiverse].getResource(_), "shaders/universe")
 
-//
+  private def walls(map: TiledMap): Set[Vector2i] =
+    (for (layer <- map.getLayers.asScala if layer.isInstanceOf[TiledMapTileLayer] && hasCollision(layer);
+          tiledLayer = layer.asInstanceOf[TiledMapTileLayer];
+          x <- 0 until tiledLayer.getWidth;
+          y <- 0 until tiledLayer.getHeight if hasTileAt(tiledLayer, x, y)) yield {
+      Vector2i(
+        (x + layer.getOffsetX.toDouble / map.getProperties.get("tilewidth", classOf[Int])).round.toInt,
+        (y + layer.getOffsetY.toDouble / map.getProperties.get("tileheight", classOf[Int])).round.toInt)
+    }).toSet
 
-//}
+  private def hasCollision(layer: MapLayer): Boolean =
+    layer.getProperties.containsKey("Collision") && layer.getProperties.get("Collision", classOf[Boolean])
+
+  private def hasTileAt(layer: TiledMapTileLayer, x: Int, y: Int): Boolean = Option(layer.getCell(x, y)).isDefined
+}

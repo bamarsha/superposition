@@ -10,7 +10,7 @@ import superposition.quantum.{Gate, MetaId, StateId, Universe}
 import scala.Ordering.Implicits._
 import scala.math.sqrt
 
-private final class Multiverse(val camera: OrthographicCamera) extends Component {
+private final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera) extends Component {
   private var _universes: Seq[Universe] = Seq(Universe())
 
   private var _entities: List[Entity] = List()
@@ -71,7 +71,7 @@ private final class Multiverse(val camera: OrthographicCamera) extends Component
     }
 
   def isBlocked(universe: Universe, cell: Vector2i): Boolean =
-    entities
+    walls.contains(cell) || entities
       .filter(CollisionMapper.has)
       .exists(CollisionMapper.get(_).cells(universe).contains(cell))
 
