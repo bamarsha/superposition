@@ -28,6 +28,9 @@ private final class Multiverse(val camera: OrthographicCamera) extends Component
     id
   }
 
+  def updateMetaWith(id: MetaId[_])(updater: id.Value => Universe => id.Value): Unit =
+    _universes = _universes map (universe => universe.updatedMetaWith(id)(updater(_)(universe)))
+
   def addEntity(entity: Entity): Unit = entities ::= entity
 
   def allInCell(universe: Universe, cell: Vector2i): Iterable[BasicState] =

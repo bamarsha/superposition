@@ -82,7 +82,7 @@ private final class LevelLoader(engine: Engine) {
     val y = obj.getProperties.get("y", classOf[Float])
     val cell = Vector2i((x / tileWidth).floor.toInt, (y / tileHeight).floor.toInt)
     obj.getProperties.get("type") match {
-      case "Player" => new Player(multiverse, cell)
+      case "Player" => new Cat(multiverse, cell)
       case "Quball" => new Quball(multiverse, cell)
       case "Laser" =>
         val gate = makeGate(obj.getProperties.get("Gate", classOf[String]))

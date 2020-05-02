@@ -58,8 +58,7 @@ private final class Level(map: TiledMap) extends Entity {
 //
 //  def forall(f: Universe => Boolean): Boolean = universes forall f
 //
-//  def updateMetaWith(id: MetaId[_])(updater: id.Value => Universe => id.Value): Unit =
-//    universes = universes map (universe => universe.updatedMetaWith(id)(updater(_)(universe)))
+
 //
 //  private def step(): Unit = {
 //    tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
