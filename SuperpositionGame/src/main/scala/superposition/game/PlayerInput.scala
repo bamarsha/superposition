@@ -8,6 +8,8 @@ import superposition.game.PlayerInput._
 import superposition.math.{Vector2d, Vector2i}
 import superposition.quantum.{Gate, Translate}
 
+import scala.math.exp
+
 private class PlayerInput
   extends IteratingSystem(Family.all(classOf[Player], classOf[Position], classOf[Quantum]).get) {
 
@@ -72,7 +74,7 @@ private object PlayerInput {
     multiverse.updateMetaWith(position.absolute) { pos => universe =>
       if (universe.state(player.alive)) {
         val targetPosition = universe.state(position.cell).toVector2d + position.relative
-        pos.lerp(targetPosition, 10 * deltaTime)
+        pos.lerp(targetPosition, 1 - exp(-10 * deltaTime))
       } else pos
     }
 }
