@@ -1,5 +1,15 @@
 package superposition.game
 
+import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.graphics.Color.{BLACK, WHITE}
+import com.badlogic.gdx.graphics.Texture
+import superposition.game.Player.CatTexture
+import superposition.game.ResourceResolver.resolve
+import superposition.math.{Vector2d, Vector2i}
+import superposition.quantum.{MetaId, StateId}
+
+import scala.Function.const
+
 //import engine.core.Behavior.Entity
 //import engine.core.Game
 //import engine.core.Game.{dt, track}
@@ -14,30 +24,30 @@ package superposition.game
 //
 //import scala.Function.const
 //import scala.jdk.CollectionConverters._
-//
-///**
-// * The player character in the game.
-// *
-// * @param multiverse  the multiverse this player belongs to
-// * @param initialCell the initial position for this player
-// */
-//private final class Player(multiverse: Multiverse, initialCell: Vec2i) extends Entity {
-//  private val alive: StateId[Boolean] = multiverse.allocate(true)
-//
-//  val cell: StateId[Vec2i] = multiverse.allocate(initialCell)
-//
-//  private val position: MetaId[Vec2d] = multiverse.allocateMeta(initialCell.toVec2d add 0.5)
-//
-//  private var relativePosition = new Vec2d(0.5, 0.5)
-//
-//  add(new SpriteComponent(this,
-//    sprite = const(CatSprite),
-//    position = _.meta(position),
-//    scale = const(new Vec2d(2, 2)),
-//    universe => if (universe.state(alive)) WHITE else BLACK))
-//
-//  add(new UniverseComponent(this, primaryBit = Some(alive), position = Some(cell)))
-//
+
+/**
+ * The player character in the game.
+ *
+ * @param multiverse  the multiverse this player belongs to
+ * @param initialCell the initial position for this player
+ */
+private final class Player(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
+  private val alive: StateId[Boolean] = multiverse.allocate(true)
+
+  val cell: StateId[Vector2i] = multiverse.allocate(initialCell)
+
+  private val position: MetaId[Vector2d] = multiverse.allocateMeta(initialCell.toVector2d + Vector2d(0.5, 0.5))
+
+//  private var relativePosition = Vector2d(0.5, 0.5)
+
+  add(new SpriteView(
+    texture = const(CatTexture),
+    position = _.meta(position),
+    scale = const(Vector2d(2, 2)),
+    universe => if (universe.state(alive)) WHITE else BLACK))
+
+  add(new BasicState(primaryBit = Some(alive), position = Some(cell)))
+
 //  private val walkGate: Gate[Vec2i] = {
 //    val walkPlayer: Gate[Vec2i] = Translate.multi controlled { delta => universe =>
 //      if (universe.state(alive)) List((cell, delta)) else List()
@@ -96,9 +106,9 @@ package superposition.game
 //    updatePlayerPosition()
 //    updateCarriedPositions()
 //  }
-//}
-//
-//private object Player {
+}
+
+private object Player {
 //  val All: Iterable[Player] = track(classOf[Player]).asScala
 //
 //  private val WalkKeys: Map[Int, Vec2d] = Map(
@@ -106,9 +116,9 @@ package superposition.game
 //    GLFW_KEY_A -> new Vec2d(-1, 0),
 //    GLFW_KEY_S -> new Vec2d(0, -1),
 //    GLFW_KEY_D -> new Vec2d(1, 0))
-//
-//  private val CatSprite: Sprite = Sprite.load(getClass.getResource("sprites/cat.png"))
-//
+
+  private val CatTexture: Texture = new Texture(resolve("sprites/cat.png"))
+
 //  private val Speed: Double = 6.5
 //
 //  def declareSystem(): Unit = Game.declareSystem(classOf[Player], (_: Player).step())
@@ -129,4 +139,4 @@ package superposition.game
 //    val next = start add delta
 //    Vec2i(snapPosition(next.x), snapPosition(next.y))
 //  }
-//}
+}

@@ -76,22 +76,22 @@ private final class LevelLoader(engine: Engine) {
   })
 
   private def makeEntity(multiverse: Multiverse, map: TiledMap, obj: MapObject): Entity = {
-    val height = map.getProperties.get("height", classOf[Int])
     val tileWidth = map.getProperties.get("tilewidth", classOf[Int])
     val tileHeight = map.getProperties.get("tileheight", classOf[Int])
     val x = obj.getProperties.get("x", classOf[Float])
     val y = obj.getProperties.get("y", classOf[Float])
     val cell = Vector2i((x / tileWidth).floor.toInt, (y / tileHeight).floor.toInt)
     obj.getProperties.get("type") match {
-      case "Player" => println("would make player"); null //new Player(multiverse, cell)
+      case "Player" => new Player(multiverse, cell)
       case "Quball" => new Quball(multiverse, cell)
       case "Laser" =>
         val gate = makeGate(obj.getProperties.get("Gate", classOf[String]))
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
-//        val control = (properties.get("Control") map (control => cellFromString(tileMap, control.value))).toList
-        println("would make laser")
-        null
-//        new Laser(multiverse, cell, gate, direction, control)
+        val control =
+          if (obj.getProperties.containsKey("Control"))
+            List(makeCell(obj.getProperties.get("Control", classOf[String])))
+          else Nil
+        new Laser(multiverse, cell, gate, direction, control)
       case "Door" =>
         val controls = makeCells(obj.getProperties.get("Controls", classOf[String])).toList
         new Door(multiverse, cell, controls)

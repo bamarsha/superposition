@@ -1,5 +1,15 @@
 package superposition.game
 
+import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.graphics.Texture
+import superposition.game.Laser.Textures
+import superposition.game.ResourceResolver.resolve
+import superposition.math.Direction.{Down, Left, Right, Up}
+import superposition.math.{Direction, Vector2d, Vector2i}
+import superposition.quantum.{Gate, StateId}
+
+import scala.Function.const
+
 //import java.net.URL
 //
 //import engine.core.Behavior.Entity
@@ -20,31 +30,31 @@ package superposition.game
 //import scala.Function.const
 //import scala.jdk.CollectionConverters._
 //import scala.math.min
-//
-///**
-// * A laser applies a quantum gate to any qubit hit by its beam.
-// *
-// * @param multiverse the multiverse this laser belongs to
-// * @param cell       the position of this laser
-// * @param gate       the gate to apply
-// * @param direction  the direction this laser is pointing
-// * @param controls   the cell that controls this laser if it contains a bit, or None if the laser is not controlled
-// */
-//private final class Laser(multiverse: Multiverse,
-//                          cell: Vec2i,
-//                          gate: Gate[StateId[Boolean]],
-//                          direction: Direction,
-//                          controls: Iterable[Vec2i]) extends Entity {
+
+/**
+ * A laser applies a quantum gate to any qubit hit by its beam.
+ *
+ * @param multiverse the multiverse this laser belongs to
+ * @param cell       the position of this laser
+ * @param gate       the gate to apply
+ * @param direction  the direction this laser is pointing
+ * @param controls   the cell that controls this laser if it contains a bit, or None if the laser is not controlled
+ */
+private final class Laser(multiverse: Multiverse,
+                          cell: Vector2i,
+                          gate: Gate[StateId[Boolean]],
+                          direction: Direction,
+                          controls: Iterable[Vector2i]) extends Entity {
 //  private val lastTarget: MetaId[Option[Vec2i]] = multiverse.allocateMeta(None)
 //
 //  private val elapsedTime: MetaId[Double] = multiverse.allocateMeta(0)
-//
-//  add(new SpriteComponent(this,
-//    sprite = const(Sprite.load(Sprites(direction))),
-//    position = const(cell.toVec2d add 0.5)))
-//
-//  add(new UniverseComponent(this, blockingCells = const(Set(cell))))
-//
+
+  add(new SpriteView(
+    texture = const(Textures(direction)),
+    position = const(cell.toVector2d + Vector2d(0.5, 0.5))))
+
+  add(new BasicState(blockingCells = const(Set(cell))))
+
 //  private val beam: LazyList[Vec2i] = LazyList.iterate(cell)(_ + direction.toVec2i).tail
 //
 //  /**
@@ -86,17 +96,18 @@ package superposition.game
 //    }
 //    multiverse.updateMetaWith(elapsedTime)(time => const(time + dt))
 //  }
-//}
-//
-//private object Laser {
+}
+
+private object Laser {
 //  val All: Iterable[Laser] = track(classOf[Laser]).asScala
-//
-//  private val Sprites: Map[Direction, URL] = Map(
-//    Up -> getClass.getResource("sprites/laser_up.png"),
-//    Down -> getClass.getResource("sprites/laser_down.png"),
-//    Left -> getClass.getResource("sprites/laser_left.png"),
-//    Right -> getClass.getResource("sprites/laser_right.png"))
-//
+
+  private val Textures: Map[Direction, Texture] = Map(
+    Up -> "sprites/laser_up.png",
+    Down -> "sprites/laser_down.png",
+    Left -> "sprites/laser_left.png",
+    Right -> "sprites/laser_right.png")
+      .map { case (direction, fileName) => (direction, new Texture(resolve(fileName))) }
+
 //  private val BeamLength: Int = 25
 //
 //  private val BeamDuration: Double = 0.2
@@ -107,4 +118,4 @@ package superposition.game
 //
 //  private def isSelected(cell: Vec2i): Boolean =
 //    cell == Vec2i(mouse.x.floor.toInt, mouse.y.floor.toInt)
-//}
+}
