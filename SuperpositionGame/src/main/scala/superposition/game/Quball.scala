@@ -23,8 +23,6 @@ private final class Quball(multiverse: Multiverse, initialCell: Vector2i) extend
 
   val onOff: StateId[Boolean] = multiverse.allocate(false)
 
-  val carried: StateId[Boolean] = multiverse.allocate(false)
-
   add(new SpriteView(
     texture = const(QuballTexture),
     position = _.meta(position),
@@ -34,6 +32,7 @@ private final class Quball(multiverse: Multiverse, initialCell: Vector2i) extend
 
   add(new Position(position, cell, Vector2d(0.5, 0.5)))
   add(new Quantum(multiverse, onOff))
+  add(new Carryable(multiverse.allocate(false)))
 }
 
 private object Quball {
