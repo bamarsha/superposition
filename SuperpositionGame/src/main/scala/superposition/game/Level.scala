@@ -36,25 +36,7 @@ private final class Level(map: TiledMap) extends Entity {
 //
 //  override protected def onDestroy(): Unit = entities.foreach(Game.destroy)
 //
-//  /**
-//   * Applies a gate to the multiverse.
-//   *
-//   * If the gate produces any universe that is in an invalid state, no changes are made.
-//   *
-//   * @param gate  the gate to apply
-//   * @param value the value to give the gate
-//   * @return whether the gate was successfully applied
-//   */
-//  def applyGate[A](gate: Gate[A], value: A): Boolean = {
-//    val newUniverses = gate.applyToAll(value)(universes)
-//    if (newUniverses forall (_.isValid)) {
-//      universes = newUniverses |>
-//        combine |>
-//        (_.toSeq) |>
-//        (_ sortBy (universe => stateIds.reverse map (universe.state(_).toString)))
-//      true
-//    } else false
-//  }
+
 //
 //  def forall(f: Universe => Boolean): Boolean = universes forall f
 //
@@ -112,15 +94,7 @@ private final class Level(map: TiledMap) extends Entity {
 //        (y + layer.offsetY.toDouble / tileMap.tileHeight).round.toInt)
 //    }).toSet
 //
-//  private def normalize(universes: Iterable[Universe]): Iterable[Universe] = {
-//    val sum = (universes map (_.amplitude.squaredMagnitude)).sum
-//    universes map (_ / Complex(sqrt(sum)))
-//  }
+
 //
-//  private def combine(universes: Iterable[Universe]): Iterable[Universe] =
-//    universes
-//      .groupMapReduce(_.state)(identity)(_ + _.amplitude)
-//      .values
-//      .filter(_.amplitude.squaredMagnitude > 1e-6) |>
-//      normalize
+
 //}

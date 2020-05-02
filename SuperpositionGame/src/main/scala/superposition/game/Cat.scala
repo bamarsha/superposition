@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Texture
 import superposition.game.Cat.CatTexture
 import superposition.game.ResourceResolver.resolve
 import superposition.math.{Vector2d, Vector2i}
-import superposition.quantum.{MetaId, StateId}
 
 import scala.Function.const
 
@@ -17,21 +16,21 @@ import scala.Function.const
  * @param initialCell the initial position for this player
  */
 private final class Cat(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
-  add(new Player)
   add(new Quantum(multiverse))
 
   locally {
     val alive = multiverse.allocate(true)
-    val position = multiverse.allocateMeta(initialCell.toVector2d + Vector2d(0.5, 0.5))
+    val absolutePosition = multiverse.allocateMeta(initialCell.toVector2d + Vector2d(0.5, 0.5))
     val cell = multiverse.allocate(initialCell)
 
-    add(new Position(position, cell, Vector2d(0.5, 0.5)))
+    add(new Player(alive))
+    add(new Position(absolutePosition, cell, Vector2d(0.5, 0.5)))
     add(new BasicState(primaryBit = Some(alive), position = Some(cell)))
     add(new SpriteView(
       texture = const(CatTexture),
-      position = _.meta(position),
+      position = _.meta(absolutePosition),
       scale = const(Vector2d(2, 2)),
-      universe => if (universe.state(alive)) WHITE else BLACK))
+      color = universe => if (universe.state(alive)) WHITE else BLACK))
   }
 
 //  private val walkGate: Gate[Vec2i] = {
@@ -57,24 +56,6 @@ private final class Cat(multiverse: Multiverse, initialCell: Vector2i) extends E
 //        .toList
 //    }
 //
-//  private def walk(): Unit = {
-//    def applyGate(delta: Vec2i) = multiverse.applyGate(walkGate, delta)
-//
-//    val Vec2i(dx, dy) = nextCell(relativePosition, deltaPosition)
-//    val delta = deltaPosition add new Vec2d(
-//      if (dx != 0 && applyGate(Vec2i(dx, 0))) -dx else 0,
-//      if (dy != 0 && applyGate(Vec2i(0, dy))) -dy else 0)
-//    relativePosition = (relativePosition add delta).clamp(0, 1)
-//  }
-//
-//  private def updatePlayerPosition(): Unit =
-//    multiverse.updateMetaWith(position) { pos => universe =>
-//      if (universe.state(alive)) {
-//        val targetPosition = universe.state(cell).toVec2d add relativePosition
-//        pos.lerp(targetPosition, 10 * dt)
-//      } else pos
-//    }
-//
 //  private def updateCarriedPositions(): Unit =
 //    for (quball <- Quball.All) {
 //      multiverse.updateMetaWith(quball.position) { pos => universe =>
@@ -96,16 +77,4 @@ private final class Cat(multiverse: Multiverse, initialCell: Vector2i) extends E
 
 private object Cat {
   private val CatTexture: Texture = new Texture(resolve("sprites/cat.png"))
-
-//  def declareSystem(): Unit = Game.declareSystem(classOf[Player], (_: Player).step())
-//
-//  private def snapPosition(delta: Double): Int =
-//    if (delta < -1e-3) -1
-//    else if (delta > 1 + 1e-3) 1
-//    else 0
-//
-//  private def nextCell(start: Vec2d, delta: Vec2d): Vec2i = {
-//    val next = start add delta
-//    Vec2i(snapPosition(next.x), snapPosition(next.y))
-//  }
 }

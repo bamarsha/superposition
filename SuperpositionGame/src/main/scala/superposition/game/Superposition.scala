@@ -12,7 +12,7 @@ private final class Superposition extends Game {
   private val levelLoader: LevelLoader = new LevelLoader(engine)
 
   override def create(): Unit = {
-    engine.addSystem(new InputListener)
+    engine.addSystem(new PlayerInput)
     engine.addSystem(new MapRenderer)
     engine.addSystem(new MultiverseRenderer)
     levelLoader.load(new TmxMapLoader(ResourceResolver).load("level1.tmx"))
