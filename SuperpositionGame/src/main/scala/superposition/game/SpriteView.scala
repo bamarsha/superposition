@@ -20,6 +20,7 @@ private final class SpriteView(
   def draw(spriteBatch: SpriteBatch, universe: Universe): Unit = {
     val currentScale = scale(universe)
     val currentPosition = position(universe) - currentScale / 2
+    spriteBatch.setColor(color(universe))
     spriteBatch.draw(texture(universe),
                      currentPosition.x.toFloat,
                      currentPosition.y.toFloat,
