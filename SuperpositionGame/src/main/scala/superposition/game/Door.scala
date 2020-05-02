@@ -16,12 +16,11 @@ import scala.Function.const
  * @param controls   the control cells for the door
  */
 private final class Door(multiverse: Multiverse, cell: Vector2i, controls: Iterable[Vector2i]) extends Entity {
+  add(new Collision(universe => if (multiverse.allOn(universe, controls)) Set.empty else Set(cell)))
   add(new SpriteView(
     texture = universe => if (multiverse.allOn(universe, controls)) OpenTexture else ClosedTexture,
     position = const(cell.toVector2d + Vector2d(0.5, 0.5)),
     layer = -1))
-
-  add(new Collision(universe => if (multiverse.allOn(universe, controls)) Set.empty else Set(cell)))
 }
 
 private object Door {
