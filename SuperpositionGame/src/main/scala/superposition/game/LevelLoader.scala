@@ -49,30 +49,30 @@ private final class LevelLoader(engine: Engine) {
    * @param map the tile map to load
    */
   def load(map: TiledMap): Unit = load(() => {
-    val multiverse = new Level(map)
+    val level = new Level(map)
+    val multiverse = level.getComponent(classOf[Multiverse])
     var entities = new HashMap[Int, Entity]
 
     for (layer <- map.getLayers.asScala;
          obj <- layer.getObjects.asScala) {
       println(s"Spawning ${obj.getName} (${obj.getProperties.get("type")}).")
-
-      val entity = makeEntity(multiverse.getComponent(classOf[Multiverse]), map, obj)
-      // todo entities shouldn't be null
-      if (entity != null) {
-        engine.addEntity(entity)
-        multiverse.getComponent(classOf[Multiverse]).addEntity(entity)
-      }
+      val entity = makeEntity(multiverse, map, obj)
+      engine.addEntity(entity)
+      multiverse.addEntity(entity)
       entities += obj.getProperties.get("id", classOf[Int]) -> entity
       // TODO: entity.layer = layer
     }
 
-//      val gates = tileMap.properties.asScala.get("Gates")
-//      for (Array(gateName, targetId) <- gates.iterator flatMap (_.value.linesIterator) map (_.split(' '))) {
-//        println("Applying gate " + gateName + " on entity " + targetId + ".")
-//        val target = entities(targetId.toInt).get(classOf[UniverseComponent]).primaryBit.get
-//        multiverse.applyGate(gateFromName(gateName), target)
-//      }
-    multiverse
+    if (map.getProperties.containsKey("Gates")) {
+      val gates = map.getProperties.get("Gates", classOf[String])
+      for (Array(name, target) <- gates.linesIterator map (_.split(' '))) {
+        println(s"Applying gate $name on entity $target.")
+        val primary = entities(target.toInt).getComponent(classOf[BasicState]).primaryBit.get
+        multiverse.applyGate(makeGate(name), primary)
+      }
+    }
+
+    level
   })
 
   private def makeEntity(multiverse: Multiverse, map: TiledMap, obj: MapObject): Entity = {
