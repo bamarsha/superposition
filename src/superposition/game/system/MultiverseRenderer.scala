@@ -1,4 +1,4 @@
-package superposition.game
+package superposition.game.system
 
 import com.badlogic.ashley.core._
 import com.badlogic.gdx.Gdx.gl
@@ -6,11 +6,12 @@ import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import superposition.game.MultiverseRenderer.{MultiverseMapper, PositionMapper, SpriteViewMapper}
+import superposition.game.component.{Multiverse, Position, SpriteView}
+import superposition.game.system.MultiverseRenderer.{MultiverseMapper, PositionMapper, SpriteViewMapper}
 
 import scala.jdk.CollectionConverters._
 
-private final class MultiverseRenderer extends EntitySystem {
+final class MultiverseRenderer extends EntitySystem {
   private var multiverses: Iterable[Entity] = Nil
 
   private val spriteBatch: SpriteBatch = new SpriteBatch

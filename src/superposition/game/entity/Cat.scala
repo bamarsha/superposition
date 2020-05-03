@@ -1,15 +1,16 @@
-package superposition.game
+package superposition.game.entity
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color.{BLACK, WHITE}
 import com.badlogic.gdx.graphics.Texture
-import superposition.game.Cat.CatTexture
 import superposition.game.ResourceResolver.resolve
+import superposition.game.component._
+import superposition.game.entity.Cat.CatTexture
 import superposition.math.{Vector2d, Vector2i}
 
 import scala.Function.const
 
-private final class Cat(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
+final class Cat(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
   locally {
     val alive = multiverse.allocate(true)
     val absolutePosition = multiverse.allocateMeta(initialCell.toVector2d + Vector2d(0.5, 0.5))

@@ -1,9 +1,10 @@
-package superposition.game
+package superposition.game.entity
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
-import superposition.game.Door.{ClosedTexture, OpenTexture}
 import superposition.game.ResourceResolver.resolve
+import superposition.game.component.{Collision, Multiverse, SpriteView}
+import superposition.game.entity.Door.{ClosedTexture, OpenTexture}
 import superposition.math.{Vector2d, Vector2i}
 
 import scala.Function.const
@@ -15,7 +16,7 @@ import scala.Function.const
  * @param cell       the position of the door
  * @param controls   the control cells for the door
  */
-private final class Door(multiverse: Multiverse, cell: Vector2i, controls: Iterable[Vector2i]) extends Entity {
+final class Door(multiverse: Multiverse, cell: Vector2i, controls: Iterable[Vector2i]) extends Entity {
   add(new Collision(universe => if (multiverse.allOn(universe, controls)) Set.empty else Set(cell)))
   add(new SpriteView(
     texture = universe => if (multiverse.allOn(universe, controls)) OpenTexture else ClosedTexture,

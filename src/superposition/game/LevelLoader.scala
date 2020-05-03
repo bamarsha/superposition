@@ -3,6 +3,8 @@ package superposition.game
 import com.badlogic.ashley.core.{Engine, Entity}
 import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
+import superposition.game.component.{Multiverse, Quantum}
+import superposition.game.entity.{Cat, Door, Goal, Laser, Level, Quball}
 import superposition.math.{Direction, Vector2i}
 import superposition.quantum._
 

@@ -1,16 +1,17 @@
-package superposition.game
+package superposition.game.component
 
 import com.badlogic.ashley.core._
 import com.badlogic.gdx.graphics.OrthographicCamera
 import scalaz.Scalaz._
-import superposition.game.Multiverse.{CollisionMapper, PositionMapper, QuantumMapper, combine}
+import superposition.game.component.Multiverse.{CollisionMapper, PositionMapper, QuantumMapper, combine}
+import superposition.game.entity.Quball
 import superposition.math.{Complex, Vector2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
 import scala.Ordering.Implicits._
 import scala.math.sqrt
 
-private final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera) extends Component {
+final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera) extends Component {
   private var _universes: Seq[Universe] = Seq(Universe())
 
   private var _entities: List[Entity] = List()

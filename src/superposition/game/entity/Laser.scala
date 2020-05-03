@@ -1,9 +1,10 @@
-package superposition.game
+package superposition.game.entity
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
-import superposition.game.Laser.Textures
 import superposition.game.ResourceResolver.resolve
+import superposition.game.component.{Beam, Collision, Multiverse, Quantum, SpriteView}
+import superposition.game.entity.Laser.Textures
 import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math.{Direction, Vector2d, Vector2i}
 import superposition.quantum.{Gate, StateId}
@@ -19,11 +20,13 @@ import scala.Function.const
  * @param direction  the direction this laser is pointing
  * @param controls   the cell that controls this laser if it contains a bit, or None if the laser is not controlled
  */
-private final class Laser(multiverse: Multiverse,
-                          cell: Vector2i,
-                          gate: Gate[StateId[Boolean]],
-                          direction: Direction,
-                          controls: Iterable[Vector2i]) extends Entity {
+final class Laser(
+  multiverse: Multiverse,
+  cell: Vector2i,
+  gate: Gate[StateId[Boolean]],
+  direction: Direction,
+  controls: Iterable[Vector2i]) extends Entity {
+
   add(new SpriteView(
     texture = const(Textures(direction)),
     position = const(cell.toVector2d + Vector2d(0.5, 0.5)),

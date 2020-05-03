@@ -1,10 +1,10 @@
-package superposition.game
+package superposition.game.component
 
 import com.badlogic.ashley.core.Component
 import superposition.math.{Direction, Vector2i}
 import superposition.quantum.{Gate, MetaId, StateId}
 
-private final class Beam(
+final class Beam(
   multiverse: Multiverse,
   val gate: Gate[StateId[Boolean]],
   val source: Vector2i,
@@ -19,6 +19,6 @@ private final class Beam(
   val path: LazyList[Vector2i] = LazyList.iterate(source)(_ + direction.toVec2i).tail
 }
 
-private object Beam {
+object Beam {
   val Length: Int = 25
 }

@@ -1,10 +1,11 @@
-package superposition.game
+package superposition.game.entity
 
 import com.badlogic.ashley.core._
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
-import superposition.game.Level.walls
+import superposition.game.component.{MapView, Multiverse}
+import superposition.game.entity.Level.walls
 import superposition.math.Vector2i
 
 import scala.jdk.CollectionConverters._
@@ -15,7 +16,7 @@ import scala.jdk.CollectionConverters._
  * Multiple universes represent qubits in superposition. The multiverse can apply quantum gates to qubits by changing
  * the amplitude of a universe or creating a copy of a universe.
  */
-private final class Level(map: TiledMap) extends Entity {
+final class Level(map: TiledMap) extends Entity {
   locally {
     val camera = new OrthographicCamera(map.getProperties.get("width", classOf[Int]),
                                         map.getProperties.get("height", classOf[Int]))

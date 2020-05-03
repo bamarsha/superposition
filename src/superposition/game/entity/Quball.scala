@@ -1,10 +1,11 @@
-package superposition.game
+package superposition.game.entity
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color.{BLACK, WHITE}
 import com.badlogic.gdx.graphics.Texture
-import superposition.game.Quball.QuballTexture
 import superposition.game.ResourceResolver.resolve
+import superposition.game.component.{Carryable, Multiverse, Position, Quantum, SpriteView}
+import superposition.game.entity.Quball.QuballTexture
 import superposition.math.{Vector2d, Vector2i}
 import superposition.quantum.{MetaId, StateId}
 
@@ -16,7 +17,7 @@ import scala.Function.const
  * @param multiverse  the multiverse this quball belongs to
  * @param initialCell the initial cell of this quball
  */
-private final class Quball(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
+final class Quball(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
   val cell: StateId[Vector2i] = multiverse.allocate(initialCell)
 
   val position: MetaId[Vector2d] = multiverse.allocateMeta(initialCell.toVector2d + Vector2d(0.5, 0.5))

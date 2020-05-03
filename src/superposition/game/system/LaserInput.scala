@@ -1,16 +1,17 @@
-package superposition.game
+package superposition.game.system
 
 import com.badlogic.ashley.core.{ComponentMapper, Entity, Family}
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.math.Vector3
-import superposition.game.LaserInput.{BeamMapper, QuantumMapper, hits, selected, target}
+import superposition.game.component.{Beam, Multiverse, Quantum}
+import superposition.game.system.LaserInput._
 import superposition.math.Vector2i
 import superposition.quantum.{StateId, Universe}
 
 import scala.Function.const
 
-private class LaserInput extends IteratingSystem(Family.all(classOf[Beam], classOf[Quantum]).get) {
+final class LaserInput extends IteratingSystem(Family.all(classOf[Beam], classOf[Quantum]).get) {
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
     val multiverse = QuantumMapper.get(entity).multiverse
     val beam = BeamMapper.get(entity)

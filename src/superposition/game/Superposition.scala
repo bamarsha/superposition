@@ -5,6 +5,7 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx.graphics
 import com.badlogic.gdx.backends.lwjgl3.{Lwjgl3Application, Lwjgl3ApplicationConfiguration}
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
+import superposition.game.system.{LaserInput, MapRenderer, MultiverseRenderer, PlayerInput}
 
 private final class Superposition extends Game {
   private val engine: Engine = new Engine

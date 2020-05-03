@@ -1,11 +1,12 @@
-package superposition.game
+package superposition.game.system
 
 import com.badlogic.ashley.core.{ComponentMapper, Engine, Entity, Family}
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.SPACE
-import superposition.game.PlayerInput._
+import superposition.game.component.{Carryable, Multiverse, Player, Position, Quantum}
+import superposition.game.system.PlayerInput.{PlayerMapper, PositionMapper, QuantumMapper, carryGate, updateCarriedPositions, updatePlayerPosition, walk}
 import superposition.math.{Vector2d, Vector2i}
 import superposition.quantum.{Gate, Translate, X}
 
@@ -13,7 +14,7 @@ import scala.Function.const
 import scala.jdk.CollectionConverters._
 import scala.math.exp
 
-private class PlayerInput
+final class PlayerInput
   extends IteratingSystem(Family.all(classOf[Player], classOf[Position], classOf[Quantum]).get) {
 
   private var carryables: Iterable[Entity] = Nil
