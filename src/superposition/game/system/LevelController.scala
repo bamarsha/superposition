@@ -5,11 +5,11 @@ import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input.Keys.{N, R}
 import superposition.game.LevelLoader
 import superposition.game.component.Goal
-import superposition.game.system.LevelControl.satisfied
+import superposition.game.system.LevelController.satisfied
 
 import scala.jdk.CollectionConverters._
 
-final class LevelControl(levelLoader: LevelLoader) extends EntitySystem {
+final class LevelController(levelLoader: LevelLoader) extends EntitySystem {
   private var goals: Iterable[Entity] = Nil
 
   override def addedToEngine(engine: Engine): Unit =
@@ -25,7 +25,7 @@ final class LevelControl(levelLoader: LevelLoader) extends EntitySystem {
   }
 }
 
-private object LevelControl {
+private object LevelController {
   private def satisfied(goal: Goal): Boolean =
     goal.multiverse.universes forall (_.state(goal.needs) == goal.cell)
 }

@@ -14,9 +14,9 @@ private final class Superposition extends Game {
   private val levelLoader: LevelLoader = new LevelLoader(engine)
 
   override def create(): Unit = {
-    engine.addSystem(new LevelControl(levelLoader))
-    engine.addSystem(new PlayerControl)
-    engine.addSystem(new LaserControl)
+    engine.addSystem(new LevelController(levelLoader))
+    engine.addSystem(new PlayerController)
+    engine.addSystem(new LaserController)
     engine.addSystem(new MapRenderer)
     engine.addSystem(new MultiverseRenderer)
     levelLoader.startPlaylist(new TmxMapLoader(ResourceResolver), Playlist)
