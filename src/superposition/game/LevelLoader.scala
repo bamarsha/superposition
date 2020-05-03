@@ -3,12 +3,12 @@ package superposition.game
 import com.badlogic.ashley.core.{Engine, Entity}
 import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
-import superposition.game.component.{Multiverse, Quantum}
-import superposition.game.entity.{Cat, Door, Goal, Laser, Level, Quball}
+import superposition.game.component.{Multiverse, Position, Quantum}
+import superposition.game.entity._
 import superposition.math.{Direction, Vector2i}
 import superposition.quantum._
 
-import scala.collection.immutable.HashMap
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 import scala.sys.error
 
@@ -20,31 +20,6 @@ private final class LevelLoader(engine: Engine) {
 
   private var currentMultiverse: Option[Level] = None
 
-//  /**
-//   * Declares the level system.
-//   */
-//  def declareSystem(): Unit =
-//    Game.declareSystem { () =>
-//      if (keyJustPressed(GLFW_KEY_R)) {
-//        multiverse.foreach(Game.destroy)
-//        multiverse = createMultiverse()
-//        multiverse.foreach(Game.create)
-//      }
-//    }
-
-  /**
-   * Loads the multiverse as a new level.
-   *
-   * @param makeMultiverse a function that makes a new instance of the multiverse
-   */
-  private def load(makeMultiverse: () => Level): Unit = {
-    this.makeMultiverse = () => Some(makeMultiverse())
-    // TODO: Remove all entities in the multiverse.
-    currentMultiverse.foreach(engine.removeEntity)
-    currentMultiverse = this.makeMultiverse()
-    currentMultiverse.foreach(engine.addEntity)
-  }
-
   /**
    * Loads the tile map as a new level.
    *
@@ -53,12 +28,12 @@ private final class LevelLoader(engine: Engine) {
   def load(map: TiledMap): Unit = load(() => {
     val level = new Level(map)
     val multiverse = level.getComponent(classOf[Multiverse])
-    var entities = new HashMap[Int, Entity]
+    var entities = new mutable.HashMap[Int, Entity]
 
     for (layer <- map.getLayers.asScala;
          obj <- layer.getObjects.asScala) {
       println(s"Spawning ${obj.getName} (${obj.getProperties.get("type")}).")
-      val entity = makeEntity(multiverse, map, obj)
+      val entity = makeEntity(multiverse, entities, map, obj)
       engine.addEntity(entity)
       multiverse.addEntity(entity)
       entities += obj.getProperties.get("id", classOf[Int]) -> entity
@@ -77,7 +52,36 @@ private final class LevelLoader(engine: Engine) {
     level
   })
 
-  private def makeEntity(multiverse: Multiverse, map: TiledMap, obj: MapObject): Entity = {
+  def reset(): Unit = {
+    for (level <- currentMultiverse) {
+      for (entity <- level.getComponent(classOf[Multiverse]).entities) {
+        engine.removeEntity(entity)
+      }
+      engine.removeEntity(level)
+    }
+    currentMultiverse = makeMultiverse()
+    currentMultiverse.foreach(engine.addEntity)
+  }
+
+  /**
+   * Loads the multiverse as a new level.
+   *
+   * @param makeMultiverse a function that makes a new instance of the multiverse
+   */
+  private def load(makeMultiverse: () => Level): Unit = {
+    this.makeMultiverse = () => Some(makeMultiverse())
+    for (level <- currentMultiverse) {
+      for (entity <- level.getComponent(classOf[Multiverse]).entities) {
+        engine.removeEntity(entity)
+      }
+      engine.removeEntity(level)
+    }
+    currentMultiverse = this.makeMultiverse()
+    currentMultiverse.foreach(engine.addEntity)
+  }
+
+  private def makeEntity(
+    multiverse: Multiverse, entities: mutable.HashMap[Int, Entity], map: TiledMap, obj: MapObject): Entity = {
     val tileWidth = map.getProperties.get("tilewidth", classOf[Int])
     val tileHeight = map.getProperties.get("tileheight", classOf[Int])
     val x = obj.getProperties.get("x", classOf[Float])
@@ -98,12 +102,8 @@ private final class LevelLoader(engine: Engine) {
         val controls = makeCells(map)(obj.getProperties.get("Controls", classOf[String])).toList
         new Door(multiverse, cell, controls)
       case "Goal" =>
-        // TODO: val requires = ObjectId(properties("Requires").value.toInt)
-        // TODO: val next = properties("Next Level").value
-        new Goal(multiverse,
-                 cell,
-                 required = null, // TODO: Player.All.head.cell,
-                 action = () => println("yay")) // TODO: () => load(Tilemap.load(getClass.getResource(next))))
+        val required = obj.getProperties.get("Requires", classOf[Int])
+        new Exit(multiverse, cell, required = () => entities(required).getComponent(classOf[Position]).cell)
       case unknown => error(s"Unknown entity type $unknown.")
     }
   }

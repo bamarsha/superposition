@@ -6,7 +6,7 @@ import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.SPACE
 import superposition.game.component._
-import superposition.game.system.PlayerInput.{carryGate, updateCarriedPositions, updatePlayerPosition, walk}
+import superposition.game.system.PlayerControl.{carryGate, updateCarriedPositions, updatePlayerPosition, walk}
 import superposition.math.{Vector2d, Vector2i}
 import superposition.quantum.{Gate, Translate, X}
 
@@ -14,7 +14,7 @@ import scala.Function.const
 import scala.jdk.CollectionConverters._
 import scala.math.exp
 
-final class PlayerInput
+final class PlayerControl
   extends IteratingSystem(Family.all(classOf[Player], classOf[Position], classOf[Quantum]).get) {
 
   private var carryables: Iterable[Entity] = Nil
@@ -37,7 +37,7 @@ final class PlayerInput
   }
 }
 
-private object PlayerInput {
+private object PlayerControl {
   private val WalkKeys: Map[Int, Vector2d] = Map(
     Keys.W -> Vector2d(0, 1),
     Keys.A -> Vector2d(-1, 0),

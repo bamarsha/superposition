@@ -5,7 +5,7 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx.graphics
 import com.badlogic.gdx.backends.lwjgl3.{Lwjgl3Application, Lwjgl3ApplicationConfiguration}
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
-import superposition.game.system.{LaserInput, MapRenderer, MultiverseRenderer, PlayerInput}
+import superposition.game.system.{LaserControl, LevelControl, MapRenderer, MultiverseRenderer, PlayerControl}
 
 private final class Superposition extends Game {
   private val engine: Engine = new Engine
@@ -13,8 +13,9 @@ private final class Superposition extends Game {
   private val levelLoader: LevelLoader = new LevelLoader(engine)
 
   override def create(): Unit = {
-    engine.addSystem(new PlayerInput)
-    engine.addSystem(new LaserInput)
+    engine.addSystem(new LevelControl(levelLoader))
+    engine.addSystem(new PlayerControl)
+    engine.addSystem(new LaserControl)
     engine.addSystem(new MapRenderer)
     engine.addSystem(new MultiverseRenderer)
     levelLoader.load(new TmxMapLoader(ResourceResolver).load("level1.tmx"))

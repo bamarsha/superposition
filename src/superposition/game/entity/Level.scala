@@ -40,7 +40,6 @@ final class Level(map: TiledMap) extends Entity {
 //
 //  override protected def onDestroy(): Unit = entities.foreach(Game.destroy)
 //
-//  def forall(f: Universe => Boolean): Boolean = universes forall f
 //
 //  private def step(): Unit = {
 //    tileRenderer.draw(Transformation.IDENTITY, Color.WHITE)
