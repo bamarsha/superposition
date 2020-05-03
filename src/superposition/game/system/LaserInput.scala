@@ -1,6 +1,6 @@
 package superposition.game.system
 
-import com.badlogic.ashley.core.{ComponentMapper, Entity, Family}
+import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
 import superposition.game.component.{Beam, Multiverse, Quantum}
@@ -12,8 +12,8 @@ import scala.Function.const
 
 final class LaserInput extends IteratingSystem(Family.all(classOf[Beam], classOf[Quantum]).get) {
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
-    val multiverse = QuantumMapper.get(entity).multiverse
-    val beam = BeamMapper.get(entity)
+    val multiverse = Quantum.Mapper.get(entity).multiverse
+    val beam = Beam.Mapper.get(entity)
     if (input.isButtonJustPressed(0) && multiverse.selected(beam.source)) {
       multiverse.applyGate(beam.gate.multi controlled const(universe => hits(multiverse, universe, beam)), ())
       multiverse.updateMetaWith(beam.lastTarget)(const(universe => target(multiverse, universe, beam)))
@@ -26,14 +26,11 @@ final class LaserInput extends IteratingSystem(Family.all(classOf[Beam], classOf
 }
 
 private object LaserInput {
-  private val BeamMapper: ComponentMapper[Beam] = ComponentMapper.getFor(classOf[Beam])
-
-  private val QuantumMapper: ComponentMapper[Quantum] = ComponentMapper.getFor(classOf[Quantum])
-
   private def target(multiverse: Multiverse, universe: Universe, beam: Beam): Option[Vector2i] =
     if (multiverse.allOn(universe, beam.controls))
-      beam.path.take(Beam.Length) find { cell =>
-        multiverse.isBlocked(universe, cell) || multiverse.allInCell(universe, cell).nonEmpty
+      beam.path find { cell =>
+        multiverse.isBlocked(universe, cell) ||
+          multiverse.allInCell(universe, cell).nonEmpty
       }
     else None
 

@@ -1,12 +1,12 @@
 package superposition.game.system
 
-import com.badlogic.ashley.core.{ComponentMapper, Engine, Entity, Family}
+import com.badlogic.ashley.core.{Engine, Entity, Family}
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.SPACE
-import superposition.game.component.{Carry, Multiverse, Player, Position, Quantum}
-import superposition.game.system.PlayerInput.{PlayerMapper, PositionMapper, QuantumMapper, carryGate, updateCarriedPositions, updatePlayerPosition, walk}
+import superposition.game.component._
+import superposition.game.system.PlayerInput.{carryGate, updateCarriedPositions, updatePlayerPosition, walk}
 import superposition.math.{Vector2d, Vector2i}
 import superposition.quantum.{Gate, Translate, X}
 
@@ -25,9 +25,9 @@ final class PlayerInput
   }
 
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
-    val multiverse = QuantumMapper.get(entity).multiverse
-    val position = PositionMapper.get(entity)
-    val player = PlayerMapper.get(entity)
+    val multiverse = Quantum.Mapper.get(entity).multiverse
+    val position = Position.Mapper.get(entity)
+    val player = Player.Mapper.get(entity)
     walk(multiverse, player, position, carryables, deltaTime)
     if (input.isKeyJustPressed(SPACE)) {
       multiverse.applyGate(carryGate(player, position, carryables), ())
@@ -38,14 +38,6 @@ final class PlayerInput
 }
 
 private object PlayerInput {
-  private val PlayerMapper: ComponentMapper[Player] = ComponentMapper.getFor(classOf[Player])
-
-  private val PositionMapper: ComponentMapper[Position] = ComponentMapper.getFor(classOf[Position])
-
-  private val QuantumMapper: ComponentMapper[Quantum] = ComponentMapper.getFor(classOf[Quantum])
-
-  private val CarryableMapper: ComponentMapper[Carry] = ComponentMapper.getFor(classOf[Carry])
-
   private val WalkKeys: Map[Int, Vector2d] = Map(
     Keys.W -> Vector2d(0, 1),
     Keys.A -> Vector2d(-1, 0),
@@ -60,8 +52,8 @@ private object PlayerInput {
     val walkQuballs: Gate[Vector2i] = Translate.multi controlled { delta => universe =>
       if (universe.state(player.alive))
         carryables
-          .filter(carryable => universe.state(CarryableMapper.get(carryable).carried))
-          .map(carryable => (PositionMapper.get(carryable).cell, delta))
+          .filter(carryable => universe.state(Carry.Mapper.get(carryable).carried))
+          .map(carryable => (Position.Mapper.get(carryable).cell, delta))
           .toList
       else Nil
     }
@@ -73,9 +65,9 @@ private object PlayerInput {
       carryables
         .filter { carryable =>
           universe.state(player.alive) &&
-            universe.state(position.cell) == universe.state(PositionMapper.get(carryable).cell)
+            universe.state(position.cell) == universe.state(Position.Mapper.get(carryable).cell)
         }
-        .map(CarryableMapper.get(_).carried)
+        .map(Carry.Mapper.get(_).carried)
         .toList
     }
 
@@ -127,8 +119,8 @@ private object PlayerInput {
                                      carryables: Iterable[Entity],
                                      deltaTime: Float): Unit =
     for (carryable <- carryables) {
-      val carried = CarryableMapper.get(carryable).carried
-      val carriedPosition = PositionMapper.get(carryable)
+      val carried = Carry.Mapper.get(carryable).carried
+      val carriedPosition = Position.Mapper.get(carryable)
       multiverse.updateMetaWith(carriedPosition.absolute) { pos => universe =>
         val relativePos = if (universe.state(carried)) playerPosition.relative else Vector2d(0.5, 0.5)
         val targetPos = universe.state(carriedPosition.cell).toVector2d + relativePos

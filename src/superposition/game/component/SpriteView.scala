@@ -1,6 +1,6 @@
 package superposition.game.component
 
-import com.badlogic.ashley.core.Component
+import com.badlogic.ashley.core.{Component, ComponentMapper}
 import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.{Color, Texture}
@@ -27,4 +27,8 @@ final class SpriteView(
                      currentScale.x.toFloat,
                      currentScale.y.toFloat)
   }
+}
+
+object SpriteView {
+  val Mapper: ComponentMapper[SpriteView] = ComponentMapper.getFor(classOf[SpriteView])
 }

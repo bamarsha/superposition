@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import superposition.game.component.{Beam, Multiverse, Position, SpriteView}
-import superposition.game.system.MultiverseRenderer.{BeamMapper, MultiverseMapper, PositionMapper, SpriteViewMapper}
 
 import scala.jdk.CollectionConverters._
 
@@ -23,7 +22,7 @@ final class MultiverseRenderer extends EntitySystem {
   }
 
   override def update(deltaTime: Float): Unit =
-    for (multiverse <- multiverses map MultiverseMapper.get) {
+    for (multiverse <- multiverses map Multiverse.Mapper.get) {
       highlightOccupiedCells(multiverse)
       drawSprites(multiverse)
       drawBeams(multiverse)
@@ -32,8 +31,8 @@ final class MultiverseRenderer extends EntitySystem {
   private def highlightOccupiedCells(multiverse: Multiverse): Unit = {
     val occupiedCells =
       (for {
-        entity <- multiverse.entities if PositionMapper.has(entity)
-        position = PositionMapper.get(entity)
+        entity <- multiverse.entities if Position.Mapper.has(entity)
+        position = Position.Mapper.get(entity)
         universe <- multiverse.universes
       } yield universe.state(position.cell)).toSet
 
@@ -49,7 +48,8 @@ final class MultiverseRenderer extends EntitySystem {
   }
 
   private def drawSprites(multiverse: Multiverse): Unit = {
-    val spriteViews = (multiverse.entities filter SpriteViewMapper.has map SpriteViewMapper.get).toSeq sortBy (_.layer)
+    val spriteViews = (multiverse.entities filter SpriteView.Mapper.has map SpriteView.Mapper.get)
+      .toSeq sortBy (_.layer)
     spriteBatch.setProjectionMatrix(multiverse.camera.combined)
     spriteBatch.begin()
     for (spriteView <- spriteViews; universe <- multiverse.universes) {
@@ -59,19 +59,9 @@ final class MultiverseRenderer extends EntitySystem {
   }
 
   private def drawBeams(multiverse: Multiverse): Unit = {
-    for (beam <- multiverse.entities filter BeamMapper.has map BeamMapper.get;
+    for (beam <- multiverse.entities filter Beam.Mapper.has map Beam.Mapper.get;
          universe <- multiverse.universes) {
       beam.draw(universe)
     }
   }
-}
-
-private object MultiverseRenderer {
-  private val MultiverseMapper: ComponentMapper[Multiverse] = ComponentMapper.getFor(classOf[Multiverse])
-
-  private val SpriteViewMapper: ComponentMapper[SpriteView] = ComponentMapper.getFor(classOf[SpriteView])
-
-  private val PositionMapper = ComponentMapper.getFor(classOf[Position])
-
-  private val BeamMapper = ComponentMapper.getFor(classOf[Beam])
 }

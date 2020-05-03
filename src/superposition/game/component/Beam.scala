@@ -1,12 +1,12 @@
 package superposition.game.component
 
-import com.badlogic.ashley.core.Component
+import com.badlogic.ashley.core.{Component, ComponentMapper}
 import com.badlogic.gdx.Gdx.gl
 import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.{Filled, Line}
-import superposition.game.component.Beam.{BeamDuration, FadeDuration}
+import superposition.game.component.Beam.{BeamDuration, FadeDuration, Length}
 import superposition.math.{Direction, Vector2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
@@ -24,7 +24,7 @@ final class Beam(
 
   val elapsedTime: MetaId[Double] = multiverse.allocateMeta(0)
 
-  val path: LazyList[Vector2i] = LazyList.iterate(source)(_ + direction.toVec2i).tail
+  val path: LazyList[Vector2i] = LazyList.iterate(source)(_ + direction.toVec2i).tail.take(Length)
 
   private val shapeRenderer = new ShapeRenderer
 
@@ -53,7 +53,9 @@ final class Beam(
 }
 
 object Beam {
-  val Length: Int = 25
+  val Mapper: ComponentMapper[Beam] = ComponentMapper.getFor(classOf[Beam])
+
+  private val Length: Int = 25
 
   private val BeamDuration: Double = 0.2
 
