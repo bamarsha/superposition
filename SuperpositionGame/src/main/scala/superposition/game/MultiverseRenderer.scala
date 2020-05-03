@@ -47,11 +47,10 @@ private final class MultiverseRenderer extends EntitySystem {
   }
 
   private def drawSprites(multiverse: Multiverse): Unit = {
+    val spriteViews = (multiverse.entities filter SpriteViewMapper.has map SpriteViewMapper.get).toSeq sortBy (_.layer)
     spriteBatch.setProjectionMatrix(multiverse.camera.combined)
     spriteBatch.begin()
-    for (entity <- multiverse.entities if SpriteViewMapper.has(entity);
-         spriteView = SpriteViewMapper.get(entity);
-         universe <- multiverse.universes) {
+    for (spriteView <- spriteViews; universe <- multiverse.universes) {
       spriteView.draw(spriteBatch, universe)
     }
     spriteBatch.end()

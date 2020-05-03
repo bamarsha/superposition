@@ -51,7 +51,8 @@ private final class Laser(multiverse: Multiverse,
 
   add(new SpriteView(
     texture = const(Textures(direction)),
-    position = const(cell.toVector2d + Vector2d(0.5, 0.5))))
+    position = const(cell.toVector2d + Vector2d(0.5, 0.5)),
+    layer = -1))
 
   add(new Collision(const(Set(cell))))
 
