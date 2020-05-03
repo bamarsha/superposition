@@ -5,7 +5,7 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.SPACE
-import superposition.game.component.{Carryable, Multiverse, Player, Position, Quantum}
+import superposition.game.component.{Carry, Multiverse, Player, Position, Quantum}
 import superposition.game.system.PlayerInput.{PlayerMapper, PositionMapper, QuantumMapper, carryGate, updateCarriedPositions, updatePlayerPosition, walk}
 import superposition.math.{Vector2d, Vector2i}
 import superposition.quantum.{Gate, Translate, X}
@@ -21,7 +21,7 @@ final class PlayerInput
 
   override def addedToEngine(engine: Engine): Unit = {
     super.addedToEngine(engine)
-    carryables = engine.getEntitiesFor(Family.all(classOf[Carryable], classOf[Position]).get).asScala
+    carryables = engine.getEntitiesFor(Family.all(classOf[Carry], classOf[Position]).get).asScala
   }
 
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
@@ -44,7 +44,7 @@ private object PlayerInput {
 
   private val QuantumMapper: ComponentMapper[Quantum] = ComponentMapper.getFor(classOf[Quantum])
 
-  private val CarryableMapper: ComponentMapper[Carryable] = ComponentMapper.getFor(classOf[Carryable])
+  private val CarryableMapper: ComponentMapper[Carry] = ComponentMapper.getFor(classOf[Carry])
 
   private val WalkKeys: Map[Int, Vector2d] = Map(
     Keys.W -> Vector2d(0, 1),
