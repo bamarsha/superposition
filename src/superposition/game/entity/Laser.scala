@@ -27,37 +27,13 @@ final class Laser(
   direction: Direction,
   controls: Iterable[Vector2i]) extends Entity {
 
+  add(new Quantum(multiverse, null))
+  add(new Collision(const(Set(cell))))
+  add(new Beam(multiverse, gate, cell, direction, controls))
   add(new SpriteView(
     texture = const(Textures(direction)),
     position = const(cell.toVector2d + Vector2d(0.5, 0.5)),
     layer = -1))
-
-  add(new Collision(const(Set(cell))))
-
-  add(new Beam(multiverse, gate, cell, direction, controls))
-
-  add(new Quantum(multiverse, null))
-
-//  /**
-//   * Draws the laser in a universe.
-//   *
-//   * @param universe the universe to draw in
-//   */
-//  def draw(universe: Universe): Unit = {
-//    if (isSelected(cell)) {
-//      drawRectangleOutline(Transformation.create(cell.toVec2d, 0, 1), RED)
-//    }
-//    universe.meta(lastTarget) match {
-//      case Some(target) if universe.meta(elapsedTime) <= BeamDuration + FadeDuration =>
-//        drawWideLine(
-//          cell.toVec2d add 0.5,
-//          target.toVec2d add 0.5,
-//          0.25,
-//          new Color(1, 0, 0,
-//            min(FadeDuration, BeamDuration + FadeDuration - universe.meta(elapsedTime)) / FadeDuration))
-//      case _ => ()
-//    }
-//  }
 }
 
 private object Laser {
@@ -66,11 +42,5 @@ private object Laser {
     Down -> "sprites/laser_down.png",
     Left -> "sprites/laser_left.png",
     Right -> "sprites/laser_right.png")
-      .map { case (direction, fileName) => (direction, new Texture(resolve(fileName))) }
-
-//  private val BeamDuration: Double = 0.2
-//
-//  private val FadeDuration: Double = 0.3
-//
-//  def declareSystem(): Unit = Game.declareSystem(classOf[Laser], (_: Laser).step())
+    .map { case (direction, fileName) => (direction, new Texture(resolve(fileName))) }
 }

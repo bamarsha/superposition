@@ -3,7 +3,6 @@ package superposition.game.system
 import com.badlogic.ashley.core.{ComponentMapper, Entity, Family}
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
-import com.badlogic.gdx.math.Vector3
 import superposition.game.component.{Beam, Multiverse, Quantum}
 import superposition.game.system.LaserInput._
 import superposition.math.Vector2i
@@ -15,7 +14,7 @@ final class LaserInput extends IteratingSystem(Family.all(classOf[Beam], classOf
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
     val multiverse = QuantumMapper.get(entity).multiverse
     val beam = BeamMapper.get(entity)
-    if (input.isButtonJustPressed(0) && selected(multiverse, beam.source)) {
+    if (input.isButtonJustPressed(0) && multiverse.selected(beam.source)) {
       multiverse.applyGate(beam.gate.multi controlled const(universe => hits(multiverse, universe, beam)), ())
       multiverse.updateMetaWith(beam.lastTarget)(const(universe => target(multiverse, universe, beam)))
       multiverse.updateMetaWith(beam.elapsedTime) { time => universe =>
@@ -30,11 +29,6 @@ private object LaserInput {
   private val BeamMapper: ComponentMapper[Beam] = ComponentMapper.getFor(classOf[Beam])
 
   private val QuantumMapper: ComponentMapper[Quantum] = ComponentMapper.getFor(classOf[Quantum])
-
-  private def selected(multiverse: Multiverse, cell: Vector2i): Boolean = {
-    val mouse = multiverse.camera.unproject(new Vector3(input.getX, input.getY, 0))
-    cell == Vector2i(mouse.x.floor.toInt, mouse.y.floor.toInt)
-  }
 
   private def target(multiverse: Multiverse, universe: Universe, beam: Beam): Option[Vector2i] =
     if (multiverse.allOn(universe, beam.controls))

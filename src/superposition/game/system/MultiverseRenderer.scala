@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import superposition.game.component.{Multiverse, Position, SpriteView}
-import superposition.game.system.MultiverseRenderer.{MultiverseMapper, PositionMapper, SpriteViewMapper}
+import superposition.game.component.{Beam, Multiverse, Position, SpriteView}
+import superposition.game.system.MultiverseRenderer.{BeamMapper, MultiverseMapper, PositionMapper, SpriteViewMapper}
 
 import scala.jdk.CollectionConverters._
 
@@ -26,6 +26,7 @@ final class MultiverseRenderer extends EntitySystem {
     for (multiverse <- multiverses map MultiverseMapper.get) {
       highlightOccupiedCells(multiverse)
       drawSprites(multiverse)
+      drawBeams(multiverse)
     }
 
   private def highlightOccupiedCells(multiverse: Multiverse): Unit = {
@@ -56,6 +57,13 @@ final class MultiverseRenderer extends EntitySystem {
     }
     spriteBatch.end()
   }
+
+  private def drawBeams(multiverse: Multiverse): Unit = {
+    for (beam <- multiverse.entities filter BeamMapper.has map BeamMapper.get;
+         universe <- multiverse.universes) {
+      beam.draw(universe)
+    }
+  }
 }
 
 private object MultiverseRenderer {
@@ -64,4 +72,6 @@ private object MultiverseRenderer {
   private val SpriteViewMapper: ComponentMapper[SpriteView] = ComponentMapper.getFor(classOf[SpriteView])
 
   private val PositionMapper = ComponentMapper.getFor(classOf[Position])
+
+  private val BeamMapper = ComponentMapper.getFor(classOf[Beam])
 }

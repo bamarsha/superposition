@@ -1,7 +1,9 @@
 package superposition.game.component
 
 import com.badlogic.ashley.core._
+import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Vector3
 import scalaz.Scalaz._
 import superposition.game.component.Multiverse.{CollisionMapper, PositionMapper, QuantumMapper, combine}
 import superposition.game.entity.Quball
@@ -87,6 +89,11 @@ final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera)
     entities filter PositionMapper.has forall { entity =>
       !isBlocked(universe, universe.state(PositionMapper.get(entity).cell))
     }
+
+  def selected(cell: Vector2i): Boolean = {
+    val mouse = camera.unproject(new Vector3(input.getX, input.getY, 0))
+    cell == Vector2i(mouse.x.floor.toInt, mouse.y.floor.toInt)
+  }
 }
 
 private object Multiverse {
