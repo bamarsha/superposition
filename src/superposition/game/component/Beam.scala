@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.{Filled, Line}
 import superposition.game.component.Beam.{BeamDuration, FadeDuration, Length}
+import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math.{Direction, Vector2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
@@ -43,7 +44,10 @@ final class Beam(
       gl.glEnable(GL_BLEND)
       shapeRenderer.begin(Filled)
       shapeRenderer.setColor(1, 0, 0, opacity.toFloat)
-      shapeRenderer.rect(source.x + 0.5f, source.y + 0.375f, target.x - source.x, 0.25f)
+      direction match {
+        case Left | Right => shapeRenderer.rect(source.x + 0.5f, source.y + 0.375f, target.x - source.x, 0.25f)
+        case Up | Down => shapeRenderer.rect(source.x + 0.375f, source.y + 0.5f, 0.25f, target.y - source.y)
+      }
       shapeRenderer.end()
       gl.glDisable(GL_BLEND)
     }
