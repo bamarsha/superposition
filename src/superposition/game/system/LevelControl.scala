@@ -17,11 +17,10 @@ final class LevelControl(levelLoader: LevelLoader) extends EntitySystem {
 
   override def update(deltaTime: Float): Unit = {
     if (input.isKeyJustPressed(R)) {
-      levelLoader.reset()
+      levelLoader.resetLevel()
     }
     if (input.isKeyJustPressed(N) || (goals map Goal.Mapper.get forall satisfied)) {
-      // TODO
-      println("yay")
+      levelLoader.nextLevel()
     }
   }
 }

@@ -2,7 +2,8 @@ package superposition.game
 
 import com.badlogic.ashley.core.{Engine, Entity}
 import com.badlogic.gdx.maps.MapObject
-import com.badlogic.gdx.maps.tiled.TiledMap
+import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
+import superposition.game.LevelLoader.{LevelFactory, addLevel, makeLevel, removeLevel}
 import superposition.game.component.{Multiverse, Position, Quantum}
 import superposition.game.entity._
 import superposition.math.{Direction, Vector2i}
@@ -12,33 +13,59 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 import scala.sys.error
 
-/**
- * Loads game levels.
- */
 private final class LevelLoader(engine: Engine) {
-  private var makeMultiverse: () => Option[Level] = () => None
+  private var playlist: Seq[LevelFactory] = Nil
 
-  private var currentMultiverse: Option[Level] = None
+  private var current: Option[Level] = None
 
-  /**
-   * Loads the tile map as a new level.
-   *
-   * @param map the tile map to load
-   */
-  def load(map: TiledMap): Unit = load(() => {
+  def startPlaylist(loader: TmxMapLoader, fileNames: Seq[String]): Unit = {
+    playlist = fileNames map (fileName => () => makeLevel(loader.load(fileName)))
+    resetLevel()
+  }
+
+  def nextLevel(): Unit = {
+    playlist = playlist match {
+      case Nil => Nil
+      case _ :: next => next
+    }
+    resetLevel()
+  }
+
+  def resetLevel(): Unit = {
+    current.foreach(removeLevel(engine))
+    current = playlist.headOption map (_())
+    current.foreach(addLevel(engine))
+  }
+}
+
+private object LevelLoader {
+  private type LevelFactory = () => Level
+
+  private def addLevel(engine: Engine)(level: Level): Unit = {
+    engine.addEntity(level)
+    for (entity <- level.getComponent(classOf[Multiverse]).entities) {
+      engine.addEntity(entity)
+    }
+  }
+
+  private def removeLevel(engine: Engine)(level: Level): Unit = {
+    for (entity <- level.getComponent(classOf[Multiverse]).entities) {
+      engine.removeEntity(entity)
+    }
+    engine.removeEntity(level)
+  }
+
+  private def makeLevel(map: TiledMap): Level = {
     val level = new Level(map)
     val multiverse = level.getComponent(classOf[Multiverse])
     var entities = new mutable.HashMap[Int, Entity]
-
     for (layer <- map.getLayers.asScala; obj <- layer.getObjects.asScala) {
       println(s"Spawning ${obj.getName} (${obj.getProperties.get("type")}).")
       val entity = makeEntity(multiverse, entities, map, obj)
-      engine.addEntity(entity)
       multiverse.addEntity(entity)
       entities += obj.getProperties.get("id", classOf[Int]) -> entity
       // TODO: entity.layer = layer
     }
-
     if (map.getProperties.containsKey("Gates")) {
       val gates = map.getProperties.get("Gates", classOf[String])
       for (Array(name, target) <- gates.linesIterator map (_.split(' '))) {
@@ -47,45 +74,19 @@ private final class LevelLoader(engine: Engine) {
         multiverse.applyGate(makeGate(name), primary)
       }
     }
-
     level
-  })
-
-  def reset(): Unit = {
-    for (level <- currentMultiverse) {
-      for (entity <- level.getComponent(classOf[Multiverse]).entities) {
-        engine.removeEntity(entity)
-      }
-      engine.removeEntity(level)
-    }
-    currentMultiverse = makeMultiverse()
-    currentMultiverse.foreach(engine.addEntity)
   }
 
-  /**
-   * Loads the multiverse as a new level.
-   *
-   * @param makeMultiverse a function that makes a new instance of the multiverse
-   */
-  private def load(makeMultiverse: () => Level): Unit = {
-    this.makeMultiverse = () => Some(makeMultiverse())
-    for (level <- currentMultiverse) {
-      for (entity <- level.getComponent(classOf[Multiverse]).entities) {
-        engine.removeEntity(entity)
-      }
-      engine.removeEntity(level)
-    }
-    currentMultiverse = this.makeMultiverse()
-    currentMultiverse.foreach(engine.addEntity)
-  }
-
-  private def makeEntity(
-      multiverse: Multiverse, entities: mutable.HashMap[Int, Entity], map: TiledMap, obj: MapObject): Entity = {
+  private def makeEntity(multiverse: Multiverse,
+                         entities: mutable.HashMap[Int, Entity],
+                         map: TiledMap,
+                         obj: MapObject): Entity = {
     val tileWidth = map.getProperties.get("tilewidth", classOf[Int])
     val tileHeight = map.getProperties.get("tileheight", classOf[Int])
     val x = obj.getProperties.get("x", classOf[Float])
     val y = obj.getProperties.get("y", classOf[Float])
     val cell = Vector2i((x / tileWidth).floor.toInt, (y / tileHeight).floor.toInt)
+
     obj.getProperties.get("type") match {
       case "Player" => new Cat(multiverse, cell)
       case "Quball" => new Quball(multiverse, cell)
