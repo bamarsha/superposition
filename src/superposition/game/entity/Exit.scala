@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
 import superposition.game.ResourceResolver.resolve
 import superposition.game.component.{Goal, Multiverse, SpriteView}
-import superposition.game.entity.Exit.ExitTexture
+import superposition.game.entity.Exit.KeyTexture
 import superposition.math.{Vector2d, Vector2i}
 import superposition.quantum.StateId
 
@@ -18,17 +18,16 @@ import scala.Function.const
  * @param required   the position of the object that must reach this goal
  */
 final class Exit(
-  multiverse: Multiverse,
-  cell: Vector2i,
-  required: () => StateId[Vector2i])
+    multiverse: Multiverse,
+    cell: Vector2i,
+    required: () => StateId[Vector2i])
   extends Entity {
-
   add(new Goal(multiverse, cell, required))
   add(new SpriteView(
-    texture = const(ExitTexture),
+    texture = const(KeyTexture),
     position = const(cell.toVector2d + Vector2d(0.5, 0.5))))
 }
 
 private object Exit {
-  private val ExitTexture = new Texture(resolve("sprites/key.png"))
+  private val KeyTexture = new Texture(resolve("sprites/key.png"))
 }

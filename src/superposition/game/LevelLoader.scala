@@ -30,8 +30,7 @@ private final class LevelLoader(engine: Engine) {
     val multiverse = level.getComponent(classOf[Multiverse])
     var entities = new mutable.HashMap[Int, Entity]
 
-    for (layer <- map.getLayers.asScala;
-         obj <- layer.getObjects.asScala) {
+    for (layer <- map.getLayers.asScala; obj <- layer.getObjects.asScala) {
       println(s"Spawning ${obj.getName} (${obj.getProperties.get("type")}).")
       val entity = makeEntity(multiverse, entities, map, obj)
       engine.addEntity(entity)
@@ -81,7 +80,7 @@ private final class LevelLoader(engine: Engine) {
   }
 
   private def makeEntity(
-    multiverse: Multiverse, entities: mutable.HashMap[Int, Entity], map: TiledMap, obj: MapObject): Entity = {
+      multiverse: Multiverse, entities: mutable.HashMap[Int, Entity], map: TiledMap, obj: MapObject): Entity = {
     val tileWidth = map.getProperties.get("tilewidth", classOf[Int])
     val tileHeight = map.getProperties.get("tileheight", classOf[Int])
     val x = obj.getProperties.get("x", classOf[Float])

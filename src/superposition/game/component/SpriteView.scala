@@ -10,13 +10,12 @@ import superposition.quantum.Universe
 import scala.Function.const
 
 final class SpriteView(
-  val texture: Universe => Texture,
-  val position: Universe => Vector2d,
-  val scale: Universe => Vector2d = const(Vector2d(1, 1)),
-  val color: Universe => Color = const(WHITE),
-  val layer: Int = 0)
+    val texture: Universe => Texture,
+    val position: Universe => Vector2d,
+    val scale: Universe => Vector2d = const(Vector2d(1, 1)),
+    val color: Universe => Color = const(WHITE),
+    val layer: Int = 0)
   extends Component {
-
   def draw(spriteBatch: SpriteBatch, universe: Universe): Unit = {
     val currentScale = scale(universe)
     val currentPosition = position(universe) - currentScale / 2

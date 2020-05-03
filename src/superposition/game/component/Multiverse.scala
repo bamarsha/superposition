@@ -54,10 +54,11 @@ final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera)
   def applyGate[A](gate: Gate[A], value: A): Boolean = {
     val newUniverses = gate.applyToAll(value)(universes)
     if (newUniverses forall isValid) {
-      _universes = newUniverses |>
-        combine |>
-        (_.toSeq) |>
-        (_ sortBy (universe => stateIds.reverse map (universe.state(_).toString)))
+      _universes =
+        (newUniverses
+          |> combine
+          |> (_.toSeq)
+          |> (_ sortBy (universe => stateIds.reverse map (universe.state(_).toString))))
       true
     } else false
   }
@@ -74,9 +75,10 @@ final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera)
     }
 
   def isBlocked(universe: Universe, cell: Vector2i): Boolean =
-    walls.contains(cell) || entities
-      .filter(Collision.Mapper.has)
-      .exists(Collision.Mapper.get(_).cells(universe).contains(cell))
+    walls.contains(cell) ||
+      (entities
+        filter Collider.Mapper.has
+        exists (Collider.Mapper.get(_).cells(universe).contains(cell)))
 
   def allOn(universe: Universe, controls: Iterable[Vector2i]): Boolean =
     controls forall { control =>
@@ -105,9 +107,9 @@ object Multiverse {
   }
 
   private def combine(universes: Iterable[Universe]): Iterable[Universe] =
-    universes
+    (universes
       .groupMapReduce(_.state)(identity)(_ + _.amplitude)
       .values
-      .filter(_.amplitude.squaredMagnitude > 1e-6) |>
-      normalize
+      .filter(_.amplitude.squaredMagnitude > 1e-6)
+      |> normalize)
 }

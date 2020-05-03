@@ -16,12 +16,11 @@ import scala.math.exp
 
 final class PlayerControl
   extends IteratingSystem(Family.all(classOf[Player], classOf[Position], classOf[Quantum]).get) {
-
   private var carryables: Iterable[Entity] = Nil
 
   override def addedToEngine(engine: Engine): Unit = {
     super.addedToEngine(engine)
-    carryables = engine.getEntitiesFor(Family.all(classOf[Carry], classOf[Position]).get).asScala
+    carryables = engine.getEntitiesFor(Family.all(classOf[Carried], classOf[Position]).get).asScala
   }
 
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
@@ -52,7 +51,7 @@ private object PlayerControl {
     val walkQuballs: Gate[Vector2i] = Translate.multi controlled { delta => universe =>
       if (universe.state(player.alive))
         carryables
-          .filter(carryable => universe.state(Carry.Mapper.get(carryable).carried))
+          .filter(carryable => universe.state(Carried.Mapper.get(carryable).carried))
           .map(carryable => (Position.Mapper.get(carryable).cell, delta))
           .toList
       else Nil
@@ -67,7 +66,7 @@ private object PlayerControl {
           universe.state(player.alive) &&
             universe.state(position.cell) == universe.state(Position.Mapper.get(carryable).cell)
         }
-        .map(Carry.Mapper.get(_).carried)
+        .map(Carried.Mapper.get(_).carried)
         .toList
     }
 
@@ -97,7 +96,7 @@ private object PlayerControl {
                    deltaTime: Float): Unit = {
     def applyGate(delta: Vector2i) = multiverse.applyGate(walkGate(player, position, carryables), delta)
 
-    val rawDelta = deltaPosition(deltaTime, player.speed)
+    val rawDelta = deltaPosition(deltaTime, Player.Speed)
     val Vector2i(dx, dy) = nextCell(position.relative, rawDelta)
     val effectiveDelta = rawDelta - Vector2d(
       if (dx != 0 && applyGate(Vector2i(dx, 0))) dx else 0,
@@ -119,7 +118,7 @@ private object PlayerControl {
                                      carryables: Iterable[Entity],
                                      deltaTime: Float): Unit =
     for (carryable <- carryables) {
-      val carried = Carry.Mapper.get(carryable).carried
+      val carried = Carried.Mapper.get(carryable).carried
       val carriedPosition = Position.Mapper.get(carryable)
       multiverse.updateMetaWith(carriedPosition.absolute) { pos => universe =>
         val relativePos = if (universe.state(carried)) playerPosition.relative else Vector2d(0.5, 0.5)

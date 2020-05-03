@@ -4,7 +4,11 @@ import com.badlogic.ashley.core.{Component, ComponentMapper}
 import superposition.math.Vector2i
 import superposition.quantum.StateId
 
-final class Goal(val multiverse: Multiverse, val cell: Vector2i, needsThunk: () => StateId[Vector2i]) extends Component {
+final class Goal(
+    val multiverse: Multiverse,
+    val cell: Vector2i,
+    needsThunk: () => StateId[Vector2i])
+  extends Component {
   lazy val needs: StateId[Vector2i] = needsThunk()
 }
 

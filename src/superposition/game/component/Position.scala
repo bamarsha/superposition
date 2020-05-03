@@ -5,9 +5,9 @@ import superposition.math.{Vector2d, Vector2i}
 import superposition.quantum.{MetaId, StateId}
 
 final class Position(
-  val absolute: MetaId[Vector2d],
-  val cell: StateId[Vector2i],
-  var relative: Vector2d)
+    val absolute: MetaId[Vector2d],
+    val cell: StateId[Vector2i],
+    var relative: Vector2d)
   extends Component
 
 object Position {

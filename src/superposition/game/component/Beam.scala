@@ -13,13 +13,12 @@ import superposition.quantum.{Gate, MetaId, StateId, Universe}
 import scala.math.min
 
 final class Beam(
-  multiverse: Multiverse,
-  val gate: Gate[StateId[Boolean]],
-  val source: Vector2i,
-  val direction: Direction,
-  val controls: Iterable[Vector2i])
+    multiverse: Multiverse,
+    val gate: Gate[StateId[Boolean]],
+    val source: Vector2i,
+    val direction: Direction,
+    val controls: Iterable[Vector2i])
   extends Component {
-
   val lastTarget: MetaId[Option[Vector2i]] = multiverse.allocateMeta(None)
 
   val elapsedTime: MetaId[Double] = multiverse.allocateMeta(0)
@@ -38,16 +37,15 @@ final class Beam(
       shapeRenderer.end()
     }
 
-    universe.meta(lastTarget) match {
-      case Some(target) if universe.meta(elapsedTime) <= BeamDuration + FadeDuration =>
-        val opacity = min(FadeDuration, BeamDuration + FadeDuration - universe.meta(elapsedTime)) / FadeDuration
-        gl.glEnable(GL_BLEND)
-        shapeRenderer.begin(Filled)
-        shapeRenderer.setColor(1, 0, 0, opacity.toFloat)
-        shapeRenderer.rect(source.x + 0.5f, source.y + 0.375f, target.x - source.x, 0.25f)
-        shapeRenderer.end()
-        gl.glDisable(GL_BLEND)
-      case _ => ()
+    for (target <- universe.meta(lastTarget)
+         if universe.meta(elapsedTime) <= BeamDuration + FadeDuration) {
+      val opacity = min(FadeDuration, BeamDuration + FadeDuration - universe.meta(elapsedTime)) / FadeDuration
+      gl.glEnable(GL_BLEND)
+      shapeRenderer.begin(Filled)
+      shapeRenderer.setColor(1, 0, 0, opacity.toFloat)
+      shapeRenderer.rect(source.x + 0.5f, source.y + 0.375f, target.x - source.x, 0.25f)
+      shapeRenderer.end()
+      gl.glDisable(GL_BLEND)
     }
   }
 }

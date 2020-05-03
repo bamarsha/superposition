@@ -10,9 +10,10 @@ import superposition.math._
  * Universes contain objects in a particular (definite) state that can interact with each other, but not with objects
  * from other universes. It corresponds to a basis vector with a particular amplitude (coefficient) in a quantum state.
  */
-final case class Universe(amplitude: Complex = Complex(1),
-                          state: DependentMap[StateId[_]] = DependentMap.empty,
-                          meta: DependentMap[MetaId[_]] = DependentMap.empty) {
+final case class Universe(
+    amplitude: Complex = Complex(1),
+    state: DependentMap[StateId[_]] = DependentMap.empty,
+    meta: DependentMap[MetaId[_]] = DependentMap.empty) {
   def +(c: Complex): Universe = copy(amplitude = amplitude + c)
 
   def -(c: Complex): Universe = copy(amplitude = amplitude - c)

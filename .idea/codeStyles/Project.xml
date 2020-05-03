@@ -3,6 +3,7 @@
     <ScalaCodeStyleSettings>
       <option name="INDENT_FIRST_PARAMETER" value="false" />
       <option name="INDENT_FIRST_PARAMETER_CLAUSE" value="true" />
+      <option name="USE_ALTERNATE_CONTINUATION_INDENT_FOR_PARAMS" value="true" />
     </ScalaCodeStyleSettings>
     <codeStyleSettings language="Scala">
       <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />

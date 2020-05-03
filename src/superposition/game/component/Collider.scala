@@ -6,8 +6,8 @@ import superposition.quantum.Universe
 
 import scala.Function.const
 
-final class Collision(val cells: Universe => Set[Vector2i] = const(Set.empty)) extends Component
+final class Collider(val cells: Universe => Set[Vector2i] = const(Set.empty)) extends Component
 
-object Collision {
-  val Mapper: ComponentMapper[Collision] = ComponentMapper.getFor(classOf[Collision])
+object Collider {
+  val Mapper: ComponentMapper[Collider] = ComponentMapper.getFor(classOf[Collider])
 }

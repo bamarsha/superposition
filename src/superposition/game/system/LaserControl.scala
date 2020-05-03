@@ -29,8 +29,7 @@ private object LaserControl {
   private def target(multiverse: Multiverse, universe: Universe, beam: Beam): Option[Vector2i] =
     if (multiverse.allOn(universe, beam.controls))
       beam.path find { cell =>
-        multiverse.isBlocked(universe, cell) ||
-          multiverse.allInCell(universe, cell).nonEmpty
+        multiverse.isBlocked(universe, cell) || multiverse.allInCell(universe, cell).nonEmpty
       }
     else None
 

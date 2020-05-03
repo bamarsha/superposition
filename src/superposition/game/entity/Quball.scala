@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color.{BLACK, WHITE}
 import com.badlogic.gdx.graphics.Texture
 import superposition.game.ResourceResolver.resolve
-import superposition.game.component.{Carry, Multiverse, Position, Quantum, SpriteView}
+import superposition.game.component.{Carried, Multiverse, Position, Quantum, SpriteView}
 import superposition.game.entity.Quball.QuballTexture
 import superposition.math.{Vector2d, Vector2i}
 import superposition.quantum.{MetaId, StateId}
@@ -24,16 +24,15 @@ final class Quball(multiverse: Multiverse, initialCell: Vector2i) extends Entity
 
   val onOff: StateId[Boolean] = multiverse.allocate(false)
 
+  add(new Position(position, cell, Vector2d(0.5, 0.5)))
+  add(new Quantum(multiverse, onOff))
+  add(new Carried(multiverse.allocate(false)))
   add(new SpriteView(
     texture = const(QuballTexture),
     position = _.meta(position),
     scale = const(Vector2d(1, 1)),
     color = universe => if (universe.state(onOff)) WHITE else BLACK,
     layer = 1))
-
-  add(new Position(position, cell, Vector2d(0.5, 0.5)))
-  add(new Quantum(multiverse, onOff))
-  add(new Carry(multiverse.allocate(false)))
 }
 
 private object Quball {

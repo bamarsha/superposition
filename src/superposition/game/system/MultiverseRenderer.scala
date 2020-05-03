@@ -17,9 +17,8 @@ final class MultiverseRenderer extends EntitySystem {
 
   private val shapeRenderer = new ShapeRenderer
 
-  override def addedToEngine(engine: Engine): Unit = {
+  override def addedToEngine(engine: Engine): Unit =
     multiverses = engine.getEntitiesFor(Family.all(classOf[Multiverse]).get).asScala
-  }
 
   override def update(deltaTime: Float): Unit =
     for (multiverse <- multiverses map Multiverse.Mapper.get) {
@@ -58,10 +57,9 @@ final class MultiverseRenderer extends EntitySystem {
     spriteBatch.end()
   }
 
-  private def drawBeams(multiverse: Multiverse): Unit = {
+  private def drawBeams(multiverse: Multiverse): Unit =
     for (beam <- multiverse.entities filter Beam.Mapper.has map Beam.Mapper.get;
          universe <- multiverse.universes) {
       beam.draw(universe)
     }
-  }
 }
