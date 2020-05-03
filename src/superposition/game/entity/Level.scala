@@ -83,14 +83,17 @@ private object Level {
   //  private val UniverseShader: Shader = Shader.load(classOf[Multiverse].getResource(_), "shaders/universe")
 
   private def walls(map: TiledMap): Set[Vector2i] =
-    (for (layer <- map.getLayers.asScala if layer.isInstanceOf[TiledMapTileLayer] && hasCollision(layer);
-          tiledLayer = layer.asInstanceOf[TiledMapTileLayer];
-          x <- 0 until tiledLayer.getWidth;
-          y <- 0 until tiledLayer.getHeight if hasTileAt(tiledLayer, x, y)) yield {
-      Vector2i(
-        (x + layer.getOffsetX.toDouble / map.getProperties.get("tilewidth", classOf[Int])).round.toInt,
-        (y + layer.getOffsetY.toDouble / map.getProperties.get("tileheight", classOf[Int])).round.toInt)
-    }).toSet
+    (for {
+      layer <- map.getLayers.asScala
+      if layer.isInstanceOf[TiledMapTileLayer] && hasCollision(layer)
+      tiledLayer = layer.asInstanceOf[TiledMapTileLayer]
+      x <- 0 until tiledLayer.getWidth
+      y <- 0 until tiledLayer.getHeight
+      if hasTileAt(tiledLayer, x, y)
+    } yield Vector2i(
+      (x + layer.getOffsetX.toDouble / map.getProperties.get("tilewidth", classOf[Int])).round.toInt,
+      (y + layer.getOffsetY.toDouble / map.getProperties.get("tileheight", classOf[Int])).round.toInt))
+      .toSet
 
   private def hasCollision(layer: MapLayer): Boolean =
     layer.getProperties.containsKey("Collision") && layer.getProperties.get("Collision", classOf[Boolean])
