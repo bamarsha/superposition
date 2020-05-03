@@ -89,11 +89,11 @@ private final class LevelLoader(engine: Engine) {
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
         val control =
           if (obj.getProperties.containsKey("Control"))
-            List(makeCell(obj.getProperties.get("Control", classOf[String])))
+            List(makeCell(map)(obj.getProperties.get("Control", classOf[String])))
           else Nil
         new Laser(multiverse, cell, gate, direction, control)
       case "Door" =>
-        val controls = makeCells(obj.getProperties.get("Controls", classOf[String])).toList
+        val controls = makeCells(map)(obj.getProperties.get("Controls", classOf[String])).toList
         new Door(multiverse, cell, controls)
       case "Goal" =>
         // TODO: val requires = ObjectId(properties("Requires").value.toInt)
@@ -106,13 +106,16 @@ private final class LevelLoader(engine: Engine) {
     }
   }
 
-  private def makeCell(string: String): Vector2i =
+  private def makeCell(map: TiledMap)(string: String): Vector2i = {
+    val height = map.getProperties.get("height", classOf[Int])
     """\((\d+),\s*(\d+)\)""".r("x", "y").findFirstMatchIn(string) match {
-      case Some(m) => Vector2i(m.group("x").trim.toInt, m.group("y").trim.toInt)
+      case Some(m) => Vector2i(m.group("x").trim.toInt, height - m.group("y").trim.toInt - 1)
       case None => error("Invalid cell '" + string + "'.")
     }
+  }
 
-  private def makeCells(string: String): Seq[Vector2i] = (string.linesIterator map makeCell).toSeq
+  private def makeCells(map: TiledMap)(string: String): Seq[Vector2i] =
+    (string.linesIterator map makeCell(map)).toSeq
 
   private def makeGate(name: String): Gate[StateId[Boolean]] = name match {
     case "X" => X
