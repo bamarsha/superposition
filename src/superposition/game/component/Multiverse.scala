@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector3
 import scalaz.Scalaz._
 import superposition.game.component.Multiverse.combine
-import superposition.game.entity.Quball
 import superposition.math.{Complex, Vector2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
@@ -82,8 +81,10 @@ final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera)
 
   def allOn(universe: Universe, controls: Iterable[Vector2i]): Boolean =
     controls forall { control =>
-      entities filter (_.isInstanceOf[Quball]) exists { quball =>
-        universe.state(quball.asInstanceOf[Quball].cell) == control && universe.state(quball.asInstanceOf[Quball].onOff)
+      entities exists { entity =>
+        Activator.Mapper.has(entity) && Position.Mapper.has(entity) &&
+          universe.state(Activator.Mapper.get(entity).activator) &&
+          universe.state(Position.Mapper.get(entity).cell) == control
       }
     }
 
