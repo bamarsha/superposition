@@ -4,13 +4,13 @@ import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
 import superposition.game.component.{Beam, Multiverse, Quantum}
-import superposition.game.system.LaserController._
+import superposition.game.system.LaserSystem.{hits, target}
 import superposition.math.Vector2i
 import superposition.quantum.{StateId, Universe}
 
 import scala.Function.const
 
-final class LaserController extends IteratingSystem(Family.all(classOf[Beam], classOf[Quantum]).get) {
+final class LaserSystem extends IteratingSystem(Family.all(classOf[Beam], classOf[Quantum]).get) {
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
     val multiverse = Quantum.Mapper.get(entity).multiverse
     val beam = Beam.Mapper.get(entity)
@@ -25,7 +25,7 @@ final class LaserController extends IteratingSystem(Family.all(classOf[Beam], cl
   }
 }
 
-private object LaserController {
+private object LaserSystem {
   private def target(multiverse: Multiverse, universe: Universe, beam: Beam): Option[Vector2i] =
     if (multiverse.allOn(universe, beam.controls))
       beam.path find { cell =>

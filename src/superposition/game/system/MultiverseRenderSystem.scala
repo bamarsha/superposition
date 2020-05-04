@@ -16,7 +16,7 @@ import superposition.quantum.Universe
 import scala.jdk.CollectionConverters._
 import scala.math.Pi
 
-final class MultiverseRenderer extends EntitySystem {
+final class MultiverseRenderSystem extends EntitySystem {
   private val defaultBatch: SpriteBatch = new SpriteBatch
 
   private val universeShader: ShaderProgram = new ShaderProgram(
