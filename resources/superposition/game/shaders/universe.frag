@@ -1,21 +1,3 @@
-#version 330
-
-in vec2 TexCoords;
-
-out vec4 FragColor;
-
-uniform float minVal;
-uniform float maxVal;
-uniform float time;
-uniform float hue;
-uniform vec4 color;
-
-uniform sampler2D tex;
-
-
-
-
-//
 // Description : Array and textureless GLSL 2D/3D/4D simplex
 //               noise functions.
 //      Author : Ian McEwan, Ashima Arts.
@@ -25,7 +7,16 @@ uniform sampler2D tex;
 //               Distributed under the MIT License. See LICENSE file.
 //               https://github.com/ashima/webgl-noise
 //               https://github.com/stegu/webgl-noise
-//
+
+uniform sampler2D u_texture;
+
+uniform float minVal;
+uniform float maxVal;
+uniform float time;
+uniform float hue;
+uniform vec4 color;
+
+varying vec2 texCoords;
 
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -133,13 +124,13 @@ void main() {
     float noise = .5;
     float scale = 1;
     for (int i = 0; i < 1; i++) {
-        noise += snoise(vec3(TexCoords.xy * scale * 15, time / 15)) / scale;
+        noise += snoise(vec3(texCoords.xy * scale * 15, time / 15)) / scale;
         scale *= 2;
     }
     noise = fract(noise);
     if (noise < minVal || noise > maxVal) {
         discard;
     }
-    vec4 texColor = texture(tex, TexCoords);
-    FragColor = mix(vec4(hsv2rgb(vec3(hue, 1, 1)), texColor.a), texColor, .9) * color;
+    vec4 texColor = texture2D(u_texture, texCoords);
+    gl_FragColor = mix(vec4(hsv2rgb(vec3(hue, 1, 1)), texColor.a), texColor, .9) * color;
 }
