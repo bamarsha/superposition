@@ -1,7 +1,7 @@
 package superposition.game.system
 
 import com.badlogic.ashley.core._
-import com.badlogic.gdx.Gdx.gl
+import com.badlogic.gdx.Gdx.{gl, graphics}
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.GL20.{GL_BLEND, GL_COLOR_BUFFER_BIT}
 import com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888
@@ -27,8 +27,8 @@ final class MultiverseRenderer extends EntitySystem {
 
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
-  // TODO: Frame buffer dimensions?
-  private val frameBuffer: FrameBuffer = new FrameBuffer(RGBA8888, 1280, 720, false)
+  // TODO: Resize the framebuffer if the window is resized.
+  private val frameBuffer: FrameBuffer = new FrameBuffer(RGBA8888, graphics.getWidth, graphics.getHeight, false)
 
   private var multiverses: Iterable[Entity] = Nil
 
