@@ -68,9 +68,9 @@ final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera)
       Position.Mapper.has(entity) && universe.state(Position.Mapper.get(entity).cell) == cell
     }
 
-  def primaryBits(universe: Universe, cell: Vector2i): Iterable[StateId[Boolean]] =
+  def toggles(universe: Universe, cell: Vector2i): Iterable[StateId[Boolean]] =
     allInCell(universe, cell) flatMap { entity =>
-      if (Quantum.Mapper.has(entity)) Some(Quantum.Mapper.get(entity).primary)
+      if (Toggle.Mapper.has(entity)) Some(Toggle.Mapper.get(entity).toggle)
       else None
     }
 
@@ -92,7 +92,7 @@ final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera)
       !isBlocked(universe, universe.state(Position.Mapper.get(entity).cell))
     }
 
-  def selected(cell: Vector2i): Boolean = {
+  def isSelected(cell: Vector2i): Boolean = {
     val mouse = camera.unproject(new Vector3(input.getX, input.getY, 0))
     cell == Vector2i(mouse.x.floor.toInt, mouse.y.floor.toInt)
   }

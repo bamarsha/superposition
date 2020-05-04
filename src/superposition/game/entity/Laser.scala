@@ -3,7 +3,7 @@ package superposition.game.entity
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
 import superposition.game.ResourceResolver.resolve
-import superposition.game.component.{Beam, Collider, Multiverse, Quantum, SpriteView}
+import superposition.game.component.{Beam, Collider, Multiverse, SpriteView}
 import superposition.game.entity.Laser.Textures
 import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math.{Direction, Vector2d, Vector2i}
@@ -27,7 +27,6 @@ final class Laser(
     direction: Direction,
     controls: Iterable[Vector2i])
   extends Entity {
-  add(new Quantum(multiverse, null))
   add(new Collider(const(Set(cell))))
   add(new Beam(multiverse, gate, cell, direction, controls))
   add(new SpriteView(

@@ -14,7 +14,7 @@ import superposition.quantum.{Gate, MetaId, StateId, Universe}
 import scala.math.min
 
 final class Beam(
-    multiverse: Multiverse,
+    val multiverse: Multiverse,
     val gate: Gate[StateId[Boolean]],
     val source: Vector2i,
     val direction: Direction,
@@ -31,7 +31,7 @@ final class Beam(
   def draw(universe: Universe): Unit = {
     shapeRenderer.setProjectionMatrix(multiverse.camera.combined)
 
-    if (multiverse.selected(source)) {
+    if (multiverse.isSelected(source)) {
       shapeRenderer.begin(Line)
       shapeRenderer.setColor(RED)
       shapeRenderer.rect(source.x, source.y, 1, 1)

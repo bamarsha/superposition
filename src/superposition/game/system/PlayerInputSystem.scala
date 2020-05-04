@@ -15,7 +15,7 @@ import scala.jdk.CollectionConverters._
 import scala.math.exp
 
 final class PlayerInputSystem
-  extends IteratingSystem(Family.all(classOf[Player], classOf[Position], classOf[Quantum]).get) {
+  extends IteratingSystem(Family.all(classOf[Player], classOf[Position]).get) {
   private var carryables: Iterable[Entity] = Nil
 
   override def addedToEngine(engine: Engine): Unit = {
@@ -24,9 +24,9 @@ final class PlayerInputSystem
   }
 
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
-    val multiverse = Quantum.Mapper.get(entity).multiverse
     val position = Position.Mapper.get(entity)
     val player = Player.Mapper.get(entity)
+    val multiverse = player.multiverse
     walk(multiverse, player, position, carryables, deltaTime)
     if (input.isKeyJustPressed(SPACE)) {
       multiverse.applyGate(carryGate(player, position, carryables), ())

@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.{Engine, Entity}
 import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
 import superposition.game.LevelLoader.{LevelFactory, addLevel, makeLevel, removeLevel}
-import superposition.game.component.{Multiverse, Position, Quantum}
+import superposition.game.component.{Multiverse, Position, Toggle}
 import superposition.game.entity._
 import superposition.math.{Direction, Vector2i}
 import superposition.quantum._
@@ -70,8 +70,8 @@ private object LevelLoader {
       val gates = map.getProperties.get("Gates", classOf[String])
       for (Array(name, target) <- gates.linesIterator map (_.split(' '))) {
         println(s"Applying gate $name on entity $target.")
-        val primary = entities(target.toInt).getComponent(classOf[Quantum]).primary
-        multiverse.applyGate(makeGate(name), primary)
+        val toggle = entities(target.toInt).getComponent(classOf[Toggle]).toggle
+        multiverse.applyGate(makeGate(name), toggle)
       }
     }
     level

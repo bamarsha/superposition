@@ -6,7 +6,7 @@ import superposition.quantum.StateId
 /**
  * The player character.
  */
-final class Player(var alive: StateId[Boolean]) extends Component
+final class Player(val multiverse: Multiverse, var alive: StateId[Boolean]) extends Component
 
 object Player {
   val Mapper: ComponentMapper[Player] = ComponentMapper.getFor(classOf[Player])
