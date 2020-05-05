@@ -3,7 +3,7 @@ package superposition.game.entity
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
 import superposition.game.ResourceResolver.resolve
-import superposition.game.component.{ClassicalPosition, Goal, Multiverse, SpriteView}
+import superposition.game.component.{ClassicalPosition, Goal, Multiverse, QuantumObject, SpriteView}
 import superposition.game.entity.Exit.KeyTexture
 import superposition.math.{Vector2d, Vector2i}
 import superposition.quantum.StateId
@@ -22,6 +22,7 @@ final class Exit(
     cell: Vector2i,
     required: () => StateId[Vector2i])
   extends Entity {
+  add(new QuantumObject(multiverse))
   add(new ClassicalPosition(cell.toVector2d + Vector2d(0.5, 0.5), cell))
   add(new Goal(multiverse, required))
   add(new SpriteView(texture = const(KeyTexture)))

@@ -1,16 +1,21 @@
 package superposition.game.component
 
 import com.badlogic.ashley.core._
-import com.badlogic.gdx.Gdx.input
+import com.badlogic.gdx.Gdx.{gl, graphics, input}
+import com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.{FrameBuffer, ShaderProgram}
 import com.badlogic.gdx.math.Vector3
 import scalaz.Scalaz._
+import superposition.game.ResourceResolver.resolve
 import superposition.game.component.Multiverse.combine
 import superposition.math.{Complex, Vector2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
 import scala.Ordering.Implicits._
-import scala.math.sqrt
+import scala.math.{Pi, sqrt}
 
 final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera) extends Component {
   private var _universes: Seq[Universe] = Seq(Universe())
@@ -18,6 +23,19 @@ final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera)
   private var _entities: List[Entity] = List()
 
   private var stateIds: List[StateId[_]] = List()
+
+  private val shaderSettings: MetaId[(Float, Float)] = allocateMeta((0, 0))
+
+  private var time: Float = 0
+
+  private val universeShader: ShaderProgram = new ShaderProgram(
+    resolve("shaders/universe.vert"),
+    resolve("shaders/universe.frag"))
+
+  private val universeBatch: SpriteBatch = new SpriteBatch(1000, universeShader)
+
+  // TODO: Resize the framebuffer if the window is resized.
+  private val frameBuffer: FrameBuffer = new FrameBuffer(RGBA8888, graphics.getWidth, graphics.getHeight, false)
 
   def universes: Seq[Universe] = _universes
 
@@ -97,6 +115,52 @@ final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera)
     val mouse = camera.unproject(new Vector3(input.getX, input.getY, 0))
     cell == Vector2i(mouse.x.floor.toInt, mouse.y.floor.toInt)
   }
+
+  def updateShaderSettings(deltaTime: Float): Unit = {
+    time += deltaTime
+    var minValue: Float = 0
+    _universes = for (universe <- universes) yield {
+      val maxValue = minValue + universe.amplitude.squaredMagnitude.toFloat
+      val newUniverse = universe.updatedMeta(shaderSettings)((minValue, maxValue))
+      minValue = maxValue
+      newUniverse
+    }
+  }
+
+  def drawWithin(universe: Universe)(draw: => Unit): Unit = {
+    frameBuffer.begin()
+    gl.glClearColor(0, 0, 0, 0)
+    gl.glClear(GL_COLOR_BUFFER_BIT)
+    draw
+    frameBuffer.end()
+    val (minValue, maxValue) = universe.meta(shaderSettings)
+    drawBuffer(universe, minValue, maxValue)
+  }
+
+  private def drawBuffer(universe: Universe, minValue: Float, maxValue: Float): Unit = {
+    universeBatch.setProjectionMatrix(camera.combined)
+    drawBufferWith {
+      universeShader.setUniformf("time", time)
+      universeShader.setUniformf("minVal", minValue)
+      universeShader.setUniformf("maxVal", maxValue)
+      universeShader.setUniformf("hue", (universe.amplitude.phase / (2 * Pi)).toFloat)
+      universeShader.setUniform4fv("color", Array(1, 1, 1, 1), 0, 4)
+    }
+    drawBufferWith {
+      universeShader.setUniformf("minVal", 0f)
+      universeShader.setUniformf("maxVal", 1f)
+      universeShader.setUniform4fv("color", Array(1, 1, 1, 0.1f), 0, 4)
+    }
+  }
+
+  private def drawBufferWith(setup: => Unit): Unit = {
+    universeBatch.begin()
+    setup
+    universeBatch.draw(
+      frameBuffer.getColorBufferTexture, 0, camera.viewportHeight, camera.viewportWidth, -camera.viewportHeight)
+    universeBatch.end()
+  }
+
 }
 
 object Multiverse {

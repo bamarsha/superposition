@@ -16,6 +16,7 @@ final class LaserSystem extends IteratingSystem(Family.all(classOf[Beam], classO
     val beam = Beam.Mapper.get(entity)
     val cell = ClassicalPosition.Mapper.get(entity).cell
     val multiverse = beam.multiverse
+
     if (input.isButtonJustPressed(0) && multiverse.isSelected(cell)) {
       multiverse.applyGate(beam.gate.multi controlled const(universe => hits(multiverse, universe, entity)), ())
       multiverse.updateMetaWith(beam.lastTarget)(const(universe => target(multiverse, universe, entity)))
@@ -24,6 +25,12 @@ final class LaserSystem extends IteratingSystem(Family.all(classOf[Beam], classO
       }
     }
     multiverse.updateMetaWith(beam.elapsedTime)(time => const(time + deltaTime))
+
+    for (universe <- multiverse.universes) {
+      multiverse.drawWithin(universe) {
+        beam.draw(universe, ClassicalPosition.Mapper.get(entity).cell)
+      }
+    }
   }
 }
 

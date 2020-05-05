@@ -15,15 +15,15 @@ final class SpriteView(
     val color: Universe => Color = const(WHITE),
     val layer: Int = 0)
   extends Component {
-  def draw(spriteBatch: SpriteBatch, universe: Universe, position: Vector2d): Unit = {
+  def draw(batch: SpriteBatch, universe: Universe, position: Vector2d): Unit = {
     val currentScale = scale(universe)
     val currentPosition = position - currentScale / 2
-    spriteBatch.setColor(color(universe))
-    spriteBatch.draw(texture(universe),
-                     currentPosition.x.toFloat,
-                     currentPosition.y.toFloat,
-                     currentScale.x.toFloat,
-                     currentScale.y.toFloat)
+    batch.setColor(color(universe))
+    batch.draw(texture(universe),
+               currentPosition.x.toFloat,
+               currentPosition.y.toFloat,
+               currentScale.x.toFloat,
+               currentScale.y.toFloat)
   }
 }
 

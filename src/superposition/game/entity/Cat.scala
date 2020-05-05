@@ -16,6 +16,7 @@ final class Cat(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
     val absolutePosition = multiverse.allocateMeta(initialCell.toVector2d + Vector2d(0.5, 0.5))
     val cell = multiverse.allocate(initialCell)
 
+    add(new QuantumObject(multiverse))
     add(new Toggle(alive))
     add(new Player(multiverse, alive))
     add(new QuantumPosition(absolutePosition, cell, Vector2d(0.5, 0.5)))

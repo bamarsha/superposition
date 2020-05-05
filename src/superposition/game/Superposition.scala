@@ -15,10 +15,11 @@ private final class Superposition extends Game {
 
   override def create(): Unit = {
     engine.addSystem(new LevelSystem(levelLoader))
-    engine.addSystem(new PlayerInputSystem)
-    engine.addSystem(new LaserSystem)
     engine.addSystem(new MapRenderSystem)
     engine.addSystem(new MultiverseRenderSystem)
+    engine.addSystem(new PlayerInputSystem)
+    engine.addSystem(new LaserSystem)
+    engine.addSystem(new SpriteRenderSystem)
     levelLoader.startPlaylist(new TmxMapLoader(ResourceResolver), Playlist)
   }
 

@@ -21,6 +21,7 @@ final class Quball(multiverse: Multiverse, initialCell: Vector2i) extends Entity
     val position = multiverse.allocateMeta(initialCell.toVector2d + Vector2d(0.5, 0.5))
     val onOff = multiverse.allocate(false)
 
+    add(new QuantumObject(multiverse))
     add(new QuantumPosition(position, multiverse.allocate(initialCell), Vector2d(0.5, 0.5)))
     add(new Toggle(onOff))
     add(new Activator(onOff))
