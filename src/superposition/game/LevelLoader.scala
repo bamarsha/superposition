@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.{Engine, Entity}
 import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
 import superposition.game.LevelLoader.{LevelFactory, addLevel, makeLevel, removeLevel}
-import superposition.game.component.{Multiverse, Position, Toggle}
+import superposition.game.component.{Multiverse, QuantumPosition, Toggle}
 import superposition.game.entity._
 import superposition.math.{Direction, Vector2i}
 import superposition.quantum._
@@ -103,7 +103,7 @@ private object LevelLoader {
         new Door(multiverse, cell, controls)
       case "Goal" =>
         val required = obj.getProperties.get("Requires", classOf[Int])
-        new Exit(multiverse, cell, required = () => entities(required).getComponent(classOf[Position]).cell)
+        new Exit(multiverse, cell, required = () => entities(required).getComponent(classOf[QuantumPosition]).cell)
       case unknown => error(s"Unknown entity type $unknown.")
     }
   }

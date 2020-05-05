@@ -64,7 +64,7 @@ final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera)
 
   def allInCell(universe: Universe, cell: Vector2i): Iterable[Entity] =
     entities filter { entity =>
-      Position.Mapper.has(entity) && universe.state(Position.Mapper.get(entity).cell) == cell
+      QuantumPosition.Mapper.has(entity) && universe.state(QuantumPosition.Mapper.get(entity).cell) == cell
     }
 
   def toggles(universe: Universe, cell: Vector2i): Iterable[StateId[Boolean]] =
@@ -82,15 +82,15 @@ final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera)
   def allOn(universe: Universe, controls: Iterable[Vector2i]): Boolean =
     controls forall { control =>
       entities exists { entity =>
-        Activator.Mapper.has(entity) && Position.Mapper.has(entity) &&
+        Activator.Mapper.has(entity) && QuantumPosition.Mapper.has(entity) &&
           universe.state(Activator.Mapper.get(entity).activator) &&
-          universe.state(Position.Mapper.get(entity).cell) == control
+          universe.state(QuantumPosition.Mapper.get(entity).cell) == control
       }
     }
 
   def isValid(universe: Universe): Boolean =
-    entities filter Position.Mapper.has forall { entity =>
-      !isBlocked(universe, universe.state(Position.Mapper.get(entity).cell))
+    entities filter QuantumPosition.Mapper.has forall { entity =>
+      !isBlocked(universe, universe.state(QuantumPosition.Mapper.get(entity).cell))
     }
 
   def isSelected(cell: Vector2i): Boolean = {

@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.{Filled, Line}
-import superposition.game.component.Beam.{BeamDuration, FadeDuration, Length}
+import superposition.game.component.Beam.{BeamDuration, FadeDuration}
 import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math.{Direction, Vector2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
@@ -16,7 +16,6 @@ import scala.math.min
 final class Beam(
     val multiverse: Multiverse,
     val gate: Gate[StateId[Boolean]],
-    val source: Vector2i,
     val direction: Direction,
     val controls: Iterable[Vector2i])
   extends Component {
@@ -24,11 +23,9 @@ final class Beam(
 
   val elapsedTime: MetaId[Double] = multiverse.allocateMeta(0)
 
-  val path: LazyList[Vector2i] = LazyList.iterate(source)(_ + direction.toVec2i).tail.take(Length)
-
   private val shapeRenderer = new ShapeRenderer
 
-  def draw(universe: Universe): Unit = {
+  def draw(universe: Universe, source: Vector2i): Unit = {
     shapeRenderer.setProjectionMatrix(multiverse.camera.combined)
 
     if (multiverse.isSelected(source)) {
@@ -57,7 +54,7 @@ final class Beam(
 object Beam {
   val Mapper: ComponentMapper[Beam] = ComponentMapper.getFor(classOf[Beam])
 
-  private val Length: Int = 25
+  val Length: Int = 25
 
   private val BeamDuration: Double = 0.2
 

@@ -21,13 +21,12 @@ final class Quball(multiverse: Multiverse, initialCell: Vector2i) extends Entity
     val position = multiverse.allocateMeta(initialCell.toVector2d + Vector2d(0.5, 0.5))
     val onOff = multiverse.allocate(false)
 
-    add(new Position(position, multiverse.allocate(initialCell), Vector2d(0.5, 0.5)))
+    add(new QuantumPosition(position, multiverse.allocate(initialCell), Vector2d(0.5, 0.5)))
     add(new Toggle(onOff))
     add(new Activator(onOff))
     add(new Carried(multiverse.allocate(false)))
     add(new SpriteView(
       texture = const(QuballTexture),
-      position = _.meta(position),
       scale = const(Vector2d(1, 1)),
       color = universe => if (universe.state(onOff)) WHITE else BLACK,
       layer = 1))

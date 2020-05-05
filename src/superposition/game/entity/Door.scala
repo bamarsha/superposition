@@ -3,7 +3,7 @@ package superposition.game.entity
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
 import superposition.game.ResourceResolver.resolve
-import superposition.game.component.{Collider, Multiverse, SpriteView}
+import superposition.game.component.{Collider, Multiverse, ClassicalPosition, SpriteView}
 import superposition.game.entity.Door.{ClosedTexture, OpenTexture}
 import superposition.math.{Vector2d, Vector2i}
 
@@ -18,9 +18,9 @@ import scala.Function.const
  */
 final class Door(multiverse: Multiverse, cell: Vector2i, controls: Iterable[Vector2i]) extends Entity {
   add(new Collider(universe => if (multiverse.allOn(universe, controls)) Set.empty else Set(cell)))
+  add(new ClassicalPosition(cell.toVector2d + Vector2d(0.5, 0.5), cell))
   add(new SpriteView(
     texture = universe => if (multiverse.allOn(universe, controls)) OpenTexture else ClosedTexture,
-    position = const(cell.toVector2d + Vector2d(0.5, 0.5)),
     layer = -1))
 }
 

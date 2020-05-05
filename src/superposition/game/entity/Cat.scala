@@ -18,10 +18,9 @@ final class Cat(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
 
     add(new Toggle(alive))
     add(new Player(multiverse, alive))
-    add(new Position(absolutePosition, cell, Vector2d(0.5, 0.5)))
+    add(new QuantumPosition(absolutePosition, cell, Vector2d(0.5, 0.5)))
     add(new SpriteView(
       texture = const(CatTexture),
-      position = _.meta(absolutePosition),
       scale = const(Vector2d(2, 2)),
       color = universe => if (universe.state(alive)) WHITE else BLACK))
   }

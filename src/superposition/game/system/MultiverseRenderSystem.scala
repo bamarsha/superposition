@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.graphics.glutils.{FrameBuffer, ShaderProgram, ShapeRenderer}
 import com.badlogic.gdx.math.Matrix4
 import superposition.game.ResourceResolver.resolve
-import superposition.game.component.{Beam, Multiverse, Position, SpriteView}
+import superposition.game.component._
 import superposition.quantum.Universe
 
 import scala.jdk.CollectionConverters._
@@ -42,16 +42,23 @@ final class MultiverseRenderSystem extends EntitySystem {
     for (multiverse <- multiverses map Multiverse.Mapper.get) {
       highlightOccupiedCells(multiverse)
 
-      val spriteViews = (multiverse.entities filter SpriteView.Mapper.has map SpriteView.Mapper.get)
-        .toSeq sortBy (_.layer)
-      val beams = multiverse.entities filter Beam.Mapper.has map Beam.Mapper.get
+      val spriteEntities =
+        (multiverse.entities filter { entity =>
+          SpriteView.Mapper.has(entity) &&
+            (ClassicalPosition.Mapper.has(entity) || QuantumPosition.Mapper.has(entity))
+        }).toSeq sortBy (SpriteView.Mapper.get(_).layer)
+      val beamEntities = multiverse.entities filter { entity =>
+        Beam.Mapper.has(entity) && ClassicalPosition.Mapper.has(entity)
+      }
       var minValue: Float = 0
       for (universe <- multiverse.universes) {
         frameBuffer.begin()
         gl.glClearColor(0, 0, 0, 0)
         gl.glClear(GL_COLOR_BUFFER_BIT)
-        drawSprites(multiverse.camera.combined, universe, spriteViews)
-        beams.foreach(_.draw(universe))
+        drawSprites(multiverse.camera.combined, universe, spriteEntities)
+        for (entity <- beamEntities) {
+          Beam.Mapper.get(entity).draw(universe, ClassicalPosition.Mapper.get(entity).cell)
+        }
         frameBuffer.end()
 
         val maxValue = minValue + universe.amplitude.squaredMagnitude.toFloat
@@ -91,8 +98,8 @@ final class MultiverseRenderSystem extends EntitySystem {
   private def highlightOccupiedCells(multiverse: Multiverse): Unit = {
     val occupiedCells =
       (for {
-        entity <- multiverse.entities if Position.Mapper.has(entity)
-        position = Position.Mapper.get(entity)
+        entity <- multiverse.entities if QuantumPosition.Mapper.has(entity)
+        position = QuantumPosition.Mapper.get(entity)
         universe <- multiverse.universes
       } yield universe.state(position.cell)).toSet
 
@@ -107,10 +114,16 @@ final class MultiverseRenderSystem extends EntitySystem {
     gl.glDisable(GL_BLEND)
   }
 
-  private def drawSprites(projection: Matrix4, universe: Universe, spriteViews: Seq[SpriteView]): Unit = {
+  private def drawSprites(projection: Matrix4, universe: Universe, entities: Seq[Entity]): Unit = {
     defaultBatch.setProjectionMatrix(projection)
     defaultBatch.begin()
-    spriteViews.foreach(_.draw(defaultBatch, universe))
+    for (entity <- entities) {
+      val spriteView = SpriteView.Mapper.get(entity)
+      val position =
+        if (ClassicalPosition.Mapper.has(entity)) ClassicalPosition.Mapper.get(entity).absolute
+        else universe.meta(QuantumPosition.Mapper.get(entity).absolute)
+      spriteView.draw(defaultBatch, universe, position)
+    }
     defaultBatch.end()
   }
 }
