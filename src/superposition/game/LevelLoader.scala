@@ -13,16 +13,28 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 import scala.sys.error
 
+/** Loads and resets levels and tracks the current position in a playlist.
+  *
+  * @param engine the entity engine
+  */
 private final class LevelLoader(engine: Engine) {
+  /** The current playlist of levels. */
   private var playlist: Seq[LevelFactory] = Nil
 
+  /** The current level. */
   private var current: Option[Level] = None
 
+  /** Starts a level playlist.
+    *
+    * @param loader the tile map loader
+    * @param fileNames the file name of the tile map for each level in the playlist
+    */
   def startPlaylist(loader: TmxMapLoader, fileNames: Seq[String]): Unit = {
     playlist = fileNames map (fileName => () => makeLevel(loader.load(fileName)))
     resetLevel()
   }
 
+  /** Advances to the next level in the playlist. */
   def nextLevel(): Unit = {
     playlist = playlist match {
       case Nil => Nil
@@ -31,34 +43,50 @@ private final class LevelLoader(engine: Engine) {
     resetLevel()
   }
 
+  /** Resets the current level. */
   def resetLevel(): Unit = {
     current.foreach(removeLevel(engine))
-    current = playlist.headOption map (_())
+    current = playlist.headOption map (_ ())
     current.foreach(addLevel(engine))
   }
 }
 
+/** Tools for loading levels. */
 private object LevelLoader {
+  /** A function that returns a new instance of a level. */
   private type LevelFactory = () => Level
 
+  /** Adds a level and all of its entities to the engine.
+    *
+    * @param engine the entity engine
+    * @param level the level to add
+    */
   private def addLevel(engine: Engine)(level: Level): Unit = {
     engine.addEntity(level)
-    for (entity <- level.getComponent(classOf[Multiverse]).entities) {
-      engine.addEntity(entity)
-    }
+    level.getComponent(classOf[Multiverse]).entities.foreach(engine.addEntity)
   }
 
+  /** Removes a level and all of its entities from the engine.
+    *
+    * @param engine the entity engine
+    * @param level the level to remove
+    */
   private def removeLevel(engine: Engine)(level: Level): Unit = {
-    for (entity <- level.getComponent(classOf[Multiverse]).entities) {
-      engine.removeEntity(entity)
-    }
+    level.getComponent(classOf[Multiverse]).entities.foreach(engine.removeEntity)
     engine.removeEntity(level)
   }
 
+  /** Makes a level from the tile map.
+    *
+    * @param map the tile map
+    * @return the level
+    */
   private def makeLevel(map: TiledMap): Level = {
     val level = new Level(map)
     val multiverse = level.getComponent(classOf[Multiverse])
-    var entities = new mutable.HashMap[Int, Entity]
+    val entities = new mutable.HashMap[Int, Entity]
+
+    // Spawn entities.
     for (layer <- map.getLayers.asScala; obj <- layer.getObjects.asScala) {
       println(s"Spawning ${obj.getName} (${obj.getProperties.get("type")}).")
       val entity = makeEntity(multiverse, entities, map, obj)
@@ -66,6 +94,8 @@ private object LevelLoader {
       entities += obj.getProperties.get("id", classOf[Int]) -> entity
       // TODO: entity.layer = layer
     }
+
+    // Apply gates.
     if (map.getProperties.containsKey("Gates")) {
       val gates = map.getProperties.get("Gates", classOf[String])
       for (Array(name, target) <- gates.linesIterator map (_.split(' '))) {
@@ -74,9 +104,18 @@ private object LevelLoader {
         multiverse.applyGate(makeGate(name), toggle)
       }
     }
+
     level
   }
 
+  /** Makes an entity from a tile map object.
+    *
+    * @param multiverse the multiverse that the entity belongs to
+    * @param entities a map from object ID to entity for each entity in the tile map
+    * @param map the tile map
+    * @param obj the map object
+    * @return the entity
+    */
   private def makeEntity(multiverse: Multiverse,
                          entities: mutable.HashMap[Int, Entity],
                          map: TiledMap,
@@ -108,6 +147,12 @@ private object LevelLoader {
     }
   }
 
+  /** Makes a cell position for the tile map from a string "(x, y)".
+    *
+    * @param map the tile map
+    * @param string the cell position string
+    * @return the cell position
+    */
   private def makeCell(map: TiledMap)(string: String): Vector2i = {
     val height = map.getProperties.get("height", classOf[Int])
     """\((\d+),\s*(\d+)\)""".r("x", "y").findFirstMatchIn(string) match {
@@ -116,9 +161,19 @@ private object LevelLoader {
     }
   }
 
-  private def makeCells(map: TiledMap)(string: String): Seq[Vector2i] =
-    (string.linesIterator map makeCell(map)).toSeq
+  /** Makes a sequence of cell positions for the tile map from a string "(x_1, y_1)\n...\n(x_n, y_n)".
+    *
+    * @param map the tile map
+    * @param string the cell positions string
+    * @return the cell positions
+    */
+  private def makeCells(map: TiledMap)(string: String): Seq[Vector2i] = (string.linesIterator map makeCell(map)).toSeq
 
+  /** Returns the gate corresponding to the gate name.
+    *
+    * @param name the gate name
+    * @return the corresponding gate
+    */
   private def makeGate(name: String): Gate[StateId[Boolean]] = name match {
     case "X" => X
     case "Z" => Z
