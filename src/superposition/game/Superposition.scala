@@ -8,12 +8,13 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import superposition.game.Superposition.Playlist
 import superposition.game.system._
 
+/** The Superposition game. */
 private final class Superposition extends Game {
+  /** The entity engine. */
   private val engine: Engine = new Engine
 
-  private val levelLoader: LevelLoader = new LevelLoader(engine)
-
   override def create(): Unit = {
+    val levelLoader = new LevelLoader(engine)
     engine.addSystem(new LevelSystem(levelLoader))
     engine.addSystem(new MapRenderSystem)
     engine.addSystem(new MultiverseRenderSystem)
@@ -29,7 +30,9 @@ private final class Superposition extends Game {
   }
 }
 
+/** The main class for Superposition. */
 private object Superposition {
+  /** The level playlist. */
   private val Playlist: Seq[String] = Seq(
     "level1.tmx",
     "level2.tmx",
@@ -37,6 +40,10 @@ private object Superposition {
     "level4.tmx",
     "win.tmx")
 
+  /** The entry point for Superposition.
+    *
+    * @param args the command-line arguments
+    */
   def main(args: Array[String]): Unit = {
     val config = new Lwjgl3ApplicationConfiguration
     config.setTitle("Superposition")

@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.files.FileHandle
 import scalaz.Scalaz._
 
+/** Resolves file names to file handles using the application's Java resources. */
 private object ResourceResolver extends FileHandleResolver {
   override def resolve(fileName: String): FileHandle =
     (fileName
