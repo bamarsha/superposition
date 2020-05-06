@@ -3,7 +3,7 @@ package superposition.game.system
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.ashley.systems.SortedIteratingSystem
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import superposition.game.component.{ClassicalPosition, Multiverse, QuantumPosition, SpriteView}
+import superposition.game.component.{ClassicalPosition, QuantumPosition, SpriteView}
 import superposition.game.entity.Level
 import superposition.game.system.SpriteRenderer.{SpriteRenderFamily, compareLayers}
 
@@ -12,10 +12,10 @@ final class SpriteRenderer(level: () => Option[Level])
   private val batch: SpriteBatch = new SpriteBatch
 
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
-    val multiverse = Multiverse.Mapper.get(level().get)
+    val multiverseView = level().get.multiverseView
     val spriteView = SpriteView.Mapper.get(entity)
-    batch.setProjectionMatrix(multiverse.camera.combined)
-    multiverse.draw { universe =>
+    batch.setProjectionMatrix(multiverseView.camera.combined)
+    multiverseView.draw { universe =>
       val position =
         if (ClassicalPosition.Mapper.has(entity)) ClassicalPosition.Mapper.get(entity).absolute
         else universe.meta(QuantumPosition.Mapper.get(entity).absolute)

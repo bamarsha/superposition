@@ -4,28 +4,32 @@ import com.badlogic.ashley.core._
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
-import superposition.game.component.{MapView, Multiverse}
+import superposition.game.component.{MapView, Multiverse, MultiverseView}
 import superposition.game.entity.Level.walls
 import superposition.math.Vector2i
 
 import scala.jdk.CollectionConverters._
 
 /**
- * The multiverse is a collection of universes.
- *
- * Multiple universes represent qubits in superposition. The multiverse can apply quantum gates to qubits by changing
- * the amplitude of a universe or creating a copy of a universe.
- */
+  * The multiverse is a collection of universes.
+  *
+  * Multiple universes represent qubits in superposition. The multiverse can apply quantum gates to qubits by changing
+  * the amplitude of a universe or creating a copy of a universe.
+  */
 final class Level(map: TiledMap) extends Entity {
-  locally {
-    val camera = new OrthographicCamera(map.getProperties.get("width", classOf[Int]),
-                                        map.getProperties.get("height", classOf[Int]))
-    camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0)
-    camera.update()
+  private val camera: OrthographicCamera = new OrthographicCamera(
+    map.getProperties.get("width", classOf[Int]),
+    map.getProperties.get("height", classOf[Int]))
+  camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0)
+  camera.update()
 
-    add(new MapView(map, camera))
-    add(new Multiverse(walls(map), camera))
-  }
+  val multiverse: Multiverse = new Multiverse(walls(map))
+
+  val multiverseView: MultiverseView = new MultiverseView(multiverse, camera)
+
+  add(new MapView(map, camera))
+  add(multiverse)
+  add(multiverseView)
 }
 
 private object Level {

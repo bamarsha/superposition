@@ -1,52 +1,24 @@
 package superposition.game.component
 
 import com.badlogic.ashley.core._
-import com.badlogic.gdx.Gdx.{gl, graphics, input}
-import com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.{FrameBuffer, ShaderProgram}
-import com.badlogic.gdx.math.Vector3
 import scalaz.Scalaz._
-import superposition.game.ResourceResolver.resolve
 import superposition.game.component.Multiverse.combine
 import superposition.math.{Complex, Vector2i}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
 import scala.Ordering.Implicits._
-import scala.math.{Pi, sqrt}
+import scala.math.sqrt
 
 /** The multiverse component is the quantum system for a level.
   *
   * @param walls the set of cells in the multiverse that always have collision
-  * @param camera the camera with which to draw the multiverse
   */
-final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera) extends Component {
+final class Multiverse(val walls: Set[Vector2i]) extends Component {
   /** The universes in the multiverse. */
   private var _universes: Seq[Universe] = Seq(Universe())
 
   /** The entities in the multiverse. */
   private var _entities: List[Entity] = List()
-
-  /** The shader program used to draw each universe. */
-  private val shader: ShaderProgram = new ShaderProgram(
-    resolve("shaders/universe.vert"),
-    resolve("shaders/universe.frag"))
-
-  /** The interval assigned to each universe that is used by the shader. */
-  private val shaderInterval: MetaId[(Float, Float)] = allocateMeta((0, 0))
-
-  /** The sprite batch used to draw each universe. */
-  private val batch: SpriteBatch = new SpriteBatch(1000, shader)
-
-  /** The frame buffer used to draw each universe. */
-  private val buffer: FrameBuffer =
-    // TODO: Resize the frame buffer if the window is resized.
-    new FrameBuffer(RGBA8888, graphics.getWidth, graphics.getHeight, false)
-
-  /** The elapsed time since the multiverse began. */
-  private var time: Float = 0
 
   /** The list of qudit state IDs in the multiverse. */
   private var stateIds: List[StateId[_]] = List()
@@ -125,53 +97,6 @@ final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera)
           universe.state(QuantumPosition.Mapper.get(entity).cell) == control
       }
     }
-
-  def isSelected(cell: Vector2i): Boolean = {
-    val mouse = camera.unproject(new Vector3(input.getX, input.getY, 0))
-    cell == Vector2i(mouse.x.floor.toInt, mouse.y.floor.toInt)
-  }
-
-  def updateShader(deltaTime: Float): Unit = {
-    time += deltaTime
-    var minValue = 0f
-    _universes = for (universe <- universes) yield {
-      val maxValue = minValue + universe.amplitude.squaredMagnitude.toFloat
-      val newUniverse = universe.updatedMeta(shaderInterval)((minValue, maxValue))
-      minValue = maxValue
-      newUniverse
-    }
-  }
-
-  def draw(action: Universe => Unit): Unit =
-    for (universe <- universes) {
-      buffer.begin()
-      gl.glClearColor(0, 0, 0, 0)
-      gl.glClear(GL_COLOR_BUFFER_BIT)
-      action(universe)
-      buffer.end()
-      val (minValue, maxValue) = universe.meta(shaderInterval)
-      drawBuffer(minValue, maxValue, universe.amplitude.phase.toFloat)
-    }
-
-  private def drawBuffer(minValue: Float, maxValue: Float, phase: Float): Unit = {
-    batch.setProjectionMatrix(camera.combined)
-
-    batch.begin()
-    shader.setUniformf("time", time)
-    shader.setUniformf("minVal", minValue)
-    shader.setUniformf("maxVal", maxValue)
-    shader.setUniformf("hue", (phase / (2 * Pi)).toFloat)
-    shader.setUniform4fv("color", Array(1, 1, 1, 1), 0, 4)
-    batch.draw(buffer.getColorBufferTexture, 0, camera.viewportHeight, camera.viewportWidth, -camera.viewportHeight)
-    batch.end()
-
-    batch.begin()
-    shader.setUniformf("minVal", 0f)
-    shader.setUniformf("maxVal", 1f)
-    shader.setUniform4fv("color", Array(1, 1, 1, 0.1f), 0, 4)
-    batch.draw(buffer.getColorBufferTexture, 0, camera.viewportHeight, camera.viewportWidth, -camera.viewportHeight)
-    batch.end()
-  }
 
   private def isValid(universe: Universe): Boolean =
     entities filter QuantumPosition.Mapper.has forall { entity =>

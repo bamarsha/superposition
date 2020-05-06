@@ -8,16 +8,16 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import superposition.game.component._
 
-final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiverse]).get) {
+final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiverse], classOf[MultiverseView]).get) {
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
-    val multiverse = Multiverse.Mapper.get(entity)
-    highlightOccupiedCells(multiverse)
-    multiverse.updateShader(deltaTime)
+    highlightOccupiedCells(entity)
+    MultiverseView.Mapper.get(entity).update(deltaTime)
   }
 
-  private def highlightOccupiedCells(multiverse: Multiverse): Unit = {
+  private def highlightOccupiedCells(entity: Entity): Unit = {
+    val multiverse = Multiverse.Mapper.get(entity)
     val occupiedCells =
       (for {
         entity <- multiverse.entities if QuantumPosition.Mapper.has(entity)
@@ -26,7 +26,7 @@ final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiv
       } yield universe.state(position.cell)).toSet
 
     gl.glEnable(GL_BLEND)
-    shapeRenderer.setProjectionMatrix(multiverse.camera.combined)
+    shapeRenderer.setProjectionMatrix(MultiverseView.Mapper.get(entity).camera.combined)
     shapeRenderer.begin(ShapeType.Filled)
     shapeRenderer.setColor(1, 1, 1, 0.3f)
     for (cell <- occupiedCells) {

@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.{Filled, Line}
-import superposition.game.component.{Beam, ClassicalPosition, Multiverse}
+import superposition.game.component.{Beam, ClassicalPosition, Multiverse, MultiverseView}
 import superposition.game.entity.Level
 import superposition.game.system.LaserSystem.{beamHits, beamTarget, drawBeam}
 import superposition.math.Direction.{Down, Left, Right, Up}
@@ -24,9 +24,10 @@ final class LaserSystem(level: () => Option[Level])
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
     val beam = Beam.Mapper.get(entity)
     val cell = ClassicalPosition.Mapper.get(entity).cell
-    val multiverse = Multiverse.Mapper.get(level().get)
+    val multiverse = level().get.multiverse
+    val multiverseView = level().get.multiverseView
 
-    if (input.isButtonJustPressed(0) && multiverse.isSelected(cell)) {
+    if (input.isButtonJustPressed(0) && multiverseView.isSelected(cell)) {
       multiverse.applyGate(beam.gate.multi controlled const(beamHits(multiverse, entity)), ())
       multiverse.updateMetaWith(beam.lastTarget)(const(beamTarget(multiverse, entity)))
       multiverse.updateMetaWith(beam.elapsedTime) { time => universe =>
@@ -34,7 +35,7 @@ final class LaserSystem(level: () => Option[Level])
       }
     }
     multiverse.updateMetaWith(beam.elapsedTime)(time => const(time + deltaTime))
-    multiverse.draw(drawBeam(multiverse, shapeRenderer, entity))
+    multiverseView.draw(drawBeam(multiverseView, shapeRenderer, entity))
   }
 }
 
@@ -64,13 +65,13 @@ private object LaserSystem {
     (beamTarget(multiverse, entity)(universe).iterator.to(Seq)
       flatMap (cell => multiverse.toggles(universe, cell)))
 
-  private def drawBeam(multiverse: Multiverse, shapeRenderer: ShapeRenderer, entity: Entity)
+  private def drawBeam(multiverseView: MultiverseView, shapeRenderer: ShapeRenderer, entity: Entity)
                       (universe: Universe): Unit = {
     val source = ClassicalPosition.Mapper.get(entity).cell
     val beam = Beam.Mapper.get(entity)
-    shapeRenderer.setProjectionMatrix(multiverse.camera.combined)
+    shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
 
-    if (multiverse.isSelected(source)) {
+    if (multiverseView.isSelected(source)) {
       shapeRenderer.begin(Line)
       shapeRenderer.setColor(RED)
       shapeRenderer.rect(source.x, source.y, 1, 1)
