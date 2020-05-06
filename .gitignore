@@ -1,5 +1,7 @@
 .DS_Store
-/.idea/*
-!/.idea/codeStyles
 /project/build.properties
 target
+
+/.idea/*
+!/.idea/codeStyles
+!/.idea/sbt.xml
