@@ -4,9 +4,9 @@ import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.ashley.systems.SortedIteratingSystem
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import superposition.game.component.{ClassicalPosition, QuantumObject, QuantumPosition, SpriteView}
-import superposition.game.system.SpriteRenderSystem.{SpriteRenderFamily, compareLayers}
+import superposition.game.system.SpriteRenderer.{SpriteRenderFamily, compareLayers}
 
-final class SpriteRenderSystem extends SortedIteratingSystem(SpriteRenderFamily, compareLayers) {
+final class SpriteRenderer extends SortedIteratingSystem(SpriteRenderFamily, compareLayers) {
   private val batch: SpriteBatch = new SpriteBatch
 
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
@@ -27,7 +27,7 @@ final class SpriteRenderSystem extends SortedIteratingSystem(SpriteRenderFamily,
   }
 }
 
-private object SpriteRenderSystem {
+private object SpriteRenderer {
   private val SpriteRenderFamily: Family =
     Family.all(classOf[SpriteView], classOf[QuantumObject])
       .one(classOf[ClassicalPosition], classOf[QuantumPosition])

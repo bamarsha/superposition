@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import superposition.game.component._
 
-final class MultiverseRenderSystem extends IteratingSystem(Family.all(classOf[Multiverse]).get) {
+final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiverse]).get) {
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
