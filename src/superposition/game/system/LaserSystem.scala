@@ -38,7 +38,7 @@ private object LaserSystem {
   private def path(entity: Entity): Seq[Vector2i] = {
     val source = ClassicalPosition.Mapper.get(entity).cell
     val direction = Beam.Mapper.get(entity).direction
-    LazyList.iterate(source)(_ + direction.toVec2i).tail.take(Length)
+    LazyList.iterate(source)(_ + direction.toVector2i).tail.take(Length)
   }
 
   private def target(multiverse: Multiverse, universe: Universe, entity: Entity): Option[Vector2i] = {
