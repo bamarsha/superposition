@@ -3,7 +3,7 @@ package superposition.game
 import com.badlogic.ashley.core.{Engine, Entity}
 import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
-import superposition.game.LevelLoader.{LevelFactory, addLevel, makeLevel, removeLevel}
+import superposition.game.LevelPlaylist.{LevelFactory, addLevel, makeLevel, removeLevel}
 import superposition.game.component.{Multiverse, QuantumPosition, Toggle}
 import superposition.game.entity._
 import superposition.math.{Direction, Vector2i}
@@ -13,46 +13,47 @@ import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 import scala.sys.error
 
-/** Loads and resets levels and tracks the current position in a playlist.
+/** A playlist of game levels.
   *
   * @param engine the entity engine
   */
-private final class LevelLoader(engine: Engine) {
-  /** The current playlist of levels. */
-  private var playlist: Seq[LevelFactory] = Nil
+private final class LevelPlaylist(engine: Engine) {
+  /** The list of level factories. */
+  private var factories: Seq[LevelFactory] = Nil
 
   /** The current level. */
-  private var current: Option[Level] = None
+  private var _current: Option[Level] = None
 
-  /** Starts a level playlist.
+  /** The current level. */
+  def current: Option[Level] = _current
+
+  /** Appends the sequence of tile maps to the playlist.
     *
     * @param loader the tile map loader
-    * @param fileNames the file name of the tile map for each level in the playlist
+    * @param fileNames the file names for the tile maps
     */
-  def startPlaylist(loader: TmxMapLoader, fileNames: Seq[String]): Unit = {
-    playlist = fileNames map (fileName => () => makeLevel(loader.load(fileName)))
-    resetLevel()
-  }
+  def appendAll(loader: TmxMapLoader, fileNames: Seq[String]): Unit =
+    factories ++= fileNames map (fileName => () => makeLevel(loader.load(fileName)))
 
   /** Advances to the next level in the playlist. */
-  def nextLevel(): Unit = {
-    playlist = playlist match {
+  def next(): Unit = {
+    factories = factories match {
       case Nil => Nil
       case _ :: next => next
     }
-    resetLevel()
+    play()
   }
 
-  /** Resets the current level. */
-  def resetLevel(): Unit = {
+  /** Plays the current level or resets the current level if it is already playing. */
+  def play(): Unit = {
     current.foreach(removeLevel(engine))
-    current = playlist.headOption map (_ ())
+    _current = factories.headOption map (_ ())
     current.foreach(addLevel(engine))
   }
 }
 
-/** Tools for loading levels. */
-private object LevelLoader {
+/** Functions for loading levels. */
+private object LevelPlaylist {
   /** A function that returns a new instance of a level. */
   private type LevelFactory = () => Level
 

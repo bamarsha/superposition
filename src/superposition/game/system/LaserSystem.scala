@@ -7,7 +7,8 @@ import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.{Filled, Line}
-import superposition.game.component.{Beam, ClassicalPosition, QuantumObject}
+import superposition.game.component.{Beam, ClassicalPosition, Multiverse}
+import superposition.game.entity.Level
 import superposition.game.system.LaserSystem.{beamHits, beamTarget, drawBeam}
 import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math.Vector2i
@@ -16,28 +17,26 @@ import superposition.quantum.{StateId, Universe}
 import scala.Function.const
 import scala.math.min
 
-final class LaserSystem
-  extends IteratingSystem(Family.all(classOf[Beam], classOf[QuantumObject], classOf[ClassicalPosition]).get) {
+final class LaserSystem(level: () => Option[Level])
+  extends IteratingSystem(Family.all(classOf[Beam], classOf[ClassicalPosition]).get) {
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
     val beam = Beam.Mapper.get(entity)
     val cell = ClassicalPosition.Mapper.get(entity).cell
-    val multiverse = QuantumObject.Mapper.get(entity).multiverse
+    val multiverse = Multiverse.Mapper.get(level().get)
 
     if (input.isButtonJustPressed(0) && multiverse.isSelected(cell)) {
-      multiverse.applyGate(beam.gate.multi controlled const(beamHits(entity)), ())
-      multiverse.updateMetaWith(beam.lastTarget)(const(beamTarget(entity)))
+      multiverse.applyGate(beam.gate.multi controlled const(beamHits(multiverse, entity)), ())
+      multiverse.updateMetaWith(beam.lastTarget)(const(beamTarget(multiverse, entity)))
       multiverse.updateMetaWith(beam.elapsedTime) { time => universe =>
-        if (beamTarget(entity)(universe).isEmpty) time else 0
+        if (beamTarget(multiverse, entity)(universe).isEmpty) time else 0
       }
     }
     multiverse.updateMetaWith(beam.elapsedTime)(time => const(time + deltaTime))
 
     for (universe <- multiverse.universes) {
-      multiverse.drawWithin(universe) {
-        drawBeam(shapeRenderer, universe, entity)
-      }
+      multiverse.drawWithin(universe)(() => drawBeam(multiverse, shapeRenderer, entity, universe))
     }
   }
 }
@@ -55,8 +54,7 @@ private object LaserSystem {
     LazyList.iterate(source)(_ + direction.toVector2i).tail.take(BeamLength)
   }
 
-  private def beamTarget(entity: Entity)(universe: Universe): Option[Vector2i] = {
-    val multiverse = QuantumObject.Mapper.get(entity).multiverse
+  private def beamTarget(multiverse: Multiverse, entity: Entity)(universe: Universe): Option[Vector2i] = {
     val controls = Beam.Mapper.get(entity).controls
     if (multiverse.allOn(universe, controls))
       beamPath(entity) find { cell =>
@@ -65,13 +63,14 @@ private object LaserSystem {
     else None
   }
 
-  private def beamHits(entity: Entity)(universe: Universe): Seq[StateId[Boolean]] = {
-    val multiverse = QuantumObject.Mapper.get(entity).multiverse
-    beamTarget(entity)(universe).iterator.to(Seq) flatMap (cell => multiverse.toggles(universe, cell))
-  }
+  private def beamHits(multiverse: Multiverse, entity: Entity)(universe: Universe): Seq[StateId[Boolean]] =
+    (beamTarget(multiverse, entity)(universe).iterator.to(Seq)
+      flatMap (cell => multiverse.toggles(universe, cell)))
 
-  private def drawBeam(shapeRenderer: ShapeRenderer, universe: Universe, entity: Entity): Unit = {
-    val multiverse = QuantumObject.Mapper.get(entity).multiverse
+  private def drawBeam(multiverse: Multiverse,
+                       shapeRenderer: ShapeRenderer,
+                       entity: Entity,
+                       universe: Universe): Unit = {
     val source = ClassicalPosition.Mapper.get(entity).cell
     val beam = Beam.Mapper.get(entity)
     shapeRenderer.setProjectionMatrix(multiverse.camera.combined)

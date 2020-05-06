@@ -15,7 +15,6 @@ import superposition.math.{Vector2d, Vector2i}
  * @param controls   the control cells for the door
  */
 final class Door(multiverse: Multiverse, cell: Vector2i, controls: Iterable[Vector2i]) extends Entity {
-  add(new QuantumObject(multiverse))
   add(new Collider(universe => if (multiverse.allOn(universe, controls)) Set.empty else Set(cell)))
   add(new ClassicalPosition(cell.toVector2d + Vector2d(0.5, 0.5), cell))
   add(new SpriteView(

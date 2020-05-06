@@ -3,13 +3,13 @@ package superposition.game.system
 import com.badlogic.ashley.core.{Engine, Entity, EntitySystem, Family}
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input.Keys.{N, R}
-import superposition.game.LevelLoader
-import superposition.game.component.{ClassicalPosition, Goal, QuantumObject}
+import superposition.game.LevelPlaylist
+import superposition.game.component.{ClassicalPosition, Goal, Multiverse}
 import superposition.game.system.LevelSystem.satisfied
 
 import scala.jdk.CollectionConverters._
 
-final class LevelSystem(levelLoader: LevelLoader) extends EntitySystem {
+final class LevelSystem(levels: LevelPlaylist) extends EntitySystem {
   private var goals: Iterable[Entity] = Nil
 
   override def addedToEngine(engine: Engine): Unit =
@@ -17,19 +17,19 @@ final class LevelSystem(levelLoader: LevelLoader) extends EntitySystem {
 
   override def update(deltaTime: Float): Unit = {
     if (input.isKeyJustPressed(R)) {
-      levelLoader.resetLevel()
+      levels.play()
     }
-    if (input.isKeyJustPressed(N) || (goals forall satisfied)) {
-      levelLoader.nextLevel()
+    val multiverse = Multiverse.Mapper.get(levels.current.get)
+    if (input.isKeyJustPressed(N) || (goals forall satisfied(multiverse))) {
+      levels.next()
     }
   }
 }
 
 private object LevelSystem {
-  private def satisfied(entity: Entity): Boolean = {
+  private def satisfied(multiverse: Multiverse)(entity: Entity): Boolean = {
     val goal = Goal.Mapper.get(entity)
     val cell = ClassicalPosition.Mapper.get(entity).cell
-    val multiverse = QuantumObject.Mapper.get(entity).multiverse
     multiverse.universes forall (_.state(goal.needs) == cell)
   }
 }
