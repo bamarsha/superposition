@@ -14,7 +14,7 @@ final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiv
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
     val multiverse = Multiverse.Mapper.get(entity)
     highlightOccupiedCells(multiverse)
-    multiverse.updateShaderSettings(deltaTime)
+    multiverse.updateShader(deltaTime)
   }
 
   private def highlightOccupiedCells(multiverse: Multiverse): Unit = {

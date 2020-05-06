@@ -17,30 +17,50 @@ import superposition.quantum.{Gate, MetaId, StateId, Universe}
 import scala.Ordering.Implicits._
 import scala.math.{Pi, sqrt}
 
+/** The multiverse component is the quantum system for a level.
+  *
+  * @param walls the set of cells in the multiverse that always have collision
+  * @param camera the camera with which to draw the multiverse
+  */
 final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera) extends Component {
+  /** The universes in the multiverse. */
   private var _universes: Seq[Universe] = Seq(Universe())
 
+  /** The entities in the multiverse. */
   private var _entities: List[Entity] = List()
 
-  private var stateIds: List[StateId[_]] = List()
-
-  private val shaderSettings: MetaId[(Float, Float)] = allocateMeta((0, 0))
-
-  private var time: Float = 0
-
-  private val universeShader: ShaderProgram = new ShaderProgram(
+  /** The shader program used to draw each universe. */
+  private val shader: ShaderProgram = new ShaderProgram(
     resolve("shaders/universe.vert"),
     resolve("shaders/universe.frag"))
 
-  private val universeBatch: SpriteBatch = new SpriteBatch(1000, universeShader)
+  /** The interval assigned to each universe that is used by the shader. */
+  private val shaderInterval: MetaId[(Float, Float)] = allocateMeta((0, 0))
 
-  // TODO: Resize the framebuffer if the window is resized.
-  private val frameBuffer: FrameBuffer = new FrameBuffer(RGBA8888, graphics.getWidth, graphics.getHeight, false)
+  /** The sprite batch used to draw each universe. */
+  private val batch: SpriteBatch = new SpriteBatch(1000, shader)
 
+  /** The frame buffer used to draw each universe. */
+  private val buffer: FrameBuffer =
+    // TODO: Resize the frame buffer if the window is resized.
+    new FrameBuffer(RGBA8888, graphics.getWidth, graphics.getHeight, false)
+
+  /** The elapsed time since the multiverse began. */
+  private var time: Float = 0
+
+  /** The list of qudit state IDs in the multiverse. */
+  private var stateIds: List[StateId[_]] = List()
+
+  /** The universes in the multiverse. */
   def universes: Seq[Universe] = _universes
 
+  /** The entities in the multiverse. */
   def entities: Iterable[Entity] = _entities
 
+  /** Adds an entity to the multiverse.
+    *
+    * @param entity the entity to add
+    */
   def addEntity(entity: Entity): Unit = _entities ::= entity
 
   def allocate[A](initialValue: A): StateId[A] = {
@@ -106,61 +126,56 @@ final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera)
       }
     }
 
-  def isValid(universe: Universe): Boolean =
-    entities filter QuantumPosition.Mapper.has forall { entity =>
-      !isBlocked(universe, universe.state(QuantumPosition.Mapper.get(entity).cell))
-    }
-
   def isSelected(cell: Vector2i): Boolean = {
     val mouse = camera.unproject(new Vector3(input.getX, input.getY, 0))
     cell == Vector2i(mouse.x.floor.toInt, mouse.y.floor.toInt)
   }
 
-  def updateShaderSettings(deltaTime: Float): Unit = {
+  def updateShader(deltaTime: Float): Unit = {
     time += deltaTime
-    var minValue: Float = 0
+    var minValue = 0f
     _universes = for (universe <- universes) yield {
       val maxValue = minValue + universe.amplitude.squaredMagnitude.toFloat
-      val newUniverse = universe.updatedMeta(shaderSettings)((minValue, maxValue))
+      val newUniverse = universe.updatedMeta(shaderInterval)((minValue, maxValue))
       minValue = maxValue
       newUniverse
     }
   }
 
-  def drawWithin(universe: Universe)(draw: => Unit): Unit = {
-    frameBuffer.begin()
+  def drawWithin(universe: Universe)(draw: () => Unit): Unit = {
+    buffer.begin()
     gl.glClearColor(0, 0, 0, 0)
     gl.glClear(GL_COLOR_BUFFER_BIT)
-    draw
-    frameBuffer.end()
-    val (minValue, maxValue) = universe.meta(shaderSettings)
-    drawBuffer(universe, minValue, maxValue)
+    draw()
+    buffer.end()
+    val (minValue, maxValue) = universe.meta(shaderInterval)
+    drawBuffer(minValue, maxValue, universe.amplitude.phase.toFloat)
   }
 
-  private def drawBuffer(universe: Universe, minValue: Float, maxValue: Float): Unit = {
-    universeBatch.setProjectionMatrix(camera.combined)
-    drawBufferWith {
-      universeShader.setUniformf("time", time)
-      universeShader.setUniformf("minVal", minValue)
-      universeShader.setUniformf("maxVal", maxValue)
-      universeShader.setUniformf("hue", (universe.amplitude.phase / (2 * Pi)).toFloat)
-      universeShader.setUniform4fv("color", Array(1, 1, 1, 1), 0, 4)
+  private def drawBuffer(minValue: Float, maxValue: Float, phase: Float): Unit = {
+    batch.setProjectionMatrix(camera.combined)
+
+    batch.begin()
+    shader.setUniformf("time", time)
+    shader.setUniformf("minVal", minValue)
+    shader.setUniformf("maxVal", maxValue)
+    shader.setUniformf("hue", (phase / (2 * Pi)).toFloat)
+    shader.setUniform4fv("color", Array(1, 1, 1, 1), 0, 4)
+    batch.draw(buffer.getColorBufferTexture, 0, camera.viewportHeight, camera.viewportWidth, -camera.viewportHeight)
+    batch.end()
+
+    batch.begin()
+    shader.setUniformf("minVal", 0f)
+    shader.setUniformf("maxVal", 1f)
+    shader.setUniform4fv("color", Array(1, 1, 1, 0.1f), 0, 4)
+    batch.draw(buffer.getColorBufferTexture, 0, camera.viewportHeight, camera.viewportWidth, -camera.viewportHeight)
+    batch.end()
+  }
+
+  private def isValid(universe: Universe): Boolean =
+    entities filter QuantumPosition.Mapper.has forall { entity =>
+      !isBlocked(universe, universe.state(QuantumPosition.Mapper.get(entity).cell))
     }
-    drawBufferWith {
-      universeShader.setUniformf("minVal", 0f)
-      universeShader.setUniformf("maxVal", 1f)
-      universeShader.setUniform4fv("color", Array(1, 1, 1, 0.1f), 0, 4)
-    }
-  }
-
-  private def drawBufferWith(setup: => Unit): Unit = {
-    universeBatch.begin()
-    setup
-    universeBatch.draw(
-      frameBuffer.getColorBufferTexture, 0, camera.viewportHeight, camera.viewportWidth, -camera.viewportHeight)
-    universeBatch.end()
-  }
-
 }
 
 object Multiverse {
