@@ -24,7 +24,7 @@ final class Exit(
   extends Entity {
   add(new QuantumObject(multiverse))
   add(new ClassicalPosition(cell.toVector2d + Vector2d(0.5, 0.5), cell))
-  add(new Goal(multiverse, required))
+  add(new Goal(required))
   add(new SpriteView(texture = const(KeyTexture)))
 }
 

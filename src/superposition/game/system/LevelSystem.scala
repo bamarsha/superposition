@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.{Engine, Entity, EntitySystem, Family}
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input.Keys.{N, R}
 import superposition.game.LevelLoader
-import superposition.game.component.{ClassicalPosition, Goal}
+import superposition.game.component.{ClassicalPosition, Goal, QuantumObject}
 import superposition.game.system.LevelSystem.satisfied
 
 import scala.jdk.CollectionConverters._
@@ -29,6 +29,7 @@ private object LevelSystem {
   private def satisfied(entity: Entity): Boolean = {
     val goal = Goal.Mapper.get(entity)
     val cell = ClassicalPosition.Mapper.get(entity).cell
-    goal.multiverse.universes forall (_.state(goal.needs) == cell)
+    val multiverse = QuantumObject.Mapper.get(entity).multiverse
+    multiverse.universes forall (_.state(goal.needs) == cell)
   }
 }
