@@ -34,10 +34,7 @@ final class LaserSystem(level: () => Option[Level])
       }
     }
     multiverse.updateMetaWith(beam.elapsedTime)(time => const(time + deltaTime))
-
-    for (universe <- multiverse.universes) {
-      multiverse.drawWithin(universe)(() => drawBeam(multiverse, shapeRenderer, entity, universe))
-    }
+    multiverse.draw(drawBeam(multiverse, shapeRenderer, entity))
   }
 }
 
@@ -67,10 +64,8 @@ private object LaserSystem {
     (beamTarget(multiverse, entity)(universe).iterator.to(Seq)
       flatMap (cell => multiverse.toggles(universe, cell)))
 
-  private def drawBeam(multiverse: Multiverse,
-                       shapeRenderer: ShapeRenderer,
-                       entity: Entity,
-                       universe: Universe): Unit = {
+  private def drawBeam(multiverse: Multiverse, shapeRenderer: ShapeRenderer, entity: Entity)
+                      (universe: Universe): Unit = {
     val source = ClassicalPosition.Mapper.get(entity).cell
     val beam = Beam.Mapper.get(entity)
     shapeRenderer.setProjectionMatrix(multiverse.camera.combined)

@@ -15,16 +15,13 @@ final class SpriteRenderer(level: () => Option[Level])
     val multiverse = Multiverse.Mapper.get(level().get)
     val spriteView = SpriteView.Mapper.get(entity)
     batch.setProjectionMatrix(multiverse.camera.combined)
-    for (universe <- multiverse.universes) {
+    multiverse.draw { universe =>
       val position =
-        if (ClassicalPosition.Mapper.has(entity))
-          ClassicalPosition.Mapper.get(entity).absolute
+        if (ClassicalPosition.Mapper.has(entity)) ClassicalPosition.Mapper.get(entity).absolute
         else universe.meta(QuantumPosition.Mapper.get(entity).absolute)
-      multiverse.drawWithin(universe) { () =>
-        batch.begin()
-        spriteView.draw(batch, universe, position)
-        batch.end()
-      }
+      batch.begin()
+      spriteView.draw(batch, universe, position)
+      batch.end()
     }
   }
 }

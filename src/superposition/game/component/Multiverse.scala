@@ -142,15 +142,16 @@ final class Multiverse(val walls: Set[Vector2i], val camera: OrthographicCamera)
     }
   }
 
-  def drawWithin(universe: Universe)(draw: () => Unit): Unit = {
-    buffer.begin()
-    gl.glClearColor(0, 0, 0, 0)
-    gl.glClear(GL_COLOR_BUFFER_BIT)
-    draw()
-    buffer.end()
-    val (minValue, maxValue) = universe.meta(shaderInterval)
-    drawBuffer(minValue, maxValue, universe.amplitude.phase.toFloat)
-  }
+  def draw(action: Universe => Unit): Unit =
+    for (universe <- universes) {
+      buffer.begin()
+      gl.glClearColor(0, 0, 0, 0)
+      gl.glClear(GL_COLOR_BUFFER_BIT)
+      action(universe)
+      buffer.end()
+      val (minValue, maxValue) = universe.meta(shaderInterval)
+      drawBuffer(minValue, maxValue, universe.amplitude.phase.toFloat)
+    }
 
   private def drawBuffer(minValue: Float, maxValue: Float, phase: Float): Unit = {
     batch.setProjectionMatrix(camera.combined)
