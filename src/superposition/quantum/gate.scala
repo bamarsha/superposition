@@ -5,29 +5,27 @@ import superposition.math.{Complex, Vector2i}
 
 import scala.math.sqrt
 
-/**
- * A quantum gate.
- *
- * @tparam A The type of the gate's argument.
- */
+/** A quantum gate.
+  *
+  * @tparam A the type of the gate's argument
+  */
 sealed trait Gate[A] {
-  /**
-   * Applies a value to the gate within a universe.
-   *
-   * @param value    The value to apply.
-   * @param universe The universe in which to apply the value.
-   * @return The universes produced by the gate.
-   */
+  /** Applies the gate within a universe.
+    *
+    * @param value the value of the argument to the gate
+    * @param universe the universe in which to apply the gate
+    * @return the universes produced by the gate
+    */
   def apply(value: A)(universe: Universe): NonEmptyList[Universe]
 
-  /**
-   * The adjoint is the reverse of the gate.
-   */
+  /** The reverse of the gate. */
   def adjoint: Gate[A]
 }
 
+/** Gate operations and type classes. */
 object Gate {
 
+  /** An instance of the divisible type class for gates. */
   implicit object GateDivisible extends Divisible[Gate] {
     override def conquer[A]: Gate[A] = Identity[A]()
 
@@ -41,16 +39,31 @@ object Gate {
     }
   }
 
+  /** Operations on gates.
+    *
+    * @param gate the gate to apply the operations to
+    */
   final implicit class Ops[A](val gate: Gate[A]) extends AnyVal {
 
     import Gate.GateDivisible.divisibleSyntax._
 
+    /** Applies the gate within all of the universes using the same argument.
+      *
+      * @param value the argument to the gate
+      * @param universes the universes in which to apply the gate
+      * @return the new universes
+      */
     def applyToAll(value: A)(universes: Iterable[Universe]): Iterable[Universe] =
       universes flatMap (gate(value)(_).stream)
 
-    def andThen(other: Gate[A]): Gate[A] =
-      Divisible[Gate].divide(gate, other)(value => (value, value))
+    /** Returns a new gate that applies this gate and then the other gate.
+      *
+      * @param other the gate to apply after this gate
+      * @return the sequential composition of the two gates
+      */
+    def andThen(other: Gate[A]): Gate[A] = Divisible[Gate].divide(gate, other)(value => (value, value))
 
+    /** A new gate that applies this gate to each argument in the sequence in order. */
     def multi: Gate[Seq[A]] = new Gate[Seq[A]] {
       override def apply(values: Seq[A])(universe: Universe): NonEmptyList[Universe] = values match {
         case Nil => NonEmptyList(universe)
@@ -60,31 +73,58 @@ object Gate {
       override def adjoint: Gate[Seq[A]] = gate.adjoint.multi contramap (_.reverse)
     }
 
+    /** Returns a new gate that "controls" the argument to the original gate by mapping it based on its value and the
+      * universe.
+      *
+      * To preserve unitarity, the new gate must not change the state of any qudits used by the mapping function to map
+      * the argument.
+      *
+      * @param f a mapping function that receives the gate argument and the universe
+      * @tparam B the type of the new argument
+      * @throws AssertionError if the mapping function violates unitarity
+      * @return the new controlled gate
+      */
     def controlled[B](f: B => Universe => A): Gate[B] = new Gate[B] {
       override def apply(value: B)(universe: Universe): NonEmptyList[Universe] = {
-        val result = gate(f(value)(universe))(universe)
-        for (newUniverse <- result) {
-          assert(f(value)(universe) == f(value)(newUniverse))
-        }
-        result
+        val newUniverses = gate(f(value)(universe))(universe)
+        assert(newUniverses.stream forall (f(value)(_) == f(value)(universe)))
+        newUniverses
       }
 
       override def adjoint: Gate[B] = gate.adjoint controlled f
     }
 
-    def flatMap[B](f: B => Seq[A]): Gate[B] = multi contramap f
+    /** Returns a new gate that maps its argument to a sequence and applies the original gate with each value in the
+      * sequence.
+      *
+      * @param f the mapping function that returns a sequence
+      * @tparam B the type of the new argument
+      * @return the new mapped and flattened gate
+      */
+    def flatContramap[B](f: B => Seq[A]): Gate[B] = multi contramap f
 
-    def filter(predicate: A => Boolean): Gate[A] = flatMap(List(_) filter predicate)
+    /** Returns a new gate that applies the original gate only if the argument satisfies the predicate, and otherwise
+      * applies the identity gate instead.
+      *
+      * @param predicate the predicate that must be satisfied to apply the original gate
+      * @return the new filtered gate
+      */
+    def filter(predicate: A => Boolean): Gate[A] = flatContramap(List(_) filter predicate)
   }
 
 }
 
+/** The identity gate leaves every universe unchanged.
+  *
+  * @tparam A the type of the gate's argument
+  */
 case class Identity[A]() extends Gate[A] {
   override def apply(value: A)(universe: Universe): NonEmptyList[Universe] = NonEmptyList(universe)
 
   override def adjoint: Gate[A] = this
 }
 
+/** The X or NOT gate swaps the |0⟩ and |1⟩ basis states of a qubit. */
 case object X extends Gate[StateId[Boolean]] {
   override def apply(id: StateId[Boolean])(universe: Universe): NonEmptyList[Universe] =
     NonEmptyList(universe.updatedStateWith(id)(!_))
@@ -92,6 +132,7 @@ case object X extends Gate[StateId[Boolean]] {
   override def adjoint: Gate[StateId[Boolean]] = this
 }
 
+/** The Z gate leaves the |0⟩ basis state of a qubit unchanged and maps |1⟩ to -|1⟩. */
 case object Z extends Gate[StateId[Boolean]] {
   override def apply(id: StateId[Boolean])(universe: Universe): NonEmptyList[Universe] =
     NonEmptyList(universe * Complex(if (universe.state(id)) -1 else 1))
@@ -99,6 +140,7 @@ case object Z extends Gate[StateId[Boolean]] {
   override def adjoint: Gate[StateId[Boolean]] = this
 }
 
+/** The Hadamard gate maps the |0⟩ basis state to |+⟩ and |1⟩ to |-⟩. */
 case object H extends Gate[StateId[Boolean]] {
   override def apply(id: StateId[Boolean])(universe: Universe): NonEmptyList[Universe] =
     NonEmptyList(
@@ -108,6 +150,7 @@ case object H extends Gate[StateId[Boolean]] {
   override def adjoint: Gate[StateId[Boolean]] = this
 }
 
+/** The translate gate applies vector addition to a qudit that represents a two-dimensional vector. */
 case object Translate extends Gate[(StateId[Vector2i], Vector2i)] {
 
   import Gate.GateDivisible.divisibleSyntax._

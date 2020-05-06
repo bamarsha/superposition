@@ -4,6 +4,11 @@
       <option name="INDENT_FIRST_PARAMETER" value="false" />
       <option name="INDENT_FIRST_PARAMETER_CLAUSE" value="true" />
       <option name="USE_ALTERNATE_CONTINUATION_INDENT_FOR_PARAMS" value="true" />
+      <option name="USE_SCALADOC2_FORMATTING" value="true" />
+      <option name="SD_ALIGN_OTHER_TAGS_COMMENTS" value="false" />
+      <option name="SD_ALIGN_PARAMETERS_COMMENTS" value="false" />
+      <option name="SD_ALIGN_EXCEPTION_COMMENTS" value="false" />
+      <option name="SD_ALIGN_RETURN_COMMENTS" value="false" />
     </ScalaCodeStyleSettings>
     <codeStyleSettings language="Scala">
       <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
