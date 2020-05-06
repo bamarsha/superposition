@@ -43,7 +43,7 @@ final case class Universe(
     */
   def /(c: Complex): Universe = copy(amplitude = amplitude / c)
 
-  /** Replaces the value of a qudit.
+  /** Adds or replaces the value of a qudit.
     *
     * @param id the qudit to update
     * @param value the new value of the qudit
@@ -51,7 +51,7 @@ final case class Universe(
     */
   def updatedState(id: StateId[_])(value: id.Value): Universe = copy(state = state.updated(id)(value))
 
-  /** Maps the value of a qudit.
+  /** Maps the value of a qudit if the qudit exists.
     *
     * @param id the qudit to update
     * @param updater a function that maps the value of the qudit to the new value
@@ -60,7 +60,7 @@ final case class Universe(
   def updatedStateWith(id: StateId[_])(updater: id.Value => id.Value): Universe =
     copy(state = state.updatedWith(id)(updater.lift))
 
-  /** Replaces the value of a piece of metadata.
+  /** Adds or replaces the value of a piece of metadata.
     *
     * @param id the metadata to update
     * @param value the new value of the metadata
@@ -68,7 +68,7 @@ final case class Universe(
     */
   def updatedMeta(id: MetaId[_])(value: id.Value): Universe = copy(meta = meta.updated(id)(value))
 
-  /** Maps the value of a piece of metadata.
+  /** Maps the value of a piece of metadata if the metadata exists.
     *
     * @param id the metadata to update
     * @param updater a function that maps the value of the metadata to the new value
