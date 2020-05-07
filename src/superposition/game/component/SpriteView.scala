@@ -9,12 +9,26 @@ import superposition.quantum.Universe
 
 import scala.Function.const
 
+/** The sprite view component gives an entity a renderable sprite.
+  *
+  * @param texture the sprite texture
+  * @param scale the sprite scale
+  * @param color the sprite color
+  * @param layer the sprite layer
+  */
 final class SpriteView(
     val texture: Universe => Texture,
     val scale: Universe => Vector2d = const(Vector2d(1, 1)),
     val color: Universe => Color = const(WHITE),
     val layer: Int = 0)
   extends Component {
+
+  /** Draws the sprite.
+    *
+    * @param batch the sprite batch to draw in
+    * @param universe the universe to draw in
+    * @param position the position of the sprite
+    */
   def draw(batch: SpriteBatch, universe: Universe, position: Vector2d): Unit = {
     val currentScale = scale(universe)
     val currentPosition = position - currentScale / 2
@@ -27,6 +41,8 @@ final class SpriteView(
   }
 }
 
+/** Contains the component mapper for the quantum position component. */
 object SpriteView {
+  /** The component mapper for the quantum position component. */
   val Mapper: ComponentMapper[SpriteView] = ComponentMapper.getFor(classOf[SpriteView])
 }
