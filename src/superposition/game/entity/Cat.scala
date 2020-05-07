@@ -10,6 +10,11 @@ import superposition.math.{Vector2d, Vector2i}
 
 import scala.Function.const
 
+/** Schrödinger's cat.
+  *
+  * @param multiverse the multiverse
+  * @param initialCell the initial cell position
+  */
 final class Cat(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
   locally {
     val alive = multiverse.allocate(true)
@@ -26,6 +31,8 @@ final class Cat(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
   }
 }
 
+/** Settings for Schrödinger's cat. */
 private object Cat {
+  /** The sprite texture for Schrödinger's cat. */
   private val CatTexture: Texture = new Texture(resolve("sprites/cat.png"))
 }
