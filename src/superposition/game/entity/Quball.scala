@@ -10,18 +10,17 @@ import superposition.math.{Vector2d, Vector2i}
 
 import scala.Function.const
 
-/**
- * A quball is a quantum ball that can be either on or off.
- *
- * @param multiverse  the multiverse this quball belongs to
- * @param initialCell the initial cell of this quball
- */
+/** A quball is a quantum ball that can be either on or off.
+  *
+  * @param multiverse the multiverse
+  * @param initialCell the initial cell of the quball
+  */
 final class Quball(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
   locally {
-    val position = multiverse.allocateMeta(initialCell.toVector2d + Vector2d(0.5, 0.5))
+    val absolutePosition = multiverse.allocateMeta(initialCell.toVector2d + Vector2d(0.5, 0.5))
     val onOff = multiverse.allocate(false)
 
-    add(new QuantumPosition(position, multiverse.allocate(initialCell), Vector2d(0.5, 0.5)))
+    add(new QuantumPosition(absolutePosition, multiverse.allocate(initialCell), Vector2d(0.5, 0.5)))
     add(new Toggle(onOff))
     add(new Activator(onOff))
     add(new Carried(multiverse.allocate(false)))
@@ -33,6 +32,8 @@ final class Quball(multiverse: Multiverse, initialCell: Vector2i) extends Entity
   }
 }
 
+/** Contains the sprite texture for quballs. */
 private object Quball {
+  /** The sprite texture for a quball. */
   private val QuballTexture = new Texture(resolve("sprites/ball.png"))
 }

@@ -10,21 +10,22 @@ import superposition.math.Vector2i
 
 import scala.jdk.CollectionConverters._
 
-/**
-  * The multiverse is a collection of universes.
+/** A quantum level with a multiverse and tile map.
   *
-  * Multiple universes represent qubits in superposition. The multiverse can apply quantum gates to qubits by changing
-  * the amplitude of a universe or creating a copy of a universe.
+  * @param map the tile map
   */
 final class Level(map: TiledMap) extends Entity {
+  /** The camera with which to draw the level. */
   private val camera: OrthographicCamera = new OrthographicCamera(
     map.getProperties.get("width", classOf[Int]),
     map.getProperties.get("height", classOf[Int]))
   camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0)
   camera.update()
 
+  /** The multiverse for the level. */
   val multiverse: Multiverse = new Multiverse(walls(map))
 
+  /** The view of the multiverse for the level. */
   val multiverseView: MultiverseView = new MultiverseView(multiverse, camera)
 
   add(new MapView(map, camera))
@@ -32,7 +33,13 @@ final class Level(map: TiledMap) extends Entity {
   add(multiverseView)
 }
 
+/** Functions for extracting information from tile maps. */
 private object Level {
+  /** Returns the set of walls, or cells with collision, in the tile map.
+    *
+    * @param map the tile map
+    * @return the set of walls in the tile map
+    */
   private def walls(map: TiledMap): Set[Vector2i] =
     (for {
       layer <- map.getLayers.asScala
@@ -46,8 +53,20 @@ private object Level {
       (y + layer.getOffsetY.toDouble / map.getProperties.get("tileheight", classOf[Int])).round.toInt))
       .toSet
 
+  /** Returns true if the tile map layer has collision.
+    *
+    * @param layer the tile map layer
+    * @return true if the tile map layer has collision
+    */
   private def hasCollision(layer: MapLayer): Boolean =
     layer.getProperties.containsKey("Collision") && layer.getProperties.get("Collision", classOf[Boolean])
 
+  /** Returns true if the tile map layer has a tile at the position.
+    *
+    * @param layer the tile map layer
+    * @param x the x coordinate
+    * @param y the y coordinate
+    * @return true if the tile map layer has a tile at the position
+    */
   private def hasTileAt(layer: TiledMapTileLayer, x: Int, y: Int): Boolean = Option(layer.getCell(x, y)).isDefined
 }
