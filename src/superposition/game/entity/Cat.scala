@@ -17,7 +17,7 @@ final class Cat(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
     val cell = multiverse.allocate(initialCell)
 
     add(new Toggle(alive))
-    add(new Player(multiverse, alive))
+    add(new Player(alive))
     add(new QuantumPosition(absolutePosition, cell, Vector2d(0.5, 0.5)))
     add(new SpriteView(
       texture = const(CatTexture),

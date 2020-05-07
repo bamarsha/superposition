@@ -20,7 +20,7 @@ private final class Superposition extends Game {
     engine.addSystem(new LevelSystem(levels))
     engine.addSystem(new MapRenderer)
     engine.addSystem(new MultiverseRenderer)
-    engine.addSystem(new PlayerInputSystem)
+    engine.addSystem(new PlayerInputSystem(() => levels.current))
     engine.addSystem(new LaserSystem(() => levels.current))
     engine.addSystem(new SpriteRenderer(() => levels.current))
   }

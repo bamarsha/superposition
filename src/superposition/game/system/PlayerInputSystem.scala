@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.SPACE
 import superposition.game.component._
+import superposition.game.entity.Level
 import superposition.game.system.PlayerInputSystem.{carryGate, updateCarriedPositions, updatePlayerPosition, walk}
 import superposition.math.{Vector2d, Vector2i}
 import superposition.quantum.{Gate, Translate, X}
@@ -14,7 +15,7 @@ import scala.Function.const
 import scala.jdk.CollectionConverters._
 import scala.math.exp
 
-final class PlayerInputSystem
+final class PlayerInputSystem(level: () => Option[Level])
   extends IteratingSystem(Family.all(classOf[Player], classOf[QuantumPosition]).get) {
   private var carryables: Iterable[Entity] = Nil
 
@@ -26,7 +27,7 @@ final class PlayerInputSystem
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
     val position = QuantumPosition.Mapper.get(entity)
     val player = Player.Mapper.get(entity)
-    val multiverse = player.multiverse
+    val multiverse = level().get.multiverse
     walk(multiverse, player, position, carryables, deltaTime)
     if (input.isKeyJustPressed(SPACE)) {
       multiverse.applyGate(carryGate(player, position, carryables), ())
@@ -37,6 +38,8 @@ final class PlayerInputSystem
 }
 
 private object PlayerInputSystem {
+  private val Speed: Float = 6.5f
+
   private val WalkKeys: Map[Int, Vector2d] = Map(
     Keys.W -> Vector2d(0, 1),
     Keys.A -> Vector2d(-1, 0),
@@ -96,7 +99,7 @@ private object PlayerInputSystem {
                    deltaTime: Float): Unit = {
     def applyGate(delta: Vector2i) = multiverse.applyGate(walkGate(player, position, carryables), delta)
 
-    val rawDelta = deltaPosition(deltaTime, Player.Speed)
+    val rawDelta = deltaPosition(deltaTime, Speed)
     val Vector2i(dx, dy) = nextCell(position.relative, rawDelta)
     val effectiveDelta = rawDelta - Vector2d(
       if (dx != 0 && applyGate(Vector2i(dx, 0))) dx else 0,
