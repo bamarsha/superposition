@@ -10,23 +10,24 @@ import superposition.quantum.StateId
 
 import scala.Function.const
 
-/**
- * A goal activates an action when the required object has reached the goal in every universe.
- *
- * @param multiverse the multiverse this goal belongs to
- * @param cell       the position of this goal
- * @param required   the position of the object that must reach this goal
- */
+/** An exit allows the player to leave a level.
+  *
+  * @param multiverse the multiverse
+  * @param cell the cell position of the exit
+  * @param playerCell the cell position of the player
+  */
 final class Exit(
     multiverse: Multiverse,
     cell: Vector2i,
-    required: () => StateId[Vector2i])
+    playerCell: () => StateId[Vector2i])
   extends Entity {
   add(new ClassicalPosition(cell.toVector2d + Vector2d(0.5, 0.5), cell))
-  add(new Goal(required))
+  add(new Goal(playerCell))
   add(new SpriteView(texture = const(KeyTexture)))
 }
 
+/** Contains the sprite textures for exits. */
 private object Exit {
+  /** The sprite texture for a key. TODO: This should probably look more like an exit. */
   private val KeyTexture = new Texture(resolve("sprites/key.png"))
 }

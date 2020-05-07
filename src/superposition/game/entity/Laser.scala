@@ -11,15 +11,14 @@ import superposition.quantum.{Gate, StateId}
 
 import scala.Function.const
 
-/**
- * A laser applies a quantum gate to any qubit hit by its beam.
- *
- * @param multiverse the multiverse this laser belongs to
- * @param cell       the position of this laser
- * @param gate       the gate to apply
- * @param direction  the direction this laser is pointing
- * @param controls   the cell that controls this laser if it contains a bit, or None if the laser is not controlled
- */
+/** A laser applies a quantum gate to any qubit hit by its beam.
+  *
+  * @param multiverse the multiverse
+  * @param cell the position of the laser
+  * @param gate the gate that the laser applies
+  * @param direction the direction the laser points
+  * @param controls the control cells for the laser
+  */
 final class Laser(
     multiverse: Multiverse,
     cell: Vector2i,
@@ -33,7 +32,9 @@ final class Laser(
   add(new SpriteView(texture = const(Textures(direction)), layer = -1))
 }
 
+/** Contains the sprite textures for lasers. */
 private object Laser {
+  /** The sprite texture for every cardinal direction. */
   private val Textures: Map[Direction, Texture] = Map(
     Up -> "sprites/laser_up.png",
     Down -> "sprites/laser_down.png",

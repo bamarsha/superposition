@@ -31,7 +31,7 @@ final class Cat(multiverse: Multiverse, initialCell: Vector2i) extends Entity {
   }
 }
 
-/** Settings for Schrödinger's cat. */
+/** Contains the sprite texture for Schrödinger's cat. */
 private object Cat {
   /** The sprite texture for Schrödinger's cat. */
   private val CatTexture: Texture = new Texture(resolve("sprites/cat.png"))

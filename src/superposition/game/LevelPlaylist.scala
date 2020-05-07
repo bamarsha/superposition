@@ -143,7 +143,7 @@ private object LevelPlaylist {
         new Door(multiverse, cell, controls)
       case "Goal" =>
         val required = obj.getProperties.get("Requires", classOf[Int])
-        new Exit(multiverse, cell, required = () => entities(required).getComponent(classOf[QuantumPosition]).cell)
+        new Exit(multiverse, cell, playerCell = () => entities(required).getComponent(classOf[QuantumPosition]).cell)
       case unknown => error(s"Unknown entity type $unknown.")
     }
   }
