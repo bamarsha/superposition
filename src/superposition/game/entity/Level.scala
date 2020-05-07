@@ -41,17 +41,17 @@ private object Level {
     * @return the set of walls in the tile map
     */
   private def walls(map: TiledMap): Set[Vector2i] =
-    (for {
-      layer <- map.getLayers.asScala
-      if layer.isInstanceOf[TiledMapTileLayer] && hasCollision(layer)
-      tiledLayer = layer.asInstanceOf[TiledMapTileLayer]
-      x <- 0 until tiledLayer.getWidth
-      y <- 0 until tiledLayer.getHeight
-      if hasTileAt(tiledLayer, x, y)
-    } yield Vector2i(
-      (x + layer.getOffsetX.toDouble / map.getProperties.get("tilewidth", classOf[Int])).round.toInt,
-      (y + layer.getOffsetY.toDouble / map.getProperties.get("tileheight", classOf[Int])).round.toInt))
-      .toSet
+    (map.getLayers.asScala flatMap {
+      case layer: TiledMapTileLayer if hasCollision(layer) =>
+        for {
+          x <- 0 until layer.getWidth
+          y <- 0 until layer.getHeight
+          if hasTileAt(layer, x, y)
+          cellX = (x + layer.getOffsetX / map.getProperties.get("tilewidth", classOf[Int])).round
+          cellY = (y + layer.getOffsetY / map.getProperties.get("tileheight", classOf[Int])).round
+        } yield Vector2i(cellX, cellY)
+      case _ => Nil
+    }).toSet
 
   /** Returns true if the tile map layer has collision.
     *
