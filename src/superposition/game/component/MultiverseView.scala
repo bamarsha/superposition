@@ -12,9 +12,13 @@ import superposition.game.ResourceResolver.resolve
 import superposition.math.Vector2i
 import superposition.quantum.{MetaId, Universe}
 
-import scala.Function.const
 import scala.math.Pi
 
+/** The multiverse view component manages the camera and provides rendering effects for the multiverse.
+  *
+  * @param multiverse the multiverse corresponding to this view
+  * @param camera the camera used to view the multiverse
+  */
 final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends Component {
   /** The shader program used to draw each universe. */
   private val shader: ShaderProgram = new ShaderProgram(
@@ -35,22 +39,35 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
   /** The elapsed time since the multiverse began. */
   private var time: Float = 0
 
+  /** Returns true if the cell is selected by the mouse.
+    *
+    * @param cell the cell to check
+    * @return true if the cell is selected by the mouse
+    */
   def isSelected(cell: Vector2i): Boolean = {
     val mouse = camera.unproject(new Vector3(input.getX, input.getY, 0))
     cell == Vector2i(mouse.x.floor.toInt, mouse.y.floor.toInt)
   }
 
+  /** Updates the view of the multiverse each frame.
+    *
+    * @param deltaTime the time elapsed since the last update
+    */
   def update(deltaTime: Float): Unit = {
     time += deltaTime
     var minValue = 0f
-    multiverse.updateMetaWith(shaderInterval)(const { universe =>
+    multiverse.updateMetaWith(shaderInterval) { _ => universe =>
       val maxValue = minValue + universe.amplitude.squaredMagnitude.toFloat
       val interval = (minValue, maxValue)
       minValue = maxValue
       interval
-    })
+    }
   }
 
+  /** Performs a drawing action for each universe and applies rendering effects to it.
+    *
+    * @param action the drawing action
+    */
   def draw(action: Universe => Unit): Unit =
     for (universe <- multiverse.universes) {
       buffer.begin()
@@ -62,6 +79,12 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
       drawBuffer(minValue, maxValue, universe.amplitude.phase.toFloat)
     }
 
+  /** Draws the contents of the buffer with the shader applied.
+    *
+    * @param minValue the lower bound of the shader interval assigned to the universe
+    * @param maxValue the upper bound of the shader interval assigned to the universe
+    * @param phase the phase of the universe
+    */
   private def drawBuffer(minValue: Float, maxValue: Float, phase: Float): Unit = {
     def drawBatch(action: () => Unit): Unit = {
       batch.begin()
@@ -86,6 +109,8 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
   }
 }
 
+/** Contains the component mapper for the multiverse view component. */
 object MultiverseView {
+  /** The component mapper for the multiverse view component. */
   val Mapper: ComponentMapper[MultiverseView] = ComponentMapper.getFor(classOf[MultiverseView])
 }
