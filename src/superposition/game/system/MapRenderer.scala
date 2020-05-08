@@ -5,7 +5,9 @@ import superposition.game.component.MapView
 
 import scala.jdk.CollectionConverters._
 
+/** The tile map renderer. */
 final class MapRenderer extends EntitySystem {
+  /** Entities with a map view. */
   private var entities: Iterable[Entity] = Nil
 
   override def addedToEngine(engine: Engine): Unit =
