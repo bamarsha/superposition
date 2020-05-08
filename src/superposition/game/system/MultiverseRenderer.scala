@@ -8,7 +8,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import superposition.game.component._
 
+/** The multiverse renderer. */
 final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiverse], classOf[MultiverseView]).get) {
+  /** A shape renderer. */
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
@@ -16,6 +18,10 @@ final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiv
     MultiverseView.Mapper.get(entity).update(deltaTime)
   }
 
+  /** Highlights all cells occupied by an entity in the multiverse.
+    *
+    * @param entity the multiverse entity
+    */
   private def highlightOccupiedCells(entity: Entity): Unit = {
     val multiverse = Multiverse.Mapper.get(entity)
     val occupiedCells =
