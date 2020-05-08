@@ -9,7 +9,12 @@ import superposition.game.system.LevelSystem.satisfied
 
 import scala.jdk.CollectionConverters._
 
+/** The system for changing levels or resetting the current level.
+  *
+  * @param levels the level playlist
+  */
 final class LevelSystem(levels: LevelPlaylist) extends EntitySystem {
+  /** The goal entities. */
   private var goals: Iterable[Entity] = Nil
 
   override def addedToEngine(engine: Engine): Unit =
@@ -26,7 +31,14 @@ final class LevelSystem(levels: LevelPlaylist) extends EntitySystem {
   }
 }
 
+/** Functions for computing properties about the state of the level. */
 private object LevelSystem {
+  /** Returns true if all of the goal's needs are satisfied.
+    *
+    * @param multiverse the multiverse
+    * @param entity the goal entity
+    * @return true if all of the goal's needs are satisfied
+    */
   private def satisfied(multiverse: Multiverse)(entity: Entity): Boolean = {
     val goal = Goal.Mapper.get(entity)
     val cell = ClassicalPosition.Mapper.get(entity).cell
