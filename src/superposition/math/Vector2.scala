@@ -55,6 +55,13 @@ object Vector2 {
       */
     def -(that: Vector2[A]): Vector2[A] = vector.fzipWith(that)(_ - _)
 
+    /** Computes the dot product of two vectors.
+      *
+      * @param that the other vector
+      * @return the dot product
+      */
+    def *(that: Vector2[A]): A = vector.fzipWith(that)(_ * _).foldl(zero)((plus _).curried)
+
     /** Multiplies the vector by a scalar.
       *
       * @param scalar the scalar
@@ -94,7 +101,7 @@ object Vector2 {
     import TraverseVector2.traverseSyntax._
 
     /** The length of the vector. */
-    def length: Double = sqrt(vector.x * vector.x + vector.y * vector.y)
+    def length: Double = sqrt(vector * vector)
 
     /** Scales the vector to have the given length.
       *
