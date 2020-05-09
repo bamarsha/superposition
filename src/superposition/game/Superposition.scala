@@ -13,6 +13,9 @@ private final class Superposition extends Game {
   /** The entity engine. */
   private val engine: Engine = new Engine
 
+  /** The time it took to render the last frame in nanoseconds. */
+  private var frameNanoTime: Long = 0
+
   override def create(): Unit = {
     val levels = new LevelPlaylist(engine)
     levels.appendAll(new TmxMapLoader(ResourceResolver), Playlist)
@@ -23,11 +26,14 @@ private final class Superposition extends Game {
     engine.addSystem(new PlayerInputSystem(() => levels.current))
     engine.addSystem(new LaserSystem(() => levels.current))
     engine.addSystem(new SpriteRenderer(() => levels.current))
+    engine.addSystem(new FrameTimeRenderer(() => frameNanoTime))
   }
 
   override def render(): Unit = {
+    val startTime = System.nanoTime()
     engine.update(graphics.getDeltaTime)
     super.render()
+    frameNanoTime = System.nanoTime() - startTime
   }
 }
 
