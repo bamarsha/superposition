@@ -1,7 +1,6 @@
 package superposition.math
 
 import com.badlogic.gdx.math.MathUtils
-import scalaz.{Applicative, Traverse, Zip}
 
 import scala.math.sqrt
 
@@ -11,23 +10,18 @@ import scala.math.sqrt
   * @param y the y component
   * @tparam A the type of the components
   */
-final case class Vector2[A](x: A, y: A)
+final case class Vector2[A](x: A, y: A) {
+  /** Maps the components of the vector.
+    *
+    * @param f the mapping function
+    * @tparam B the new type of the components
+    * @return the mapped vector
+    */
+  def map[B](f: A => B): Vector2[B] = Vector2(f(x), f(y))
+}
 
-/** Vector operations and type class instances. */
+/** Vector operations. */
 object Vector2 {
-
-  /** An instance of the [[scalaz.Traverse]] type class for [[superposition.math.Vector2]]. */
-  implicit object TraverseVector2 extends Traverse[Vector2] {
-    override def traverseImpl[C[_], A, B](vector: Vector2[A])(f: A => C[B])
-                                         (implicit applicative: Applicative[C]): C[Vector2[B]] =
-      applicative.ap2(f(vector.x), f(vector.y))(applicative pure Vector2.apply)
-  }
-
-  /** An instance of the [[scalaz.Zip]] type class for [[superposition.math.Vector2]]. */
-  implicit object ZipVector2 extends Zip[Vector2] {
-    override def zip[A, B](a: => Vector2[A], b: => Vector2[B]): Vector2[(A, B)] =
-      Vector2((a.x, b.x), (a.y, b.y))
-  }
 
   /** Operations on vectors of numeric values.
     *
@@ -37,8 +31,6 @@ object Vector2 {
     */
   implicit final class NumericOps[A](vector: Vector2[A])(implicit numeric: Numeric[A]) {
 
-    import TraverseVector2.traverseSyntax._
-    import ZipVector2.zipSyntax._
     import numeric._
 
     /** Adds two vectors.
@@ -46,21 +38,21 @@ object Vector2 {
       * @param that the other vector
       * @return the vector sum
       */
-    def +(that: Vector2[A]): Vector2[A] = vector.fzipWith(that)(_ + _)
+    def +(that: Vector2[A]): Vector2[A] = Vector2(vector.x + that.x, vector.y + that.y)
 
     /** Subtracts two vectors.
       *
       * @param that the other vector
       * @return the vector difference
       */
-    def -(that: Vector2[A]): Vector2[A] = vector.fzipWith(that)(_ - _)
+    def -(that: Vector2[A]): Vector2[A] = Vector2(vector.x - that.x, vector.y - that.y)
 
     /** Computes the dot product of two vectors.
       *
       * @param that the other vector
       * @return the dot product
       */
-    def *(that: Vector2[A]): A = vector.fzipWith(that)(_ * _).foldl(zero)((plus _).curried)
+    def *(that: Vector2[A]): A = vector.x * that.x + vector.y * that.y
 
     /** Multiplies the vector by a scalar.
       *
@@ -81,7 +73,6 @@ object Vector2 {
     */
   implicit final class FractionalOps[A](vector: Vector2[A])(implicit fractional: Fractional[A]) {
 
-    import TraverseVector2.traverseSyntax._
     import fractional._
 
     /** Divides the vector by a scalar.
@@ -97,8 +88,6 @@ object Vector2 {
     * @param vector the vector
     */
   implicit final class DoubleOps(vector: Vector2[Double]) {
-
-    import TraverseVector2.traverseSyntax._
 
     /** The length of the vector. */
     def length: Double = sqrt(vector * vector)
