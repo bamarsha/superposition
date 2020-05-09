@@ -3,7 +3,7 @@ package superposition.game.component
 import com.badlogic.ashley.core._
 import scalaz.Scalaz._
 import superposition.game.component.Multiverse.combine
-import superposition.math.{Complex, Vector2i}
+import superposition.math.{Complex, Vector2}
 import superposition.quantum.{Gate, MetaId, StateId, Universe}
 
 import scala.Ordering.Implicits._
@@ -13,7 +13,7 @@ import scala.math.sqrt
   *
   * @param walls the set of cells in the multiverse that always have collision
   */
-final class Multiverse(val walls: Set[Vector2i]) extends Component {
+final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
   /** The universes in the multiverse. */
   private var _universes: Seq[Universe] = Seq(Universe())
 
@@ -92,7 +92,7 @@ final class Multiverse(val walls: Set[Vector2i]) extends Component {
     * @param cell the cell to look at
     * @return the entities occupying the cell
     */
-  def allInCell(universe: Universe, cell: Vector2i): Iterable[Entity] =
+  def allInCell(universe: Universe, cell: Vector2[Int]): Iterable[Entity] =
     entities filter { entity =>
       QuantumPosition.Mapper.has(entity) && universe.state(QuantumPosition.Mapper.get(entity).cell) == cell
     }
@@ -103,7 +103,7 @@ final class Multiverse(val walls: Set[Vector2i]) extends Component {
     * @param cell the cell to look at
     * @return the toggleable qubits occupying the cell
     */
-  def toggles(universe: Universe, cell: Vector2i): Iterable[StateId[Boolean]] =
+  def toggles(universe: Universe, cell: Vector2[Int]): Iterable[StateId[Boolean]] =
     allInCell(universe, cell) flatMap { entity =>
       if (Toggle.Mapper.has(entity)) Some(Toggle.Mapper.get(entity).toggle)
       else None
@@ -115,7 +115,7 @@ final class Multiverse(val walls: Set[Vector2i]) extends Component {
     * @param cell the cell to look at
     * @return true if the cell is blocked by an entity with collision
     */
-  def isBlocked(universe: Universe, cell: Vector2i): Boolean =
+  def isBlocked(universe: Universe, cell: Vector2[Int]): Boolean =
     walls.contains(cell) ||
       (entities
         filter Collider.Mapper.has
@@ -127,7 +127,7 @@ final class Multiverse(val walls: Set[Vector2i]) extends Component {
     * @param controls the control cells to look at
     * @return true if all control cells have at least one activator qubit in the |1⟩ state
     */
-  def allOn(universe: Universe, controls: Iterable[Vector2i]): Boolean =
+  def allOn(universe: Universe, controls: Iterable[Vector2[Int]]): Boolean =
     controls forall { control =>
       entities exists { entity =>
         Activator.Mapper.has(entity) && QuantumPosition.Mapper.has(entity) &&

@@ -1,7 +1,7 @@
 package superposition.game.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
-import superposition.math.{Vector2d, Vector2i}
+import superposition.math.Vector2
 import superposition.quantum.{MetaId, StateId}
 
 /** The quantum position component has a position that may depend on which universe the entity is in.
@@ -10,7 +10,10 @@ import superposition.quantum.{MetaId, StateId}
   * @param cell the qudit representing the cell position in grid coordinates
   * @param relative the position relative to the current cell
   */
-final class QuantumPosition(val absolute: MetaId[Vector2d], val cell: StateId[Vector2i], var relative: Vector2d)
+final class QuantumPosition(
+    val absolute: MetaId[Vector2[Double]],
+    val cell: StateId[Vector2[Int]],
+    var relative: Vector2[Double])
   extends Component
 
 /** Contains the component mapper for the quantum position component. */

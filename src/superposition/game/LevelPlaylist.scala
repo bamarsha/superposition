@@ -3,10 +3,11 @@ package superposition.game
 import com.badlogic.ashley.core.{Engine, Entity}
 import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
+import scalaz.syntax.functor._
 import superposition.game.LevelPlaylist.{LevelFactory, addLevel, makeLevel, removeLevel}
 import superposition.game.component.{Multiverse, QuantumPosition, Toggle}
 import superposition.game.entity._
-import superposition.math.{Direction, Vector2i}
+import superposition.math.{Direction, Vector2}
 import superposition.quantum._
 
 import scala.collection.mutable
@@ -125,7 +126,7 @@ private object LevelPlaylist {
     val tileHeight = map.getProperties.get("tileheight", classOf[Int])
     val x = obj.getProperties.get("x", classOf[Float])
     val y = obj.getProperties.get("y", classOf[Float])
-    val cell = Vector2i((x / tileWidth).floor.toInt, (y / tileHeight).floor.toInt)
+    val cell = Vector2(x / tileWidth, y / tileHeight) map (_.floor.toInt)
 
     obj.getProperties.get("type") match {
       case "Player" => new Cat(multiverse, cell)
@@ -154,10 +155,10 @@ private object LevelPlaylist {
     * @param string the cell position string
     * @return the cell position
     */
-  private def makeCell(map: TiledMap)(string: String): Vector2i = {
+  private def makeCell(map: TiledMap)(string: String): Vector2[Int] = {
     val height = map.getProperties.get("height", classOf[Int])
     """\((\d+),\s*(\d+)\)""".r("x", "y").findFirstMatchIn(string) match {
-      case Some(m) => Vector2i(m.group("x").trim.toInt, height - m.group("y").trim.toInt - 1)
+      case Some(m) => Vector2(m.group("x").trim.toInt, height - m.group("y").trim.toInt - 1)
       case None => error("Invalid cell '" + string + "'.")
     }
   }
@@ -168,7 +169,8 @@ private object LevelPlaylist {
     * @param string the cell positions string
     * @return the cell positions
     */
-  private def makeCells(map: TiledMap)(string: String): Seq[Vector2i] = (string.linesIterator map makeCell(map)).toSeq
+  private def makeCells(map: TiledMap)(string: String): Seq[Vector2[Int]] =
+    (string.linesIterator map makeCell(map)).toSeq
 
   /** Returns the gate corresponding to the gate name.
     *

@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.{FrameBuffer, ShaderProgram}
 import com.badlogic.gdx.math.Vector3
 import superposition.game.ResourceResolver.resolve
-import superposition.math.Vector2i
+import superposition.math.Vector2
 import superposition.quantum.{MetaId, Universe}
 
 import scala.math.Pi
@@ -44,9 +44,9 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
     * @param cell the cell to check
     * @return true if the cell is selected by the mouse
     */
-  def isSelected(cell: Vector2i): Boolean = {
+  def isSelected(cell: Vector2[Int]): Boolean = {
     val mouse = camera.unproject(new Vector3(input.getX, input.getY, 0))
-    cell == Vector2i(mouse.x.floor.toInt, mouse.y.floor.toInt)
+    cell == Vector2(mouse.x.floor.toInt, mouse.y.floor.toInt)
   }
 
   /** Updates the view of the multiverse each frame.

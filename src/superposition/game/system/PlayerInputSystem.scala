@@ -5,10 +5,11 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.SPACE
+import scalaz.syntax.functor._
 import superposition.game.component._
 import superposition.game.entity.Level
 import superposition.game.system.PlayerInputSystem.{carryGate, updateCarriedPositions, updatePlayerPosition, walk}
-import superposition.math.{Vector2d, Vector2i}
+import superposition.math.Vector2
 import superposition.quantum.{Gate, Translate, X}
 
 import scala.Function.const
@@ -46,11 +47,11 @@ private object PlayerInputSystem {
   private val Speed: Float = 6.5f
 
   /** A map from key code to unit vector representing the direction of movement. */
-  private val WalkKeys: Map[Int, Vector2d] = Map(
-    Keys.W -> Vector2d(0, 1),
-    Keys.A -> Vector2d(-1, 0),
-    Keys.S -> Vector2d(0, -1),
-    Keys.D -> Vector2d(1, 0))
+  private val WalkKeys: Map[Int, Vector2[Double]] = Map(
+    Keys.W -> Vector2(0, 1),
+    Keys.A -> Vector2(-1, 0),
+    Keys.S -> Vector2(0, -1),
+    Keys.D -> Vector2(1, 0))
 
   /** Returns a gate that walks the player and all carried entities to another cell.
     *
@@ -58,14 +59,14 @@ private object PlayerInputSystem {
     * @param carriables the carriable entities
     * @return the player walk gate
     */
-  private def walkGate(entity: Entity, carriables: Iterable[Entity]): Gate[Vector2i] = {
+  private def walkGate(entity: Entity, carriables: Iterable[Entity]): Gate[Vector2[Int]] = {
     val player = Player.Mapper.get(entity)
     val position = QuantumPosition.Mapper.get(entity)
-    val walkPlayer: Gate[Vector2i] = Translate.multi controlled { delta => universe =>
+    val walkPlayer: Gate[Vector2[Int]] = Translate.multi controlled { delta => universe =>
       if (universe.state(player.alive)) List((position.cell, delta))
       else Nil
     }
-    val walkCarried: Gate[Vector2i] = Translate.multi controlled { delta => universe =>
+    val walkCarried: Gate[Vector2[Int]] = Translate.multi controlled { delta => universe =>
       if (universe.state(player.alive))
         carriables
           .filter(carriable => universe.state(Carried.Mapper.get(carriable).carried))
@@ -101,8 +102,8 @@ private object PlayerInputSystem {
     * @param deltaTime the time elapsed since the last frame
     * @return the difference in player positions
     */
-  private def deltaPosition(deltaTime: Float): Vector2d = {
-    val delta = WalkKeys.foldLeft(Vector2d(0, 0)) {
+  private def deltaPosition(deltaTime: Float): Vector2[Double] = {
+    val delta = WalkKeys.foldLeft(Vector2(0d, 0d)) {
       case (delta, (key, direction)) =>
         if (input.isKeyPressed(key)) delta + direction
         else delta
@@ -120,12 +121,11 @@ private object PlayerInputSystem {
   private def walk(multiverse: Multiverse, entity: Entity, carriables: Iterable[Entity], deltaTime: Float): Unit = {
     val position = QuantumPosition.Mapper.get(entity)
     val rawDelta = deltaPosition(deltaTime)
-    val dx = (position.relative.x + rawDelta.x).floor.toInt
-    val dy = (position.relative.y + rawDelta.y).floor.toInt
+    val Vector2(dx, dy) = (position.relative + rawDelta) map (_.floor.toInt)
     val gate = walkGate(entity, carriables)
-    val delta = rawDelta - Vector2d(
-      if (dx != 0 && multiverse.applyGate(gate, Vector2i(dx, 0))) dx else 0,
-      if (dy != 0 && multiverse.applyGate(gate, Vector2i(0, dy))) dy else 0)
+    val delta = rawDelta - Vector2(
+      if (dx != 0 && multiverse.applyGate(gate, Vector2(dx, 0))) dx else 0,
+      if (dy != 0 && multiverse.applyGate(gate, Vector2(0, dy))) dy else 0)
     position.relative = (position.relative + delta).clamp(0, 1)
   }
 
@@ -140,7 +140,7 @@ private object PlayerInputSystem {
     val position = QuantumPosition.Mapper.get(entity)
     multiverse.updateMetaWith(position.absolute) { pos => universe =>
       if (universe.state(player.alive)) {
-        val targetPosition = universe.state(position.cell).toVector2d + position.relative
+        val targetPosition = (universe.state(position.cell) map (_.toDouble)) + position.relative
         pos.lerp(targetPosition, 1 - exp(-10 * deltaTime))
       } else pos
     }
@@ -166,8 +166,8 @@ private object PlayerInputSystem {
       multiverse.updateMetaWith(carriedPosition.absolute) { pos => universe =>
         val relativePos =
           if (universe.state(carried)) playerPosition.relative
-          else Vector2d(0.5, 0.5)
-        val targetPos = universe.state(carriedPosition.cell).toVector2d + relativePos
+          else Vector2(0.5, 0.5)
+        val targetPos = (universe.state(carriedPosition.cell) map (_.toDouble)) + relativePos
         if (universe.state(player.alive))
           pos.lerp(targetPos, 1 - exp(-10 * deltaTime))
         else pos

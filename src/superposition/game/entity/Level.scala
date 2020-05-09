@@ -6,7 +6,7 @@ import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
 import superposition.game.component.{MapView, Multiverse, MultiverseView}
 import superposition.game.entity.Level.walls
-import superposition.math.Vector2i
+import superposition.math.Vector2
 
 import scala.jdk.CollectionConverters._
 
@@ -40,7 +40,7 @@ private object Level {
     * @param map the tile map
     * @return the set of walls in the tile map
     */
-  private def walls(map: TiledMap): Set[Vector2i] =
+  private def walls(map: TiledMap): Set[Vector2[Int]] =
     (map.getLayers.asScala flatMap {
       case layer: TiledMapTileLayer if hasCollision(layer) =>
         for {
@@ -49,7 +49,7 @@ private object Level {
           if hasTileAt(layer, x, y)
           cellX = (x + layer.getOffsetX / map.getProperties.get("tilewidth", classOf[Int])).round
           cellY = (y + layer.getOffsetY / map.getProperties.get("tileheight", classOf[Int])).round
-        } yield Vector2i(cellX, cellY)
+        } yield Vector2(cellX, cellY)
       case _ => Nil
     }).toSet
 

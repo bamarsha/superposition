@@ -2,6 +2,7 @@ name := "Superposition"
 version := "0.2-SNAPSHOT"
 
 ThisBuild / scalaVersion := "2.13.1"
+Compile / scalacOptions += "-Xsource:2.14"
 Compile / scalaSource := baseDirectory.value / "src"
 Compile / resourceDirectory := baseDirectory.value / "resources"
 

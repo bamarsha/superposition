@@ -1,7 +1,7 @@
 package superposition.quantum
 
 import scalaz.{Divisible, NonEmptyList}
-import superposition.math.{Complex, Vector2i}
+import superposition.math.{Complex, Vector2}
 
 import scala.math.sqrt
 
@@ -26,7 +26,7 @@ sealed trait Gate[A] {
 object Gate {
 
   /** An instance of the divisible type class for gates. */
-  implicit object GateDivisible extends Divisible[Gate] {
+  implicit object DivisibleGate extends Divisible[Gate] {
     override def conquer[A]: Gate[A] = Identity[A]()
 
     override def divide2[A, B, C](gate1: => Gate[A], gate2: => Gate[B])(f: C => (A, B)): Gate[C] = new Gate[C] {
@@ -43,9 +43,9 @@ object Gate {
     *
     * @param gate the gate to apply the operations to
     */
-  final implicit class Ops[A](val gate: Gate[A]) extends AnyVal {
+  implicit final class Ops[A](val gate: Gate[A]) extends AnyVal {
 
-    import Gate.GateDivisible.divisibleSyntax._
+    import Gate.DivisibleGate.divisibleSyntax._
 
     /** Applies the gate within all of the universes using the same argument.
       *
@@ -151,14 +151,15 @@ case object H extends Gate[StateId[Boolean]] {
 }
 
 /** The translate gate applies vector addition to a qudit that represents a two-dimensional vector. */
-case object Translate extends Gate[(StateId[Vector2i], Vector2i)] {
+case object Translate extends Gate[(StateId[Vector2[Int]], Vector2[Int])] {
 
-  import Gate.GateDivisible.divisibleSyntax._
+  import Gate.DivisibleGate.divisibleSyntax._
 
-  override def apply(value: (StateId[Vector2i], Vector2i))(universe: Universe): NonEmptyList[Universe] = value match {
-    case (id, delta) => NonEmptyList(universe.updatedStateWith(id)(_ + delta))
-  }
+  override def apply(value: (StateId[Vector2[Int]], Vector2[Int]))(universe: Universe): NonEmptyList[Universe] =
+    value match {
+      case (id, delta) => NonEmptyList(universe.updatedStateWith(id)(_ + delta))
+    }
 
-  override def adjoint: Gate[(StateId[Vector2i], Vector2i)] =
+  override def adjoint: Gate[(StateId[Vector2[Int]], Vector2[Int])] =
     this contramap { case (id, delta) => (id, -delta) }
 }

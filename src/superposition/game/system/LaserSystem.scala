@@ -11,7 +11,7 @@ import superposition.game.component.{Beam, ClassicalPosition, Multiverse, Multiv
 import superposition.game.entity.Level
 import superposition.game.system.LaserSystem.{beamHits, beamTarget, drawBeam, drawOutline}
 import superposition.math.Direction.{Down, Left, Right, Up}
-import superposition.math.Vector2i
+import superposition.math.Vector2
 import superposition.quantum.{StateId, Universe}
 
 import scala.Function.const
@@ -71,10 +71,10 @@ private object LaserSystem {
     * @param entity the entity shooting the laser beam
     * @return the cells in the path of the laser beam
     */
-  private def beamPath(entity: Entity): Seq[Vector2i] = {
+  private def beamPath(entity: Entity): Seq[Vector2[Int]] = {
     val source = ClassicalPosition.Mapper.get(entity).cell
     val direction = Beam.Mapper.get(entity).direction
-    LazyList.iterate(source)(_ + direction.toVector2i).tail.take(BeamLength)
+    LazyList.iterate(source)(_ + direction.toVector2).tail.take(BeamLength)
   }
 
   /** The target of the laser beam.
@@ -84,7 +84,7 @@ private object LaserSystem {
     * @param universe the universe
     * @return the target of the laser beam
     */
-  private def beamTarget(multiverse: Multiverse, entity: Entity)(universe: Universe): Option[Vector2i] = {
+  private def beamTarget(multiverse: Multiverse, entity: Entity)(universe: Universe): Option[Vector2[Int]] = {
     val controls = Beam.Mapper.get(entity).controls
     if (multiverse.allOn(universe, controls))
       beamPath(entity) find { cell =>

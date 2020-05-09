@@ -2,10 +2,11 @@ package superposition.game.entity
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
+import scalaz.syntax.functor._
 import superposition.game.ResourceResolver.resolve
 import superposition.game.component.{ClassicalPosition, Goal, Multiverse, SpriteView}
 import superposition.game.entity.Exit.KeyTexture
-import superposition.math.{Vector2d, Vector2i}
+import superposition.math.Vector2
 import superposition.quantum.StateId
 
 import scala.Function.const
@@ -18,10 +19,10 @@ import scala.Function.const
   */
 final class Exit(
     multiverse: Multiverse,
-    cell: Vector2i,
-    playerCell: () => StateId[Vector2i])
+    cell: Vector2[Int],
+    playerCell: () => StateId[Vector2[Int]])
   extends Entity {
-  add(new ClassicalPosition(cell.toVector2d + Vector2d(0.5, 0.5), cell))
+  add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5), cell))
   add(new Goal(playerCell))
   add(new SpriteView(texture = const(KeyTexture)))
 }

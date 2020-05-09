@@ -1,7 +1,7 @@
 package superposition.game.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
-import superposition.math.{Direction, Vector2i}
+import superposition.math.{Direction, Vector2}
 import superposition.quantum.{Gate, MetaId, StateId}
 
 /** The beam component shoots a laser beam that applies a quantum gate.
@@ -15,10 +15,10 @@ final class Beam(
     multiverse: Multiverse,
     val gate: Gate[StateId[Boolean]],
     val direction: Direction,
-    val controls: Iterable[Vector2i])
+    val controls: Iterable[Vector2[Int]])
   extends Component {
   /** The most recent target cell, if any. */
-  val lastTarget: MetaId[Option[Vector2i]] = multiverse.allocateMeta(None)
+  val lastTarget: MetaId[Option[Vector2[Int]]] = multiverse.allocateMeta(None)
 
   /** The amount of time since the beam was most recently activated. */
   val elapsedTime: MetaId[Double] = multiverse.allocateMeta(0)

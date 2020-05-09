@@ -2,11 +2,12 @@ package superposition.game.entity
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
+import scalaz.syntax.functor._
 import superposition.game.ResourceResolver.resolve
 import superposition.game.component._
 import superposition.game.entity.Laser.Textures
 import superposition.math.Direction.{Down, Left, Right, Up}
-import superposition.math.{Direction, Vector2d, Vector2i}
+import superposition.math.{Direction, Vector2}
 import superposition.quantum.{Gate, StateId}
 
 import scala.Function.const
@@ -21,12 +22,12 @@ import scala.Function.const
   */
 final class Laser(
     multiverse: Multiverse,
-    cell: Vector2i,
+    cell: Vector2[Int],
     gate: Gate[StateId[Boolean]],
     direction: Direction,
-    controls: Iterable[Vector2i])
+    controls: Iterable[Vector2[Int]])
   extends Entity {
-  add(new ClassicalPosition(cell.toVector2d + Vector2d(0.5, 0.5), cell))
+  add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5), cell))
   add(new Collider(const(Set(cell))))
   add(new Beam(multiverse, gate, direction, controls))
   add(new SpriteView(texture = const(Textures(direction)), layer = -1))
