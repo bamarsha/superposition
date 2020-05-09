@@ -3,7 +3,6 @@ package superposition.game.entity
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color.{BLACK, WHITE}
 import com.badlogic.gdx.graphics.Texture
-import scalaz.syntax.functor._
 import superposition.game.ResourceResolver.resolve
 import superposition.game.component._
 import superposition.game.entity.Cat.CatTexture
@@ -22,7 +21,7 @@ final class Cat(multiverse: Multiverse, initialCell: Vector2[Int]) extends Entit
     val absolutePosition = multiverse.allocateMeta((initialCell map (_.toDouble)) + Vector2(0.5, 0.5))
     val cell = multiverse.allocate(initialCell)
 
-    add(new Toggle(alive))
+    add(new PrimaryBit(alive))
     add(new Player(alive))
     add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))
     add(new SpriteView(

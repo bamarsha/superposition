@@ -5,7 +5,6 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.SPACE
-import scalaz.syntax.functor._
 import superposition.game.component._
 import superposition.game.entity.Level
 import superposition.game.system.PlayerInputSystem.{carryGate, updateCarriedPositions, updatePlayerPosition, walk}

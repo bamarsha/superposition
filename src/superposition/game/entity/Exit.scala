@@ -2,7 +2,6 @@ package superposition.game.entity
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
-import scalaz.syntax.functor._
 import superposition.game.ResourceResolver.resolve
 import superposition.game.component.{ClassicalPosition, Goal, Multiverse, SpriteView}
 import superposition.game.entity.Exit.KeyTexture

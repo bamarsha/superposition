@@ -3,7 +3,6 @@ package superposition.game.entity
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color.{BLACK, WHITE}
 import com.badlogic.gdx.graphics.Texture
-import scalaz.syntax.functor._
 import superposition.game.ResourceResolver.resolve
 import superposition.game.component._
 import superposition.game.entity.Quball.QuballTexture
@@ -22,7 +21,7 @@ final class Quball(multiverse: Multiverse, initialCell: Vector2[Int]) extends En
     val onOff = multiverse.allocate(false)
 
     add(new QuantumPosition(absolutePosition, multiverse.allocate(initialCell), Vector2(0.5, 0.5)))
-    add(new Toggle(onOff))
+    add(new PrimaryBit(onOff))
     add(new Activator(onOff))
     add(new Carried(multiverse.allocate(false)))
     add(new SpriteView(

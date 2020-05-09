@@ -102,7 +102,7 @@ private object LaserSystem {
     */
   private def beamHits(multiverse: Multiverse, entity: Entity)(universe: Universe): Seq[StateId[Boolean]] =
     (beamTarget(multiverse, entity)(universe).iterator.to(Seq)
-      flatMap (cell => multiverse.toggles(universe, cell)))
+      flatMap (cell => multiverse.primaryBits(universe, cell)))
 
   /** Draws an outline around the laser.
     *

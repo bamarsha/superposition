@@ -3,9 +3,8 @@ package superposition.game
 import com.badlogic.ashley.core.{Engine, Entity}
 import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
-import scalaz.syntax.functor._
 import superposition.game.LevelPlaylist.{LevelFactory, addLevel, makeLevel, removeLevel}
-import superposition.game.component.{Multiverse, QuantumPosition, Toggle}
+import superposition.game.component.{Multiverse, PrimaryBit, QuantumPosition}
 import superposition.game.entity._
 import superposition.math.{Direction, Vector2}
 import superposition.quantum._
@@ -102,8 +101,8 @@ private object LevelPlaylist {
       val gates = map.getProperties.get("Gates", classOf[String])
       for (Array(name, target) <- gates.linesIterator map (_.split(' '))) {
         println(s"Applying gate $name on entity $target.")
-        val toggle = entities(target.toInt).getComponent(classOf[Toggle]).toggle
-        multiverse.applyGate(makeGate(name), toggle)
+        val bit = entities(target.toInt).getComponent(classOf[PrimaryBit]).bit
+        multiverse.applyGate(makeGate(name), bit)
       }
     }
 

@@ -97,15 +97,15 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
       QuantumPosition.Mapper.has(entity) && universe.state(QuantumPosition.Mapper.get(entity).cell) == cell
     }
 
-  /** Returns the toggleable qubits occupying the cell.
+  /** Returns all primary qubits in the cell.
     *
     * @param universe the universe to look in
     * @param cell the cell to look at
-    * @return the toggleable qubits occupying the cell
+    * @return the primary qubits in the cell
     */
-  def toggles(universe: Universe, cell: Vector2[Int]): Iterable[StateId[Boolean]] =
+  def primaryBits(universe: Universe, cell: Vector2[Int]): Iterable[StateId[Boolean]] =
     allInCell(universe, cell) flatMap { entity =>
-      if (Toggle.Mapper.has(entity)) Some(Toggle.Mapper.get(entity).toggle)
+      if (PrimaryBit.Mapper.has(entity)) Some(PrimaryBit.Mapper.get(entity).bit)
       else None
     }
 
