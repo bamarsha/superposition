@@ -46,7 +46,7 @@ final class LaserSystem(level: () => Option[Level])
 
     // Draw the laser.
     shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
-    multiverseView.draw { universe =>
+    multiverseView.enqueueDrawing { universe =>
       if (multiverseView.isSelected(cell)) {
         drawOutline(multiverseView, shapeRenderer, entity)
       }

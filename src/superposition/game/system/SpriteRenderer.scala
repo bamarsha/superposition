@@ -20,7 +20,7 @@ final class SpriteRenderer(level: () => Option[Level])
     val multiverseView = level().get.multiverseView
     val spriteView = SpriteView.Mapper.get(entity)
     batch.setProjectionMatrix(multiverseView.camera.combined)
-    multiverseView.draw { universe =>
+    multiverseView.enqueueDrawing { universe =>
       val position =
         if (ClassicalPosition.Mapper.has(entity))
           ClassicalPosition.Mapper.get(entity).absolute
