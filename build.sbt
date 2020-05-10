@@ -1,13 +1,13 @@
 name := "Superposition"
 version := "0.2-SNAPSHOT"
 
-ThisBuild / scalaVersion := "2.13.1"
+ThisBuild / scalaVersion := "2.13.2"
 Compile / scalacOptions += "-Xsource:2.14"
 Compile / scalaSource := baseDirectory.value / "src"
 Compile / resourceDirectory := baseDirectory.value / "resources"
 
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.3.0-M32"
-libraryDependencies += "com.beachape" %% "enumeratum" % "1.5.15"
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.3.0"
+libraryDependencies += "com.beachape" %% "enumeratum" % "1.6.0"
 libraryDependencies ++= {
   val version = "1.9.10"
   Seq(
