@@ -16,11 +16,11 @@ final class DebugInfoSystem(renderNanoTime: () => Long) extends EntitySystem {
   private val font: BitmapFont = new BitmapFont
 
   override def update(deltaTime: Float): Unit = {
-    val ms = (renderNanoTime() / 1e6d).round
     val fps = graphics.getFramesPerSecond
+    val ms = (renderNanoTime() / 1e6d).round
     batch.begin()
-    font.draw(batch, s"$ms ms", 8, 20)
-    font.draw(batch, s"$fps fps", 60, 20)
+    font.draw(batch, s"$fps fps", 8, 20)
+    font.draw(batch, s"$ms ms", 60, 20)
     batch.end()
   }
 }
