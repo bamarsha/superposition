@@ -43,7 +43,7 @@ final class PlayerInputSystem(level: () => Option[Level])
 /** Player settings and functions for performing player actions. */
 private object PlayerInputSystem {
   /** The speed of the player in cells per second. */
-  private val Speed: Float = 4f
+  private val Speed: Float = 3f
 
   /** A map from key code to unit vector representing the direction of movement. */
   private val WalkKeys: Map[Int, Vector2[Double]] = Map(
