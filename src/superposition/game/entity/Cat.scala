@@ -1,14 +1,11 @@
 package superposition.game.entity
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.graphics.Color.{BLACK, WHITE}
 import com.badlogic.gdx.graphics.Texture
 import superposition.game.ResourceResolver.resolve
 import superposition.game.component._
-import superposition.game.entity.Cat.CatTexture
+import superposition.game.entity.Cat._
 import superposition.math.Vector2
-
-import scala.Function.const
 
 /** Schrödinger's cat.
   *
@@ -24,15 +21,13 @@ final class Cat(multiverse: Multiverse, initialCell: Vector2[Int]) extends Entit
     add(new PrimaryBit(alive))
     add(new Player(alive))
     add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))
-    add(new SpriteView(
-      texture = const(CatTexture),
-      scale = const(Vector2(2, 2)),
-      color = universe => if (universe.state(alive)) WHITE else BLACK))
+    add(new SpriteView(texture = universe => if (universe.state(alive)) CatTextureAlive else CatTextureDead))
   }
 }
 
 /** Contains the sprite texture for Schrödinger's cat. */
 private object Cat {
   /** The sprite texture for Schrödinger's cat. */
-  private val CatTexture: Texture = new Texture(resolve("sprites/cat.png"))
+  private val CatTextureAlive: Texture = new Texture(resolve("sprites/cat_alive.png"))
+  private val CatTextureDead: Texture = new Texture(resolve("sprites/cat_dead.png"))
 }

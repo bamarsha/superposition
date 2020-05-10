@@ -43,7 +43,7 @@ final class PlayerInputSystem(level: () => Option[Level])
 /** Player settings and functions for performing player actions. */
 private object PlayerInputSystem {
   /** The speed of the player in cells per second. */
-  private val Speed: Float = 6.5f
+  private val Speed: Float = 4f
 
   /** A map from key code to unit vector representing the direction of movement. */
   private val WalkKeys: Map[Int, Vector2[Double]] = Map(
@@ -140,7 +140,7 @@ private object PlayerInputSystem {
     multiverse.updateMetaWith(position.absolute) { pos => universe =>
       if (universe.state(player.alive)) {
         val targetPosition = (universe.state(position.cell) map (_.toDouble)) + position.relative
-        pos.lerp(targetPosition, 1 - exp(-10 * deltaTime))
+        pos.lerp(targetPosition, 1 - exp(-20 * deltaTime))
       } else pos
     }
   }
@@ -168,7 +168,7 @@ private object PlayerInputSystem {
           else Vector2(0.5, 0.5)
         val targetPos = (universe.state(carriedPosition.cell) map (_.toDouble)) + relativePos
         if (universe.state(player.alive))
-          pos.lerp(targetPos, 1 - exp(-10 * deltaTime))
+          pos.lerp(targetPos, 1 - exp(-20 * deltaTime))
         else pos
       }
     }

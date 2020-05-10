@@ -1,11 +1,11 @@
 package superposition.game.entity
 
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.graphics.Color.{BLACK, WHITE}
+import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.Texture
 import superposition.game.ResourceResolver.resolve
 import superposition.game.component._
-import superposition.game.entity.Quball.QuballTexture
+import superposition.game.entity.Quball._
 import superposition.math.Vector2
 
 import scala.Function.const
@@ -19,15 +19,16 @@ final class Quball(multiverse: Multiverse, initialCell: Vector2[Int]) extends En
   locally {
     val absolutePosition = multiverse.allocateMeta((initialCell map (_.toDouble)) + Vector2(0.5, 0.5))
     val onOff = multiverse.allocate(false)
+    val carried = multiverse.allocate(false)
 
     add(new QuantumPosition(absolutePosition, multiverse.allocate(initialCell), Vector2(0.5, 0.5)))
     add(new PrimaryBit(onOff))
     add(new Activator(onOff))
-    add(new Carried(multiverse.allocate(false)))
+    add(new Carried(carried))
     add(new SpriteView(
-      texture = const(QuballTexture),
-      scale = const(Vector2(1, 1)),
-      color = universe => if (universe.state(onOff)) WHITE else BLACK,
+      texture = universe => if (universe.state(onOff)) QuballTextureOn else QuballTextureOff,
+      scale = universe => Vector2(1d, 1d) * (if (universe.state(carried)) .5 else .75),
+      color = const(WHITE),
       layer = 1))
   }
 }
@@ -35,5 +36,6 @@ final class Quball(multiverse: Multiverse, initialCell: Vector2[Int]) extends En
 /** Contains the sprite texture for quballs. */
 private object Quball {
   /** The sprite texture for a quball. */
-  private val QuballTexture = new Texture(resolve("sprites/ball.png"))
+  private val QuballTextureOn = new Texture(resolve("sprites/quball_v1_1.png"))
+  private val QuballTextureOff = new Texture(resolve("sprites/quball_v1_0.png"))
 }

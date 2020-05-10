@@ -134,8 +134,8 @@ private object LevelPlaylist {
         val gate = makeGate(obj.getProperties.get("Gate", classOf[String]))
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
         val control =
-          if (obj.getProperties.containsKey("Control"))
-            List(makeCell(map)(obj.getProperties.get("Control", classOf[String])))
+          if (obj.getProperties.containsKey("Controls"))
+            makeCells(map)(obj.getProperties.get("Controls", classOf[String])).toList
           else Nil
         new Laser(multiverse, cell, gate, direction, control)
       case "Door" =>

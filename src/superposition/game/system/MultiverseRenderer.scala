@@ -112,7 +112,7 @@ final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiv
     drawBatch { () =>
       shader.setUniformf("minVal", 0f)
       shader.setUniformf("maxVal", 1f)
-      shader.setUniform4fv("color", Array(1, 1, 1, 0.1f), 0, 4)
+      shader.setUniform4fv("color", Array(1, 1, 1, 0.2f), 0, 4)
     }
   }
 }

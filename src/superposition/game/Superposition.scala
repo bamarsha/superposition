@@ -54,7 +54,7 @@ private object Superposition {
   def main(args: Array[String]): Unit = {
     val config = new Lwjgl3ApplicationConfiguration
     config.setTitle("Superposition")
-    config.setWindowedMode(1280, 720)
+    config.setWindowedMode(1536, 864)
     new Lwjgl3Application(new Superposition, config)
   }
 }

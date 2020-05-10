@@ -1,92 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="17">
+<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="16" height="9" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="27">
  <properties>
-  <property name="Gates" value="X 5"/>
+  <property name="Gates" value="X 26"/>
  </properties>
- <tileset firstgid="1" name="spritesheet" tilewidth="16" tileheight="16" tilecount="16" columns="4">
-  <image source="sprites/spritesheet.png" width="64" height="64"/>
+ <tileset firstgid="1" name="industrial-sprite-sheet-DeadEnd-LMZ" tilewidth="16" tileheight="16" tilecount="204" columns="12">
+  <image source="sprites/industrial-sprite-sheet-DeadEnd-LMZ.png" width="192" height="272"/>
  </tileset>
- <layer id="3" name="Floor" width="32" height="18">
+ <tileset firstgid="205" name="sprites" tilewidth="64" tileheight="64" tilecount="9" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="32" height="32" source="sprites/ball.png"/>
+  </tile>
+  <tile id="1">
+   <image width="64" height="64" source="sprites/cat.png"/>
+  </tile>
+  <tile id="2">
+   <image width="16" height="16" source="sprites/key.png"/>
+  </tile>
+  <tile id="3">
+   <image width="16" height="16" source="sprites/laser_down.png"/>
+  </tile>
+  <tile id="4">
+   <image width="16" height="16" source="sprites/laser_left.png"/>
+  </tile>
+  <tile id="5">
+   <image width="16" height="16" source="sprites/laser_right.png"/>
+  </tile>
+  <tile id="6">
+   <image width="16" height="16" source="sprites/laser_up.png"/>
+  </tile>
+  <tile id="7">
+   <image width="16" height="16" source="sprites/quball_v1.png"/>
+  </tile>
+  <tile id="8">
+   <image width="16" height="16" source="sprites/quball_v2.png"/>
+  </tile>
+ </tileset>
+ <layer id="1" name="Art" width="16" height="9">
   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,16,8,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,16,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+4,6,6,6,6,6,6,6,6,6,6,6,6,6,6,5,
+7,30,30,30,30,30,30,197,198,203,203,30,30,30,30,7,
+7,21,21,21,21,21,21,21,21,190,190,21,21,21,21,7,
+7,21,21,129,128,21,21,21,21,21,21,21,21,21,21,7,
+7,21,21,204,140,21,21,21,21,21,21,21,21,21,21,7,
+7,21,21,190,21,21,21,21,21,21,21,21,21,21,21,7,
+7,21,21,21,21,21,21,21,21,21,21,21,21,21,21,7,
+7,21,21,21,21,21,21,21,21,21,21,21,21,21,21,7,
+16,6,6,6,6,6,6,6,6,6,6,6,6,6,6,17
 </data>
  </layer>
- <layer id="2" name="Walls" width="32" height="18">
+ <layer id="3" name="Collision" width="16" height="9" visible="0">
   <properties>
    <property name="Collision" type="bool" value="true"/>
   </properties>
   <data encoding="csv">
-13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,
-13,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,13,
-13,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,13,
-13,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,13,
-13,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,13,
-13,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,13,
-13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,
-13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,
-13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,
-13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,
-13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,
-13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,
-13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,
-13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,
-13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,
-13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,
-13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,
-13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13
+101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,
+101,101,101,101,101,101,101,0,0,101,101,101,101,101,101,101,
+101,0,0,0,0,0,0,0,0,0,0,0,0,0,0,101,
+101,0,0,101,101,0,0,0,0,0,0,0,0,0,0,101,
+101,0,0,101,101,0,0,0,0,0,0,0,0,0,0,101,
+101,0,0,0,0,0,0,0,0,0,0,0,0,0,0,101,
+101,0,0,0,0,0,0,0,0,0,0,0,0,0,0,101,
+101,0,0,0,0,0,0,0,0,0,0,0,0,0,0,101,
+101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101
 </data>
  </layer>
- <objectgroup id="5" name="Environment">
-  <object id="7" name="CNOT" type="Laser" x="311.5" y="188">
+ <objectgroup id="2" name="Objects">
+  <object id="10" name="Player" type="Player" gid="206" x="112" y="96" width="16" height="16"/>
+  <object id="12" name="Quball" type="Quball" gid="212" x="144" y="80" width="16" height="16"/>
+  <object id="13" name="X Laser" type="Laser" gid="210" x="64" y="80" width="16" height="16">
    <properties>
-    <property name="Control" value="(19, 12)"/>
-    <property name="Direction" value="Up"/>
+    <property name="Controls" value="(3, 5)"/>
+    <property name="Direction" value="Right"/>
     <property name="Gate" value="X"/>
    </properties>
-   <point/>
   </object>
-  <object id="10" name="Door" type="Door" x="248.5" y="90.5">
+  <object id="18" name="Door" type="Door" x="120.125" y="27.125">
    <properties>
-    <property name="Controls">(14, 7)
-(16, 7)</property>
+    <property name="Controls">(9, 2)
+(10, 2)</property>
    </properties>
    <point/>
   </object>
-  <object id="15" name="Goal" type="Goal" x="248" y="43">
+  <object id="19" name="Door" type="Door" x="134.375" y="26.875">
    <properties>
-    <property name="Requires" type="int" value="3"/>
+    <property name="Controls">(9, 2)
+(10, 2)</property>
    </properties>
    <point/>
   </object>
- </objectgroup>
- <objectgroup id="7" name="Player">
-  <object id="3" name="Player" type="Player" x="184.5" y="188.5">
+  <object id="20" name="Goal" type="Goal" x="120.375" y="27.75">
+   <properties>
+    <property name="Requires" type="int" value="12"/>
+   </properties>
    <point/>
   </object>
- </objectgroup>
- <objectgroup id="6" name="Quballs">
-  <object id="5" name="Quball |1&gt;" type="Quball" x="312" y="235">
+  <object id="21" name="Goal" type="Goal" x="134.875" y="26.375">
+   <properties>
+    <property name="Requires" type="int" value="12"/>
+   </properties>
    <point/>
   </object>
-  <object id="6" name="Quball |0&gt;" type="Quball" x="310.5" y="141.5">
-   <point/>
-  </object>
+  <object id="26" name="Quball" type="Quball" gid="212" x="144" y="96" width="16" height="16"/>
  </objectgroup>
 </map>
