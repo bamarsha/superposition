@@ -84,7 +84,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
         (newUniverses
           |> combine
           |> (_.toSeq)
-          |> (_ sortBy (universe => _stateIds map (universe.state(_).toString))))
+          |> (_ sortBy printUniverse))
       true
     } else false
   }
@@ -148,6 +148,9 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     entities filter QuantumPosition.Mapper.has forall { entity =>
       !isBlocked(universe, universe.state(QuantumPosition.Mapper.get(entity).cell))
     }
+
+  def printUniverse(universe: Universe): List[String] =
+  /*_*/ stateIds.map(id => id.printer(universe.state(id))) /*_*/
 }
 
 /** Contains the component mapper for the multiverse component. */
