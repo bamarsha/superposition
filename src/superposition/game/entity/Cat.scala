@@ -14,9 +14,9 @@ import superposition.math.Vector2
   */
 final class Cat(multiverse: Multiverse, initialCell: Vector2[Int]) extends Entity {
   locally {
-    val alive = multiverse.allocate(true)
+    val alive = multiverse.allocate("Is Alive?", true, (a: Boolean) => if (a) "Alive" else "Dead")
     val absolutePosition = multiverse.allocateMeta((initialCell map (_.toDouble)) + Vector2(0.5, 0.5))
-    val cell = multiverse.allocate(initialCell)
+    val cell = multiverse.allocate("Position", initialCell)
 
     add(new PrimaryBit(alive))
     add(new Player(alive))

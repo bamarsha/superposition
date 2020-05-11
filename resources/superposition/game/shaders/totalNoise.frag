@@ -9,13 +9,8 @@
 //               https://github.com/stegu/webgl-noise
 
 uniform sampler2D u_texture;
-uniform sampler2D totalNoise;
-
-//uniform float minVal;
-//uniform float maxVal;
 uniform float time;
 uniform float probability;
-uniform float hue;
 uniform vec4 color;
 
 varying vec2 texCoords;
@@ -129,9 +124,12 @@ void main() {
         noise += snoise(vec3(texCoords.xy * scale * 15., time / 5.)) / scale;
         scale *= 2.;
     }
-    float total = texture2D(totalNoise, texCoords).r;
-    noise = probability * exp(5. * noise) / total;
+    noise = probability * exp(5. * noise);
+
     vec4 texColor = texture2D(u_texture, texCoords);
-    vec3 tintedColor = mix(hsv2rgb(vec3(hue, 1, 1)), texColor.rgb, .7);
-    gl_FragColor = vec4(tintedColor, texColor.a * noise) * color;
+    if (texColor.a > 1000.) {
+        discard;
+    }
+
+    gl_FragColor = vec4(noise, noise, noise, 1) * color;
 }

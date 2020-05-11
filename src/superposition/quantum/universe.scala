@@ -82,8 +82,9 @@ final case class Universe(
   *
   * @tparam A the type of the qudit
   */
-final class StateId[A] extends DependentKey {
+final class StateId[A](val name: String, _printer: A => String) extends DependentKey {
   type Value = A
+  val printer: Value => String = _printer
 }
 
 /** An opaque identifier corresponding to metadata of a particular type.

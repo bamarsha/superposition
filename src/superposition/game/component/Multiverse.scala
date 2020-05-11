@@ -21,13 +21,16 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
   private var _entities: List[Entity] = List()
 
   /** The list of qudit state IDs in the multiverse. */
-  private var stateIds: List[StateId[_]] = List()
+  private var _stateIds: List[StateId[_]] = List()
 
   /** The universes in the multiverse. */
   def universes: Seq[Universe] = _universes
 
   /** The entities in the multiverse. */
   def entities: Iterable[Entity] = _entities
+
+  /** The list of qudit state IDs in the multiverse. */
+  def stateIds: List[StateId[_]] = _stateIds
 
   /** Adds an entity to the multiverse.
     *
@@ -41,10 +44,10 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     * @tparam A the qudit's type
     * @return the qudit's ID
     */
-  def allocate[A](initialValue: A): StateId[A] = {
-    val id = new StateId[A]
+  def allocate[A](name: String, initialValue: A, printer: A => String = (x: A) => x.toString): StateId[A] = {
+    val id = new StateId[A](name, printer)
     _universes = _universes map (_.updatedState(id)(initialValue))
-    stateIds ::= id
+    _stateIds = _stateIds.appended(id)
     id
   }
 
@@ -81,7 +84,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
         (newUniverses
           |> combine
           |> (_.toSeq)
-          |> (_ sortBy (universe => stateIds.reverse map (universe.state(_).toString))))
+          |> (_ sortBy (universe => _stateIds map (universe.state(_).toString))))
       true
     } else false
   }

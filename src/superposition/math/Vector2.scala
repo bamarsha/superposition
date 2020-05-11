@@ -18,6 +18,8 @@ final case class Vector2[A](x: A, y: A) {
     * @return the mapped vector
     */
   def map[B](f: A => B): Vector2[B] = Vector2(f(x), f(y))
+
+  override def toString: String = s"($x, $y)"
 }
 
 /** Vector operations. */
