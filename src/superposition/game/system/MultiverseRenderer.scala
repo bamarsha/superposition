@@ -20,33 +20,20 @@ final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiv
   /** A shape renderer. */
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
-  /** The shader program used to draw each universe. */
-  private val shader: ShaderProgram = new ShaderProgram(
-    resolve("shaders/universe.vert"),
-    resolve("shaders/universe.frag"))
+  /** The sprite batch. */
+  private val batch: SpriteBatch = new SpriteBatch
 
+  /** The font. */
+  private val font: BitmapFont = new BitmapFont
 
-  private val noiseShader: ShaderProgram = new ShaderProgram(
-    resolve("shaders/universe.vert"),
-    resolve("shaders/totalNoise.frag"))
+  private val universeStep = new PostProcessingStep()
 
-  /** The sprite batch used to draw each universe. */
-  private val batch: SpriteBatch = new SpriteBatch(1000, shader)
+  private val multiverseStep = new PostProcessingStep("universe")
+  multiverseStep.batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE, GL20.GL_ONE)
 
-  private val batch3: SpriteBatch = new SpriteBatch()
+  private val noiseStep = new PostProcessingStep("totalNoise", true)
+  noiseStep.batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE)
 
-  private val batchN: SpriteBatch = new SpriteBatch(1000, noiseShader)
-
-  /** The frame buffer used to draw each universe. */
-  private val buffer: FrameBuffer =
-  // TODO: Resize the frame buffer if the window is resized.
-    new FrameBuffer(RGBA8888, graphics.getWidth, graphics.getHeight, false)
-  private val buffer2: FrameBuffer =
-  // TODO: Resize the frame buffer if the window is resized.
-    new FrameBuffer(RGBA8888, graphics.getWidth, graphics.getHeight, false)
-  private val bufferN: FloatFrameBuffer =
-  // TODO: Resize the frame buffer if the window is resized.
-    new FloatFrameBuffer(graphics.getWidth, graphics.getHeight, false)
 
   /** The elapsed time since the system began. */
   private var time: Float = 0
@@ -89,115 +76,76 @@ final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiv
   def draw(entity: Entity): Unit = {
     val multiverse = Multiverse.Mapper.get(entity)
     val multiverseView = MultiverseView.Mapper.get(entity)
+
+    universeStep.camera = multiverseView.camera
+    multiverseStep.camera = multiverseView.camera
+    noiseStep.camera = multiverseView.camera
+
+    noiseStep.clear()
+    noiseStep.run {
+      var timeOffset = 0f
+      for (universe <- multiverse.universes) {
+        noiseStep.shader.setUniformf("time", time + timeOffset)
+        noiseStep.shader.setUniformf("probability", universe.amplitude.squaredMagnitude.toFloat)
+        multiverseStep.drawTo(noiseStep.batch)
+        noiseStep.batch.flush()
+        timeOffset += 10
+      }
+    }
+
+    multiverseStep.clear()
+
     var minValue = 0f
-
-    buffer2.begin()
-    gl.glClearColor(0, 0, 0, 0)
-    gl.glClear(GL_COLOR_BUFFER_BIT)
-    buffer2.end()
-
-    bufferN.begin()
-    gl.glClearColor(0, 0, 0, 0)
-    gl.glClear(GL_COLOR_BUFFER_BIT)
-    batchN.setProjectionMatrix(multiverseView.camera.combined)
-    batchN.begin()
-    batchN.enableBlending()
-    batchN.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE)
-    var i = 0f
+    var timeOffset = 0
     for (universe <- multiverse.universes) {
-      noiseShader.setUniformf("time", time + i)
-      noiseShader.setUniformf("probability", universe.amplitude.squaredMagnitude.toFloat)
-      noiseShader.setUniform4fv("color", Array(1, 1-i/10, i/10, 1), 0, 4)
-      i += 10
-      batchN.draw(buffer2.getColorBufferTexture, 0, multiverseView.camera.viewportHeight,
-                  multiverseView.camera.viewportWidth, -multiverseView.camera.viewportHeight)
-      batchN.flush()
-    }
-    batchN.end()
-    bufferN.end()
-
-    i = 0
-    for (universe <- multiverse.universes) {
-      buffer.begin()
-      gl.glClearColor(0, 0, 0, 0)
-      gl.glClear(GL_COLOR_BUFFER_BIT)
+      universeStep.clear()
+      universeStep.buffer.begin()
       multiverseView.drawAll(universe)
-      buffer.end()
+      universeStep.buffer.end()
 
-      drawBuffer(multiverseView.camera, minValue, i, universe.amplitude.squaredMagnitude.toFloat, universe.amplitude.phase.toFloat)
-      minValue += universe.amplitude.squaredMagnitude.toFloat
-      i += 10
+      val probability = universe.amplitude.squaredMagnitude.toFloat
+      multiverseStep.run {
+        multiverseStep.shader.setUniformf("time", time + timeOffset)
+        multiverseStep.shader.setUniformf("probability", probability)
+        multiverseStep.shader.setUniformf("hue", minValue)
+        multiverseStep.shader.setUniformi("totalNoise", 1)
+        noiseStep.buffer.getColorBufferTexture.bind(1)
+        gl.glActiveTexture(GL20.GL_TEXTURE0)
+        universeStep.drawTo(multiverseStep.batch)
+      }
+
+      minValue += probability
+      timeOffset += 10
     }
 
-    batch3.setProjectionMatrix(multiverseView.camera.combined)
-    batch3.begin()
-    batch3.setColor(1, 1, 1, 1)
-    batch3.draw(buffer2.getColorBufferTexture, 0, multiverseView.camera.viewportHeight,
-                multiverseView.camera.viewportWidth, -multiverseView.camera.viewportHeight)
-//    batch3.setColor(1, 1, 1, .91f)
-//    batch3.draw(bufferN.getColorBufferTexture, 0, multiverseView.camera.viewportHeight,
-//                multiverseView.camera.viewportWidth, -multiverseView.camera.viewportHeight)
-    batch3.end()
+    batch.setProjectionMatrix(multiverseView.camera.combined)
+    batch.begin()
+    batch.setColor(1, 1, 1, 1)
+    multiverseStep.drawTo(batch)
+    batch.end()
 
     multiverseView.emptyDrawingQueue()
   }
 
-  /** The sprite batch. */
-  private val batch2: SpriteBatch = new SpriteBatch
-
-  /** The font. */
-  private val font2: BitmapFont = new BitmapFont
-
   def drawState(entity: Entity): Unit = {
     val multiverse = Multiverse.Mapper.get(entity)
 
-    batch2.begin()
+    batch.begin()
     var x = 10f
     for (id <- multiverse.stateIds) {
       var y = 45f
       var maxWidth = 0f
 
       for (universe <- multiverse.universes) {
-        val g = font2.draw(batch2, id.printer(universe.state(id)), x, y)
+        val g = font.draw(batch, id.printer(universe.state(id)), x, y)
         maxWidth = math.max(maxWidth, g.width)
         y += 20
       }
-      val g = font2.draw(batch2, id.name, x, y)
+      val g = font.draw(batch, id.name, x, y)
       maxWidth = math.max(maxWidth, g.width)
       y += 20
       x += maxWidth + 10
     }
-    batch2.end()
-  }
-
-  /** Draws the contents of the buffer with the shader applied.
-    *
-    * @param minValue the lower bound of the shader interval assigned to the universe
-    * @param maxValue the upper bound of the shader interval assigned to the universe
-    * @param phase the phase of the universe
-    */
-  private def drawBuffer(camera: Camera, minValue: Float, timeOffset: Float, probability: Float, phase: Float): Unit = {
-    def drawBatch(action: () => Unit): Unit = {
-      batch.begin()
-      action()
-      batch.draw(buffer.getColorBufferTexture, 0, camera.viewportHeight, camera.viewportWidth, -camera.viewportHeight)
-      batch.end()
-    }
-
-    buffer2.begin()
-    batch.setProjectionMatrix(camera.combined)
-    batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE, GL20.GL_ONE)
-    drawBatch { () =>
-      shader.setUniformf("time", time + timeOffset)
-      shader.setUniformf("probability", probability)
-      shader.setUniformf("hue", minValue)
-      shader.setUniform4fv("color", Array(1, 1, 1, 1), 0, 4)
-
-      shader.setUniformi("totalNoise", 1)
-      bufferN.getColorBufferTexture.bind(1)
-      gl.glActiveTexture(GL20.GL_TEXTURE0)
-    }
-    batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
-    buffer2.end()
+    batch.end()
   }
 }

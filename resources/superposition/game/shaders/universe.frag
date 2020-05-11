@@ -16,7 +16,6 @@ uniform sampler2D totalNoise;
 uniform float time;
 uniform float probability;
 uniform float hue;
-uniform vec4 color;
 
 varying vec2 texCoords;
 
@@ -133,5 +132,5 @@ void main() {
     noise = probability * exp(5. * noise) / total;
     vec4 texColor = texture2D(u_texture, texCoords);
     vec3 tintedColor = mix(hsv2rgb(vec3(hue, 1, 1)), texColor.rgb, .7);
-    gl_FragColor = vec4(tintedColor, texColor.a * noise) * color;
+    gl_FragColor = vec4(tintedColor, texColor.a * noise);
 }

@@ -11,7 +11,6 @@
 uniform sampler2D u_texture;
 uniform float time;
 uniform float probability;
-uniform vec4 color;
 
 varying vec2 texCoords;
 
@@ -131,5 +130,5 @@ void main() {
         discard;
     }
 
-    gl_FragColor = vec4(noise, noise, noise, 1) * color;
+    gl_FragColor = vec4(noise, noise, noise, 1);
 }
