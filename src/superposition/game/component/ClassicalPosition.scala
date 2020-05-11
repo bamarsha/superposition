@@ -6,9 +6,12 @@ import superposition.math.Vector2
 /** The classical position component has a position that does not depend on which universe the entity is in.
   *
   * @param absolute the absolute position in camera coordinates
-  * @param cell the cell position in grid coordinates
+  * @param cells the cell positions in grid coordinates
   */
-final class ClassicalPosition(val absolute: Vector2[Double], val cell: Vector2[Int]) extends Component
+final class ClassicalPosition(
+    val absolute: Vector2[Double] = Vector2(0, 0),
+    val cells: Set[Vector2[Int]] = Set.empty)
+  extends Component
 
 /** Contains the component mapper for the classical position component. */
 object ClassicalPosition {

@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.{Filled, Line}
-import superposition.game.component.{Beam, ClassicalPosition, Multiverse, MultiverseView}
+import superposition.game.component.{Beam, ClassicalPosition, Multiverse}
 import superposition.game.entity.Level
 import superposition.game.system.LaserSystem.{beamHits, beamTarget, drawBeam, drawOutline}
 import superposition.math.Direction.{Down, Left, Right, Up}
@@ -28,7 +28,7 @@ final class LaserSystem(level: () => Option[Level])
 
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
     val beam = Beam.Mapper.get(entity)
-    val cell = ClassicalPosition.Mapper.get(entity).cell
+    val cell = ClassicalPosition.Mapper.get(entity).cells.head
     val multiverse = level().get.multiverse
     val multiverseView = level().get.multiverseView
 
@@ -48,7 +48,7 @@ final class LaserSystem(level: () => Option[Level])
     shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
     multiverseView.enqueueDrawing { universe =>
       if (multiverseView.isSelected(cell)) {
-        drawOutline(multiverseView, shapeRenderer, entity)
+        drawOutline(shapeRenderer, cell)
       }
       drawBeam(shapeRenderer, entity, universe)
     }
@@ -72,7 +72,7 @@ private object LaserSystem {
     * @return the cells in the path of the laser beam
     */
   private def beamPath(entity: Entity): Seq[Vector2[Int]] = {
-    val source = ClassicalPosition.Mapper.get(entity).cell
+    val source = ClassicalPosition.Mapper.get(entity).cells.head
     val direction = Beam.Mapper.get(entity).direction
     LazyList.iterate(source)(_ + direction.toVector2).tail.take(BeamLength)
   }
@@ -104,14 +104,12 @@ private object LaserSystem {
     (beamTarget(multiverse, entity)(universe).iterator.to(Seq)
       flatMap (cell => multiverse.primaryBits(universe, cell)))
 
-  /** Draws an outline around the laser.
+  /** Draws an outline around a cell.
     *
-    * @param multiverseView the multiverse view
     * @param shapeRenderer a shape renderer
-    * @param entity the laser
+    * @param cell the cell
     */
-  private def drawOutline(multiverseView: MultiverseView, shapeRenderer: ShapeRenderer, entity: Entity): Unit = {
-    val cell = ClassicalPosition.Mapper.get(entity).cell
+  private def drawOutline(shapeRenderer: ShapeRenderer, cell: Vector2[Int]): Unit = {
     shapeRenderer.begin(Line)
     shapeRenderer.setColor(RED)
     shapeRenderer.rect(cell.x, cell.y, 1, 1)
@@ -125,7 +123,7 @@ private object LaserSystem {
     * @param universe the universe
     */
   private def drawBeam(shapeRenderer: ShapeRenderer, entity: Entity, universe: Universe): Unit = {
-    val source = ClassicalPosition.Mapper.get(entity).cell
+    val source = ClassicalPosition.Mapper.get(entity).cells.head
     val beam = Beam.Mapper.get(entity)
     for (target <- universe.meta(beam.lastTarget)
          if universe.meta(beam.elapsedTime) <= BeamDuration + FadeDuration) {

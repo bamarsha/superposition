@@ -26,7 +26,7 @@ final class Laser(
     direction: Direction,
     controls: Iterable[Vector2[Int]])
   extends Entity {
-  add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5), cell))
+  add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5), Set(cell)))
   add(new Collider(const(Set(cell))))
   add(new Beam(multiverse, gate, direction, controls))
   add(new SpriteView(texture = const(Textures(direction)), layer = -1, scale = const(Vector2(0, 0))))
