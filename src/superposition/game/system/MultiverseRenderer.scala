@@ -3,17 +3,14 @@ package superposition.game.system
 import com.badlogic.ashley.core._
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.{gl, graphics}
-import com.badlogic.gdx.graphics.{Camera, Color, GL20}
-import com.badlogic.gdx.graphics.GL20.{GL_BLEND, GL_COLOR_BUFFER_BIT}
-import com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.g2d.{BitmapFont, SpriteBatch}
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import com.badlogic.gdx.graphics.glutils.{FloatFrameBuffer, FrameBuffer, ShaderProgram, ShapeRenderer}
-import superposition.game.ResourceResolver.resolve
+import com.badlogic.gdx.math.Matrix4
 import superposition.game.component._
 import superposition.graphics.PostProcessingStep
-
-import scala.math.Pi
 
 /** The multiverse renderer. */
 final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiverse], classOf[MultiverseView]).get) {
@@ -120,7 +117,6 @@ final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiv
 
     batch.setProjectionMatrix(multiverseView.camera.combined)
     batch.begin()
-    batch.setColor(1, 1, 1, 1)
     multiverseStep.drawTo(batch)
     batch.end()
 
@@ -130,6 +126,7 @@ final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiv
   def drawState(entity: Entity): Unit = {
     val multiverse = Multiverse.Mapper.get(entity)
 
+    batch.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, graphics.getWidth(), graphics.getHeight()))
     batch.begin()
     var x = 10f
     for (id <- multiverse.stateIds) {
