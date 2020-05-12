@@ -18,8 +18,6 @@ libraryDependencies ++= {
 libraryDependencies += "com.badlogicgames.ashley" % "ashley" % "1.7.3"
 
 assemblyMergeStrategy in assembly := {
-  case PathList("META-INF", "versions", "9", "module-info.class") => MergeStrategy.discard
-  case path =>
-    val strategy = (assemblyMergeStrategy in assembly).value
-    strategy(path)
+  case PathList("META-INF", "versions", "9", "module-info.class") => MergeStrategy.first
+  case path => (assemblyMergeStrategy in assembly).value(path)
 }
