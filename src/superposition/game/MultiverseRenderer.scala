@@ -1,7 +1,6 @@
-package superposition.game.system
+package superposition.game
 
 import com.badlogic.ashley.core._
-import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.{gl, graphics}
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.g2d.{BitmapFont, GlyphLayout, SpriteBatch}
@@ -12,8 +11,8 @@ import com.badlogic.gdx.math.Matrix4
 import superposition.game.component._
 import superposition.graphics.PostProcessingStep
 
-/** The multiverse renderer. */
-final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiverse], classOf[MultiverseView]).get) {
+/** Renders the multiverse. */
+private final class MultiverseRenderer extends Renderer {
   /** A shape renderer. */
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
@@ -31,11 +30,12 @@ final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiv
   private val noiseStep = new PostProcessingStep("totalNoise", true)
   noiseStep.batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE)
 
-
   /** The elapsed time since the system began. */
   private var time: Float = 0
 
-  override def processEntity(entity: Entity, deltaTime: Float): Unit = {
+  override val family: Family = Family.all(classOf[Multiverse], classOf[MultiverseView]).get
+
+  override def render(entity: Entity, deltaTime: Float): Unit = {
     time += deltaTime
     highlightOccupiedCells(entity)
     draw(entity)
@@ -70,7 +70,7 @@ final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiv
     *
     * @param entity the multiverse entity
     */
-  def draw(entity: Entity): Unit = {
+  private def draw(entity: Entity): Unit = {
     val multiverse = Multiverse.Mapper.get(entity)
     val multiverseView = MultiverseView.Mapper.get(entity)
 
@@ -123,7 +123,7 @@ final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiv
     multiverseView.emptyDrawingQueue()
   }
 
-  def drawState(entity: Entity): Unit = {
+  private def drawState(entity: Entity): Unit = {
     val multiverse = Multiverse.Mapper.get(entity)
 
     val header = multiverse.stateIds.map(_.name)
@@ -142,7 +142,7 @@ final class MultiverseRenderer extends IteratingSystem(Family.all(classOf[Multiv
     shapeRenderer.setProjectionMatrix(new Matrix4().setToOrtho2D(0, 0, graphics.getWidth(), graphics.getHeight()))
     shapeRenderer.begin(ShapeType.Filled)
     for ((y, minValue) <- ys.zip(None +: minValues.map(Some(_)))) {
-      val color = new Color().fromHsv(minValue.map(_ * 360f).getOrElse(0f), if (minValue.isDefined) 1 else 0, 1);
+      val color = new Color().fromHsv(minValue.map(_ * 360f).getOrElse(0f), if (minValue.isDefined) 1 else 0, 1)
       color.a = .5f
       shapeRenderer.setColor(color)
       shapeRenderer.rect(12f, y + 2, widths.sum - 2, -16)

@@ -1,23 +1,29 @@
 package superposition.game.component
 
-import com.badlogic.ashley.core.{Component, ComponentMapper}
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.maps.tiled.TiledMap
+import com.badlogic.ashley.core.{Component, ComponentMapper, Entity}
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 
-/** The map view component stores a renderer for a tile map.
+/** The map view component contains a renderer for a tile map.
   *
-  * @param map the tile map to render
-  * @param camera the camera with which to view the tile map
+  * @param renderer the tile map renderer
+  * @param layers the tile map layer indices to render
   */
-final class MapView(map: TiledMap, camera: OrthographicCamera) extends Component {
-  /** The tile map renderer. */
-  val renderer: OrthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(map, 1 / 16f)
-  renderer.setView(camera)
-}
+final class MapView(val renderer: OrthogonalTiledMapRenderer, val layers: Array[Int]) extends Component
 
 /** Contains the component mapper for the map view component. */
 object MapView {
   /** The component mapper for the map view component. */
   val Mapper: ComponentMapper[MapView] = ComponentMapper.getFor(classOf[MapView])
+
+  /** Creates a renderable map view entity.
+    *
+    * @param renderer the tile map renderer
+    * @param renderableLayer the renderable layer to render the tile map in
+    * @param mapLayers the tile map layer indices to render
+    * @return the renderable map view entity
+    */
+  def makeEntity(renderer: OrthogonalTiledMapRenderer, renderableLayer: Int, mapLayers: Array[Int]): Entity =
+    (new Entity)
+      .add(new Renderable(renderableLayer))
+      .add(new MapView(renderer, mapLayers))
 }

@@ -1,4 +1,4 @@
-package superposition.game.system
+package superposition.game
 
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.gdx.Gdx.gl
@@ -6,46 +6,46 @@ import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.{Filled, Line}
+import superposition.game.BeamRenderer.{drawBeam, drawOutline}
 import superposition.game.component.{Beam, ClassicalPosition}
 import superposition.game.entity.Level
-import superposition.game.system.RenderingSystem.RenderingAction
 import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math.Vector2
 import superposition.quantum.Universe
 
 import scala.math.min
 
-/** Renders laser beams. */
-object BeamRenderer {
-  /** The component family used by the beam renderer. */
-  val BeamRendererFamily: Family = Family.all(classOf[Beam], classOf[ClassicalPosition]).get
+/** Renders laser beams.
+  *
+  * @param level a function that returns the current level
+  */
+private final class BeamRenderer(level: () => Option[Level]) extends Renderer {
+  // TODO: ShapeRenderer is disposable.
+  /** A shape renderer. */
+  private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
+  override val family: Family = Family.all(classOf[Beam], classOf[ClassicalPosition]).get
+
+  override def render(entity: Entity, deltaTime: Float): Unit = {
+    val multiverseView = level().get.multiverseView
+    val cell = ClassicalPosition.Mapper.get(entity).cells.head
+    shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
+    multiverseView.enqueueDrawing { universe =>
+      if (multiverseView.isSelected(cell)) {
+        drawOutline(shapeRenderer, cell)
+      }
+      drawBeam(shapeRenderer, entity, universe)
+    }
+  }
+}
+
+/** Functions for rendering laser beams. */
+private object BeamRenderer {
   /** The amount of time that the laser beam shines at full intensity. */
   private val BeamDuration: Double = 0.2
 
   /** The amount of time that the laser beam takes to fade away. */
   private val FadeDuration: Double = 0.3
-
-  /** Renders a beam for an entity.
-    *
-    * @param level a function that returns the current level
-    * @return the rendering action
-    */
-  def renderBeam(level: () => Option[Level]): RenderingAction = {
-    // TODO: ShapeRenderer is disposable.
-    val shapeRenderer = new ShapeRenderer
-    entity => {
-      val multiverseView = level().get.multiverseView
-      val cell = ClassicalPosition.Mapper.get(entity).cells.head
-      shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
-      multiverseView.enqueueDrawing { universe =>
-        if (multiverseView.isSelected(cell)) {
-          drawOutline(shapeRenderer, cell)
-        }
-        drawBeam(shapeRenderer, entity, universe)
-      }
-    }
-  }
 
   /** Draws an outline around a cell.
     *

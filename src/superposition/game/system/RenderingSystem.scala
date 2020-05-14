@@ -2,26 +2,24 @@ package superposition.game.system
 
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.ashley.systems.SortedIteratingSystem
+import superposition.game.Renderer
 import superposition.game.component.Renderable
-import superposition.game.system.RenderingSystem.{RenderingAction, compareLayers}
+import superposition.game.system.RenderingSystem.compareLayers
 
-/** The rendering system uses the collection of renderers to render all renderable entities.
+/** The rendering system uses the renderers to render all renderable entities.
   *
-  * @param renderers the collection of rendering actions and their corresponding component families
+  * @param renderers the renderers
   */
-final class RenderingSystem(renderers: Iterable[(Family, RenderingAction)])
+final class RenderingSystem(renderers: Iterable[Renderer])
   extends SortedIteratingSystem(Family.all(classOf[Renderable]).get, compareLayers) {
   override def processEntity(entity: Entity, deltaTime: Float): Unit =
-    for ((family, render) <- renderers if family.matches(entity)) {
-      render(entity)
+    for (renderer <- renderers if renderer.family.matches(entity)) {
+      renderer.render(entity, deltaTime)
     }
 }
 
-/** Types and functions for the rendering system. */
-object RenderingSystem {
-  /** A rendering action is a function that accepts an entity and renders it to the screen. */
-  type RenderingAction = Entity => Unit
-
+/** Functions for the rendering system. */
+private object RenderingSystem {
   /** Compares the layers of both entities and returns an integer whose sign indicates the result.
     *
     * @param entity1 the first entity
