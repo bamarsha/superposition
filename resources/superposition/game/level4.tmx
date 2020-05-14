@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="32" height="18" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="21">
+<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="32" height="18" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="22">
  <tileset firstgid="1" name="spritesheet" tilewidth="16" tileheight="16" tilecount="16" columns="4">
   <image source="sprites/spritesheet.png" width="64" height="64"/>
  </tileset>
@@ -64,12 +64,6 @@
    </properties>
    <point/>
   </object>
-  <object id="18" name="Goal" type="Goal" x="248.5" y="45">
-   <properties>
-    <property name="Requires" type="int" value="17"/>
-   </properties>
-   <point/>
-  </object>
   <object id="20" name="X" type="Laser" x="310.5" y="187.5">
    <properties>
     <property name="Direction" value="Down"/>
@@ -77,6 +71,7 @@
    </properties>
    <point/>
   </object>
+  <object id="21" name="Exit" type="Exit" x="239.892" y="32.688" width="15.6686" height="14.8582"/>
  </objectgroup>
  <objectgroup id="7" name="Player">
   <object id="17" name="Player" type="Player" x="248.5" y="236.5">
