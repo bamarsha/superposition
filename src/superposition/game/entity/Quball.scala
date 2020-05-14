@@ -26,11 +26,11 @@ final class Quball(multiverse: Multiverse, initialCell: Vector2[Int]) extends En
     add(new PrimaryBit(onOff))
     add(new Activator(onOff))
     add(new Carried(carried))
+    add(new Renderable(1))
     add(new SpriteView(
       texture = universe => if (universe.state(onOff)) QuballTextureOn else QuballTextureOff,
       scale = universe => Vector2(1d, 1d) * (if (universe.state(carried)) .5 else .75),
-      color = const(WHITE),
-      layer = 1))
+      color = const(WHITE)))
   }
 }
 

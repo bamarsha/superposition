@@ -18,9 +18,10 @@ final class Cat(multiverse: Multiverse, initialCell: Vector2[Int]) extends Entit
     val absolutePosition = multiverse.allocateMeta((initialCell map (_.toDouble)) + Vector2(0.5, 0.5))
     val cell = multiverse.allocate("Position", initialCell)
 
-    add(new PrimaryBit(alive))
     add(new Player(alive))
     add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))
+    add(new PrimaryBit(alive))
+    add(new Renderable)
     add(new SpriteView(texture = universe => if (universe.state(alive)) CatTextureAlive else CatTextureDead))
   }
 }
