@@ -1,10 +1,10 @@
-package superposition.game
+package superposition.graphics
 
-import com.badlogic.ashley.core._
+import com.badlogic.ashley.core.{Entity, Family}
 import superposition.game.component.MapView
 
 /** Renders tile maps. */
-private object MapRenderer extends Renderer {
+object MapRenderer extends Renderer {
   override val family: Family = Family.all(classOf[MapView]).get
 
   override def render(entity: Entity, deltaTime: Float): Unit = {

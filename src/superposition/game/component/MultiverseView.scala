@@ -4,8 +4,8 @@ import com.badlogic.ashley.core.{Component, ComponentMapper}
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.math.Vector3
-import superposition.game.UniverseRenderParams
 import superposition.game.component.MultiverseView.UniversePartRenderer
+import superposition.graphics.UniverseRenderParams
 import superposition.math.Vector2
 import superposition.quantum.Universe
 

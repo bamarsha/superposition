@@ -2,9 +2,9 @@ package superposition.game.system
 
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.ashley.systems.SortedIteratingSystem
-import superposition.game.Renderer
 import superposition.game.component.Renderable
 import superposition.game.system.RenderingSystem.compareLayers
+import superposition.graphics.Renderer
 
 /** The rendering system uses the renderers to render all renderable entities.
   *

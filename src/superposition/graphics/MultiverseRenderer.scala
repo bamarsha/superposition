@@ -1,4 +1,4 @@
-package superposition.game
+package superposition.graphics
 
 import com.badlogic.ashley.core._
 import com.badlogic.gdx.Gdx.{gl, graphics}
@@ -9,10 +9,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.graphics.{Color, GL20}
 import com.badlogic.gdx.math.Matrix4
 import superposition.game.component._
-import superposition.graphics.PostProcessingStep
 
 /** Renders the multiverse. */
-private final class MultiverseRenderer extends Renderer {
+final class MultiverseRenderer extends Renderer {
   /** A shape renderer. */
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
@@ -97,7 +96,7 @@ private final class MultiverseRenderer extends Renderer {
     for (universe <- multiverse.universes) {
       universeStep.clear()
       universeStep.buffer.begin()
-      multiverseView.render(universe, UniverseRenderParams((new Color).fromHsv(minValue * 360f, 1, 1)))
+      multiverseView.render(universe, UniverseRenderParams(new Color(1, 1, 1, .3f).fromHsv(minValue * 360f, 1, 1)))
       universeStep.buffer.end()
 
       val probability = universe.amplitude.squaredMagnitude.toFloat

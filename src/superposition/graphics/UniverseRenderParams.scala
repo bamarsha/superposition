@@ -1,4 +1,4 @@
-package superposition.game
+package superposition.graphics
 
 import com.badlogic.gdx.graphics.Color
 
@@ -6,4 +6,4 @@ import com.badlogic.gdx.graphics.Color
   *
   * @param color the color of the universe
   */
-private final case class UniverseRenderParams(color: Color)
+final case class UniverseRenderParams(color: Color)

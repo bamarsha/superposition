@@ -131,6 +131,6 @@ void main() {
     float total = texture2D(totalNoise, texCoords).r;
     noise = probability * exp(5. * noise) / total;
     vec4 texColor = texture2D(u_texture, texCoords);
-    vec3 tintedColor = mix(hsv2rgb(vec3(hue, 1, 1)), texColor.rgb, .7);
+    vec3 tintedColor = mix(hsv2rgb(vec3(hue, 1, 1)), texColor.rgb, .99999);
     gl_FragColor = vec4(tintedColor, texColor.a * noise);
 }
