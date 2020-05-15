@@ -103,7 +103,6 @@ final class MultiverseRenderer extends Renderer {
       multiverseStep.run {
         multiverseStep.shader.setUniformf("time", time + timeOffset)
         multiverseStep.shader.setUniformf("probability", probability)
-        multiverseStep.shader.setUniformf("hue", minValue)
         multiverseStep.shader.setUniformi("totalNoise", 1)
         noiseStep.buffer.getColorBufferTexture.bind(1)
         gl.glActiveTexture(GL20.GL_TEXTURE0)

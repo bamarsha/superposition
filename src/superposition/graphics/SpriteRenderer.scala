@@ -17,7 +17,6 @@ final class SpriteRenderer(level: () => Option[Level]) extends Renderer {
   private val shader: ShaderProgram = new ShaderProgram(
     resolve("shaders/sprite.vert"),
     resolve("shaders/spriteMixColor.frag"))
-
   assert(shader.isCompiled)
 
   // TODO: SpriteBatch is disposable.

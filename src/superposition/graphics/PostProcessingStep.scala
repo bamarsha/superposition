@@ -13,6 +13,7 @@ class PostProcessingStep(fragShaderName: String = "sprite", useFloats: Boolean =
   val shader: ShaderProgram = new ShaderProgram(
     resolve("shaders/sprite.vert"),
     resolve("shaders/" + fragShaderName + ".frag"))
+  assert(shader.isCompiled)
 
   val batch: SpriteBatch = new SpriteBatch(1000, shader)
 
