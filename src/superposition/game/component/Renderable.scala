@@ -6,7 +6,7 @@ import com.badlogic.ashley.core.{Component, ComponentMapper}
   *
   * @param layer the layer to render in
   */
-final class Renderable(val layer: Int = 0) extends Component
+final class Renderable(val layer: Int) extends Component
 
 /** Contains the component mapper for the renderable component. */
 object Renderable {

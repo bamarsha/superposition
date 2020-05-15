@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.{Filled, Line}
-import superposition.game.BeamRenderer.{drawBeam, drawOutline}
-import superposition.game.component.{Beam, ClassicalPosition}
+import superposition.game.BeamRenderer.{dependentState, drawBeam, drawOutline}
+import superposition.game.component.{Beam, ClassicalPosition, Multiverse}
 import superposition.game.entity.Level
 import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math.Vector2
@@ -28,9 +28,10 @@ private final class BeamRenderer(level: () => Option[Level]) extends Renderer {
 
   override def render(entity: Entity, deltaTime: Float): Unit = {
     val multiverseView = level().get.multiverseView
-    val cell = ClassicalPosition.Mapper.get(entity).cells.head
     shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
-    multiverseView.enqueueDrawing { universe =>
+    val multiverse = level().get.multiverse
+    val cell = ClassicalPosition.Mapper.get(entity).cells.head
+    multiverseView.enqueueRenderer(dependentState(multiverse, entity)) { (universe, _) =>
       if (multiverseView.isSelected(cell)) {
         drawOutline(shapeRenderer, cell)
       }
@@ -46,6 +47,16 @@ private object BeamRenderer {
 
   /** The amount of time that the laser beam takes to fade away. */
   private val FadeDuration: Double = 0.3
+
+  /** Returns the value of the quantum state that the sprite renderer depends on.
+    *
+    * @param multiverse the multiverse
+    * @param entity the entity
+    * @param universe the universe
+    * @return the value of the dependent state
+    */
+  private def dependentState(multiverse: Multiverse, entity: Entity)(universe: Universe): Any =
+    multiverse.allOn(universe, Beam.Mapper.get(entity).controls)
 
   /** Draws an outline around a cell.
     *

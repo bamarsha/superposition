@@ -9,6 +9,7 @@ import superposition.game.component.{MapView, Multiverse, MultiverseView, Render
 import superposition.game.entity.Level.walls
 import superposition.math.Vector2
 
+import scala.Function.const
 import scala.jdk.CollectionConverters._
 
 /** A quantum level with a multiverse and tile map.
