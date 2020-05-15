@@ -29,7 +29,7 @@ final class Laser(
   add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5), Set(cell)))
   add(new Collider(const(Set(cell))))
   add(new Beam(multiverse, gate, direction, controls))
-  add(new Renderable(-1))
+  add(new Renderable(-1, multiverse.allOn(_, controls)))
   add(new SpriteView(texture = const(Textures(direction)), scale = const(Vector2(0, 0))))
 }
 

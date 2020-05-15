@@ -32,7 +32,7 @@ final class Level(map: TiledMap) extends Entity {
 
   add(multiverse)
   add(multiverseView)
-  add(new Renderable(1))
+  add(new Renderable(1, const(())))
 
   /** The tile map renderer. */
   private val mapRenderer: OrthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(map, 1 / 16f)
