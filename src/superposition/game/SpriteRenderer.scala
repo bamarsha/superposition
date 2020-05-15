@@ -2,8 +2,8 @@ package superposition.game
 
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import superposition.game.SpriteRenderer.{dependentState, draw}
-import superposition.game.component.{ClassicalPosition, QuantumPosition, SpriteView}
+import superposition.game.SpriteRenderer.draw
+import superposition.game.component.{ClassicalPosition, QuantumPosition, Renderable, SpriteView}
 import superposition.game.entity.Level
 import superposition.math.Vector2
 import superposition.quantum.Universe
@@ -22,7 +22,7 @@ private final class SpriteRenderer(level: () => Option[Level]) extends Renderer 
   override def render(entity: Entity, deltaTime: Float): Unit = {
     val multiverseView = level().get.multiverseView
     batch.setProjectionMatrix(multiverseView.camera.combined)
-    multiverseView.enqueueRenderer(dependentState(entity)) { (universe, _) =>
+    multiverseView.enqueueRenderer(Renderable.Mapper.get(entity).dependentState) { (universe, _) =>
       batch.begin()
       draw(batch, entity, universe)
       batch.end()
@@ -31,20 +31,6 @@ private final class SpriteRenderer(level: () => Option[Level]) extends Renderer 
 }
 
 private object SpriteRenderer {
-  /** Returns the value of the quantum state that the sprite renderer depends on.
-    *
-    * @param entity the entity
-    * @param universe the universe
-    * @return the value of the dependent state
-    */
-  private def dependentState(entity: Entity)(universe: Universe): Any = {
-    val spriteView = SpriteView.Mapper.get(entity)
-    (absolutePosition(entity, universe),
-      spriteView.texture(universe),
-      spriteView.color(universe),
-      spriteView.scale(universe))
-  }
-
   /** Draws the entity's sprite.
     *
     * @param batch the sprite batch to draw in

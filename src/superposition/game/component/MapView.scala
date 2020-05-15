@@ -26,6 +26,6 @@ object MapView {
     */
   def makeEntity(renderer: OrthogonalTiledMapRenderer, renderableLayer: Int, mapLayers: Array[Int]): Entity =
     (new Entity)
-      .add(new Renderable(renderableLayer))
+      .add(new Renderable(renderableLayer, const(())))
       .add(new MapView(renderer, mapLayers))
 }
