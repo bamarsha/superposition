@@ -14,13 +14,11 @@ import scala.Function.const
   * @param texture the sprite texture
   * @param scale the sprite scale
   * @param color the sprite color
-  * @param layer the sprite layer
   */
 final class SpriteView(
     val texture: Universe => Texture,
     val scale: Universe => Vector2[Double] = const(Vector2(1, 1)),
-    val color: Universe => Color = const(WHITE),
-    val layer: Int = 0)
+    val color: Universe => Color = const(WHITE))
   extends Component {
 
   /** Draws the sprite.
@@ -41,8 +39,8 @@ final class SpriteView(
   }
 }
 
-/** Contains the component mapper for the quantum position component. */
+/** Contains the component mapper for the sprite view component. */
 object SpriteView {
-  /** The component mapper for the quantum position component. */
+  /** The component mapper for the sprite view component. */
   val Mapper: ComponentMapper[SpriteView] = ComponentMapper.getFor(classOf[SpriteView])
 }

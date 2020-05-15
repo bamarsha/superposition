@@ -14,11 +14,10 @@ import superposition.math.Vector2
   * @param controls the control cells for the door
   */
 final class Door(multiverse: Multiverse, cell: Vector2[Int], controls: Iterable[Vector2[Int]]) extends Entity {
-  add(new Collider(universe => if (multiverse.allOn(universe, controls)) Set.empty else Set(cell)))
   add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5)))
-  add(new SpriteView(
-    texture = universe => if (multiverse.allOn(universe, controls)) OpenTexture else ClosedTexture,
-    layer = -1))
+  add(new Collider(universe => if (multiverse.allOn(universe, controls)) Set.empty else Set(cell)))
+  add(new Renderable(-1))
+  add(new SpriteView(universe => if (multiverse.allOn(universe, controls)) OpenTexture else ClosedTexture))
 }
 
 /** Contains the sprite textures for doors. */

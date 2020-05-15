@@ -20,12 +20,15 @@ private final class Superposition extends Game {
     val levels = new LevelPlaylist(engine)
     levels.appendAll(new TmxMapLoader(ResourceResolver), Playlist)
     levels.play()
+
     engine.addSystem(new LevelSystem(levels))
-    engine.addSystem(new MapRenderer)
-    engine.addSystem(new MultiverseRenderer)
     engine.addSystem(new PlayerInputSystem(() => levels.current))
-    engine.addSystem(new LaserSystem(() => levels.current))
-    engine.addSystem(new SpriteRenderer(() => levels.current))
+    engine.addSystem(new LaserInputSystem(() => levels.current))
+    engine.addSystem(new RenderingSystem(Iterable(
+      MapRenderer,
+      new SpriteRenderer(() => levels.current),
+      new BeamRenderer(() => levels.current),
+      new MultiverseRenderer)))
     engine.addSystem(new DebugInfoSystem(() => renderNanoTime))
   }
 

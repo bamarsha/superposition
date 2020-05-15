@@ -64,6 +64,7 @@ private object LevelPlaylist {
     */
   private def addLevel(engine: Engine)(level: Level): Unit = {
     engine.addEntity(level)
+    level.mapLayers.foreach(engine.addEntity)
     level.getComponent(classOf[Multiverse]).entities.foreach(engine.addEntity)
   }
 
@@ -74,6 +75,7 @@ private object LevelPlaylist {
     */
   private def removeLevel(engine: Engine)(level: Level): Unit = {
     level.getComponent(classOf[Multiverse]).entities.foreach(engine.removeEntity)
+    level.mapLayers.foreach(engine.removeEntity)
     engine.removeEntity(level)
   }
 

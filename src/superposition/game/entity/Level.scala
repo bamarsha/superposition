@@ -3,8 +3,9 @@ package superposition.game.entity
 import com.badlogic.ashley.core._
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.MapLayer
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
-import superposition.game.component.{MapView, Multiverse, MultiverseView}
+import superposition.game.component.{MapView, Multiverse, MultiverseView, Renderable}
 import superposition.game.entity.Level.walls
 import superposition.math.Vector2
 
@@ -28,9 +29,25 @@ final class Level(map: TiledMap) extends Entity {
   /** The view of the multiverse for the level. */
   val multiverseView: MultiverseView = new MultiverseView(multiverse, camera)
 
-  add(new MapView(map, camera))
   add(multiverse)
   add(multiverseView)
+  add(new Renderable(1))
+
+  /** The tile map renderer. */
+  private val mapRenderer: OrthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(map, 1 / 16f)
+  mapRenderer.setView(camera)
+
+  /** The renderable entities corresponding to each tile map layer. */
+  val mapLayers: Iterable[Entity] = map
+    .getLayers
+    .asScala
+    .zipWithIndex
+    .groupBy { case (mapLayer, _) =>
+      Option(mapLayer.getProperties.get("Layer", classOf[Int])).getOrElse(0)
+    }
+    .map { case (renderableLayer, mapLayers) =>
+      MapView.makeEntity(mapRenderer, renderableLayer, (mapLayers map (_._2)).toArray)
+    }
 }
 
 /** Functions for extracting information from tile maps. */
