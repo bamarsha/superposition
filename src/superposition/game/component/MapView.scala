@@ -3,6 +3,8 @@ package superposition.game.component
 import com.badlogic.ashley.core.{Component, ComponentMapper, Entity}
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 
+import scala.Function.const
+
 /** The map view component contains a renderer for a tile map.
   *
   * @param renderer the tile map renderer

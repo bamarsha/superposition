@@ -97,7 +97,7 @@ private final class MultiverseRenderer extends Renderer {
     for (universe <- multiverse.universes) {
       universeStep.clear()
       universeStep.buffer.begin()
-      multiverseView.drawAll(universe)
+      multiverseView.render(universe, UniverseRenderParams((new Color).fromHsv(minValue * 360f, 1, 1)))
       universeStep.buffer.end()
 
       val probability = universe.amplitude.squaredMagnitude.toFloat
@@ -120,7 +120,7 @@ private final class MultiverseRenderer extends Renderer {
     multiverseStep.drawTo(batch)
     batch.end()
 
-    multiverseView.emptyDrawingQueue()
+    multiverseView.clearRenderers()
   }
 
   private def drawState(entity: Entity): Unit = {
