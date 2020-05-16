@@ -13,7 +13,6 @@ final case class Universe(
     amplitude: Complex = Complex(1),
     state: DependentMap[StateId[_]] = DependentMap.empty,
     meta: DependentMap[MetaId[_]] = DependentMap.empty) {
-
   /** Increases the probability amplitude by `c`.
     *
     * @param c the number to add to the probability amplitude
@@ -75,21 +74,4 @@ final case class Universe(
     */
   def updatedMetaWith(id: MetaId[_])(updater: id.Value => id.Value): Universe =
     copy(meta = meta.updatedWith(id)(updater.lift))
-}
-
-/** An opaque identifier corresponding to a qudit of a particular type.
-  *
-  * @tparam A the type of the qudit
-  */
-final class StateId[A](val name: String, _printer: A => String) extends DependentKey {
-  type Value = A
-  val printer: Value => String = _printer
-}
-
-/** An opaque identifier corresponding to metadata of a particular type.
-  *
-  * @tparam A the type of the metadata
-  */
-final class MetaId[A] extends DependentKey {
-  type Value = A
 }

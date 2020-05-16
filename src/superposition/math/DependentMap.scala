@@ -60,17 +60,11 @@ final class DependentMap[K <: DependentKey] private(private val map: HashMap[K, 
   }
 }
 
-/** Factory for dependent maps. */
+/** Factories for dependent maps. */
 object DependentMap {
   /** An empty map.
     *
     * @tparam K the type of the key.
     */
   def empty[K <: DependentKey]: DependentMap[K] = new DependentMap(new HashMap)
-}
-
-/** A key in a dependent map. */
-trait DependentKey {
-  /** The type of the value associated with this key. */
-  type Value
 }
