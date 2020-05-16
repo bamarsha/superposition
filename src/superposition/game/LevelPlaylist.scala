@@ -8,7 +8,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer, TmxMapLoader}
 import com.badlogic.gdx.maps.{MapLayer, MapObject}
 import superposition.component._
-import superposition.entity._
+import superposition.entity.{MapLayer => MapLayerEntity, _}
 import superposition.game.LevelPlaylist.{LevelFactory, addLevel, makeLevel, removeLevel}
 import superposition.game.ResourceResolver.resolve
 import superposition.math._
@@ -123,7 +123,7 @@ private object LevelPlaylist {
     val layers = map.getLayers.asScala.zipWithIndex.map(makeLayerEntity(multiverse, map, mapRenderer).tupled)
     new Level(multiverse,
               new MultiverseView(multiverse, camera),
-              layers ++ Iterable(CellHighlighter.makeEntity(1)),
+              layers ++ Iterable(new CellHighlighter(1)),
               shader,
               batch)
   }
@@ -141,7 +141,7 @@ private object LevelPlaylist {
                              (mapLayer: MapLayer, index: Int): Entity = {
     val renderLayer = Option(mapLayer.getProperties.get("Layer", classOf[Int])).getOrElse(0)
     val controls = Option(mapLayer.getProperties.get("Controls", classOf[String])).toSeq flatMap parseCells(map)
-    MapLayerView.makeEntity(multiverse, mapRenderer, renderLayer, index, controls)
+    new MapLayerEntity(mapRenderer, renderLayer, index, multiverse, controls)
   }
 
   /** Makes an entity from a tile map object.
@@ -167,7 +167,7 @@ private object LevelPlaylist {
       case "Door" =>
         val controls = parseCells(map)(obj.getProperties.get("Controls", classOf[String])).toList
         new Door(multiverse, cells.head, controls)
-      case "Exit" => Exit.makeEntity(cells)
+      case "Exit" => new Exit(cells)
       case unknown => error(s"Unknown entity type '$unknown'.")
     }
   }

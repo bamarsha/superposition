@@ -5,7 +5,7 @@ import com.badlogic.gdx.Gdx.gl
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import superposition.component.{CellHighlighter, QuantumPosition}
+import superposition.component.{CellHighlightView, QuantumPosition}
 import superposition.entity.Level
 
 import scala.Function.const
@@ -18,7 +18,7 @@ final class CellHighlightRenderer(level: () => Option[Level]) extends Renderer {
   /** A shape renderer. */
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
-  override val family: Family = Family.all(CellHighlighter.getClass).get
+  override val family: Family = Family.all(CellHighlightView.getClass).get
 
   override def render(entity: Entity, deltaTime: Float): Unit = {
     val multiverse = level().get.multiverse

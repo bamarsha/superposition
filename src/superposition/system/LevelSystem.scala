@@ -21,7 +21,7 @@ final class LevelSystem(levels: LevelPlaylist) extends EntitySystem {
   private var players: Iterable[Entity] = Nil
 
   override def addedToEngine(engine: Engine): Unit = {
-    exits = engine.getEntitiesFor(Family.all(classOf[Exit], classOf[ClassicalPosition]).get).asScala
+    exits = engine.getEntitiesFor(Family.all(Exit.getClass, classOf[ClassicalPosition]).get).asScala
     players = engine.getEntitiesFor(Family.all(classOf[Player], classOf[QuantumPosition]).get).asScala
   }
 
