@@ -5,8 +5,8 @@ import com.badlogic.gdx.Gdx.gl
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import superposition.game.component.{CellHighlighter, QuantumPosition}
-import superposition.game.entity.Level
+import superposition.component.{CellHighlighter, QuantumPosition}
+import superposition.entity.Level
 
 import scala.Function.const
 

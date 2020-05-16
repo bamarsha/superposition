@@ -1,10 +1,10 @@
-package superposition.game.entity
+package superposition.entity
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
-import superposition.game.component.{Multiverse, MultiverseView, Renderable}
+import superposition.component.{Multiverse, MultiverseView, Renderable}
 
 import scala.Function.const
 

@@ -1,8 +1,7 @@
-package superposition.quantum
+package superposition.math
 
 import scalaz.std.option._
 import scalaz.syntax.functor._
-import superposition.math._
 
 /** A universe represents a basis state, its corresponding probability amplitude, and additional arbitrary metadata.
   *

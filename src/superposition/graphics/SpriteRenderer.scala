@@ -4,13 +4,12 @@ import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import superposition.component.{ClassicalPosition, QuantumPosition, Renderable, SpriteView}
+import superposition.entity.Level
 import superposition.game.ResourceResolver.resolve
-import superposition.game.component.{ClassicalPosition, QuantumPosition, Renderable, SpriteView}
-import superposition.game.entity.Level
 import superposition.graphics.Extensions._
 import superposition.graphics.SpriteRenderer.absolutePosition
-import superposition.math.Vector2
-import superposition.quantum.Universe
+import superposition.math.{Universe, Vector2}
 
 /** Renders sprites. */
 final class SpriteRenderer(level: () => Option[Level]) extends Renderer {

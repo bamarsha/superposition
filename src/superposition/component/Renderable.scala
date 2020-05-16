@@ -1,7 +1,7 @@
-package superposition.game.component
+package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
-import superposition.quantum.Universe
+import superposition.math.Universe
 
 /** The renderable component allows an entity to be rendered on the screen.
   *

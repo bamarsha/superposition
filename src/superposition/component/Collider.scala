@@ -1,8 +1,7 @@
-package superposition.game.component
+package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
-import superposition.math.Vector2
-import superposition.quantum.Universe
+import superposition.math.{Universe, Vector2}
 
 /** The collider component lets an entity collide with other entities.
   *

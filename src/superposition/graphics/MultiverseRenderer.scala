@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.graphics.{Color, GL20}
 import com.badlogic.gdx.math.Matrix4
-import superposition.game.component._
+import superposition.component._
 
 /** Renders the multiverse. */
 final class MultiverseRenderer extends Renderer {

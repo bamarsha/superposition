@@ -9,7 +9,7 @@ trait Renderer {
 
   /** Renders the entity.
     *
-    * The entity has the [[superposition.game.component.Renderable]] component and matches the component family for this
+    * The entity has the [[superposition.component.Renderable]] component and matches the component family for this
     * renderer.
     *
     * @param entity the entity

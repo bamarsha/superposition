@@ -1,10 +1,10 @@
-package superposition.game.system
+package superposition.system
 
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.ashley.systems.SortedIteratingSystem
-import superposition.game.component.Renderable
-import superposition.game.system.RenderingSystem.compareLayers
+import superposition.component.Renderable
 import superposition.graphics.Renderer
+import superposition.system.RenderingSystem.compareLayers
 
 /** The rendering system uses the renderers to render all renderable entities.
   *

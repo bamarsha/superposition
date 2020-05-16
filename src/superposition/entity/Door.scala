@@ -1,12 +1,11 @@
-package superposition.game.entity
+package superposition.entity
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
+import superposition.component._
+import superposition.entity.Door.{ClosedTexture, OpenTexture}
 import superposition.game.ResourceResolver.resolve
-import superposition.game.component._
-import superposition.game.entity.Door.{ClosedTexture, OpenTexture}
-import superposition.math.Vector2
-import superposition.quantum.Universe
+import superposition.math.{Universe, Vector2}
 
 /** A door blocks movement unless all of the door's control cells have a qubit in the on state.
   *

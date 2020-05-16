@@ -1,13 +1,12 @@
-package superposition.game.component
+package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.math.Vector3
-import superposition.game.component.MultiverseView.UniversePartRenderer
+import superposition.component.MultiverseView.UniversePartRenderer
 import superposition.graphics.UniverseRenderParams
-import superposition.math.Vector2
-import superposition.quantum.Universe
+import superposition.math.{Universe, Vector2}
 
 import scala.collection.immutable.Queue
 

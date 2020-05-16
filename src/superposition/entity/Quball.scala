@@ -1,11 +1,11 @@
-package superposition.game.entity
+package superposition.entity
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.Texture
+import superposition.component._
+import superposition.entity.Quball._
 import superposition.game.ResourceResolver.resolve
-import superposition.game.component._
-import superposition.game.entity.Quball._
 import superposition.math.Vector2
 
 import scala.Function.const

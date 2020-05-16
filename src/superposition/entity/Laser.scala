@@ -1,13 +1,12 @@
-package superposition.game.entity
+package superposition.entity
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
+import superposition.component._
+import superposition.entity.Laser.Textures
 import superposition.game.ResourceResolver.resolve
-import superposition.game.component._
-import superposition.game.entity.Laser.Textures
 import superposition.math.Direction.{Down, Left, Right, Up}
-import superposition.math.{Direction, Vector2}
-import superposition.quantum.{Gate, StateId}
+import superposition.math.{Direction, Gate, StateId, Vector2}
 
 import scala.Function.const
 

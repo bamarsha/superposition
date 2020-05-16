@@ -2,8 +2,8 @@ package superposition.graphics
 
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.gdx.graphics.Color.{BLACK, WHITE}
-import superposition.game.component.{MapLayerView, Renderable}
-import superposition.game.entity.Level
+import superposition.component.{MapLayerView, Renderable}
+import superposition.entity.Level
 import superposition.graphics.Extensions._
 
 /** Renders tile map layers.

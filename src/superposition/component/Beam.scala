@@ -1,8 +1,7 @@
-package superposition.game.component
+package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
-import superposition.math.{Direction, Vector2}
-import superposition.quantum.{Gate, MetaId, StateId}
+import superposition.math._
 
 /** The beam component shoots a laser beam that applies a quantum gate.
   *

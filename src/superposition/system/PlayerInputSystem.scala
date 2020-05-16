@@ -1,15 +1,14 @@
-package superposition.game.system
+package superposition.system
 
 import com.badlogic.ashley.core.{Engine, Entity, Family}
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.SPACE
-import superposition.game.component._
-import superposition.game.entity.Level
-import superposition.game.system.PlayerInputSystem.{carryGate, updateCarriedPositions, updatePlayerPosition, walk}
-import superposition.math.Vector2
-import superposition.quantum.{Gate, Translate, X}
+import superposition.component._
+import superposition.entity.Level
+import superposition.math.{Gate, Translate, Vector2, X}
+import superposition.system.PlayerInputSystem.{carryGate, updateCarriedPositions, updatePlayerPosition, walk}
 
 import scala.Function.const
 import scala.jdk.CollectionConverters._

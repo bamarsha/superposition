@@ -1,10 +1,9 @@
-package superposition.game.component
+package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
 import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.{Color, Texture}
-import superposition.math.Vector2
-import superposition.quantum.Universe
+import superposition.math.{Universe, Vector2}
 
 import scala.Function.const
 

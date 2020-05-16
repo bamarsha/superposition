@@ -1,10 +1,9 @@
-package superposition.game.component
+package superposition.component
 
 import com.badlogic.ashley.core._
 import scalaz.Scalaz._
-import superposition.game.component.Multiverse.combine
-import superposition.math.{Complex, Vector2}
-import superposition.quantum.{Gate, MetaId, StateId, Universe}
+import superposition.component.Multiverse.combine
+import superposition.math._
 
 import scala.Ordering.Implicits._
 import scala.math.sqrt

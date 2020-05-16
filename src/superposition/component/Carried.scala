@@ -1,7 +1,7 @@
-package superposition.game.component
+package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
-import superposition.quantum.StateId
+import superposition.math.StateId
 
 /** Entities with the carried component can be carried.
   *

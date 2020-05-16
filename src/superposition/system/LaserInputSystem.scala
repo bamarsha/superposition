@@ -1,13 +1,12 @@
-package superposition.game.system
+package superposition.system
 
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
-import superposition.game.component.{Beam, ClassicalPosition, Multiverse}
-import superposition.game.entity.Level
-import superposition.game.system.LaserInputSystem.{beamHits, beamTarget}
-import superposition.math.Vector2
-import superposition.quantum.{StateId, Universe}
+import superposition.component.{Beam, ClassicalPosition, Multiverse}
+import superposition.entity.Level
+import superposition.math.{StateId, Universe, Vector2}
+import superposition.system.LaserInputSystem.{beamHits, beamTarget}
 
 import scala.Function.const
 

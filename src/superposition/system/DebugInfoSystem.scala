@@ -1,4 +1,4 @@
-package superposition.game.system
+package superposition.system
 
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.gdx.Gdx.graphics

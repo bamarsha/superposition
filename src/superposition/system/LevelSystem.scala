@@ -1,11 +1,11 @@
-package superposition.game.system
+package superposition.system
 
 import com.badlogic.ashley.core.{Engine, Entity, EntitySystem, Family}
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input.Keys.{N, R}
+import superposition.component._
 import superposition.game.LevelPlaylist
-import superposition.game.component._
-import superposition.game.system.LevelSystem.{entityAtExit, product}
+import superposition.system.LevelSystem.{entityAtExit, product}
 
 import scala.jdk.CollectionConverters._
 

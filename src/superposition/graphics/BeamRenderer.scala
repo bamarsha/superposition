@@ -7,13 +7,12 @@ import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.{Filled, Line}
-import superposition.game.component.{Beam, ClassicalPosition, Renderable}
-import superposition.game.entity.Level
+import superposition.component.{Beam, ClassicalPosition, Renderable}
+import superposition.entity.Level
 import superposition.graphics.BeamRenderer._
+import superposition.graphics.Extensions._
 import superposition.math.Direction.{Down, Left, Right, Up}
-import superposition.math.Vector2
-import superposition.quantum.Universe
-import Extensions._
+import superposition.math.{Universe, Vector2}
 
 import scala.math.min
 

@@ -1,4 +1,4 @@
-package superposition.game.component
+package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper, Entity}
 import superposition.math.Vector2

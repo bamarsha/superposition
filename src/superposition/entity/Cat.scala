@@ -1,10 +1,10 @@
-package superposition.game.entity
+package superposition.entity
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
+import superposition.component._
+import superposition.entity.Cat._
 import superposition.game.ResourceResolver.resolve
-import superposition.game.component._
-import superposition.game.entity.Cat._
 import superposition.math.Vector2
 
 /** Schrödinger's cat.

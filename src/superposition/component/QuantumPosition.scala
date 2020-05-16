@@ -1,8 +1,7 @@
-package superposition.game.component
+package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
-import superposition.math.Vector2
-import superposition.quantum.{MetaId, StateId}
+import superposition.math.{MetaId, StateId, Vector2}
 
 /** The quantum position component has a position that may depend on which universe the entity is in.
   *

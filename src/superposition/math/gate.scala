@@ -1,7 +1,6 @@
-package superposition.quantum
+package superposition.math
 
 import scalaz.{Divisible, NonEmptyList}
-import superposition.math.{Complex, Vector2}
 
 import scala.math.sqrt
 

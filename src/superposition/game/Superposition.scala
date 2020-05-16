@@ -6,8 +6,8 @@ import com.badlogic.gdx.Gdx.graphics
 import com.badlogic.gdx.backends.lwjgl3.{Lwjgl3Application, Lwjgl3ApplicationConfiguration}
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import superposition.game.Superposition.Playlist
-import superposition.game.system._
 import superposition.graphics._
+import superposition.system._
 
 /** The Superposition game. */
 private final class Superposition extends Game {

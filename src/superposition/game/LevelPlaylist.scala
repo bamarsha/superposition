@@ -7,12 +7,11 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer, TmxMapLoader}
 import com.badlogic.gdx.maps.{MapLayer, MapObject}
+import superposition.component._
+import superposition.entity._
 import superposition.game.LevelPlaylist.{LevelFactory, addLevel, makeLevel, removeLevel}
 import superposition.game.ResourceResolver.resolve
-import superposition.game.component.{CellHighlighter, Exit, MapLayerView, Multiverse, MultiverseView, PrimaryBit}
-import superposition.game.entity._
-import superposition.math.{Direction, Vector2}
-import superposition.quantum._
+import superposition.math._
 
 import scala.collection.immutable.HashMap
 import scala.jdk.CollectionConverters._
@@ -22,7 +21,7 @@ import scala.sys.error
   *
   * @param engine the entity engine
   */
-private final class LevelPlaylist(engine: Engine) {
+final class LevelPlaylist(engine: Engine) {
   /** The list of level factories. */
   private var factories: Seq[LevelFactory] = Nil
 
