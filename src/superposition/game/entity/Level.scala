@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
-import superposition.game.component.{CellHighlighter, MapView, Multiverse, MultiverseView, Renderable}
+import superposition.game.component._
 import superposition.game.entity.Level.walls
 import superposition.math.Vector2
 
@@ -38,6 +38,7 @@ final class Level(map: TiledMap) extends Entity {
   private val mapRenderer: OrthogonalTiledMapRenderer = new OrthogonalTiledMapRenderer(map, 1 / 16f)
   mapRenderer.setView(camera)
 
+  /** The entities corresponding to each distinct render layer in the tile map. */
   private val mapLayers: Iterable[Entity] = map
     .getLayers
     .asScala
@@ -49,12 +50,8 @@ final class Level(map: TiledMap) extends Entity {
       MapView.makeEntity(mapRenderer, renderableLayer, (mapLayers map (_._2)).toArray)
     }
 
-  private val cellHighlighter: Entity = (new Entity)
-    .add(new Renderable(1, const(())))
-    .add(new CellHighlighter)
-
   /** Entities used by the level to render the map and other UI elements. */
-  val entities: Iterable[Entity] = mapLayers ++ Iterable(cellHighlighter)
+  val entities: Iterable[Entity] = mapLayers ++ Iterable(CellHighlighter.makeEntity(1))
 }
 
 /** Functions for extracting information from tile maps. */

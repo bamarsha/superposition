@@ -2,7 +2,6 @@ package superposition.graphics
 
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.gdx.Gdx.gl
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
@@ -11,7 +10,7 @@ import superposition.game.entity.Level
 
 import scala.Function.const
 
-/** Highlights all cells occupied by an entity in the multiverse.
+/** Highlights all cells that are occupied by at least one entity in the multiverse.
   *
   * @param level a function that returns the current level
   */

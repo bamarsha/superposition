@@ -16,6 +16,8 @@ final class MapRenderer(level: () => Option[Level]) extends Renderer {
   override def render(entity: Entity, deltaTime: Float): Unit = {
     val multiverseView = level().get.multiverseView
     val mapView = MapView.Mapper.get(entity)
-    multiverseView.enqueueRenderer(const(()))((_, _) => mapView.renderer.render(mapView.layers))
+    multiverseView.enqueueRenderer(const(())) { (_, _) =>
+      mapView.renderer.render(mapView.layers)
+    }
   }
 }
