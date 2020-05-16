@@ -26,7 +26,7 @@ private final class Superposition extends Game {
     engine.addSystem(new PlayerInputSystem(() => levels.current))
     engine.addSystem(new LaserInputSystem(() => levels.current))
     engine.addSystem(new RenderingSystem(Iterable(
-      new MapRenderer(() => levels.current),
+      new MapLayerRenderer(() => levels.current),
       new SpriteRenderer(() => levels.current),
       new BeamRenderer(() => levels.current),
       new CellHighlightRenderer(() => levels.current),
@@ -50,6 +50,7 @@ private object Superposition {
     "level2.tmx",
     "level3.tmx",
     "level4.tmx",
+    "level6.tmx",
     "win.tmx")
 
   /** The entry point for Superposition.

@@ -1,15 +1,20 @@
 package superposition.game
 
 import com.badlogic.ashley.core.{Engine, Entity}
-import com.badlogic.gdx.maps.MapObject
-import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
+import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer, TmxMapLoader}
+import com.badlogic.gdx.maps.{MapLayer, MapObject}
 import superposition.game.LevelPlaylist.{LevelFactory, addLevel, makeLevel, removeLevel}
-import superposition.game.component.{Exit, Multiverse, PrimaryBit}
+import superposition.game.ResourceResolver.resolve
+import superposition.game.component.{CellHighlighter, Exit, MapLayerView, Multiverse, MultiverseView, PrimaryBit}
 import superposition.game.entity._
 import superposition.math.{Direction, Vector2}
 import superposition.quantum._
 
-import scala.collection.mutable
+import scala.collection.immutable.HashMap
 import scala.jdk.CollectionConverters._
 import scala.sys.error
 
@@ -85,16 +90,15 @@ private object LevelPlaylist {
     * @return the level
     */
   private def makeLevel(map: TiledMap): Level = {
-    val level = new Level(map)
-    val multiverse = level.getComponent(classOf[Multiverse])
-    val entities = new mutable.HashMap[Int, Entity]
+    val multiverse = new Multiverse(walls(map))
 
-    // Spawn entities.
+    // Make object entities.
+    var objects = new HashMap[Int, Entity]
     for (layer <- map.getLayers.asScala; obj <- layer.getObjects.asScala) {
-      println(s"Spawning ${obj.getName} (${obj.getProperties.get("type")}).")
-      val entity = makeEntity(multiverse, entities, map, obj)
+      println(s"Making ${obj.getName} (${obj.getProperties.get("type")}).")
+      val entity = makeObjectEntity(multiverse, map, obj)
       multiverse.addEntity(entity)
-      entities += obj.getProperties.get("id", classOf[Int]) -> entity
+      objects += obj.getProperties.get("id", classOf[Int]) -> entity
       // TODO: entity.layer = layer
     }
 
@@ -102,27 +106,52 @@ private object LevelPlaylist {
     if (map.getProperties.containsKey("Gates")) {
       val gates = map.getProperties.get("Gates", classOf[String])
       for (Array(name, target) <- gates.linesIterator map (_.split(' '))) {
-        println(s"Applying gate $name on entity $target.")
-        val bit = entities(target.toInt).getComponent(classOf[PrimaryBit]).bit
+        println(s"Applying gate $name on object $target.")
+        val bit = objects(target.toInt).getComponent(classOf[PrimaryBit]).bit
         multiverse.applyGate(makeGate(name), bit)
       }
     }
 
-    level
+    val camera = new OrthographicCamera(map.getProperties.get("width", classOf[Int]),
+                                        map.getProperties.get("height", classOf[Int]))
+    camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0)
+    camera.update()
+    // TODO: ShaderProgram is disposable.
+    val shader = new ShaderProgram(resolve("shaders/sprite.vert"), resolve("shaders/spriteMixColor.frag"))
+    // TODO: SpriteBatch is disposable.
+    val mapRenderer = new OrthogonalTiledMapRenderer(map, 1 / 16f, new SpriteBatch(1000, shader))
+    mapRenderer.setView(camera)
+    val layers = map.getLayers.asScala.zipWithIndex.map(makeLayerEntity(multiverse, map, mapRenderer).tupled)
+    new Level(
+      multiverse,
+      new MultiverseView(multiverse, camera),
+      layers ++ Iterable(CellHighlighter.makeEntity(1)))
+  }
+
+  /** Makes an entity from a tile map layer.
+    *
+    * @param multiverse the multiverse
+    * @param map the tile map
+    * @param mapRenderer the tile map renderer
+    * @param mapLayer the map layer
+    * @param index the map layer index
+    * @return the layer entity
+    */
+  private def makeLayerEntity(multiverse: Multiverse, map: TiledMap, mapRenderer: OrthogonalTiledMapRenderer)
+                             (mapLayer: MapLayer, index: Int): Entity = {
+    val renderLayer = Option(mapLayer.getProperties.get("Layer", classOf[Int])).getOrElse(0)
+    val controls = Option(mapLayer.getProperties.get("Controls", classOf[String])).toSeq flatMap parseCells(map)
+    MapLayerView.makeEntity(multiverse, mapRenderer, renderLayer, index, controls)
   }
 
   /** Makes an entity from a tile map object.
     *
-    * @param multiverse the multiverse that the entity belongs to
-    * @param entities a map from object ID to entity for each entity in the tile map
+    * @param multiverse the multiverse
     * @param map the tile map
     * @param obj the map object
-    * @return the entity
+    * @return the object entity
     */
-  private def makeEntity(multiverse: Multiverse,
-                         entities: mutable.HashMap[Int, Entity],
-                         map: TiledMap,
-                         obj: MapObject): Entity = {
+  private def makeObjectEntity(multiverse: Multiverse, map: TiledMap, obj: MapObject): Entity = {
     val cells = objectCells(map, obj)
     obj.getProperties.get("type") match {
       case "Player" => new Cat(multiverse, cells.head)
@@ -139,7 +168,7 @@ private object LevelPlaylist {
         val controls = parseCells(map)(obj.getProperties.get("Controls", classOf[String])).toList
         new Door(multiverse, cells.head, controls)
       case "Exit" => Exit.makeEntity(cells)
-      case unknown => error(s"Unknown entity type $unknown.")
+      case unknown => error(s"Unknown entity type '$unknown'.")
     }
   }
 
@@ -153,7 +182,7 @@ private object LevelPlaylist {
     val height = map.getProperties.get("height", classOf[Int])
     """\((\d+),\s*(\d+)\)""".r("x", "y").findFirstMatchIn(string) match {
       case Some(m) => Vector2(m.group("x").trim.toInt, height - m.group("y").trim.toInt - 1)
-      case None => error("Invalid cell '" + string + "'.")
+      case None => error(s"Invalid cell '$string'.")
     }
   }
 
@@ -200,4 +229,39 @@ private object LevelPlaylist {
       y <- bottomLeft.y until topRight.y
     } yield Vector2(x, y)).toSet
   }
+
+  /** Returns the set of walls, or cells with collision, in the tile map.
+    *
+    * @param map the tile map
+    * @return the set of walls in the tile map
+    */
+  private def walls(map: TiledMap): Set[Vector2[Int]] =
+    (map.getLayers.asScala flatMap {
+      case layer: TiledMapTileLayer if hasCollision(layer) =>
+        for {
+          x <- 0 until layer.getWidth
+          y <- 0 until layer.getHeight
+          if hasTileAt(layer, x, y)
+          cellX = (x + layer.getOffsetX / map.getProperties.get("tilewidth", classOf[Int])).round
+          cellY = (y + layer.getOffsetY / map.getProperties.get("tileheight", classOf[Int])).round
+        } yield Vector2(cellX, cellY)
+      case _ => Nil
+    }).toSet
+
+  /** Returns true if the tile map layer has collision.
+    *
+    * @param layer the tile map layer
+    * @return true if the tile map layer has collision
+    */
+  private def hasCollision(layer: MapLayer): Boolean =
+    layer.getProperties.containsKey("Collision") && layer.getProperties.get("Collision", classOf[Boolean])
+
+  /** Returns true if the tile map layer has a tile at the position.
+    *
+    * @param layer the tile map layer
+    * @param x the x coordinate
+    * @param y the y coordinate
+    * @return true if the tile map layer has a tile at the position
+    */
+  private def hasTileAt(layer: TiledMapTileLayer, x: Int, y: Int): Boolean = Option(layer.getCell(x, y)).isDefined
 }

@@ -9,6 +9,9 @@ trait Renderer {
 
   /** Renders the entity.
     *
+    * The entity has the [[superposition.game.component.Renderable]] component and matches the component family for this
+    * renderer.
+    *
     * @param entity the entity
     * @param deltaTime the time elapsed since the last frame
     */

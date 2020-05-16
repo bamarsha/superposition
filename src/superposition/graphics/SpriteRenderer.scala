@@ -1,6 +1,7 @@
 package superposition.graphics
 
 import com.badlogic.ashley.core.{Entity, Family}
+import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import superposition.game.ResourceResolver.resolve
@@ -47,7 +48,8 @@ final class SpriteRenderer(level: () => Option[Level]) extends Renderer {
     val spriteView = SpriteView.Mapper.get(entity)
     val scale = spriteView.scale(universe)
     val position = absolutePosition(entity, universe) - scale / 2
-    shader.setUniformColor("color", urp.color)
+    shader.setUniformColor("color", WHITE)
+    shader.setUniformColor("tintColor", urp.color)
     batch.setColor(spriteView.color(universe))
     batch.draw(spriteView.texture(universe), position.x.toFloat, position.y.toFloat, scale.x.toFloat, scale.y.toFloat)
     batch.flush()
