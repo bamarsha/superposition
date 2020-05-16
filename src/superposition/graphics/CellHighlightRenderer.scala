@@ -18,7 +18,7 @@ final class CellHighlightRenderer(level: () => Option[Level]) extends Renderer {
   /** A shape renderer. */
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
-  override def family: Family = Family.all(CellHighlighter.getClass).get
+  override val family: Family = Family.all(CellHighlighter.getClass).get
 
   override def render(entity: Entity, deltaTime: Float): Unit = {
     val multiverse = level().get.multiverse

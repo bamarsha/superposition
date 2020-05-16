@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.{Entity, Family}
 /** Renders entities. */
 trait Renderer {
   /** The component family that each rendered entity must have. */
-  def family: Family
+  val family: Family
 
   /** Renders the entity.
     *
