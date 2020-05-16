@@ -2,7 +2,7 @@ package superposition.graphics
 
 import com.badlogic.gdx.Gdx.{gl, graphics}
 import com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT
-import com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888
+import com.badlogic.gdx.graphics.Pixmap.Format.RGB888
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.{FloatFrameBuffer, FrameBuffer, ShaderProgram}
 import com.badlogic.gdx.graphics.{Camera, Color}
@@ -22,7 +22,7 @@ final class PostProcessingStep(fragShaderName: String = "sprite", useFloats: Boo
   val buffer: FrameBuffer = if (useFloats)
     new FloatFrameBuffer(graphics.getWidth, graphics.getHeight, false)
   else
-    new FrameBuffer(RGBA8888, graphics.getWidth, graphics.getHeight, false)
+    new FrameBuffer(RGB888, graphics.getWidth, graphics.getHeight, false)
 
   var clearColor: Color = new Color(0, 0, 0, 0)
 

@@ -29,7 +29,7 @@ private final class Superposition extends Game {
       new MapRenderer(() => levels.current),
       new SpriteRenderer(() => levels.current),
       new BeamRenderer(() => levels.current),
-//      new CellHighlightRenderer(() => levels.current),
+      new CellHighlightRenderer(() => levels.current),
       new MultiverseRenderer)))
     engine.addSystem(new DebugInfoSystem(() => renderNanoTime))
   }

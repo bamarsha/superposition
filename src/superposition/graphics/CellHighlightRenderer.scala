@@ -31,17 +31,16 @@ final class CellHighlightRenderer(level: () => Option[Level]) extends Renderer {
       } yield universe.state(position.cell)).toSet
 
     val multiverseView = level().get.multiverseView
-//    multiverseView.enqueueRenderer(const(())) { (_, _) =>
+    multiverseView.enqueueRenderer(const(())) { (_, _) =>
       gl.glEnable(GL_BLEND)
       shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
       shapeRenderer.begin(ShapeType.Filled)
-      gl.glBlendFunc(GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA)
       shapeRenderer.setColor(1, 1, 1, 0.3f)
       for (cell <- occupiedCells) {
         shapeRenderer.rect(cell.x, cell.y, 1, 1)
       }
       shapeRenderer.end()
       gl.glDisable(GL_BLEND)
-//    }
+    }
   }
 }
