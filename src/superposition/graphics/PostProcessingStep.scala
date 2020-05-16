@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.glutils.{FloatFrameBuffer, FrameBuffer, ShaderP
 import com.badlogic.gdx.graphics.{Camera, Color}
 import superposition.game.ResourceResolver.resolve
 
-class PostProcessingStep(fragShaderName: String = "sprite", useFloats: Boolean = false) {
+final class PostProcessingStep(fragShaderName: String = "sprite", useFloats: Boolean = false) {
 
   val shader: ShaderProgram = new ShaderProgram(
     resolve("shaders/sprite.vert"),

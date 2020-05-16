@@ -53,7 +53,7 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer {
       val opacity = min(FadeDuration, BeamDuration + FadeDuration - universe.meta(beam.elapsedTime)) / FadeDuration
       gl.glEnable(GL_BLEND)
       shapeRenderer.begin(Filled)
-      shapeRenderer.setColor(new Color(1, 0, 0, opacity.toFloat).mixWith(urp.color))
+      shapeRenderer.setColor(new Color(1, 0, 0, 0.3f).mixWith(urp.color))
       beam.direction match {
         case Left | Right => shapeRenderer.rect(source.x + 0.5f, source.y + 0.375f, target.x - source.x, 0.25f)
         case Up | Down => shapeRenderer.rect(source.x + 0.375f, source.y + 0.5f, 0.25f, target.y - source.y)
@@ -67,7 +67,7 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer {
 /** Functions for rendering laser beams. */
 private object BeamRenderer {
   /** The amount of time that the laser beam shines at full intensity. */
-  private val BeamDuration: Double = 0.2
+  private val BeamDuration: Double = 10//0.2
 
   /** The amount of time that the laser beam takes to fade away. */
   private val FadeDuration: Double = 0.3

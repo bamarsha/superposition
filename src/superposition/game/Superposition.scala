@@ -7,7 +7,7 @@ import com.badlogic.gdx.backends.lwjgl3.{Lwjgl3Application, Lwjgl3ApplicationCon
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import superposition.game.Superposition.Playlist
 import superposition.game.system._
-import superposition.graphics.{BeamRenderer, MapRenderer, MultiverseRenderer, SpriteRenderer}
+import superposition.graphics.{BeamRenderer, CellHighlightRenderer, MapRenderer, MultiverseRenderer, SpriteRenderer}
 
 /** The Superposition game. */
 private final class Superposition extends Game {
@@ -26,9 +26,10 @@ private final class Superposition extends Game {
     engine.addSystem(new PlayerInputSystem(() => levels.current))
     engine.addSystem(new LaserInputSystem(() => levels.current))
     engine.addSystem(new RenderingSystem(Iterable(
-      MapRenderer,
+      new MapRenderer(() => levels.current),
       new SpriteRenderer(() => levels.current),
       new BeamRenderer(() => levels.current),
+//      new CellHighlightRenderer(() => levels.current),
       new MultiverseRenderer)))
     engine.addSystem(new DebugInfoSystem(() => renderNanoTime))
   }

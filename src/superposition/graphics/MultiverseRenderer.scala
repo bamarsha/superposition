@@ -36,33 +36,8 @@ final class MultiverseRenderer extends Renderer {
 
   override def render(entity: Entity, deltaTime: Float): Unit = {
     time += deltaTime
-    highlightOccupiedCells(entity)
     draw(entity)
     drawState(entity)
-  }
-
-  /** Highlights all cells occupied by an entity in the multiverse.
-    *
-    * @param entity the multiverse entity
-    */
-  private def highlightOccupiedCells(entity: Entity): Unit = {
-    val multiverse = Multiverse.Mapper.get(entity)
-    val occupiedCells =
-      (for {
-        entity <- multiverse.entities if QuantumPosition.Mapper.has(entity)
-        position = QuantumPosition.Mapper.get(entity)
-        universe <- multiverse.universes
-      } yield universe.state(position.cell)).toSet
-
-    gl.glEnable(GL_BLEND)
-    shapeRenderer.setProjectionMatrix(MultiverseView.Mapper.get(entity).camera.combined)
-    shapeRenderer.begin(ShapeType.Filled)
-    shapeRenderer.setColor(1, 1, 1, 0.3f)
-    for (cell <- occupiedCells) {
-      shapeRenderer.rect(cell.x, cell.y, 1, 1)
-    }
-    shapeRenderer.end()
-    gl.glDisable(GL_BLEND)
   }
 
   /** Draws the multiverse.
