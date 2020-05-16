@@ -73,7 +73,7 @@ private object LevelPlaylist {
     level.getComponent(classOf[Multiverse]).entities.foreach(engine.addEntity)
   }
 
-  /** Removes a level and all of its entities from the engine.
+  /** Removes a level and all of its entities from the engine and disposes its resources.
     *
     * @param engine the entity engine
     * @param level the level to remove
@@ -82,6 +82,7 @@ private object LevelPlaylist {
     level.getComponent(classOf[Multiverse]).entities.foreach(engine.removeEntity)
     level.entities.foreach(engine.removeEntity)
     engine.removeEntity(level)
+    level.dispose()
   }
 
   /** Makes a level from the tile map.
@@ -116,16 +117,16 @@ private object LevelPlaylist {
                                         map.getProperties.get("height", classOf[Int]))
     camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0)
     camera.update()
-    // TODO: ShaderProgram is disposable.
     val shader = new ShaderProgram(resolve("shaders/sprite.vert"), resolve("shaders/spriteMixColor.frag"))
-    // TODO: SpriteBatch is disposable.
-    val mapRenderer = new OrthogonalTiledMapRenderer(map, 1 / 16f, new SpriteBatch(1000, shader))
+    val batch = new SpriteBatch(1000, shader)
+    val mapRenderer = new OrthogonalTiledMapRenderer(map, 1 / 16f, batch)
     mapRenderer.setView(camera)
     val layers = map.getLayers.asScala.zipWithIndex.map(makeLayerEntity(multiverse, map, mapRenderer).tupled)
-    new Level(
-      multiverse,
-      new MultiverseView(multiverse, camera),
-      layers ++ Iterable(CellHighlighter.makeEntity(1)))
+    new Level(multiverse,
+              new MultiverseView(multiverse, camera),
+              layers ++ Iterable(CellHighlighter.makeEntity(1)),
+              shader,
+              batch)
   }
 
   /** Makes an entity from a tile map layer.
