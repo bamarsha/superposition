@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.{Filled, Line}
+import com.badlogic.gdx.utils.Disposable
 import superposition.component.{Beam, ClassicalPosition, Renderable}
 import superposition.entity.Level
 import superposition.graphics.BeamRenderer._
@@ -20,9 +21,8 @@ import scala.math.min
   *
   * @param level a function that returns the current level
   */
-final class BeamRenderer(level: () => Option[Level]) extends Renderer {
-  // TODO: ShapeRenderer is disposable.
-  /** A shape renderer. */
+final class BeamRenderer(level: () => Option[Level]) extends Renderer with Disposable {
+  /** The shape renderer. */
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
   override val family: Family = Family.all(classOf[Beam], classOf[ClassicalPosition]).get
@@ -63,6 +63,8 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer {
       gl.glDisable(GL_BLEND)
     }
   }
+
+  override def dispose(): Unit = shapeRenderer.dispose()
 }
 
 /** Functions for rendering laser beams. */

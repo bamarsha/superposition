@@ -2,8 +2,9 @@ package superposition.graphics
 
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.gdx.graphics.Color.WHITE
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.{Batch, SpriteBatch}
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.utils.Disposable
 import superposition.component.{ClassicalPosition, QuantumPosition, Renderable, SpriteView}
 import superposition.entity.Level
 import superposition.game.ResourceResolver.resolve
@@ -12,16 +13,15 @@ import superposition.graphics.SpriteRenderer.absolutePosition
 import superposition.math.{Universe, Vector2}
 
 /** Renders sprites. */
-final class SpriteRenderer(level: () => Option[Level]) extends Renderer {
+final class SpriteRenderer(level: () => Option[Level]) extends Renderer with Disposable {
   /** The sprite shader program. */
   private val shader: ShaderProgram = new ShaderProgram(
     resolve("shaders/sprite.vert"),
     resolve("shaders/spriteMixColor.frag"))
   assert(shader.isCompiled, shader.getLog)
 
-  // TODO: SpriteBatch is disposable.
-  /** A sprite batch. */
-  private val batch: SpriteBatch = new SpriteBatch(1000, shader)
+  /** The batch. */
+  private val batch: Batch = new SpriteBatch(1000, shader)
 
   override val family: Family = Family
     .all(classOf[SpriteView])
@@ -54,6 +54,11 @@ final class SpriteRenderer(level: () => Option[Level]) extends Renderer {
     batch.setColor(spriteView.color(universe))
     batch.draw(spriteView.texture(universe), position.x.toFloat, position.y.toFloat, scale.x.toFloat, scale.y.toFloat)
     batch.flush()
+  }
+
+  override def dispose(): Unit = {
+    shader.dispose()
+    batch.dispose()
   }
 }
 

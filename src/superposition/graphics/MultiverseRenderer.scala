@@ -4,19 +4,23 @@ import com.badlogic.ashley.core._
 import com.badlogic.gdx.Gdx.gl
 import com.badlogic.gdx.graphics.g2d.{Batch, SpriteBatch}
 import com.badlogic.gdx.graphics.{Color, GL20}
+import com.badlogic.gdx.utils.Disposable
 import superposition.component._
 import superposition.game.ResourceResolver.resolve
 
 /** Renders the multiverse. */
-final class MultiverseRenderer extends Renderer {
+final class MultiverseRenderer extends Renderer with Disposable {
   /** The batch. */
   private val batch: Batch = new SpriteBatch
 
+  /** The universe frame buffer. */
   private val universeBuffer = new PostProcessedBuffer(resolve("shaders/sprite.frag"))
 
+  /** The multiverse frame buffer. */
   private val multiverseBuffer = new PostProcessedBuffer(resolve("shaders/universe.frag"))
   multiverseBuffer.batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE, GL20.GL_ONE)
 
+  /** The noise frame buffer. */
   private val noiseBuffer = new PostProcessedBuffer(resolve("shaders/totalNoise.frag"), true)
   noiseBuffer.batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE)
 
@@ -72,5 +76,12 @@ final class MultiverseRenderer extends Renderer {
     batch.end()
 
     multiverseView.clearRenderers()
+  }
+
+  override def dispose(): Unit = {
+    batch.dispose()
+    universeBuffer.dispose()
+    multiverseBuffer.dispose()
+    noiseBuffer.dispose()
   }
 }

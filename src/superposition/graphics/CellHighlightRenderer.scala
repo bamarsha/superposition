@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx.gl
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
+import com.badlogic.gdx.utils.Disposable
 import superposition.component.{CellHighlightView, QuantumPosition}
 import superposition.entity.Level
 
@@ -14,7 +15,7 @@ import scala.Function.const
   *
   * @param level a function that returns the current level
   */
-final class CellHighlightRenderer(level: () => Option[Level]) extends Renderer {
+final class CellHighlightRenderer(level: () => Option[Level]) extends Renderer with Disposable {
   /** A shape renderer. */
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
@@ -42,4 +43,6 @@ final class CellHighlightRenderer(level: () => Option[Level]) extends Renderer {
       gl.glDisable(GL_BLEND)
     }
   }
+
+  override def dispose(): Unit = shapeRenderer.dispose()
 }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT
 import com.badlogic.gdx.graphics.Pixmap.Format.RGB888
 import com.badlogic.gdx.graphics.g2d.{Batch, SpriteBatch}
 import com.badlogic.gdx.graphics.glutils.{FloatFrameBuffer, FrameBuffer, ShaderProgram}
+import com.badlogic.gdx.utils.Disposable
 import superposition.game.ResourceResolver.resolve
 
 /** A frame buffer with a post-processing shader program.
@@ -15,7 +16,7 @@ import superposition.game.ResourceResolver.resolve
   * @param useFloats true to use a [[com.badlogic.gdx.graphics.glutils.FloatFrameBuffer]] instead of a
   * [[com.badlogic.gdx.graphics.glutils.FrameBuffer]]
   */
-final class PostProcessedBuffer(fragmentShader: FileHandle, useFloats: Boolean = false) {
+final class PostProcessedBuffer(fragmentShader: FileHandle, useFloats: Boolean = false) extends Disposable {
   /** The post-processing shader program. */
   val shader: ShaderProgram = new ShaderProgram(resolve("shaders/sprite.vert"), fragmentShader)
   assert(shader.isCompiled, shader.getLog)
@@ -58,5 +59,11 @@ final class PostProcessedBuffer(fragmentShader: FileHandle, useFloats: Boolean =
     render()
     batch.end()
     buffer.end()
+  }
+
+  override def dispose(): Unit = {
+    shader.dispose()
+    batch.dispose()
+    buffer.dispose()
   }
 }
