@@ -12,11 +12,10 @@ import superposition.entity.{MapLayer => MapLayerEntity, _}
 import superposition.game.ResourceResolver.resolve
 import superposition.math._
 
-import scala.collection.immutable.HashMap
 import scala.jdk.CollectionConverters._
 import scala.sys.error
 
-/** Functions for loading levels. */
+/** Loads game levels. */
 private object LevelLoader {
   /** Loads a level from the tile map.
     *
@@ -24,82 +23,100 @@ private object LevelLoader {
     * @return the level
     */
   def loadLevel(map: TiledMap): Level = {
+    // Spawn object entities.
     val multiverse = new Multiverse(walls(map))
-
-    // Make object entities.
-    var objects = new HashMap[Int, Entity]
-    for (layer <- map.getLayers.asScala; obj <- layer.getObjects.asScala) {
-      println(s"Making ${obj.getName} (${obj.getProperties.get("type")}).")
-      val entity = makeObjectEntity(multiverse, map, obj)
+    val objects = objectEntities(multiverse, map)
+    for (entity <- objects.values) {
+      println(s"Spawning ${entity.getClass.getSimpleName}.")
       multiverse.addEntity(entity)
-      objects += obj.getProperties.get("id", classOf[Int]) -> entity
-      // TODO: entity.layer = layer
     }
 
-    // Apply gates.
-    if (map.getProperties.containsKey("Gates")) {
-      val gates = map.getProperties.get("Gates", classOf[String])
-      for (Array(name, target) <- gates.linesIterator map (_.split(' '))) {
-        println(s"Applying gate $name on object $target.")
-        val bit = objects(target.toInt).getComponent(classOf[PrimaryBit]).bit
-        multiverse.applyGate(makeGate(name), bit)
-      }
+    // Apply initial gates.
+    for (gates <- Option(map.getProperties.get("Gates", classOf[String]));
+         Array(name, target) <- gates.linesIterator map (_.split(' '))) {
+      println(s"Applying gate $name to object $target.")
+      val bit = objects(target.toInt).getComponent(classOf[PrimaryBit]).bit
+      multiverse.applyGate(toGate(name), bit)
     }
 
+    // Create the map renderer.
     val camera = new OrthographicCamera(map.getProperties.get("width", classOf[Int]),
                                         map.getProperties.get("height", classOf[Int]))
     camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0)
     camera.update()
     val shader = new ShaderProgram(resolve("shaders/sprite.vert"), resolve("shaders/spriteMixColor.frag"))
     val batch = new SpriteBatch(1000, shader)
-    val mapRenderer = new OrthogonalTiledMapRenderer(map, 1 / 16f, batch)
-    mapRenderer.setView(camera)
+    val renderer = new OrthogonalTiledMapRenderer(map, 1 / 16f, batch)
+    renderer.setView(camera)
 
-    val layers = map
+    val layers = layerEntities(map, renderer, multiverse) ++ Iterable(new CellHighlighter(1))
+    new Level(multiverse, new MultiverseView(multiverse, camera), layers, shader, batch)
+  }
+
+  /** Returns entities for all visible tile map layers.
+    *
+    * @param map the tile map
+    * @param renderer the map renderer
+    * @param multiverse the multiverse
+    * @return entities for all visible tile map layers
+    */
+  private def layerEntities(map: TiledMap,
+                            renderer: OrthogonalTiledMapRenderer,
+                            multiverse: Multiverse): Iterable[MapLayerEntity] =
+    map
       .getLayers
       .getByType(classOf[TiledMapTileLayer])
       .asScala
       .filter(_.isVisible)
       .zipWithIndex
-      .map(makeLayerEntity(multiverse, map, mapRenderer).tupled)
+      .map(layerEntity(map, renderer, multiverse).tupled)
 
-    new Level(multiverse,
-              new MultiverseView(multiverse, camera),
-              layers ++ Iterable(new CellHighlighter(1)),
-              shader,
-              batch)
+  /** Returns the entity for a tile map layer.
+    *
+    * @param map the tile map
+    * @param renderer the tile map renderer
+    * @param multiverse the multiverse
+    * @param mapLayer the map layer
+    * @param index the map layer index
+    * @return the tile map layer entity
+    */
+  private def layerEntity(map: TiledMap, renderer: OrthogonalTiledMapRenderer, multiverse: Multiverse)
+                         (mapLayer: MapLayer, index: Int): MapLayerEntity = {
+    val renderLayer = Option(mapLayer.getProperties.get("Layer", classOf[Int])).getOrElse(0)
+    val controls = Option(mapLayer.getProperties.get("Controls", classOf[String])).toSeq flatMap parseCells(map)
+    new MapLayerEntity(renderer, renderLayer, index, multiverse, controls)
   }
 
-  /** Makes an entity from a tile map layer.
+  /** Returns the entities for all of the objects in the tile map.
     *
     * @param multiverse the multiverse
     * @param map the tile map
-    * @param mapRenderer the tile map renderer
-    * @param mapLayer the map layer
-    * @param index the map layer index
-    * @return the layer entity
+    * @return a mapping from object ID to entity
     */
-  private def makeLayerEntity(multiverse: Multiverse, map: TiledMap, mapRenderer: OrthogonalTiledMapRenderer)
-                             (mapLayer: MapLayer, index: Int): Entity = {
-    val renderLayer = Option(mapLayer.getProperties.get("Layer", classOf[Int])).getOrElse(0)
-    val controls = Option(mapLayer.getProperties.get("Controls", classOf[String])).toSeq flatMap parseCells(map)
-    new MapLayerEntity(mapRenderer, renderLayer, index, multiverse, controls)
-  }
+  private def objectEntities(multiverse: Multiverse, map: TiledMap): Map[Int, Entity] =
+    (for {
+      layer <- map.getLayers.asScala
+      obj <- layer.getObjects.asScala
+    } yield {
+      val id = obj.getProperties.get("id", classOf[Int])
+      val entity = objectEntity(multiverse, map, obj)
+      id -> entity
+    }).toMap
 
-  /** Makes an entity from a tile map object.
+  /** Returns the entity for a tile map object.
     *
     * @param multiverse the multiverse
     * @param map the tile map
     * @param obj the map object
     * @return the object entity
     */
-  private def makeObjectEntity(multiverse: Multiverse, map: TiledMap, obj: MapObject): Entity = {
+  private def objectEntity(multiverse: Multiverse, map: TiledMap, obj: MapObject): Entity = {
     val cells = objectCells(map, obj)
     obj.getProperties.get("type") match {
       case "Player" => new Cat(multiverse, cells.head)
       case "Quball" => new Quball(multiverse, cells.head)
       case "Laser" =>
-        val gate = makeGate(obj.getProperties.get("Gate", classOf[String]))
+        val gate = toGate(obj.getProperties.get("Gate", classOf[String]))
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
         val control =
           if (obj.getProperties.containsKey("Controls"))
@@ -142,7 +159,7 @@ private object LevelLoader {
     * @param name the gate name
     * @return the corresponding gate
     */
-  private def makeGate(name: String): Gate[StateId[Boolean]] = name match {
+  private def toGate(name: String): Gate[StateId[Boolean]] = name match {
     case "X" => X
     case "Z" => Z
     case "H" => H
