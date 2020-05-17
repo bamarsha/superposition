@@ -37,13 +37,8 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
     val headers = multiverse.stateIds.view map (_.name)
     val columns = (multiverse.universes.view map multiverse.printUniverse).transpose
     val importants = columns map (column => column exists (_ != column.head))
-    val widths =
-      (columns.zip(headers) map { case (column, header) =>
-        (Iterable(header) ++ column).map(text => {
-          glyphLayout.setText(font, text)
-          glyphLayout.width + 10f
-        }).max
-      }).toSeq
+    val widths = columns.zip(headers) map { case (column, header) => textWidth(header).max((column map textWidth).max) }
+    val totalWidth = widths.sum
     val xs = widths.scanLeft(16f)(_ + _)
     val ys = multiverse.universes.view
       .map(const(-20f))
@@ -55,11 +50,9 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
     gl.glEnable(GL_BLEND)
     shapeRenderer.setProjectionMatrix((new Matrix4).setToOrtho2D(0, 0, graphics.getWidth, graphics.getHeight))
     shapeRenderer.begin(Filled)
-    for ((y, minValue) <- ys.zip(Iterable(None) ++ (minValues map Some.apply))) {
-      val color = (new Color).fromHsv(minValue.getOrElse(0f) * 360f, if (minValue.isDefined) 1 else 0, 1)
-      color.a = 0.5f
-      shapeRenderer.setColor(color)
-      shapeRenderer.rect(12f, y + 2, widths.sum - 2, -16)
+    drawRectangle(WHITE, ys.head, totalWidth)
+    for ((y, minValue) <- ys.tail.zip(minValues)) {
+      drawRectangle((new Color).fromHsv(minValue * 360, 1, 1), y, totalWidth)
     }
     shapeRenderer.end()
 
@@ -67,11 +60,33 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
     batch.begin()
     for ((((header, column), important), x) <- headers.zip(columns).zip(importants).zip(xs)) {
       font.setColor(if (important) ImportantColor else NormalColor)
-      for ((y, cell) <- ys.zip(Iterable(header) ++ column)) {
+      font.draw(batch, header, x, ys.head)
+      for ((y, cell) <- ys.tail.zip(column)) {
         font.draw(batch, cell, x, y)
       }
     }
     batch.end()
+  }
+
+  /** Returns the width of the text in the display font.
+    *
+    * @param text the text
+    * @return the width of the text
+    */
+  private def textWidth(text: String): Float = {
+    glyphLayout.setText(font, text)
+    glyphLayout.width + 10f
+  }
+
+  /** Draws a rectangle in the table.
+    *
+    * @param color the color
+    * @param y the y coordinate
+    * @param width the width
+    */
+  private def drawRectangle(color: Color, y: Float, width: Float): Unit = {
+    shapeRenderer.setColor(color.r, color.g, color.b, 0.5f)
+    shapeRenderer.rect(12f, y + 2, width - 2, -16)
   }
 
   override def dispose(): Unit = {

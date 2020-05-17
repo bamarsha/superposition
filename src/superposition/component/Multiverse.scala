@@ -83,7 +83,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
         (newUniverses
           |> combine
           |> (_.toSeq)
-          |> (_ sortBy printUniverse))
+          |> (_ sortBy (printUniverse andThen (_.toSeq))))
       true
     } else false
   }
@@ -148,7 +148,8 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
       !isBlocked(universe, universe.state(QuantumPosition.Mapper.get(entity).cell))
     }
 
-  def printUniverse(universe: Universe): Seq[String] = /*_*/ stateIds map (id => id.printer(universe.state(id))) /*_*/
+  def printUniverse(universe: Universe): Iterable[String] =
+    stateIds.view map (id => /*_*/ id.printer(universe.state(id)) /*_*/)
 }
 
 /** Contains the component mapper for the multiverse component. */
