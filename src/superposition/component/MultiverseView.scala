@@ -8,7 +8,8 @@ import superposition.component.MultiverseView.UniversePartRenderer
 import superposition.graphics.UniverseRenderInfo
 import superposition.math.{Universe, Vector2}
 
-import scala.collection.immutable.Queue
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 /** The multiverse view component manages the camera and provides rendering effects for the multiverse.
   *
@@ -17,7 +18,7 @@ import scala.collection.immutable.Queue
   */
 final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends Component {
   /** The queued renderers. */
-  private var renderers: Queue[UniversePartRenderer] = Queue.empty
+  private val renderers: mutable.IndexedBuffer[UniversePartRenderer] = new ArrayBuffer
 
   /** Returns true if the cell is selected by the mouse.
     *
@@ -34,9 +35,8 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
     * @param dependentState the value of the quantum state that the renderer depends on
     * @param render the rendering action
     */
-  def enqueueRenderer(dependentState: Universe => Any)
-                     (render: (Universe, UniverseRenderInfo) => Unit): Unit =
-    renderers = renderers enqueue UniversePartRenderer(render, dependentState)
+  def enqueueRenderer(dependentState: Universe => Any)(render: (Universe, UniverseRenderInfo) => Unit): Unit =
+    renderers.append(UniversePartRenderer(render, dependentState))
 
   /** Renders all of the queued renderers for the universe.
     *
@@ -48,12 +48,29 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
     */
   def render(universe: Universe, renderInfo: UniverseRenderInfo): Unit =
     for (renderer <- renderers) {
-      val isSameInAllUniverses = (multiverse.universes map renderer.dependentState).toSet.size == 1
-      renderer.render(universe, if (isSameInAllUniverses) UniverseRenderInfo.Default else renderInfo)
+      renderer.render(universe, if (isSameInAllUniverses(renderer)) UniverseRenderInfo.Default else renderInfo)
     }
 
   /** Clears the renderer queue for this frame. */
-  def clearRenderers(): Unit = renderers = Queue.empty
+  def clearRenderers(): Unit = renderers.clear()
+
+  /** Returns true if the renderer's dependent state is the same in all universes.
+    *
+    * @param renderer the universe part renderer
+    * @return true if the renderer's dependent state is the same in all universes
+    */
+  private def isSameInAllUniverses(renderer: UniversePartRenderer): Boolean = {
+    // Since this function is called several times per frame, it uses a procedural style for optimization reasons.
+    val iterator = multiverse.universes.iterator
+    var state = renderer.dependentState(iterator.next())
+    var same = true
+    while (same && iterator.hasNext) {
+      val nextState = renderer.dependentState(iterator.next())
+      same = state == nextState
+      state = nextState
+    }
+    same
+  }
 }
 
 /** Contains the component mapper for the multiverse view component. */
