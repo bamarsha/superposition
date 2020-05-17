@@ -17,7 +17,7 @@ final case class Vector2[@specialized(Int, Double) A](x: A, y: A) {
     * @tparam B the new type of the components
     * @return the mapped vector
     */
-  def map[B](f: A => B): Vector2[B] = Vector2(f(x), f(y))
+  def map[@specialized(Int, Double) B](f: A => B): Vector2[B] = Vector2(f(x), f(y))
 
   override def toString: String = s"($x, $y)"
 }
