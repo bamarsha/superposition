@@ -60,16 +60,15 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
     * @return true if the renderer's dependent state is the same in all universes
     */
   private def isSameInAllUniverses(renderer: UniversePartRenderer): Boolean = {
-    // Since this function is called several times per frame, it uses a procedural style for optimization reasons.
     val iterator = multiverse.universes.iterator
     var state = renderer.dependentState(iterator.next())
-    var same = true
-    while (same && iterator.hasNext) {
+    var allSame = true
+    while (allSame && iterator.hasNext) {
       val nextState = renderer.dependentState(iterator.next())
-      same = state == nextState
+      allSame &&= state == nextState
       state = nextState
     }
-    same
+    allSame
   }
 }
 
