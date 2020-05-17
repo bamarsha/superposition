@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import superposition.component.{ClassicalPosition, QuantumPosition, Renderable, SpriteView}
 import superposition.entity.Level
 import superposition.game.ResourceResolver.resolve
-import superposition.graphics.Extensions._
+import superposition.graphics.ColorUtils.ShaderOps
 import superposition.graphics.SpriteRenderer.absolutePosition
 import superposition.math.{Universe, Vector2}
 

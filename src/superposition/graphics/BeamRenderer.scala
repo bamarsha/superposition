@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.{Filled, Line}
 import superposition.component.{Beam, ClassicalPosition, Renderable}
 import superposition.entity.Level
 import superposition.graphics.BeamRenderer._
-import superposition.graphics.Extensions._
+import superposition.graphics.ColorUtils.ColorOps
 import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math.{Universe, Vector2}
 
@@ -54,7 +54,7 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer {
       val opacity = min(FadeDuration, BeamDuration + FadeDuration - universe.meta(beam.elapsedTime)) / FadeDuration
       gl.glEnable(GL_BLEND)
       shapeRenderer.begin(Filled)
-      shapeRenderer.setColor(new Color(1, 0, 0, opacity.toFloat).mixWith(renderInfo.color))
+      shapeRenderer.setColor(new Color(1, 0, 0, opacity.toFloat).mixed(renderInfo.color))
       beam.direction match {
         case Left | Right => shapeRenderer.rect(source.x + 0.5f, source.y + 0.375f, target.x - source.x, 0.25f)
         case Up | Down => shapeRenderer.rect(source.x + 0.375f, source.y + 0.5f, 0.25f, target.y - source.y)

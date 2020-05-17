@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.gdx.graphics.Color.{BLACK, WHITE}
 import superposition.component.{MapLayerView, Renderable}
 import superposition.entity.Level
-import superposition.graphics.Extensions._
+import superposition.graphics.ColorUtils.ShaderOps
 
 /** Renders tile map layers.
   *
