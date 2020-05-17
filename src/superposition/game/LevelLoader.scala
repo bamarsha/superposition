@@ -54,7 +54,15 @@ private object LevelLoader {
     val batch = new SpriteBatch(1000, shader)
     val mapRenderer = new OrthogonalTiledMapRenderer(map, 1 / 16f, batch)
     mapRenderer.setView(camera)
-    val layers = map.getLayers.asScala.zipWithIndex.map(makeLayerEntity(multiverse, map, mapRenderer).tupled)
+
+    val layers = map
+      .getLayers
+      .getByType(classOf[TiledMapTileLayer])
+      .asScala
+      .filter(_.isVisible)
+      .zipWithIndex
+      .map(makeLayerEntity(multiverse, map, mapRenderer).tupled)
+
     new Level(multiverse,
               new MultiverseView(multiverse, camera),
               layers ++ Iterable(new CellHighlighter(1)),
