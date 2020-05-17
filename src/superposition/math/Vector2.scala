@@ -10,7 +10,7 @@ import scala.math.sqrt
   * @param y the y component
   * @tparam A the type of the components
   */
-final case class Vector2[A](x: A, y: A) {
+final case class Vector2[@specialized(Int, Double) A](x: A, y: A) {
   /** Maps the components of the vector.
     *
     * @param f the mapping function
@@ -19,81 +19,98 @@ final case class Vector2[A](x: A, y: A) {
     */
   def map[B](f: A => B): Vector2[B] = Vector2(f(x), f(y))
 
-  /** Adds two vectors.
-    *
-    * @param that the other vector
-    * @param numeric the numeric type class
-    * @return the vector sum
-    */
-  def +(that: Vector2[A])(implicit numeric: Numeric[A]): Vector2[A] = {
-    import numeric._
-    Vector2(x + that.x, y + that.y)
-  }
-
-  /** Subtracts two vectors.
-    *
-    * @param that the other vector
-    * @param numeric the numeric type class
-    * @return the vector difference
-    */
-  def -(that: Vector2[A])(implicit numeric: Numeric[A]): Vector2[A] = {
-    import numeric._
-    Vector2(x - that.x, y - that.y)
-  }
-
-  /** Computes the dot product of two vectors.
-    *
-    * @param that the other vector
-    * @param numeric the numeric type class
-    * @return the dot product
-    */
-  def *(that: Vector2[A])(implicit numeric: Numeric[A]): A = {
-    import numeric._
-    x * that.x + y * that.y
-  }
-
-  /** Multiplies the vector by a scalar.
-    *
-    * @param scalar the scalar
-    * @param numeric the numeric type class
-    * @return the scaled vector
-    */
-  def *(scalar: A)(implicit numeric: Numeric[A]): Vector2[A] = {
-    import numeric._
-    map(_ * scalar)
-  }
-
-  /** Returns the negation of the vector.
-    *
-    * @param numeric the numeric type class
-    * @return the negation of the vector
-    */
-  def unary_-(implicit numeric: Numeric[A]): Vector2[A] = {
-    import numeric._
-    map(negate)
-  }
-
-  /** Divides the vector by a scalar.
-    *
-    * @param scalar the scalar
-    * @return the scaled vector
-    */
-  def /(scalar: A)(implicit fractional: Fractional[A]): Vector2[A] = {
-    import fractional._
-    map(_ / scalar)
-  }
-
   override def toString: String = s"($x, $y)"
 }
 
 /** Vector operations. */
 object Vector2 {
 
+  /** Operations on vectors of integers.
+    *
+    * @param vector the vector
+    */
+  implicit final class IntOps(val vector: Vector2[Int]) extends AnyVal {
+    /** Adds two vectors.
+      *
+      * @param that the other vector
+      * @return the vector sum
+      */
+    def +(that: Vector2[Int]): Vector2[Int] = Vector2(vector.x + that.x, vector.y + that.y)
+
+    /** Subtracts two vectors.
+      *
+      * @param that the other vector
+      * @return the vector difference
+      */
+    def -(that: Vector2[Int]): Vector2[Int] = Vector2(vector.x - that.x, vector.y - that.y)
+
+    /** Computes the dot product of two vectors.
+      *
+      * @param that the other vector
+      * @return the dot product
+      */
+    def *(that: Vector2[Int]): Int = vector.x * that.x + vector.y * that.y
+
+    /** Multiplies the vector by a scalar.
+      *
+      * @param scalar the scalar
+      * @return the scaled vector
+      */
+    def *(scalar: Int): Vector2[Int] = vector map (_ * scalar)
+
+    /** Returns the negation of the vector.
+      *
+      * @return the negation of the vector
+      */
+    def unary_- : Vector2[Int] = vector map (-_)
+  }
+
   /** Operations on vectors of doubles.
     *
     * @param vector the vector
     */
   implicit final class DoubleOps(val vector: Vector2[Double]) extends AnyVal {
+    /** Adds two vectors.
+      *
+      * @param that the other vector
+      * @return the vector sum
+      */
+    def +(that: Vector2[Double]): Vector2[Double] = Vector2(vector.x + that.x, vector.y + that.y)
+
+    /** Subtracts two vectors.
+      *
+      * @param that the other vector
+      * @return the vector difference
+      */
+    def -(that: Vector2[Double]): Vector2[Double] = Vector2(vector.x - that.x, vector.y - that.y)
+
+    /** Computes the dot product of two vectors.
+      *
+      * @param that the other vector
+      * @return the dot product
+      */
+    def *(that: Vector2[Double]): Double = vector.x * that.x + vector.y * that.y
+
+    /** Multiplies the vector by a scalar.
+      *
+      * @param scalar the scalar
+      * @return the scaled vector
+      */
+    def *(scalar: Double): Vector2[Double] = vector map (_ * scalar)
+
+    /** Divides the vector by a scalar.
+      *
+      * @param scalar the scalar
+      * @return the scaled vector
+      */
+    def /(scalar: Double): Vector2[Double] = vector map (_ / scalar)
+
+    /** Returns the negation of the vector.
+      *
+      * @return the negation of the vector
+      */
+    def unary_- : Vector2[Double] = vector map (-_)
+
     /** The length of the vector. */
     def length: Double = sqrt(vector * vector)
 
