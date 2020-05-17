@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.graphics.{Color, GL20}
 import com.badlogic.gdx.math.Matrix4
 import superposition.component._
+import superposition.game.ResourceResolver.resolve
 
 /** Renders the multiverse. */
 final class MultiverseRenderer extends Renderer {
@@ -21,13 +22,13 @@ final class MultiverseRenderer extends Renderer {
   /** The font. */
   private val font: BitmapFont = new BitmapFont
 
-  private val universeStep = new PostProcessingStep()
+  private val universeBuffer = new PostProcessedBuffer(resolve("shaders/sprite.frag"))
 
-  private val multiverseStep = new PostProcessingStep("universe")
-  multiverseStep.batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE, GL20.GL_ONE)
+  private val multiverseBuffer = new PostProcessedBuffer(resolve("shaders/universe.frag"))
+  multiverseBuffer.batch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE, GL20.GL_ONE)
 
-  private val noiseStep = new PostProcessingStep("totalNoise", true)
-  noiseStep.batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE)
+  private val noiseBuffer = new PostProcessedBuffer(resolve("shaders/totalNoise.frag"), true)
+  noiseBuffer.batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE)
 
   /** The elapsed time since the system began. */
   private var time: Float = 0
@@ -48,40 +49,36 @@ final class MultiverseRenderer extends Renderer {
     val multiverse = Multiverse.Mapper.get(entity)
     val multiverseView = MultiverseView.Mapper.get(entity)
 
-    universeStep.camera = multiverseView.camera
-    multiverseStep.camera = multiverseView.camera
-    noiseStep.camera = multiverseView.camera
-
-    noiseStep.clear()
-    noiseStep.run {
+    noiseBuffer.clear()
+    noiseBuffer.capture(multiverseView.camera) { () =>
       var timeOffset = 0f
       for (universe <- multiverse.universes) {
-        noiseStep.shader.setUniformf("time", time + timeOffset)
-        noiseStep.shader.setUniformf("probability", universe.amplitude.squaredMagnitude.toFloat)
-        multiverseStep.drawTo(noiseStep.batch)
-        noiseStep.batch.flush()
+        noiseBuffer.shader.setUniformf("time", time + timeOffset)
+        noiseBuffer.shader.setUniformf("probability", universe.amplitude.squaredMagnitude.toFloat)
+        multiverseBuffer.draw(noiseBuffer.batch, multiverseView.camera)
+        noiseBuffer.batch.flush()
         timeOffset += 10
       }
     }
 
-    multiverseStep.clear()
+    multiverseBuffer.clear()
 
     var minValue = 0f
     var timeOffset = 0
     for (universe <- multiverse.universes) {
-      universeStep.clear()
-      universeStep.buffer.begin()
+      universeBuffer.clear()
+      universeBuffer.buffer.begin()
       multiverseView.render(universe, UniverseRenderParams(new Color(1, 1, 1, .3f).fromHsv(minValue * 360f, 1, 1)))
-      universeStep.buffer.end()
+      universeBuffer.buffer.end()
 
       val probability = universe.amplitude.squaredMagnitude.toFloat
-      multiverseStep.run {
-        multiverseStep.shader.setUniformf("time", time + timeOffset)
-        multiverseStep.shader.setUniformf("probability", probability)
-        multiverseStep.shader.setUniformi("totalNoise", 1)
-        noiseStep.buffer.getColorBufferTexture.bind(1)
+      multiverseBuffer.capture(multiverseView.camera) { () =>
+        multiverseBuffer.shader.setUniformf("time", time + timeOffset)
+        multiverseBuffer.shader.setUniformf("probability", probability)
+        multiverseBuffer.shader.setUniformi("totalNoise", 1)
+        noiseBuffer.buffer.getColorBufferTexture.bind(1)
         gl.glActiveTexture(GL20.GL_TEXTURE0)
-        universeStep.drawTo(multiverseStep.batch)
+        universeBuffer.draw(multiverseBuffer.batch, multiverseView.camera)
       }
 
       minValue += probability
@@ -90,7 +87,7 @@ final class MultiverseRenderer extends Renderer {
 
     batch.setProjectionMatrix(multiverseView.camera.combined)
     batch.begin()
-    multiverseStep.drawTo(batch)
+    multiverseBuffer.draw(batch, multiverseView.camera)
     batch.end()
 
     multiverseView.clearRenderers()
