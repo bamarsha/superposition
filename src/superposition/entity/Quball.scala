@@ -25,7 +25,7 @@ final class Quball(multiverse: Multiverse, initialCell: Vector2[Int]) extends En
     add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))
     add(new PrimaryBit(onOff))
     add(new Activator(onOff))
-    add(new Carried(carried))
+    add(new Carriable(carried))
     add(new Renderable(1, universe => (universe.state(onOff), universe.state(carried), universe.state(cell))))
     add(new SpriteView(
       texture = universe => if (universe.state(onOff)) QuballTextureOn else QuballTextureOff,

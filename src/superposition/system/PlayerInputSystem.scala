@@ -25,7 +25,7 @@ final class PlayerInputSystem(level: () => Option[Level])
 
   override def addedToEngine(engine: Engine): Unit = {
     super.addedToEngine(engine)
-    carriables = engine.getEntitiesFor(Family.all(classOf[Carried], classOf[QuantumPosition]).get).asScala
+    carriables = engine.getEntitiesFor(Family.all(classOf[Carriable], classOf[QuantumPosition]).get).asScala
   }
 
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
@@ -67,7 +67,7 @@ private object PlayerInputSystem {
     val walkCarried: Gate[Vector2[Int]] = Translate.multi controlled { delta => universe =>
       if (universe.state(player.alive))
         carriables
-          .filter(carriable => universe.state(Carried.Mapper.get(carriable).carried))
+          .filter(carriable => universe.state(Carriable.Mapper.get(carriable).carried))
           .map(carriable => (QuantumPosition.Mapper.get(carriable).cell, delta))
           .toList
       else Nil
@@ -90,7 +90,7 @@ private object PlayerInputSystem {
           val carriableCell = QuantumPosition.Mapper.get(carriable).cell
           universe.state(player.alive) && universe.state(playerCell) == universe.state(carriableCell)
         }
-        .map(Carried.Mapper.get(_).carried)
+        .map(Carriable.Mapper.get(_).carried)
         .toList
     }
   }
@@ -159,7 +159,7 @@ private object PlayerInputSystem {
     val player = Player.Mapper.get(entity)
     val playerPosition = QuantumPosition.Mapper.get(entity)
     for (carriable <- carriables) {
-      val carried = Carried.Mapper.get(carriable).carried
+      val carried = Carriable.Mapper.get(carriable).carried
       val carriedPosition = QuantumPosition.Mapper.get(carriable)
       multiverse.updateMetaWith(carriedPosition.absolute) { pos => universe =>
         val relativePos =
