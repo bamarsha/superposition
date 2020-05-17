@@ -31,7 +31,8 @@ private final class Superposition extends Game {
       new BeamRenderer(() => levels.current),
       new CellHighlightRenderer(() => levels.current),
       new MultiverseRenderer)))
-    engine.addSystem(new DebugInfoSystem(() => renderNanoTime))
+    engine.addSystem(new StateDisplaySystem(() => levels.current))
+    engine.addSystem(new DebugDisplaySystem(() => renderNanoTime))
   }
 
   override def render(): Unit = {

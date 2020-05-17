@@ -2,17 +2,17 @@ package superposition.system
 
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.gdx.Gdx.graphics
-import com.badlogic.gdx.graphics.g2d.{BitmapFont, SpriteBatch}
+import com.badlogic.gdx.graphics.g2d.{Batch, BitmapFont, SpriteBatch}
 
-/** Displays information about the game to help with debugging.
+/** Displays debugging information about the game.
   *
   * @param renderNanoTime a function that returns the time it took to render the last frame in nanoseconds
   */
-final class DebugInfoSystem(renderNanoTime: () => Long) extends EntitySystem {
-  /** The sprite batch. */
-  private val batch: SpriteBatch = new SpriteBatch
+final class DebugDisplaySystem(renderNanoTime: () => Long) extends EntitySystem {
+  /** The batch. */
+  private val batch: Batch = new SpriteBatch
 
-  /** The font. */
+  /** The display font. */
   private val font: BitmapFont = new BitmapFont
 
   override def update(deltaTime: Float): Unit = {
