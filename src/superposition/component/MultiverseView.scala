@@ -5,7 +5,7 @@ import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.math.Vector3
 import superposition.component.MultiverseView.UniversePartRenderer
-import superposition.graphics.UniverseRenderParams
+import superposition.graphics.UniverseRenderInfo
 import superposition.math.{Universe, Vector2}
 
 import scala.collection.immutable.Queue
@@ -31,25 +31,25 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
 
   /** Enqueues a renderer that will be called for each universe.
     *
-    * The renderer will be given `Some(UniverseRenderParams)` only if the dependent state is not the same in all
-    * universes. Otherwise, it will be given `None`.
-    *
     * @param dependentState the value of the quantum state that the renderer depends on
     * @param render the rendering action
     */
   def enqueueRenderer(dependentState: Universe => Any)
-                     (render: (Universe, Option[UniverseRenderParams]) => Unit): Unit =
+                     (render: (Universe, UniverseRenderInfo) => Unit): Unit =
     renderers = renderers enqueue UniversePartRenderer(render, dependentState)
 
   /** Renders all of the queued renderers for the universe.
     *
+    * Each renderer will be given the `renderInfo` only if its dependent state is not the same in all universes. If it
+    * is the same, it will be given the default render information instead.
+    *
     * @param universe the universe
-    * @param renderParams the rendering parameters for the universe
+    * @param renderInfo the rendering information for the universe
     */
-  def render(universe: Universe, renderParams: UniverseRenderParams): Unit =
+  def render(universe: Universe, renderInfo: UniverseRenderInfo): Unit =
     for (renderer <- renderers) {
       val isSameInAllUniverses = (multiverse.universes map renderer.dependentState).toSet.size == 1
-      renderer.render(universe, if (isSameInAllUniverses) None else Some(renderParams))
+      renderer.render(universe, if (isSameInAllUniverses) UniverseRenderInfo.Default else renderInfo)
     }
 
   /** Clears the renderer queue for this frame. */
@@ -65,7 +65,7 @@ object MultiverseView {
     * @param dependentState the value of the quantum state that the renderer depends on
     */
   private final case class UniversePartRenderer(
-      render: (Universe, Option[UniverseRenderParams]) => Unit,
+      render: (Universe, UniverseRenderInfo) => Unit,
       dependentState: Universe => Any)
 
   /** The component mapper for the multiverse view component. */

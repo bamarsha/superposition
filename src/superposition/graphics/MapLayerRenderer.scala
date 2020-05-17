@@ -18,10 +18,11 @@ final class MapLayerRenderer(level: () => Option[Level]) extends Renderer {
     val multiverseView = level().get.multiverseView
     val mapView = MapLayerView.Mapper.get(entity)
     val shader = mapView.renderer.getBatch.getShader
-    multiverseView.enqueueRenderer(Renderable.Mapper.get(entity).dependentState) { (universe, renderParams) =>
+    val dependentState = Renderable.Mapper.get(entity).dependentState
+    multiverseView.enqueueRenderer(dependentState) { (universe, renderInfo) =>
       shader.begin()
       shader.setUniformColor("color", if (multiverse.allOn(universe, mapView.controls)) WHITE else BLACK)
-      shader.setUniformColor("tintColor", renderParams.color)
+      shader.setUniformColor("tintColor", renderInfo.color)
       shader.end()
       mapView.renderer.render(Array(mapView.layer))
     }

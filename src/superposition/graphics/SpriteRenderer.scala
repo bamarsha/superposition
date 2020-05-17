@@ -13,11 +13,11 @@ import superposition.math.{Universe, Vector2}
 
 /** Renders sprites. */
 final class SpriteRenderer(level: () => Option[Level]) extends Renderer {
-
+  /** The sprite shader program. */
   private val shader: ShaderProgram = new ShaderProgram(
     resolve("shaders/sprite.vert"),
     resolve("shaders/spriteMixColor.frag"))
-  assert(shader.isCompiled)
+  assert(shader.isCompiled, shader.getLog)
 
   // TODO: SpriteBatch is disposable.
   /** A sprite batch. */
@@ -30,10 +30,11 @@ final class SpriteRenderer(level: () => Option[Level]) extends Renderer {
 
   override def render(entity: Entity, deltaTime: Float): Unit = {
     val multiverseView = level().get.multiverseView
+    val dependentState = Renderable.Mapper.get(entity).dependentState
     batch.setProjectionMatrix(multiverseView.camera.combined)
-    multiverseView.enqueueRenderer(Renderable.Mapper.get(entity).dependentState) { (universe, urp) =>
+    multiverseView.enqueueRenderer(dependentState) { (universe, renderInfo) =>
       batch.begin()
-      draw(entity, universe, urp)
+      draw(entity, universe, renderInfo)
       batch.end()
     }
   }
@@ -42,13 +43,14 @@ final class SpriteRenderer(level: () => Option[Level]) extends Renderer {
     *
     * @param entity the entity
     * @param universe the universe to draw in
+    * @param renderInfo the rendering information for the universe
     */
-  private def draw(entity: Entity, universe: Universe, urp: Option[UniverseRenderParams]): Unit = {
+  private def draw(entity: Entity, universe: Universe, renderInfo: UniverseRenderInfo): Unit = {
     val spriteView = SpriteView.Mapper.get(entity)
     val scale = spriteView.scale(universe)
     val position = absolutePosition(entity, universe) - scale / 2
     shader.setUniformColor("color", WHITE)
-    shader.setUniformColor("tintColor", urp.color)
+    shader.setUniformColor("tintColor", renderInfo.color)
     batch.setColor(spriteView.color(universe))
     batch.draw(spriteView.texture(universe), position.x.toFloat, position.y.toFloat, scale.x.toFloat, scale.y.toFloat)
     batch.flush()
@@ -56,7 +58,6 @@ final class SpriteRenderer(level: () => Option[Level]) extends Renderer {
 }
 
 private object SpriteRenderer {
-
   /** Returns the absolute position of an entity that has either a classical or quantum position component.
     *
     * @param entity the entity

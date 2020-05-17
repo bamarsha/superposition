@@ -22,7 +22,4 @@ object Extensions {
     }
   }
 
-  implicit final class URPOps(val self: Option[UniverseRenderParams]) extends AnyVal {
-    def color: Color = self.map(_.color).getOrElse(Color.CLEAR)
-  }
 }

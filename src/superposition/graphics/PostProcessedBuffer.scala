@@ -18,6 +18,7 @@ import superposition.game.ResourceResolver.resolve
 final class PostProcessedBuffer(fragmentShader: FileHandle, useFloats: Boolean = false) {
   /** The post-processing shader program. */
   val shader: ShaderProgram = new ShaderProgram(resolve("shaders/sprite.vert"), fragmentShader)
+  assert(shader.isCompiled, shader.getLog)
 
   /** The post-processing batch. */
   val batch: Batch = new SpriteBatch(1000, shader)

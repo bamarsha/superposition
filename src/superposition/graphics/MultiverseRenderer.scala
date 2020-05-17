@@ -68,7 +68,7 @@ final class MultiverseRenderer extends Renderer {
     for (universe <- multiverse.universes) {
       universeBuffer.clear()
       universeBuffer.buffer.begin()
-      multiverseView.render(universe, UniverseRenderParams(new Color(1, 1, 1, .3f).fromHsv(minValue * 360f, 1, 1)))
+      multiverseView.render(universe, UniverseRenderInfo(new Color(1, 1, 1, .3f).fromHsv(minValue * 360f, 1, 1)))
       universeBuffer.buffer.end()
 
       val probability = universe.amplitude.squaredMagnitude.toFloat

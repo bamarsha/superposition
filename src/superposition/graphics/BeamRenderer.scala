@@ -31,11 +31,12 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer {
     val multiverseView = level().get.multiverseView
     shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
     val cell = ClassicalPosition.Mapper.get(entity).cells.head
-    multiverseView.enqueueRenderer(Renderable.Mapper.get(entity).dependentState) { (universe, urp) =>
+    val dependentState = Renderable.Mapper.get(entity).dependentState
+    multiverseView.enqueueRenderer(dependentState) { (universe, renderInfo) =>
       if (multiverseView.isSelected(cell)) {
         drawOutline(shapeRenderer, cell)
       }
-      drawBeam(entity, universe, urp)
+      drawBeam(entity, universe, renderInfo)
     }
   }
 
@@ -43,8 +44,9 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer {
     *
     * @param entity the entity shooting the laser beam
     * @param universe the universe
+    * @param renderInfo the rendering information for the universe
     */
-  private def drawBeam(entity: Entity, universe: Universe, urp: Option[UniverseRenderParams]): Unit = {
+  private def drawBeam(entity: Entity, universe: Universe, renderInfo: UniverseRenderInfo): Unit = {
     val source = ClassicalPosition.Mapper.get(entity).cells.head
     val beam = Beam.Mapper.get(entity)
     for (target <- universe.meta(beam.lastTarget)
@@ -52,7 +54,7 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer {
       val opacity = min(FadeDuration, BeamDuration + FadeDuration - universe.meta(beam.elapsedTime)) / FadeDuration
       gl.glEnable(GL_BLEND)
       shapeRenderer.begin(Filled)
-      shapeRenderer.setColor(new Color(1, 0, 0, opacity.toFloat).mixWith(urp.color))
+      shapeRenderer.setColor(new Color(1, 0, 0, opacity.toFloat).mixWith(renderInfo.color))
       beam.direction match {
         case Left | Right => shapeRenderer.rect(source.x + 0.5f, source.y + 0.375f, target.x - source.x, 0.25f)
         case Up | Down => shapeRenderer.rect(source.x + 0.375f, source.y + 0.5f, 0.25f, target.y - source.y)

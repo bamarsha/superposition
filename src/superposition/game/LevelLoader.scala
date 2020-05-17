@@ -45,6 +45,7 @@ private object LevelLoader {
     camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0)
     camera.update()
     val shader = new ShaderProgram(resolve("shaders/sprite.vert"), resolve("shaders/spriteMixColor.frag"))
+    assert(shader.isCompiled, shader.getLog)
     val batch = new SpriteBatch(1000, shader)
     val renderer = new OrthogonalTiledMapRenderer(map, 1 / 16f, batch)
     renderer.setView(camera)
