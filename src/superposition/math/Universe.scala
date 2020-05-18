@@ -75,3 +75,9 @@ final case class Universe(
   def updatedMetaWith(id: MetaId[_])(updater: id.Value => id.Value): Universe =
     copy(meta = meta.updatedWith(id)(updater.lift))
 }
+
+/** Factories for universes. */
+object Universe {
+  /** The empty universe. */
+  val Empty: Universe = Universe()
+}
