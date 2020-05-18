@@ -45,7 +45,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     * @tparam A the qudit's type
     * @return the qudit's ID
     */
-  def allocate[A](name: String, initialValue: A, showValue: A => String = _.toString): StateId[A] = {
+  def allocate[A](name: String, initialValue: A, showValue: A => String = (_: A).toString): StateId[A] = {
     val id = new StateId[A](name, showValue)
     _universes = _universes map (_.updatedState(id)(initialValue))
     _stateIds = _stateIds.appended(id)
