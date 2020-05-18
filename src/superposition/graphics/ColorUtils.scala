@@ -32,9 +32,15 @@ private object ColorUtils {
       *
       * @param name the name of the uniform
       * @param color the color to set the uniform to
+      * @param array an array of at least length 4 to fill with the color components
       */
-    def setUniformColor(name: String, color: Color): Unit =
-      shader.setUniform4fv(name, Array(color.r, color.g, color.b, color.a), 0, 4)
+    def setUniformColor(name: String, color: Color, array: Array[Float]): Unit = {
+      array(0) = color.r
+      array(1) = color.g
+      array(2) = color.b
+      array(3) = color.a
+      shader.setUniform4fv(name, array, 0, 4)
+    }
   }
 
 }

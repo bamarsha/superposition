@@ -23,6 +23,9 @@ final class SpriteRenderer(level: () => Option[Level]) extends Renderer with Dis
   /** The batch. */
   private val batch: Batch = new SpriteBatch(1000, shader)
 
+  /** An array for holding color components. */
+  private val colorArray: Array[Float] = Array.ofDim(4)
+
   override val family: Family = Family
     .all(classOf[SpriteView])
     .one(classOf[ClassicalPosition], classOf[QuantumPosition])
@@ -49,8 +52,8 @@ final class SpriteRenderer(level: () => Option[Level]) extends Renderer with Dis
     val spriteView = SpriteView.Mapper.get(entity)
     val scale = spriteView.scale(universe)
     val position = absolutePosition(entity, universe) - scale / 2
-    shader.setUniformColor("color", WHITE)
-    shader.setUniformColor("tintColor", renderInfo.color)
+    shader.setUniformColor("color", WHITE, colorArray)
+    shader.setUniformColor("tintColor", renderInfo.color, colorArray)
     batch.setColor(spriteView.color(universe))
     batch.draw(spriteView.texture(universe), position.x.toFloat, position.y.toFloat, scale.x.toFloat, scale.y.toFloat)
     batch.flush()

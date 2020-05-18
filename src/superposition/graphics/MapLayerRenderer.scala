@@ -11,6 +11,9 @@ import superposition.graphics.ColorUtils.ShaderOps
   * @param level a function that returns the current level
   */
 final class MapLayerRenderer(level: () => Option[Level]) extends Renderer {
+  /** An array for holding color components. */
+  private val colorArray: Array[Float] = Array.ofDim(4)
+
   override val family: Family = Family.all(classOf[MapLayerView]).get
 
   override def render(entity: Entity, deltaTime: Float): Unit = {
@@ -21,8 +24,8 @@ final class MapLayerRenderer(level: () => Option[Level]) extends Renderer {
     val dependentState = Renderable.Mapper.get(entity).dependentState
     multiverseView.enqueueRenderer(dependentState) { (universe, renderInfo) =>
       shader.begin()
-      shader.setUniformColor("color", if (multiverse.allOn(universe, mapView.controls)) WHITE else BLACK)
-      shader.setUniformColor("tintColor", renderInfo.color)
+      shader.setUniformColor("color", if (multiverse.allOn(universe, mapView.controls)) WHITE else BLACK, colorArray)
+      shader.setUniformColor("tintColor", renderInfo.color, colorArray)
       shader.end()
       mapView.renderer.render(Array(mapView.layer))
     }
