@@ -63,7 +63,7 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
   private def drawState(): Unit = {
     val multiverse = level().get.multiverse
     val headers = multiverse.stateIds.view map (_.name)
-    val columns = (multiverse.universes.view map multiverse.printUniverse).transpose
+    val columns = (multiverse.universes.view map multiverse.showUniverse).transpose
     val importants = columns map (column => column exists (_ != column.head))
     val widths = columns.zip(headers) map { case (column, header) => textWidth(header).max((column map textWidth).max) }
     val totalWidth = widths.sum

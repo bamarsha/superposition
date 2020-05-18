@@ -18,8 +18,8 @@ import scala.Function.const
 final class Quball(multiverse: Multiverse, initialCell: Vector2[Int]) extends Entity {
   locally {
     val absolutePosition = multiverse.allocateMeta((initialCell map (_.toDouble)) + Vector2(0.5, 0.5))
-    val onOff = multiverse.allocate("Is On?", false, (a: Boolean) => if (a) "On" else "Off")
-    val carried = multiverse.allocate("Is Carried?", false, (a: Boolean) => if (a) "Carried" else "Dropped")
+    val onOff = multiverse.allocate("Is On?", false, if (_) "On" else "Off")
+    val carried = multiverse.allocate("Is Carried?", false, if (_) "Carried" else "Dropped")
     val cell = multiverse.allocate("Position", initialCell)
 
     add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))

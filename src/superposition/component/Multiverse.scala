@@ -39,12 +39,14 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
 
   /** Allocates a qudit.
     *
-    * @param initialValue the qudit's initial value
+    * @param name the name of the qudit
+    * @param initialValue the initial value of the qudit
+    * @param showValue a function that maps values of the qudit to strings
     * @tparam A the qudit's type
     * @return the qudit's ID
     */
-  def allocate[A](name: String, initialValue: A, printer: A => String = (x: A) => x.toString): StateId[A] = {
-    val id = new StateId[A](name, printer)
+  def allocate[A](name: String, initialValue: A, showValue: A => String = _.toString): StateId[A] = {
+    val id = new StateId[A](name, showValue)
     _universes = _universes map (_.updatedState(id)(initialValue))
     _stateIds = _stateIds.appended(id)
     id
@@ -83,7 +85,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
         (newUniverses
           |> combine
           |> (_.toSeq)
-          |> (_ sortBy (printUniverse andThen (_.toSeq))))
+          |> (_ sortBy (showUniverse andThen (_.toSeq))))
       true
     } else false
   }
@@ -148,8 +150,13 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
       !isBlocked(universe, universe.state(QuantumPosition.Mapper.get(entity).cell))
     }
 
-  def printUniverse(universe: Universe): Iterable[String] =
-    stateIds.view map (id => /*_*/ id.printer(universe.state(id)) /*_*/)
+  /** Shows all states in the universe.
+    *
+    * @param universe the universe
+    * @return the states in the universe converted to strings
+    */
+  def showUniverse(universe: Universe): Iterable[String] =
+    stateIds.view map (id => /*_*/ id.show(universe.state(id)) /*_*/)
 }
 
 /** Contains the component mapper for the multiverse component. */
