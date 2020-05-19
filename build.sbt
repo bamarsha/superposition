@@ -6,8 +6,9 @@ Compile / scalacOptions ++= Seq("-Xsource:3", "-deprecation")
 Compile / scalaSource := baseDirectory.value / "src"
 Compile / resourceDirectory := baseDirectory.value / "resources"
 
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.3.0"
 libraryDependencies += "com.beachape" %% "enumeratum" % "1.6.0"
+libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.3.0"
 libraryDependencies ++= {
   val version = "1.9.10"
   Seq(
