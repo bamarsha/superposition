@@ -1,6 +1,6 @@
 package superposition.game
 
-import scala.util.parsing.combinator._
+import scala.util.parsing.combinator.RegexParsers
 
 /** Parses gate programs. */
 private object GateParser extends RegexParsers {
