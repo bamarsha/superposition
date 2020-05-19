@@ -18,10 +18,12 @@ final class DebugDisplaySystem(renderNanoTime: () => Long) extends EntitySystem 
 
   override def update(deltaTime: Float): Unit = {
     val fps = graphics.getFramesPerSecond
-    val ms = (renderNanoTime() / 1e6d).round
+    val renderTime = (renderNanoTime() / 1e6d).round
+    val usedMemory = (Runtime.getRuntime.totalMemory - Runtime.getRuntime.freeMemory) / (2 << 19)
     batch.begin()
-    font.draw(batch, s"$fps fps", 8, 20)
-    font.draw(batch, s"$ms ms", 60, 20)
+    font.draw(batch, s"$fps FPS", 8, 20)
+    font.draw(batch, s"$renderTime ms", 70, 20)
+    font.draw(batch, s"$usedMemory MB", 115, 20)
     batch.end()
   }
 
