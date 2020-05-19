@@ -122,12 +122,11 @@ void main() {
     float noise = 0.;
     float scale = 1.;
     for (int i = 0; i < 1; i++) {
-        vec2 t = floor(texCoords * vec2(256, 144)) / 200.;
-        noise += snoise(vec3(t.xy * scale * 25., time / 5.)) / scale;
+        noise += snoise(vec3(texCoords.xy * scale * 15., time / 5.)) / scale;
         scale *= 2.;
     }
     float total = texture2D(totalNoise, texCoords).r;
-    noise = probability * exp(15. * noise) / total;
+    noise = probability * exp(5. * noise) / total;
     vec4 texColor = texture2D(u_texture, texCoords);
     gl_FragColor = vec4(texColor.rgb, texColor.a * noise);
 }
