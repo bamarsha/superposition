@@ -1,70 +1,9 @@
-package superposition.game
+package superposition.language
 
 import scala.util.parsing.combinator.RegexParsers
 
 /** Parses gate programs. */
-private object GateParser extends RegexParsers {
-
-  /** An expression. */
-  private sealed trait Expression
-
-  /** An identifier.
-    *
-    * @param name the name of the identifier
-    */
-  private final case class Identifier(name: String) extends Expression
-
-  /** An integral number.
-    *
-    * @param value the value of the number
-    */
-  private final case class Number(value: Int) extends Expression
-
-  /** A tuple.
-    *
-    * @param items the items in the tuple
-    */
-  private final case class Tuple(items: Seq[Expression]) extends Expression
-
-  /** A function call.
-    *
-    * @param function the function
-    * @param argument the argument to the function
-    */
-  private final case class Call(function: Expression, argument: Expression) extends Expression
-
-  /** An equals condition.
-    *
-    * @param lhs the left-hand side
-    * @param rhs the right-hand side
-    */
-  private final case class Equals(lhs: Expression, rhs: Expression) extends Expression
-
-  /** A gate transformer. */
-  private sealed trait Transformer
-
-  /** The on-transformer pre-applies an argument to a gate.
-    *
-    * @param argument the argument to the gate
-    */
-  private final case class OnTransformer(argument: Expression) extends Transformer
-
-  /** The if-transformer conditions the application of a gate.
-    *
-    * @param condition the condition
-    */
-  private final case class IfTransformer(condition: Expression) extends Transformer
-
-  /** The multi-transformer converts a gate into one that takes a sequence of arguments. */
-  private case object MultiTransformer extends Transformer
-
-  /** A gate application.
-    *
-    * @param gate the gate
-    * @param transformers the transformers
-    */
-  private final case class Application(gate: Expression, transformers: Seq[Transformer])
-
+private object Parser extends RegexParsers {
   override def skipWhitespace: Boolean = false
 
   /** Makes a tuple from a sequenced parser result.
