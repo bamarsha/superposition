@@ -34,8 +34,7 @@ private object Parser extends RegexParsers {
   private val tuple: Parser[Expression] =
     (("(" ~> whiteSpace.? ~> expression <~ whiteSpace.?)
       ~ ("," ~> whiteSpace.? ~> expression <~ whiteSpace.?).+ <~ ")"
-      ^^ mkList
-      ^^ Tuple)
+      ^^ mkList ^^ Tuple)
 
   /** A term is a parenthetical expression, tuple or literal. */
   private val term: Parser[Expression] = parenthetical | tuple | literal
@@ -67,12 +66,11 @@ private object Parser extends RegexParsers {
 
   /** A gate application. */
   private val application: Parser[Application] =
-    (("Apply" ~> whiteSpace).? ~> identifier ~ (whiteSpace ~> transformer).* <~ whiteSpace.? <~ "." <~ whiteSpace.?
-      ^^ makeTuple
-      ^^ Application.tupled)
+    (("Apply" ~> whiteSpace).? ~> identifier ~ (whiteSpace ~> transformer).* <~ whiteSpace.? <~ "."
+      ^^ makeTuple ^^ Application.tupled)
 
   /** A gate program. */
-  private val program: Parser[Seq[Application]] = whiteSpace.? ~> phrase(application.*)
+  private val program: Parser[Seq[Application]] = whiteSpace.? ~> phrase((application <~ whiteSpace.?).*)
 
   /** Runs the gate parser on a couple of examples.
     *
