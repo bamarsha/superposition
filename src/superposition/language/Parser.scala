@@ -4,7 +4,7 @@ import scala.util.parsing.combinator.RegexParsers
 
 /** Parses gate programs. */
 private object Parser extends RegexParsers {
-  override def skipWhitespace: Boolean = false
+  override val skipWhitespace: Boolean = false
 
   /** Makes a tuple from a sequenced parser result.
     *
