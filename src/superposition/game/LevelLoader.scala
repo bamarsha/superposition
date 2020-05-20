@@ -10,6 +10,7 @@ import com.badlogic.gdx.maps.{MapLayer, MapObject}
 import superposition.component.{Multiverse, MultiverseView, PrimaryBit}
 import superposition.entity.{MapLayer => MapLayerEntity, _}
 import superposition.game.ResourceResolver.resolve
+import superposition.language.{Interpreter, Parser}
 import superposition.math._
 
 import scala.jdk.CollectionConverters._
@@ -37,6 +38,18 @@ private object LevelLoader {
       println(s"Applying gate $name to object $target.")
       val bit = objects(target.toInt).getComponent(classOf[PrimaryBit]).bit
       multiverse.applyGate(toGate(name), bit)
+    }
+
+    // Test code
+    val gates2 = map.getProperties.get("Gates2", classOf[String])
+    if (gates2 != null) {
+      val program = Parser.parseAndConvert(new Interpreter(objects), gates2)
+      program match {
+        case Parser.Success(result, _) =>
+          println(result)
+          multiverse.applyGate(result, ())
+        case _ => throw new RuntimeException("Failed to parse text: " + gates2)
+      }
     }
 
     // Create the map renderer.

@@ -109,6 +109,15 @@ object Gate {
       * @return the new filtered gate
       */
     def filter(predicate: A => Boolean): Gate[A] = flatContramap(List(_) filter predicate)
+
+    /** Returns a new gate that applies the original gate only if the argument satisfies the predicate, and otherwise
+      * applies the identity gate instead.
+      *
+      * @param predicate the predicate that must be satisfied to apply the original gate
+      * @return the new filtered gate
+      */
+    def filter2(predicate: Universe => Boolean): Gate[A] =
+      multi.controlled[A]((a: A) => u => if (predicate(u)) Seq(a) else Seq.empty)
   }
 
 }

@@ -1,9 +1,11 @@
 package superposition.language
 
+import superposition.math.Gate
+
 import scala.util.parsing.combinator.RegexParsers
 
 /** Parses gate programs. */
-private object Parser extends RegexParsers {
+object Parser extends RegexParsers {
   override val skipWhitespace: Boolean = false
 
   /** Makes a tuple from a sequenced parser result.
@@ -19,13 +21,13 @@ private object Parser extends RegexParsers {
   private val keyword: Parser[String] = "Apply" | "on" | "if" | "multi"
 
   /** An identifier. */
-  private val identifier: Parser[Expression] = """[^\d\W]\w*""".r - keyword ^^ Identifier
+  private val identifier: Parser[String] = """[^\d\W]\w*""".r - keyword
 
   /** A number. */
-  private val number: Parser[Expression] = """\d+""".r ^^ (_.toInt) ^^ Number
+  private val number: Parser[Int] = """\d+""".r ^^ (_.toInt)
 
   /** A literal is an identifier or a number. */
-  private val literal: Parser[Expression] = identifier | number
+  private val literal: Parser[Expression] = identifier ^^ Identifier | number  ^^ Number
 
   /** A parenthetical expression. */
   private val parenthetical: Parser[Expression] = "(" ~> whiteSpace.? ~> expression <~ whiteSpace.? <~ ")"
@@ -71,6 +73,9 @@ private object Parser extends RegexParsers {
 
   /** A gate program. */
   private val program: Parser[Seq[Application]] = whiteSpace.? ~> phrase((application <~ whiteSpace.?).*)
+
+  def parseAndConvert(interpreter: Interpreter, text: String): ParseResult[Gate[Unit]] =
+    parse(program ^^ interpreter.program2scala, text)
 
   /** Runs the gate parser on a couple of examples.
     *

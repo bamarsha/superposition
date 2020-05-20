@@ -5,4 +5,4 @@ package superposition.language
   * @param gate the gate
   * @param transformers the transformers
   */
-private final case class Application(gate: Expression, transformers: Seq[Transformer])
+private final case class Application(gate: String, transformers: Seq[Transformer])
