@@ -61,7 +61,7 @@ object LaserInputSystem {
     */
   private def beamTarget(multiverse: Multiverse, entity: Entity)(universe: Universe): Option[Vector2[Int]] = {
     val controls = Beam.Mapper.get(entity).controls
-    if (multiverse.allOn(universe, controls))
+    if (controls(universe))
       beamPath(entity) find { cell =>
         multiverse.isBlocked(universe, cell) || multiverse.allInCell(universe, cell).nonEmpty
       }

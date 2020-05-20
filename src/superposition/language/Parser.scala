@@ -1,6 +1,8 @@
 package superposition.language
 
-import superposition.math.Gate
+import com.badlogic.gdx.maps.tiled.TiledMap
+import superposition.component.Multiverse
+import superposition.math.{Gate, Universe}
 
 import scala.util.parsing.combinator.RegexParsers
 
@@ -74,8 +76,11 @@ object Parser extends RegexParsers {
   /** A gate program. */
   private val program: Parser[Seq[Application]] = whiteSpace.? ~> phrase((application <~ whiteSpace.?).*)
 
-  def parseAndConvert(interpreter: Interpreter, text: String): ParseResult[Gate[Unit]] =
-    parse(program ^^ interpreter.program2scala, text)
+  def parseExpression[A](multiverse: Multiverse, map: TiledMap, text: String): ParseResult[Universe => A] =
+    parse(expression ^^ new Interpreter(multiverse, map).expr2scala ^^ (_.asInstanceOf[Universe => A]), text)
+
+  def parseProgram(multiverse: Multiverse, map: TiledMap, text: String): ParseResult[Gate[Unit]] =
+    parse(program ^^ new Interpreter(multiverse, map).program2scala, text)
 
   /** Runs the gate parser on a couple of examples.
     *

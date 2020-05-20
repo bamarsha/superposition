@@ -6,7 +6,7 @@ import superposition.component._
 import superposition.entity.Laser.Textures
 import superposition.game.ResourceResolver.resolve
 import superposition.math.Direction.{Down, Left, Right, Up}
-import superposition.math.{Direction, Gate, StateId, Vector2}
+import superposition.math.{Direction, Gate, StateId, Universe, Vector2}
 
 import scala.Function.const
 
@@ -23,12 +23,12 @@ final class Laser(
     cell: Vector2[Int],
     gate: Gate[StateId[Boolean]],
     direction: Direction,
-    controls: Iterable[Vector2[Int]])
+    controls: Universe => Boolean)
   extends Entity {
   add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5), Set(cell)))
   add(new Collider(const(Set(cell))))
   add(new Beam(multiverse, gate, direction, controls))
-  add(new Renderable(1, multiverse.allOn(_, controls)))
+  add(new Renderable(1, controls))
   add(new SpriteView(texture = const(Textures(direction)), scale = const(Vector2(0, 0))))
 }
 

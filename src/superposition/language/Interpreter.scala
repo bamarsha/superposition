@@ -1,22 +1,24 @@
 package superposition.language
 
-import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.maps.tiled.TiledMap
 import superposition.component.{Multiverse, PrimaryBit, QuantumPosition}
 import superposition.math.Gate.DivisibleGate.divisibleSyntax._
 import superposition.math._
 
 import scala.Function.{chain, const}
 
-class Interpreter(objects: Map[Int, Entity], multiverse: Multiverse) {
+class Interpreter(multiverse: Multiverse, map: TiledMap) {
 
-  private val bitFunction = (id: Int) => objects(id).getComponent(classOf[PrimaryBit]).bit
-  private val cellFunction = (id: Int) => objects(id).getComponent(classOf[QuantumPosition]).cell
-  private val vec2Function: List[Int] => Vector2[Int] = { case List(a, b) => Vector2(a, b) }
+  private val height = map.getProperties.get("height", classOf[Int])
+
+  private val bitFunction = (id: Int) => multiverse.getById(id).get.getComponent(classOf[PrimaryBit]).bit
+  private val cellFunction = (id: Int) => multiverse.getById(id).get.getComponent(classOf[QuantumPosition]).cell
+  private val vec2Function: List[Int] => Vector2[Int] = { case List(a, b) => Vector2(a, height - b - 1) }
 
   def iden2scala(name: String): Universe => _ = name match {
     case "allOn" => u => input: List[_] =>
       multiverse.allOn(u, (if (input.head.isInstanceOf[List[Int]]) input else List(input))
-        .asInstanceOf[List[List[Int]]].map(vec2Function))
+          .asInstanceOf[List[List[Int]]].map(vec2Function))
     case "bit" => const(bitFunction)
     case "cell" => const(cellFunction)
     case "value" => u => (stateId: StateId[_]) => u.state(stateId)

@@ -8,7 +8,7 @@ on (cell 12, (6, 0))
 if value (bit 12).
 
 Apply X on bit 12
-if value (cell 12) = vec2 (6, 6).</property>
+if value (cell 12) = vec2 (6, 2).</property>
  </properties>
  <tileset firstgid="1" name="industrial-sprite-sheet-DeadEnd-LMZ" tilewidth="16" tileheight="16" tilecount="204" columns="12">
   <image source="sprites/industrial-sprite-sheet-DeadEnd-LMZ.png" width="192" height="272"/>
@@ -124,7 +124,7 @@ if value (cell 12) = vec2 (6, 6).</property>
   </object>
   <object id="27" name="X Laser" type="Laser" gid="209" x="192" y="96" width="16" height="16">
    <properties>
-    <property name="Controls" value="(12, 2)"/>
+    <property name="Controls" value="allOn (12, 2)"/>
     <property name="Direction" value="Left"/>
     <property name="Gate" value="X"/>
    </properties>

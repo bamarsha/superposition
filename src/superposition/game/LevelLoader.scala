@@ -10,9 +10,10 @@ import com.badlogic.gdx.maps.{MapLayer, MapObject}
 import superposition.component.{Multiverse, MultiverseView}
 import superposition.entity.{MapLayer => MapLayerEntity, _}
 import superposition.game.ResourceResolver.resolve
-import superposition.language.{Interpreter, Parser}
+import superposition.language.Parser
 import superposition.math._
 
+import scala.Function.const
 import scala.jdk.CollectionConverters._
 import scala.sys.error
 
@@ -26,8 +27,7 @@ private object LevelLoader {
   def loadLevel(map: TiledMap): Level = {
     // Spawn object entities.
     val multiverse = new Multiverse(walls(map))
-    val objects = objectEntities(multiverse, map)
-    for (entity <- objects.values) {
+    for (entity <- getEntities(multiverse, map)) {
       println(s"Spawning ${entity.getClass.getSimpleName}.")
       multiverse.addEntity(entity)
     }
@@ -35,7 +35,7 @@ private object LevelLoader {
     // Apply initial gates.
     val gatesText = map.getProperties.get("Gates", classOf[String])
     if (gatesText != null) {
-      val program = Parser.parseAndConvert(new Interpreter(objects, multiverse), gatesText)
+      val program = Parser.parseProgram(multiverse, map, gatesText)
       program match {
         case Parser.Success(result, _) => multiverse.applyGate(result, ())
         case _ => throw new RuntimeException("Failed to parse text: " + gatesText)
@@ -97,15 +97,11 @@ private object LevelLoader {
     * @param map the tile map
     * @return a mapping from object ID to entity
     */
-  private def objectEntities(multiverse: Multiverse, map: TiledMap): Map[Int, Entity] =
-    (for {
+  private def getEntities(multiverse: Multiverse, map: TiledMap): Iterable[Entity] =
+    for {
       layer <- map.getLayers.asScala
       obj <- layer.getObjects.asScala
-    } yield {
-      val id = obj.getProperties.get("id", classOf[Int])
-      val entity = objectEntity(multiverse, map, obj)
-      id -> entity
-    }).toMap
+    } yield objectEntity(multiverse, map, obj)
 
   /** Returns the entity for a tile map object.
     *
@@ -115,18 +111,17 @@ private object LevelLoader {
     * @return the object entity
     */
   private def objectEntity(multiverse: Multiverse, map: TiledMap, obj: MapObject): Entity = {
+    val id = obj.getProperties.get("id", classOf[Int])
     val cells = objectCells(map, obj)
     obj.getProperties.get("type") match {
-      case "Player" => new Cat(multiverse, cells.head)
-      case "Quball" => new Quball(multiverse, cells.head)
+      case "Player" => new Cat(multiverse, id, cells.head)
+      case "Quball" => new Quball(multiverse, id, cells.head)
       case "Laser" =>
         val gate = toGate(obj.getProperties.get("Gate", classOf[String]))
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
-        val control =
-          if (obj.getProperties.containsKey("Controls"))
-            parseCells(map)(obj.getProperties.get("Controls", classOf[String])).toList
-          else Nil
-        new Laser(multiverse, cells.head, gate, direction, control)
+        val controlText = Option(obj.getProperties.get("Controls", classOf[String]))
+        val control = controlText.map(Parser.parseExpression[Boolean](multiverse, map, _).get)
+        new Laser(multiverse, cells.head, gate, direction, control.getOrElse(const(true)))
       case "Door" =>
         val controls = parseCells(map)(obj.getProperties.get("Controls", classOf[String])).toList
         new Door(multiverse, cells.head, controls)
