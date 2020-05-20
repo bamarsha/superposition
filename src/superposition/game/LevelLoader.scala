@@ -119,12 +119,11 @@ private object LevelLoader {
       case "Laser" =>
         val gate = toGate(obj.getProperties.get("Gate", classOf[String]))
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
-        val controlText = Option(obj.getProperties.get("Controls", classOf[String]))
-        val control = controlText.map(Parser.parseExpression[Boolean](multiverse, map, _).get)
-        new Laser(multiverse, cells.head, gate, direction, control.getOrElse(const(true)))
+        val control = parseControls(multiverse, map, obj)
+        new Laser(multiverse, cells.head, gate, direction, control)
       case "Door" =>
-        val controls = parseCells(map)(obj.getProperties.get("Controls", classOf[String])).toList
-        new Door(multiverse, cells.head, controls)
+        val control = parseControls(multiverse, map, obj)
+        new Door(multiverse, cells.head, control)
       case "Exit" => new Exit(cells)
       case unknown => error(s"Unknown entity type '$unknown'.")
     }
@@ -142,6 +141,12 @@ private object LevelLoader {
       case Some(m) => Vector2(m.group("x").trim.toInt, height - m.group("y").trim.toInt - 1)
       case None => error(s"Invalid cell '$string'.")
     }
+  }
+
+  private def parseControls(multiverse: Multiverse, map: TiledMap, obj: MapObject): Universe => Boolean = {
+    val controlText = Option(obj.getProperties.get("Controls", classOf[String]))
+    val control = controlText.map(Parser.parseExpression[Boolean](multiverse, map, _).get)
+    control.getOrElse(const(true))
   }
 
   /** Parses a sequence of cell positions for the tile map from a string "(x_1, y_1)\n...\n(x_n, y_n)".

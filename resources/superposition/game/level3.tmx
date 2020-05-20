@@ -92,13 +92,13 @@
   </object>
   <object id="18" name="Door" type="Door" x="215.58" y="26.2159">
    <properties>
-    <property name="Controls" value="(12, 2)"/>
+    <property name="Controls" value="allOn (12, 2)"/>
    </properties>
    <point/>
   </object>
   <object id="19" name="Door" type="Door" x="229.83" y="25.9659">
    <properties>
-    <property name="Controls" value="(12, 2)"/>
+    <property name="Controls" value="allOn (12, 2)"/>
    </properties>
    <point/>
   </object>
@@ -112,13 +112,13 @@
   </object>
   <object id="34" name="Door" type="Door" x="41.0227" y="90.6136">
    <properties>
-    <property name="Controls" value="(4, 6)"/>
+    <property name="Controls" value="allOn (4, 6)"/>
    </properties>
    <point/>
   </object>
   <object id="35" name="Door" type="Door" x="55.2727" y="90.3636">
    <properties>
-    <property name="Controls" value="(4, 6)"/>
+    <property name="Controls" value="allOn (4, 6)"/>
    </properties>
    <point/>
   </object>

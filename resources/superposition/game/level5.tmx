@@ -76,7 +76,7 @@
   </object>
   <object id="18" name="Door" type="Door" x="119.944" y="25.8523">
    <properties>
-    <property name="Controls" value="(12, 2)"/>
+    <property name="Controls" value="allOn (12, 2)"/>
    </properties>
    <point/>
   </object>

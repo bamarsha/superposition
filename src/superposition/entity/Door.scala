@@ -13,18 +13,11 @@ import superposition.math.{Universe, Vector2}
   * @param cell the cell position of the door
   * @param controls the control cells for the door
   */
-final class Door(multiverse: Multiverse, cell: Vector2[Int], controls: Iterable[Vector2[Int]]) extends Entity {
+final class Door(multiverse: Multiverse, cell: Vector2[Int], controls: Universe => Boolean) extends Entity {
   add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5)))
-  add(new Collider(universe => if (open(universe)) Set.empty else Set(cell)))
-  add(new Renderable(1, multiverse.allOn(_, controls)))
-  add(new SpriteView(universe => if (open(universe)) OpenTexture else ClosedTexture))
-
-  /** Returns true if the door is open in the universe.
-    *
-    * @param universe the universe.
-    * @return true if the door is open in the universe
-    */
-  private def open(universe: Universe): Boolean = multiverse.allOn(universe, controls)
+  add(new Collider(universe => if (controls(universe)) Set.empty else Set(cell)))
+  add(new Renderable(1, controls))
+  add(new SpriteView(universe => if (controls(universe)) OpenTexture else ClosedTexture))
 }
 
 /** Contains the sprite textures for doors. */

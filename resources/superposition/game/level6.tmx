@@ -112,13 +112,13 @@ if value (cell 12) = vec2 (6, 2).</property>
   <object id="12" name="Quball" type="Quball" gid="212" x="96" y="48" width="16" height="16"/>
   <object id="18" name="Door" type="Door" x="167.58" y="25.9659">
    <properties>
-    <property name="Controls" value="(12, 2)"/>
+    <property name="Controls" value="allOn (12, 2)"/>
    </properties>
    <point/>
   </object>
   <object id="19" name="Door" type="Door" x="182.705" y="25.9659">
    <properties>
-    <property name="Controls" value="(12, 2)"/>
+    <property name="Controls" value="allOn (12, 2)"/>
    </properties>
    <point/>
   </object>
@@ -132,13 +132,13 @@ if value (cell 12) = vec2 (6, 2).</property>
   <object id="36" name="Exit" type="Exit" x="160" y="16" width="32" height="16"/>
   <object id="40" name="Door" type="Door" x="71.955" y="26.3409">
    <properties>
-    <property name="Controls" value="(6, 2)"/>
+    <property name="Controls" value="allOn (6, 2)"/>
    </properties>
    <point/>
   </object>
   <object id="41" name="Door" type="Door" x="86.83" y="26.2159">
    <properties>
-    <property name="Controls" value="(6, 2)"/>
+    <property name="Controls" value="allOn (6, 2)"/>
    </properties>
    <point/>
   </object>
