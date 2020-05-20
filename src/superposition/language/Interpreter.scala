@@ -11,11 +11,13 @@ class Interpreter(objects: Map[Int, Entity]) {
 
   private val bitFunction = (id: Int) => objects(id).getComponent(classOf[PrimaryBit]).bit
   private val cellFunction = (id: Int) => objects(id).getComponent(classOf[QuantumPosition]).cell
+  private val vec2Function: List[Int] => Vector2[Int] = { case List(a, b) => Vector2(a, b) }
 
   def iden2scala(name: String): Universe => _ = name match {
     case "bit" => const(bitFunction)
     case "cell" => const(cellFunction)
     case "value" => u => (stateId: StateId[_]) => u.state(stateId)
+    case "vec2" => const(vec2Function)
     case _ => throw new RuntimeException("Unknown literal: " + name)
   }
 
@@ -37,9 +39,9 @@ class Interpreter(objects: Map[Int, Entity]) {
   }
 
   def gate2scala(name: String): Gate[_] = name match {
-    case "X" => X contramap ((x: StateId[Boolean]) => { println("X on " + x.name); x })
-    case "H" => H contramap ((x: StateId[Boolean]) => { println("H on " + x.name); x })
-    case "Translate" => Translate contramap ((x: (StateId[Vector2[Int]], Vector2[Int])) => { println(x); x }) contramap[List[Any]] {
+    case "X" => X
+    case "H" => H
+    case "Translate" => Translate contramap[List[Any]] {
       case List(stateId: StateId[Vector2[Int]], List(x: Int, y: Int)) => (stateId, Vector2(x, y)) }
     case _ => throw new RuntimeException("Unknown gate: " + name)
   }

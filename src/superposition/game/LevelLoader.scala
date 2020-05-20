@@ -45,9 +45,7 @@ private object LevelLoader {
     if (gates2 != null) {
       val program = Parser.parseAndConvert(new Interpreter(objects), gates2)
       program match {
-        case Parser.Success(result, _) =>
-          println(result)
-          multiverse.applyGate(result, ())
+        case Parser.Success(result, _) => multiverse.applyGate(result, ())
         case _ => throw new RuntimeException("Failed to parse text: " + gates2)
       }
     }

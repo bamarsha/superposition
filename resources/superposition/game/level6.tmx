@@ -8,7 +8,7 @@ on (cell 12, (6, 0))
 if value (bit 12).
 
 Apply X on bit 12
-if value (cell 12) = (6, 6).</property>
+if value (cell 12) = vec2 (6, 6).</property>
  </properties>
  <tileset firstgid="1" name="industrial-sprite-sheet-DeadEnd-LMZ" tilewidth="16" tileheight="16" tilecount="204" columns="12">
   <image source="sprites/industrial-sprite-sheet-DeadEnd-LMZ.png" width="192" height="272"/>
