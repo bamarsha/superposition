@@ -29,8 +29,8 @@ final class LevelSystem(levels: LevelPlaylist) extends EntitySystem {
       levels.play()
     }
     val multiverse = levels.current.get.multiverse
-    val allExitSquares = exits.flatMap(ClassicalPosition.Mapper.get(_).cells).toSet
-    val playersAtExits = players.map(QuantumPosition.Mapper.get(_).cell)
+    val allExitSquares = exits.flatMap(ClassicalPosition.mapper.get(_).cells).toSet
+    val playersAtExits = players.map(QuantumPosition.mapper.get(_).cell)
       .forall(entityCell => multiverse.universes.map(_.state(entityCell)).forall(allExitSquares.contains))
     if (input.isKeyJustPressed(N) || playersAtExits) {
       levels.next()

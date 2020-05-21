@@ -26,5 +26,5 @@ final class Beam(
 /** Contains the component mapper for the beam component. */
 object Beam {
   /** The component mapper for the beam component. */
-  val Mapper: ComponentMapper[Beam] = ComponentMapper.getFor(classOf[Beam])
+  val mapper: ComponentMapper[Beam] = ComponentMapper.getFor(classOf[Beam])
 }

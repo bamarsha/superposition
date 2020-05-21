@@ -30,8 +30,8 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer with Dispo
   override def render(entity: Entity, deltaTime: Float): Unit = {
     val multiverseView = level().get.multiverseView
     shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
-    val cell = ClassicalPosition.Mapper.get(entity).cells.head
-    val dependentState = Renderable.Mapper.get(entity).dependentState
+    val cell = ClassicalPosition.mapper.get(entity).cells.head
+    val dependentState = Renderable.mapper.get(entity).dependentState
     multiverseView.enqueueRenderer(dependentState) { (universe, renderInfo) =>
       if (multiverseView.isSelected(cell)) {
         drawOutline(shapeRenderer, cell)
@@ -47,11 +47,11 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer with Dispo
     * @param renderInfo the rendering information for the universe
     */
   private def drawBeam(entity: Entity, universe: Universe, renderInfo: UniverseRenderInfo): Unit = {
-    val source = ClassicalPosition.Mapper.get(entity).cells.head
-    val beam = Beam.Mapper.get(entity)
+    val source = ClassicalPosition.mapper.get(entity).cells.head
+    val beam = Beam.mapper.get(entity)
     for (target <- universe.meta(beam.lastTarget)
-         if universe.meta(beam.elapsedTime) <= BeamDuration + FadeDuration) {
-      val opacity = min(FadeDuration, BeamDuration + FadeDuration - universe.meta(beam.elapsedTime)) / FadeDuration
+         if universe.meta(beam.elapsedTime) <= beamDuration + fadeDuration) {
+      val opacity = min(fadeDuration, beamDuration + fadeDuration - universe.meta(beam.elapsedTime)) / fadeDuration
       gl.glEnable(GL_BLEND)
       shapeRenderer.begin(Filled)
       shapeRenderer.setColor(new Color(1, 0, 0, opacity.toFloat).mixed(renderInfo.color))
@@ -70,10 +70,10 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer with Dispo
 /** Functions for rendering laser beams. */
 private object BeamRenderer {
   /** The amount of time that the laser beam shines at full intensity. */
-  private val BeamDuration: Double = 0.2
+  private val beamDuration: Double = 0.2
 
   /** The amount of time that the laser beam takes to fade away. */
-  private val FadeDuration: Double = 0.3
+  private val fadeDuration: Double = 0.3
 
   /** Draws an outline around a cell.
     *

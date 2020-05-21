@@ -22,5 +22,5 @@ final class MapLayerView(
 /** Contains the component mapper for the map layer view component. */
 object MapLayerView {
   /** The component mapper for the map layer view component. */
-  val Mapper: ComponentMapper[MapLayerView] = ComponentMapper.getFor(classOf[MapLayerView])
+  val mapper: ComponentMapper[MapLayerView] = ComponentMapper.getFor(classOf[MapLayerView])
 }

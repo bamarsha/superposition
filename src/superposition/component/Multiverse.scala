@@ -98,7 +98,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     */
   def allInCell(universe: Universe, cell: Vector2[Int]): Iterable[Entity] =
     entities filter { entity =>
-      QuantumPosition.Mapper.has(entity) && universe.state(QuantumPosition.Mapper.get(entity).cell) == cell
+      QuantumPosition.mapper.has(entity) && universe.state(QuantumPosition.mapper.get(entity).cell) == cell
     }
 
   /** Returns all primary qubits in the cell.
@@ -109,7 +109,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     */
   def primaryBits(universe: Universe, cell: Vector2[Int]): Iterable[StateId[Boolean]] =
     allInCell(universe, cell) flatMap { entity =>
-      if (PrimaryBit.Mapper.has(entity)) Some(PrimaryBit.Mapper.get(entity).bit)
+      if (PrimaryBit.mapper.has(entity)) Some(PrimaryBit.mapper.get(entity).bit)
       else None
     }
 
@@ -122,8 +122,8 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
   def isBlocked(universe: Universe, cell: Vector2[Int]): Boolean =
     walls.contains(cell) ||
       (entities
-        filter Collider.Mapper.has
-        exists (Collider.Mapper.get(_).cells(universe).contains(cell)))
+        filter Collider.mapper.has
+        exists (Collider.mapper.get(_).cells(universe).contains(cell)))
 
   /** Returns true if all control cells have at least one activator qubit in the |1⟩ state.
     *
@@ -134,9 +134,9 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
   def allOn(universe: Universe, controls: Iterable[Vector2[Int]]): Boolean =
     controls forall { control =>
       entities exists { entity =>
-        Activator.Mapper.has(entity) && QuantumPosition.Mapper.has(entity) &&
-          universe.state(Activator.Mapper.get(entity).activator) &&
-          universe.state(QuantumPosition.Mapper.get(entity).cell) == control
+        Activator.mapper.has(entity) && QuantumPosition.mapper.has(entity) &&
+          universe.state(Activator.mapper.get(entity).activator) &&
+          universe.state(QuantumPosition.mapper.get(entity).cell) == control
       }
     }
 
@@ -146,8 +146,8 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     * @return true if every entity has a valid position in the universe
     */
   private def isValid(universe: Universe): Boolean =
-    entities filter QuantumPosition.Mapper.has forall { entity =>
-      !isBlocked(universe, universe.state(QuantumPosition.Mapper.get(entity).cell))
+    entities filter QuantumPosition.mapper.has forall { entity =>
+      !isBlocked(universe, universe.state(QuantumPosition.mapper.get(entity).cell))
     }
 
   /** Shows all states in the universe.
@@ -159,13 +159,13 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     stateIds.view map (id => /*_*/ id.show(universe.state(id)) /*_*/)
 
   def getById(id: Int): Option[Entity] =
-    entities.filter(ObjectId.Mapper.has).find(e => ObjectId.Mapper.get(e).id == id)
+    entities.filter(ObjectId.mapper.has).find(e => ObjectId.mapper.get(e).id == id)
 }
 
 /** Contains the component mapper for the multiverse component. */
 object Multiverse {
   /** The component mapper for the multiverse component. */
-  val Mapper: ComponentMapper[Multiverse] = ComponentMapper.getFor(classOf[Multiverse])
+  val mapper: ComponentMapper[Multiverse] = ComponentMapper.getFor(classOf[Multiverse])
 
   /** Normalizes the total probability amplitude of the universes to 1.
     *

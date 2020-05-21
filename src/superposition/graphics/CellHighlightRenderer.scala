@@ -25,8 +25,8 @@ final class CellHighlightRenderer(level: () => Option[Level]) extends Renderer w
     val multiverse = level().get.multiverse
     val occupiedCells =
       (for {
-        entity <- multiverse.entities if QuantumPosition.Mapper.has(entity)
-        position = QuantumPosition.Mapper.get(entity)
+        entity <- multiverse.entities if QuantumPosition.mapper.has(entity)
+        position = QuantumPosition.mapper.get(entity)
         universe <- multiverse.universes
       } yield universe.state(position.cell)).toSet
 

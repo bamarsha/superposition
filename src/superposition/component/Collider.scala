@@ -12,5 +12,5 @@ final class Collider(val cells: Universe => Set[Vector2[Int]]) extends Component
 /** Contains the component mapper for the collider component. */
 object Collider {
   /** The component mapper for the collider component. */
-  val Mapper: ComponentMapper[Collider] = ComponentMapper.getFor(classOf[Collider])
+  val mapper: ComponentMapper[Collider] = ComponentMapper.getFor(classOf[Collider])
 }

@@ -19,9 +19,9 @@ final class MapLayerRenderer(level: () => Option[Level]) extends Renderer {
   override def render(entity: Entity, deltaTime: Float): Unit = {
     val multiverse = level().get.multiverse
     val multiverseView = level().get.multiverseView
-    val mapView = MapLayerView.Mapper.get(entity)
+    val mapView = MapLayerView.mapper.get(entity)
     val shader = mapView.renderer.getBatch.getShader
-    val dependentState = Renderable.Mapper.get(entity).dependentState
+    val dependentState = Renderable.mapper.get(entity).dependentState
     multiverseView.enqueueRenderer(dependentState) { (universe, renderInfo) =>
       shader.begin()
       val allOn = multiverse.allOn(universe, mapView.controls)

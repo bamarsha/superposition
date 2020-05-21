@@ -58,8 +58,8 @@ private object PlayerInputSystem {
     * @return the player walk gate
     */
   private def walkGate(entity: Entity, carriables: Iterable[Entity]): Gate[Vector2[Int]] = {
-    val player = Player.Mapper.get(entity)
-    val position = QuantumPosition.Mapper.get(entity)
+    val player = Player.mapper.get(entity)
+    val position = QuantumPosition.mapper.get(entity)
     val walkPlayer: Gate[Vector2[Int]] = Translate.multi controlled { delta => universe =>
       if (universe.state(player.alive)) List((position.cell, delta))
       else Nil
@@ -67,8 +67,8 @@ private object PlayerInputSystem {
     val walkCarried: Gate[Vector2[Int]] = Translate.multi controlled { delta => universe =>
       if (universe.state(player.alive))
         carriables
-          .filter(carriable => universe.state(Carriable.Mapper.get(carriable).carried))
-          .map(carriable => (QuantumPosition.Mapper.get(carriable).cell, delta))
+          .filter(carriable => universe.state(Carriable.mapper.get(carriable).carried))
+          .map(carriable => (QuantumPosition.mapper.get(carriable).cell, delta))
           .toList
       else Nil
     }
@@ -82,15 +82,15 @@ private object PlayerInputSystem {
     * @return the toggle carry gate
     */
   private def carryGate(entity: Entity, carriables: Iterable[Entity]): Gate[Unit] = {
-    val player = Player.Mapper.get(entity)
-    val playerCell = QuantumPosition.Mapper.get(entity).cell
+    val player = Player.mapper.get(entity)
+    val playerCell = QuantumPosition.mapper.get(entity).cell
     X.multi controlled const { universe =>
       carriables
         .filter { carriable =>
-          val carriableCell = QuantumPosition.Mapper.get(carriable).cell
+          val carriableCell = QuantumPosition.mapper.get(carriable).cell
           universe.state(player.alive) && universe.state(playerCell) == universe.state(carriableCell)
         }
-        .map(Carriable.Mapper.get(_).carried)
+        .map(Carriable.mapper.get(_).carried)
         .toList
     }
   }
@@ -117,7 +117,7 @@ private object PlayerInputSystem {
     * @param deltaTime the time elapsed since the last frame
     */
   private def walk(multiverse: Multiverse, entity: Entity, carriables: Iterable[Entity], deltaTime: Float): Unit = {
-    val position = QuantumPosition.Mapper.get(entity)
+    val position = QuantumPosition.mapper.get(entity)
     val rawDelta = deltaPosition(deltaTime)
     val Vector2(dx, dy) = (position.relative + rawDelta) map (_.floor.toInt)
     val gate = walkGate(entity, carriables)
@@ -134,8 +134,8 @@ private object PlayerInputSystem {
     * @param deltaTime the time elapsed since the last frame
     */
   private def updatePlayerPosition(multiverse: Multiverse, entity: Entity, deltaTime: Float): Unit = {
-    val player = Player.Mapper.get(entity)
-    val position = QuantumPosition.Mapper.get(entity)
+    val player = Player.mapper.get(entity)
+    val position = QuantumPosition.mapper.get(entity)
     multiverse.updateMetaWith(position.absolute) { pos => universe =>
       if (universe.state(player.alive)) {
         val targetPosition = (universe.state(position.cell) map (_.toDouble)) + position.relative
@@ -156,11 +156,11 @@ private object PlayerInputSystem {
                                      entity: Entity,
                                      carriables: Iterable[Entity],
                                      deltaTime: Float): Unit = {
-    val player = Player.Mapper.get(entity)
-    val playerPosition = QuantumPosition.Mapper.get(entity)
+    val player = Player.mapper.get(entity)
+    val playerPosition = QuantumPosition.mapper.get(entity)
     for (carriable <- carriables) {
-      val carried = Carriable.Mapper.get(carriable).carried
-      val carriedPosition = QuantumPosition.Mapper.get(carriable)
+      val carried = Carriable.mapper.get(carriable).carried
+      val carriedPosition = QuantumPosition.mapper.get(carriable)
       multiverse.updateMetaWith(carriedPosition.absolute) { pos => universe =>
         val relativePos =
           if (universe.state(carried)) playerPosition.relative

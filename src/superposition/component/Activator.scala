@@ -12,5 +12,5 @@ final class Activator(val activator: StateId[Boolean]) extends Component
 /** Contains the component mapper for the activator component. */
 object Activator {
   /** The component mapper for the activator component. */
-  val Mapper: ComponentMapper[Activator] = ComponentMapper.getFor(classOf[Activator])
+  val mapper: ComponentMapper[Activator] = ComponentMapper.getFor(classOf[Activator])
 }

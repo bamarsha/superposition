@@ -29,7 +29,7 @@ final class Quball(multiverse: Multiverse, id: Int, initialCell: Vector2[Int]) e
     add(new Carriable(carried))
     add(new Renderable(1, universe => (universe.state(onOff), universe.state(carried), universe.state(cell))))
     add(new SpriteView(
-      texture = universe => if (universe.state(onOff)) QuballTextureOn else QuballTextureOff,
+      texture = universe => if (universe.state(onOff)) onTexture else offTexture,
       scale = universe => Vector2(1d, 1d) * (if (universe.state(carried)) .5 else .75),
       color = const(WHITE)))
   }
@@ -38,6 +38,6 @@ final class Quball(multiverse: Multiverse, id: Int, initialCell: Vector2[Int]) e
 /** Contains the sprite texture for quballs. */
 private object Quball {
   /** The sprite texture for a quball. */
-  private val QuballTextureOn = new Texture(resolve("sprites/quball_v1_1.png"))
-  private val QuballTextureOff = new Texture(resolve("sprites/quball_v1_0.png"))
+  private val onTexture = new Texture(resolve("sprites/quball_v1_1.png"))
+  private val offTexture = new Texture(resolve("sprites/quball_v1_0.png"))
 }

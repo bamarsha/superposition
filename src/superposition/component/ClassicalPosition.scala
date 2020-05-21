@@ -16,5 +16,5 @@ final class ClassicalPosition(
 /** Contains the component mapper for the classical position component. */
 object ClassicalPosition {
   /** The component mapper for the classical position component. */
-  val Mapper: ComponentMapper[ClassicalPosition] = ComponentMapper.getFor(classOf[ClassicalPosition])
+  val mapper: ComponentMapper[ClassicalPosition] = ComponentMapper.getFor(classOf[ClassicalPosition])
 }

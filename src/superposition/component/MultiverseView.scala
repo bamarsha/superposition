@@ -48,7 +48,7 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
     */
   def render(universe: Universe, renderInfo: UniverseRenderInfo): Unit =
     for (renderer <- renderers) {
-      renderer.render(universe, if (isSameInAllUniverses(renderer)) UniverseRenderInfo.Default else renderInfo)
+      renderer.render(universe, if (isSameInAllUniverses(renderer)) UniverseRenderInfo.default else renderInfo)
     }
 
   /** Clears the renderer queue for this frame. */
@@ -85,5 +85,5 @@ object MultiverseView {
       dependentState: Universe => Any)
 
   /** The component mapper for the multiverse view component. */
-  val Mapper: ComponentMapper[MultiverseView] = ComponentMapper.getFor(classOf[MultiverseView])
+  val mapper: ComponentMapper[MultiverseView] = ComponentMapper.getFor(classOf[MultiverseView])
 }

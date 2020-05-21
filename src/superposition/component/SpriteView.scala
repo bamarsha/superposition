@@ -22,5 +22,5 @@ final class SpriteView(
 /** Contains the component mapper for the sprite view component. */
 object SpriteView {
   /** The component mapper for the sprite view component. */
-  val Mapper: ComponentMapper[SpriteView] = ComponentMapper.getFor(classOf[SpriteView])
+  val mapper: ComponentMapper[SpriteView] = ComponentMapper.getFor(classOf[SpriteView])
 }

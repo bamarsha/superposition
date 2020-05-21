@@ -3,7 +3,7 @@ package superposition.entity
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
 import superposition.component._
-import superposition.entity.Laser.Textures
+import superposition.entity.Laser.textures
 import superposition.game.ResourceResolver.resolve
 import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math.{Direction, Gate, StateId, Universe, Vector2}
@@ -29,13 +29,13 @@ final class Laser(
   add(new Collider(const(Set(cell))))
   add(new Beam(multiverse, gate, direction, controls))
   add(new Renderable(1, controls))
-  add(new SpriteView(texture = const(Textures(direction)), scale = const(Vector2(0, 0))))
+  add(new SpriteView(texture = const(textures(direction)), scale = const(Vector2(0, 0))))
 }
 
 /** Contains the sprite textures for lasers. */
 private object Laser {
   /** The sprite texture for every cardinal direction. */
-  private val Textures: Map[Direction, Texture] = Map(
+  private val textures: Map[Direction, Texture] = Map(
     Up -> "sprites/laser_up.png",
     Down -> "sprites/laser_down.png",
     Left -> "sprites/laser_left.png",

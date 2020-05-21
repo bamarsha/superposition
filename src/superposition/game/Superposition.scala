@@ -5,7 +5,7 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx.graphics
 import com.badlogic.gdx.backends.lwjgl3.{Lwjgl3Application, Lwjgl3ApplicationConfiguration}
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
-import superposition.game.Superposition.Playlist
+import superposition.game.Superposition.playlist
 import superposition.graphics._
 import superposition.system._
 
@@ -19,7 +19,7 @@ private final class Superposition extends Game {
 
   override def create(): Unit = {
     val levels = new LevelPlaylist(engine)
-    levels.appendAll(new TmxMapLoader(ResourceResolver), Playlist)
+    levels.appendAll(new TmxMapLoader(ResourceResolver), playlist)
     levels.play()
 
     engine.addSystem(new LevelSystem(levels))
@@ -46,7 +46,7 @@ private final class Superposition extends Game {
 /** The main class for Superposition. */
 private object Superposition {
   /** The level playlist. */
-  private val Playlist: Seq[String] = Seq(
+  private val playlist: Seq[String] = Seq(
     "level1.tmx",
     "level2.tmx",
     "level3.tmx",

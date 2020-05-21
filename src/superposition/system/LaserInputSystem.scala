@@ -17,8 +17,8 @@ import scala.Function.const
 final class LaserInputSystem(level: () => Option[Level])
   extends IteratingSystem(Family.all(classOf[Beam], classOf[ClassicalPosition]).get) {
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
-    val beam = Beam.Mapper.get(entity)
-    val cell = ClassicalPosition.Mapper.get(entity).cells.head
+    val beam = Beam.mapper.get(entity)
+    val cell = ClassicalPosition.mapper.get(entity).cells.head
     val multiverse = level().get.multiverse
     val multiverseView = level().get.multiverseView
 
@@ -39,7 +39,7 @@ final class LaserInputSystem(level: () => Option[Level])
 /** Laser settings and functions for computing properties of the laser beam. */
 object LaserInputSystem {
   /** The maximum length of the laser beam. */
-  private val BeamLength: Int = 25
+  private val beamLength: Int = 25
 
   /** Returns the cells in the path of the laser beam.
     *
@@ -47,9 +47,9 @@ object LaserInputSystem {
     * @return the cells in the path of the laser beam
     */
   private def beamPath(entity: Entity): Seq[Vector2[Int]] = {
-    val source = ClassicalPosition.Mapper.get(entity).cells.head
-    val direction = Beam.Mapper.get(entity).direction
-    LazyList.iterate(source)(_ + direction.toVector2).tail.take(BeamLength)
+    val source = ClassicalPosition.mapper.get(entity).cells.head
+    val direction = Beam.mapper.get(entity).direction
+    LazyList.iterate(source)(_ + direction.toVector2).tail.take(beamLength)
   }
 
   /** The target of the laser beam.
@@ -60,7 +60,7 @@ object LaserInputSystem {
     * @return the target of the laser beam
     */
   private def beamTarget(multiverse: Multiverse, entity: Entity)(universe: Universe): Option[Vector2[Int]] = {
-    val controls = Beam.Mapper.get(entity).controls
+    val controls = Beam.mapper.get(entity).controls
     if (controls(universe))
       beamPath(entity) find { cell =>
         multiverse.isBlocked(universe, cell) || multiverse.allInCell(universe, cell).nonEmpty

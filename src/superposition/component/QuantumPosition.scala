@@ -18,5 +18,5 @@ final class QuantumPosition(
 /** Contains the component mapper for the quantum position component. */
 object QuantumPosition {
   /** The component mapper for the quantum position component. */
-  val Mapper: ComponentMapper[QuantumPosition] = ComponentMapper.getFor(classOf[QuantumPosition])
+  val mapper: ComponentMapper[QuantumPosition] = ComponentMapper.getFor(classOf[QuantumPosition])
 }
