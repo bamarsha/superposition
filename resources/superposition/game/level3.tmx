@@ -92,33 +92,33 @@
   </object>
   <object id="18" name="Door" type="Door" x="215.58" y="26.2159">
    <properties>
-    <property name="Controls" value="activated [cell (12, 2)]"/>
+    <property name="Controls" value="activeCell (12, 2)"/>
    </properties>
    <point/>
   </object>
   <object id="19" name="Door" type="Door" x="229.83" y="25.9659">
    <properties>
-    <property name="Controls" value="activated [cell (12, 2)]"/>
+    <property name="Controls" value="activeCell (12, 2)"/>
    </properties>
    <point/>
   </object>
   <object id="26" name="Quball" type="Quball" gid="212" x="208" y="112" width="16" height="16"/>
   <object id="27" name="X Laser" type="Laser" gid="209" x="208" y="96" width="16" height="16">
    <properties>
-    <property name="Controls" value="activated [cell (13, 6)]"/>
+    <property name="Controls" value="activeCell (13, 6)"/>
     <property name="Direction" value="Left"/>
     <property name="Gate" value="X"/>
    </properties>
   </object>
   <object id="34" name="Door" type="Door" x="41.0227" y="90.6136">
    <properties>
-    <property name="Controls" value="activated [cell (4, 6)]"/>
+    <property name="Controls" value="activeCell (4, 6)"/>
    </properties>
    <point/>
   </object>
   <object id="35" name="Door" type="Door" x="55.2727" y="90.3636">
    <properties>
-    <property name="Controls" value="activated [cell (4, 6)]"/>
+    <property name="Controls" value="activeCell (4, 6)"/>
    </properties>
    <point/>
   </object>

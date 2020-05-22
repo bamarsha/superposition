@@ -73,13 +73,13 @@
   </object>
   <object id="18" name="Door" type="Door" x="120.125" y="27.125">
    <properties>
-    <property name="Controls" value="activated [cell (9, 2)]"/>
+    <property name="Controls" value="activeCell (9, 2)"/>
    </properties>
    <point/>
   </object>
   <object id="19" name="Door" type="Door" x="134.375" y="26.875">
    <properties>
-    <property name="Controls" value="activated [cell (9, 2)]"/>
+    <property name="Controls" value="activeCell (9, 2)"/>
    </properties>
    <point/>
   </object>

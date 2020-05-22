@@ -113,13 +113,20 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     */
   private def evalIdentifier(name: String): Universe => Any = name match {
     case "activated" => universe => multiverse.isActivated(universe, _)
+    case "activeCell" => universe => (nt: NTuple) => multiverse.isActivated(universe, Seq(makeCell(nt)))
     case "qubit" => const(multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bit)
     case "qucell" => const(multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell)
     case "value" => universe => (id: StateId[_]) => universe.state(id)
     case "vec2" => const({ case NTuple(x: Int, y: Int) => Vector2(x, y) }: NTuple => Vector2[Int])
-    case "cell" => const({ case NTuple(x: Int, y: Int) => Vector2(x, height - y - 1) }: NTuple => Vector2[Int])
+    case "cell" => const(makeCell)
     case _ => error(s"Unknown identifier: $name")
   }
+
+  /** Maps a TiledMap cell to a Vector2, accounting for the different coordinate systems
+    *
+    * @return The function that maps the TiledMap cell to the Vector2
+    */
+  private def makeCell: NTuple => Vector2[Int] = { case NTuple(x: Int, y: Int) => Vector2(x, height - y - 1) }
 
   /** Makes a gate corresponding to the name.
     *
