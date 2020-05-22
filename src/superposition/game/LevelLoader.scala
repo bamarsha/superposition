@@ -10,8 +10,7 @@ import com.badlogic.gdx.maps.{MapLayer, MapObject}
 import superposition.component.{Multiverse, MultiverseView}
 import superposition.entity.{MapLayer => MapLayerEntity, _}
 import superposition.game.ResourceResolver.resolve
-import superposition.language.Parser
-import superposition.language.Parser.parseExpression
+import superposition.language.Interpreter
 import superposition.math._
 
 import scala.Function.const
@@ -34,13 +33,8 @@ private object LevelLoader {
     }
 
     // Apply initial gates.
-    val gatesText = map.getProperties.get("Gates", classOf[String])
-    if (gatesText != null) {
-      val program = Parser.parseProgram(multiverse, map, gatesText)
-      program match {
-        case Parser.Success(result, _) => multiverse.applyGate(result, ())
-        case _ => throw new RuntimeException("Failed to parse text: " + gatesText)
-      }
+    for (gates <- Option(map.getProperties.get("Gates", classOf[String]))) {
+      multiverse.applyGate(new Interpreter(multiverse, map).evalProgram(gates), ())
     }
 
     // Create the map renderer.
@@ -139,7 +133,7 @@ private object LevelLoader {
     */
   private def controlFunction(multiverse: Multiverse, map: TiledMap, obj: MapObject): Universe => Boolean =
     Option(obj.getProperties.get("Controls", classOf[String]))
-      .map(parseExpression(multiverse, map, _).get)
+      .map(new Interpreter(multiverse, map).evalExpression)
       .getOrElse(const(true))
 
   /** Parses a cell position for the tile map from a string "(x, y)".

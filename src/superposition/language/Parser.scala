@@ -1,13 +1,9 @@
 package superposition.language
 
-import com.badlogic.gdx.maps.tiled.TiledMap
-import superposition.component.Multiverse
-import superposition.math.{Gate, Universe}
-
 import scala.util.parsing.combinator.RegexParsers
 
 /** Parses gate programs. */
-object Parser extends RegexParsers {
+private object Parser extends RegexParsers {
   override val skipWhitespace: Boolean = false
 
   /** Makes a tuple from a sequenced parser result.
@@ -29,7 +25,7 @@ object Parser extends RegexParsers {
   private val number: Parser[Int] = """\d+""".r ^^ (_.toInt)
 
   /** A literal is an identifier or a number. */
-  private val literal: Parser[Expression] = identifier ^^ Identifier | number  ^^ Number
+  private val literal: Parser[Expression] = identifier ^^ Identifier | number ^^ Number
 
   /** A parenthetical expression. */
   private val parenthetical: Parser[Expression] = "(" ~> whiteSpace.? ~> expression <~ whiteSpace.? <~ ")"
@@ -54,7 +50,7 @@ object Parser extends RegexParsers {
     callOrTerm ~ (whiteSpace.? ~> "=" ~> whiteSpace.? ~> expression) ^^ makeTuple ^^ Equals.tupled
 
   /** An expression. */
-  private lazy val expression: Parser[Expression] = equals | callOrTerm
+  lazy val expression: Parser[Expression] = equals | callOrTerm
 
   /** The on-transformer. */
   private val onTransformer: Parser[Transformer] = "on" ~> whiteSpace ~> expression ^^ OnTransformer
@@ -74,38 +70,5 @@ object Parser extends RegexParsers {
       ^^ makeTuple ^^ Application.tupled)
 
   /** A gate program. */
-  private val program: Parser[Seq[Application]] = whiteSpace.? ~> phrase((application <~ whiteSpace.?).*)
-
-  def parseExpression[A](multiverse: Multiverse, map: TiledMap, text: String): ParseResult[Universe => A] =
-    parse(expression ^^ new Interpreter(multiverse, map).expr2scala ^^ (_.asInstanceOf[Universe => A]), text)
-
-  def parseProgram(multiverse: Multiverse, map: TiledMap, text: String): ParseResult[Gate[Unit]] =
-    parse(program ^^ new Interpreter(multiverse, map).program2scala, text)
-
-  /** Runs the gate parser on a couple of examples.
-    *
-    * @param args the command-line arguments
-    */
-  def main(args: Array[String]): Unit = {
-    println(parse(
-      program,
-      """Apply H on bit 12.
-        |
-        |Apply Translate
-        |on (cell 12, (6, 0))
-        |if value (bit 12).
-        |
-        |Apply X on bit 12
-        |if value (cell 12) = (6, 2).""".stripMargin))
-    println(parse(
-      program,
-      """H on bit 12.
-        |
-        |Translate
-        |on (cell 12, (6, 0))
-        |if value (bit 12).
-        |
-        |X on bit 12
-        |if value (cell 12) = (6, 2).""".stripMargin))
-  }
+  val program: Parser[Seq[Application]] = whiteSpace.? ~> phrase((application <~ whiteSpace.?).*)
 }

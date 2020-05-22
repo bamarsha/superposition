@@ -1,61 +1,126 @@
 package superposition.language
 
 import com.badlogic.gdx.maps.tiled.TiledMap
+import scalaz.syntax.contravariant._
 import superposition.component.{Multiverse, PrimaryBit, QuantumPosition}
-import superposition.math.Gate.DivisibleGate.divisibleSyntax._
+import superposition.language.Parser.{expression, parse, program}
 import superposition.math._
 
 import scala.Function.{chain, const}
+import scala.sys.error
 
-class Interpreter(multiverse: Multiverse, map: TiledMap) {
+/** An interpreter for gate programs.
+  *
+  * @param multiverse the multiverse
+  * @param map the tile map
+  */
+final class Interpreter(multiverse: Multiverse, map: TiledMap) {
+  /** The height of the tile map. */
+  private val height: Int = Option(map.getProperties.get("height", classOf[Int])).get
 
-  private val height = map.getProperties.get("height", classOf[Int])
+  /** Evaluates a program string.
+    *
+    * @param string the program string
+    * @return the evaluated program
+    */
+  def evalProgram(string: String): Gate[Unit] = evalProgram(parse(program, string).get)
 
-  private val bitFunction = (id: Int) => multiverse.entityById(id).get.getComponent(classOf[PrimaryBit]).bit
-  private val cellFunction = (id: Int) => multiverse.entityById(id).get.getComponent(classOf[QuantumPosition]).cell
-  private val vec2Function: List[Int] => Vector2[Int] = { case List(a, b) => Vector2(a, height - b - 1) }
+  /** Evaluates an expression string.
+    *
+    * @param string the expression string
+    * @tparam A the type of the expression
+    * @return the evaluated expression
+    */
+  def evalExpression[A](string: String): Universe => A =
+    evalExpression(parse(expression, string).get).asInstanceOf[Universe => A]
 
-  def iden2scala(name: String): Universe => _ = name match {
-    case "allOn" => u => input: List[_] =>
-      multiverse.allOn(u, (if (input.head.isInstanceOf[List[Int]]) input else List(input))
-          .asInstanceOf[List[List[Int]]].map(vec2Function))
-    case "bit" => const(bitFunction)
-    case "cell" => const(cellFunction)
-    case "value" => u => (stateId: StateId[_]) => u.state(stateId)
-    case "vec2" => const(vec2Function)
-    case _ => throw new RuntimeException("Unknown literal: " + name)
+  /** Evaluates a program.
+    *
+    * @param program the program sequence
+    * @return the evaluated program
+    */
+  private def evalProgram(program: Seq[Application]): Gate[Unit] = program map evalApplication reduce (_ andThen _)
+
+  /** Evaluates an expression.
+    *
+    * @param expression the expression
+    * @return the evaluated expression
+    */
+  private def evalExpression(expression: Expression): Universe => Any = expression match {
+    case Identifier(name) => evalIdentifier(name)
+    case Number(value) => const(value)
+    case Tuple(expr) => universe => (expr map evalExpression map (_ (universe))).toList
+    case Call(function, argument) =>
+      val func = evalExpression(function)
+      val arg = evalExpression(argument)
+      universe => func(universe).asInstanceOf[Any => Any](arg(universe))
+    case Equals(lhs, rhs) => universe => evalExpression(lhs)(universe) == evalExpression(rhs)(universe)
   }
 
-  def expr2scala(expr: Expression): Universe => _ = expr match {
-    case Identifier(name) => iden2scala(name)
-    case Number(n) => const(n)
-    case Tuple(a) => u => a.map(expr2scala).map(_(u)).toList
-    case Call(a, b) => u => expr2scala(a)(u).asInstanceOf[Any => _](expr2scala(b)(u))
-    case Equals(a, b) => u => expr2scala(a)(u) == expr2scala(b)(u)
-  }
-
-  def trans2scala(trans: Transformer): Gate[Any] => Gate[Any] = trans match {
-    case OnTransformer(expr) => _.controlled((b: Any) => u => {
-      val expr2 = expr2scala(expr)(u)
-      if (b == ()) expr2 else expr2scala(expr)(u).asInstanceOf[Any => Any](b)
-    })
-    case IfTransformer(expr) => _.filter2(expr2scala(expr).asInstanceOf[Universe => Boolean])
+  /** Evaluates a transformer.
+    *
+    * @param transformer the transformer.
+    * @return the evaluated transformer
+    */
+  private def evalTransformer(transformer: Transformer): Gate[Any] => Gate[Any] = transformer match {
+    case OnTransformer(argument) =>
+      _.controlled(value => universe => {
+        val arg = evalExpression(argument)(universe)
+        if (value == ()) arg
+        else arg.asInstanceOf[Any => Any](value)
+      })
+    case IfTransformer(expression) => _.filter2(evalExpression(expression).asInstanceOf[Universe => Boolean])
     case MultiTransformer => _.multi.asInstanceOf[Gate[Any]]
   }
 
-  def gate2scala(name: String): Gate[_] = name match {
-    case "X" => X
-    case "H" => H
-    case "Translate" => Translate contramap[List[Any]] {
-      case List(stateId: StateId[Vector2[Int]], List(x: Int, y: Int)) => (stateId, Vector2(x, y)) }
-    case _ => throw new RuntimeException("Unknown gate: " + name)
-  }
-
-  def app2scala(app: Application): Gate[Unit] = {
-    val gate = gate2scala(app.gate)
-    val allTransformations = chain(app.transformers.map(trans2scala))
+  /** Evaluates an application.
+    *
+    * @param application the application
+    * @return the evaluated application
+    */
+  private def evalApplication(application: Application): Gate[Unit] = {
+    val gate = makeGate(application.gate)
+    val allTransformations = chain(application.transformers.map(evalTransformer))
     allTransformations(gate.asInstanceOf[Gate[Any]]).asInstanceOf[Gate[Unit]]
   }
 
-  def program2scala(program: Seq[Application]): Gate[Unit] = program.map(app2scala).reduce(_ andThen _)
+  /** Evaluates an identifier name.
+    *
+    * @param name the name of the identifier
+    * @return the evaluated identifier name
+    */
+  private def evalIdentifier(name: String): Universe => Any = name match {
+    case "allOn" =>
+      universe => value: List[_] =>
+        val controls = if (value.head.isInstanceOf[List[_]]) value else List(value)
+        multiverse.allOn(universe, controls.asInstanceOf[List[List[Int]]] map makeVector2)
+    case "bit" => const(multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bit)
+    case "cell" => const(multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell)
+    case "value" => universe => (id: StateId[_]) => universe.state(id)
+    case "vec2" => const(makeVector2 _)
+    case _ => error(s"Unknown identifier: $name")
+  }
+
+  /** Makes a gate corresponding to the name.
+    *
+    * @param name the gate name
+    * @return the gate
+    */
+  private def makeGate(name: String): Gate[_] = name match {
+    case "X" => X
+    case "H" => H
+    case "Translate" => Translate contramap[List[Any]] {
+      case List(id: StateId[Vector2[Int]], List(x: Int, y: Int)) => (id, Vector2(x, y))
+    }
+    case _ => error(s"Unknown gate: $name")
+  }
+
+  /** Makes a vector from a list of vector components.
+    *
+    * @param list the vector components
+    * @return the vector
+    */
+  private def makeVector2(list: List[Int]): Vector2[Int] = list match {
+    case List(x, y) => Vector2(x, height - y - 1)
+  }
 }
