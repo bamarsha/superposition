@@ -74,10 +74,10 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
   private def evalTransformer(transformer: Transformer): Gate[Any] => Gate[Any] = transformer match {
     case OnTransformer(argument) =>
       val arg = evalExpression(argument)
-      _.controlledMap(value => universe => {
+      _.controlledMap { value => universe =>
         if (value == ()) arg(universe)
         else arg(universe).asInstanceOf[Any => Any](value)
-      })
+      }
     case IfTransformer(expression) =>
       val expr = evalExpression(expression).asInstanceOf[Universe => Boolean]
       _.controlled(expr)
