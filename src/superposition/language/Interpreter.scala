@@ -3,6 +3,7 @@ package superposition.language
 import com.badlogic.gdx.maps.tiled.TiledMap
 import scalaz.syntax.contravariant._
 import superposition.component.{Multiverse, PrimaryBit, QuantumPosition}
+import superposition.language.Interpreter.NTuple
 import superposition.language.Parser.{expression, parse, program}
 import superposition.math._
 
@@ -49,14 +50,20 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
   private def evalExpression(expression: Expression): Universe => Any = expression match {
     case Identifier(name) => evalIdentifier(name)
     case Number(value) => const(value)
-    case Tuple(exprs) =>
-      val evals = exprs map evalExpression
-      universe => evals map (_ (universe))
+    case Tuple(items) =>
+      val xs = items map evalExpression
+      universe => NTuple(xs map (_ (universe)): _*)
+    case List(items) =>
+      val xs = items map evalExpression
+      universe => xs map (_ (universe))
     case Call(function, argument) =>
       val func = evalExpression(function)
       val arg = evalExpression(argument)
       universe => func(universe).asInstanceOf[Any => Any](arg(universe))
-    case Equals(lhs, rhs) => universe => evalExpression(lhs)(universe) == evalExpression(rhs)(universe)
+    case Equals(lhs, rhs) =>
+      val l = evalExpression(lhs)
+      val r = evalExpression(rhs)
+      universe => l(universe) == r(universe)
   }
 
   /** Evaluates a transformer.
@@ -66,12 +73,14 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     */
   private def evalTransformer(transformer: Transformer): Gate[Any] => Gate[Any] = transformer match {
     case OnTransformer(argument) =>
+      val arg = evalExpression(argument)
       _.controlledMap(value => universe => {
-        val arg = evalExpression(argument)(universe)
-        if (value == ()) arg
-        else arg.asInstanceOf[Any => Any](value)
+        if (value == ()) arg(universe)
+        else arg(universe).asInstanceOf[Any => Any](value)
       })
-    case IfTransformer(expression) => _.controlled(evalExpression(expression).asInstanceOf[Universe => Boolean])
+    case IfTransformer(expression) =>
+      val expr = evalExpression(expression).asInstanceOf[Universe => Boolean]
+      _.controlled(expr)
     case MultiTransformer => _.multi.asInstanceOf[Gate[Any]]
   }
 
@@ -92,10 +101,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @return the evaluated identifier name
     */
   private def evalIdentifier(name: String): Universe => Any = name match {
-    case "allOn" =>
-      universe => value: Seq[_] =>
-        val controls = if (value.head.isInstanceOf[Seq[_]]) value else Seq(value)
-        multiverse.allOn(universe, controls.asInstanceOf[Iterable[Seq[Int]]].view map makeVector2)
+    case "allOn" => universe => multiverse.allOn(universe, _)
     case "bit" => const(multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bit)
     case "cell" => const(multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell)
     case "value" => universe => (id: StateId[_]) => universe.state(id)
@@ -111,8 +117,9 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
   private def makeGate(name: String): Gate[_] = name match {
     case "X" => X
     case "H" => H
-    case "Translate" => Translate contramap[Seq[Any]] {
-      case Seq(id: StateId[Vector2[Int]], List(x: Int, y: Int)) => (id, Vector2(x, y))
+    case "Translate" => Translate contramap[NTuple] {
+      // TODO: Require the second argument to be a Vector2.
+      case NTuple(id: StateId[Vector2[Int]], NTuple(x: Int, y: Int)) => (id, Vector2(x, y))
     }
     case _ => error(s"Unknown gate: $name")
   }
@@ -122,7 +129,18 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @param components the vector components
     * @return the vector
     */
-  private def makeVector2(components: Seq[Int]): Vector2[Int] = components match {
-    case Seq(x, y) => Vector2(x, height - y - 1)
+  private def makeVector2(components: NTuple): Vector2[Int] = components match {
+    case NTuple(x: Int, y: Int) => Vector2(x, height - y - 1)
   }
+}
+
+/** Data types for the interpreter. */
+private object Interpreter {
+
+  /** An n-ary tuple.
+    *
+    * @param items the items in the tuple.
+    */
+  private final case class NTuple(items: Any*)
+
 }

@@ -21,6 +21,12 @@ private final case class Number(value: Int) extends Expression
   */
 private final case class Tuple(items: Seq[Expression]) extends Expression
 
+/** A list.
+  *
+  * @param items the items in the list
+  */
+private final case class List(items: Seq[Expression]) extends Expression
+
 /** A function call.
   *
   * @param function the function

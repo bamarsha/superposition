@@ -36,8 +36,14 @@ private object Parser extends RegexParsers {
       ~ ("," ~> whiteSpace.? ~> expression <~ whiteSpace.?).+ <~ ")"
       ^^ mkList ^^ Tuple)
 
-  /** A term is a parenthetical expression, tuple or literal. */
-  private val term: Parser[Expression] = parenthetical | tuple | literal
+  /** A list. */
+  private val list: Parser[Expression] =
+    (("[" ~> whiteSpace.? ~> expression <~ whiteSpace.?)
+      ~ ("," ~> whiteSpace.? ~> expression <~ whiteSpace.?).* <~ "]"
+      ^^ mkList ^^ List)
+
+  /** A term is a list, parenthetical expression, tuple or literal. */
+  private val term: Parser[Expression] = list | parenthetical | tuple | literal
 
   /** A function call. */
   private val call: Parser[Expression] = term ~ (whiteSpace ~> term) ^^ makeTuple ^^ Call.tupled
