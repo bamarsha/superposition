@@ -49,9 +49,10 @@ private object Superposition {
   private val Playlist: Seq[String] = Seq(
     "level1.tmx",
     "level2.tmx",
+    "level7.tmx",
+    "level6.tmx",
     "level3.tmx",
     "level4.tmx",
-    "level6.tmx",
     "win.tmx")
 
   /** The entry point for Superposition.

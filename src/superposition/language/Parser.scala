@@ -26,7 +26,7 @@ object Parser extends RegexParsers {
   private val identifier: Parser[String] = """[^\d\W]\w*""".r - keyword
 
   /** A number. */
-  private val number: Parser[Int] = """\d+""".r ^^ (_.toInt)
+  private val number: Parser[Int] = """-?\d+""".r ^^ (_.toInt)
 
   /** A literal is an identifier or a number. */
   private val literal: Parser[Expression] = identifier ^^ Identifier | number  ^^ Number
