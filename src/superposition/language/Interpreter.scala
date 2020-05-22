@@ -47,23 +47,27 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @param expression the expression
     * @return the evaluated expression
     */
-  private def evalExpression(expression: Expression): Universe => Any = expression match {
-    case Identifier(name) => evalIdentifier(name)
-    case Number(value) => const(value)
-    case Tuple(items) =>
-      val xs = items map evalExpression
-      universe => NTuple(xs map (_ (universe)): _*)
-    case List(items) =>
-      val xs = items map evalExpression
-      universe => xs map (_ (universe))
-    case Call(function, argument) =>
-      val func = evalExpression(function)
-      val arg = evalExpression(argument)
-      universe => func(universe).asInstanceOf[Any => Any](arg(universe))
-    case Equals(lhs, rhs) =>
-      val l = evalExpression(lhs)
-      val r = evalExpression(rhs)
-      universe => l(universe) == r(universe)
+  private def evalExpression(expression: Expression): Universe => Any = {
+    val exprFunc: Universe => Any = expression match {
+      case Identifier(name) => evalIdentifier(name)
+      case Number(value) => const(value)
+      case Tuple(items) =>
+        val xs = items map evalExpression
+        universe => NTuple(xs map (_ (universe)): _*)
+      case List(items) =>
+        val xs = items map evalExpression
+        universe => xs map (_ (universe))
+      case Call(function, argument) =>
+        val func = evalExpression(function)
+        val arg = evalExpression(argument)
+        universe => func(universe).asInstanceOf[Any => Any](arg(universe))
+      case Equals(lhs, rhs) =>
+        val l = evalExpression(lhs)
+        val r = evalExpression(rhs)
+        universe => l(universe) == r(universe)
+    }
+    if (isConstant(expression)) const(exprFunc(Universe.empty))
+    else exprFunc
   }
 
   /** Evaluates a transformer.
@@ -122,6 +126,24 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
       case NTuple(id: StateId[Vector2[Int]], delta: Vector2[Int]) => (id, delta)
     }
     case _ => error(s"Unknown gate: $name")
+  }
+
+  /** Returns true if the expression does not depend on the universe.
+    *
+    * @param expression the expression
+    * @return true if the expression does not depend on the universe
+    */
+  private def isConstant(expression: Expression): Boolean = expression match {
+    case Identifier("qubit") |
+         Identifier("qucell") |
+         Identifier("vec2") |
+         Identifier("cell") |
+         Number(_) => true
+    case Tuple(items) => items forall isConstant
+    case List(items) => items forall isConstant
+    case Call(function, argument) => isConstant(function) && isConstant(argument)
+    case Equals(lhs, rhs) => isConstant(lhs) && isConstant(rhs)
+    case _ => false
   }
 }
 
