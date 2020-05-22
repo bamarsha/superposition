@@ -1,6 +1,8 @@
 package superposition.math
 
 import com.badlogic.gdx.math.MathUtils
+import spire.implicits._
+import spire.math.Numeric
 
 import scala.math.sqrt
 
@@ -11,6 +13,40 @@ import scala.math.sqrt
   * @tparam A the type of the components
   */
 final case class Vector2[@specialized(Int, Double) A](x: A, y: A) {
+  /** Adds two vectors.
+    *
+    * @param that the other vector
+    * @return the vector sum
+    */
+  def +(that: Vector2[A])(implicit numeric: Numeric[A]): Vector2[A] = Vector2(x + that.x, y + that.y)
+
+  /** Subtracts two vectors.
+    *
+    * @param that the other vector
+    * @return the vector difference
+    */
+  def -(that: Vector2[A])(implicit numeric: Numeric[A]): Vector2[A] = Vector2(x - that.x, y - that.y)
+
+  /** Computes the dot product of two vectors.
+    *
+    * @param that the other vector
+    * @return the dot product
+    */
+  def *(that: Vector2[A])(implicit numeric: Numeric[A]): A = x * that.x + y * that.y
+
+  /** Multiplies the vector by a scalar.
+    *
+    * @param scalar the scalar
+    * @return the scaled vector
+    */
+  def *(scalar: A)(implicit numeric: Numeric[A]): Vector2[A] = map(_ * scalar)
+
+  /** Returns the negation of the vector.
+    *
+    * @return the negation of the vector
+    */
+  def unary_-(implicit numeric: Numeric[A]): Vector2[A] = map(-_)
+
   /** Maps the components of the vector.
     *
     * @param f the mapping function
@@ -25,91 +61,17 @@ final case class Vector2[@specialized(Int, Double) A](x: A, y: A) {
 /** Vector operations. */
 object Vector2 {
 
-  /** Operations on vectors of integers.
-    *
-    * @param vector the vector
-    */
-  implicit final class IntOps(val vector: Vector2[Int]) extends AnyVal {
-    /** Adds two vectors.
-      *
-      * @param that the other vector
-      * @return the vector sum
-      */
-    def +(that: Vector2[Int]): Vector2[Int] = Vector2(vector.x + that.x, vector.y + that.y)
-
-    /** Subtracts two vectors.
-      *
-      * @param that the other vector
-      * @return the vector difference
-      */
-    def -(that: Vector2[Int]): Vector2[Int] = Vector2(vector.x - that.x, vector.y - that.y)
-
-    /** Computes the dot product of two vectors.
-      *
-      * @param that the other vector
-      * @return the dot product
-      */
-    def *(that: Vector2[Int]): Int = vector.x * that.x + vector.y * that.y
-
-    /** Multiplies the vector by a scalar.
-      *
-      * @param scalar the scalar
-      * @return the scaled vector
-      */
-    def *(scalar: Int): Vector2[Int] = vector map (_ * scalar)
-
-    /** Returns the negation of the vector.
-      *
-      * @return the negation of the vector
-      */
-    def unary_- : Vector2[Int] = vector map (-_)
-  }
-
   /** Operations on vectors of doubles.
     *
     * @param vector the vector
     */
   implicit final class DoubleOps(val vector: Vector2[Double]) extends AnyVal {
-    /** Adds two vectors.
-      *
-      * @param that the other vector
-      * @return the vector sum
-      */
-    def +(that: Vector2[Double]): Vector2[Double] = Vector2(vector.x + that.x, vector.y + that.y)
-
-    /** Subtracts two vectors.
-      *
-      * @param that the other vector
-      * @return the vector difference
-      */
-    def -(that: Vector2[Double]): Vector2[Double] = Vector2(vector.x - that.x, vector.y - that.y)
-
-    /** Computes the dot product of two vectors.
-      *
-      * @param that the other vector
-      * @return the dot product
-      */
-    def *(that: Vector2[Double]): Double = vector.x * that.x + vector.y * that.y
-
-    /** Multiplies the vector by a scalar.
-      *
-      * @param scalar the scalar
-      * @return the scaled vector
-      */
-    def *(scalar: Double): Vector2[Double] = vector map (_ * scalar)
-
     /** Divides the vector by a scalar.
       *
       * @param scalar the scalar
       * @return the scaled vector
       */
     def /(scalar: Double): Vector2[Double] = vector map (_ / scalar)
-
-    /** Returns the negation of the vector.
-      *
-      * @return the negation of the vector
-      */
-    def unary_- : Vector2[Double] = vector map (-_)
 
     /** The length of the vector. */
     def length: Double = sqrt(vector * vector)
