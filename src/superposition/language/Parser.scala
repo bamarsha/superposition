@@ -56,7 +56,7 @@ private object Parser extends RegexParsers {
     callOrTerm ~ (whiteSpace.? ~> "=" ~> whiteSpace.? ~> expression) ^^ makeTuple ^^ Equals.tupled
 
   /** An expression. */
-  lazy val expression: Parser[Expression] = equals | callOrTerm
+  private lazy val expression: Parser[Expression] = equals | callOrTerm
 
   /** The on-transformer. */
   private val onTransformer: Parser[Transformer] = "on" ~> whiteSpace ~> expression ^^ OnTransformer
@@ -76,5 +76,8 @@ private object Parser extends RegexParsers {
       ^^ makeTuple ^^ Application.tupled)
 
   /** A gate program. */
-  val program: Parser[Seq[Application]] = whiteSpace.? ~> phrase((application <~ whiteSpace.?).*)
+  val gateProgram: Parser[Seq[Application]] = whiteSpace.? ~> phrase((application <~ whiteSpace.?).*)
+
+  /** An expression program. */
+  val expressionProgram: Parser[Expression] = whiteSpace.? ~> phrase(expression)
 }

@@ -4,7 +4,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import scalaz.syntax.contravariant._
 import superposition.component.{Multiverse, PrimaryBit, QuantumPosition}
 import superposition.language.Interpreter.NTuple
-import superposition.language.Parser.{expression, parse, program}
+import superposition.language.Parser.{NoSuccess, Success, expressionProgram, gateProgram, parse}
 import superposition.math._
 
 import scala.Function.{chain, const}
@@ -19,21 +19,28 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
   /** The height of the tile map. */
   private val height: Int = Option(map.getProperties.get("height", classOf[Int])).get
 
-  /** Evaluates a program string.
+  /** Evaluates a gate program string.
     *
     * @param string the program string
+    * @throws RuntimeException if parsing fails
     * @return the evaluated program
     */
-  def evalProgram(string: String): Gate[Unit] = evalProgram(parse(program, string).get)
+  def evalGate(string: String): Gate[Unit] = parse(gateProgram, string) match {
+    case Success(program, _) => evalProgram(program)
+    case NoSuccess(message, _) => error(s"Syntax error in gate program ($message): $string")
+  }
 
-  /** Evaluates an expression string.
+  /** Evaluates an expression program string.
     *
     * @param string the expression string
     * @tparam A the type of the expression
+    * @throws RuntimeException if parsing fails
     * @return the evaluated expression
     */
-  def evalExpression[A](string: String): Universe => A =
-    evalExpression(parse(expression, string).get).asInstanceOf[Universe => A]
+  def evalExpression[A](string: String): Universe => A = parse(expressionProgram, string) match {
+    case Success(expression, _) => evalExpression(expression).asInstanceOf[Universe => A]
+    case NoSuccess(message, _) => error(s"Syntax error in expression program ($message): $string")
+  }
 
   /** Evaluates a program.
     *

@@ -34,7 +34,7 @@ private object LevelLoader {
 
     // Apply initial gates.
     for (gates <- Option(map.getProperties.get("Gates", classOf[String]))) {
-      multiverse.applyGate(new Interpreter(multiverse, map).evalProgram(gates), ())
+      multiverse.applyGate(new Interpreter(multiverse, map).evalGate(gates), ())
     }
 
     // Create the map renderer.
