@@ -60,11 +60,11 @@ private object PlayerInputSystem {
   private def walkGate(entity: Entity, carriables: Iterable[Entity]): Gate[Vector2[Int]] = {
     val player = Player.mapper.get(entity)
     val position = QuantumPosition.mapper.get(entity)
-    val walkPlayer: Gate[Vector2[Int]] = Translate.multi controlled { delta => universe =>
+    val walkPlayer: Gate[Vector2[Int]] = Translate.multi controlledMap { delta => universe =>
       if (universe.state(player.alive)) List((position.cell, delta))
       else Nil
     }
-    val walkCarried: Gate[Vector2[Int]] = Translate.multi controlled { delta => universe =>
+    val walkCarried: Gate[Vector2[Int]] = Translate.multi controlledMap { delta => universe =>
       if (universe.state(player.alive))
         carriables
           .filter(carriable => universe.state(Carriable.mapper.get(carriable).carried))
@@ -84,7 +84,7 @@ private object PlayerInputSystem {
   private def carryGate(entity: Entity, carriables: Iterable[Entity]): Gate[Unit] = {
     val player = Player.mapper.get(entity)
     val playerCell = QuantumPosition.mapper.get(entity).cell
-    X.multi controlled const { universe =>
+    X.multi controlledMap const { universe =>
       carriables
         .filter { carriable =>
           val carriableCell = QuantumPosition.mapper.get(carriable).cell

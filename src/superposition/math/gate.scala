@@ -72,8 +72,8 @@ object Gate {
       override def adjoint: Gate[Seq[A]] = gate.adjoint.multi contramap (_.reverse)
     }
 
-    /** Returns a new gate that "controls" the argument to the original gate by mapping it based on its value and the
-      * universe.
+    /** Returns a new gate that controls the argument to the original gate by mapping it based on its value and the
+      * state of the universe.
       *
       * To preserve unitarity, the new gate must not change the state of any qudits used by the mapping function to map
       * the argument.
@@ -81,43 +81,46 @@ object Gate {
       * @param f a mapping function that receives the gate argument and the universe
       * @tparam B the type of the new argument
       * @throws AssertionError if the mapping function violates unitarity
-      * @return the new controlled gate
+      * @return the controlled gate
       */
-    def controlled[B](f: B => Universe => A): Gate[B] = new Gate[B] {
+    def controlledMap[B](f: B => Universe => A): Gate[B] = new Gate[B] {
       override def apply(value: B)(universe: Universe): NonEmptyList[Universe] = {
         val newUniverses = gate(f(value)(universe))(universe)
         assert(newUniverses.stream forall (f(value)(_) == f(value)(universe)))
         newUniverses
       }
 
-      override def adjoint: Gate[B] = gate.adjoint controlled f
+      override def adjoint: Gate[B] = gate.adjoint controlledMap f
     }
+
+    /** Returns a new gate that applies the original gate if the universe satisfies the predicate, and otherwise applies
+      * the identity gate instead.
+      *
+      * @param predicate the predicate that must be satisfied to apply the original gate
+      * @return the controlled gate
+      */
+    def controlled(predicate: Universe => Boolean): Gate[A] =
+      multi.controlledMap /*_*/ { value => universe =>
+        if (predicate(universe)) Seq(value)
+        else Seq.empty
+      } /*_*/
 
     /** Returns a new gate that maps its argument to a sequence and applies the original gate with each value in the
       * sequence.
       *
       * @param f the mapping function that returns a sequence
       * @tparam B the type of the new argument
-      * @return the new mapped and flattened gate
+      * @return the mapped and flattened gate
       */
-    def flatContramap[B](f: B => Seq[A]): Gate[B] = multi contramap f
+    def flatMap[B](f: B => Seq[A]): Gate[B] = multi contramap f
 
-    /** Returns a new gate that applies the original gate only if the argument satisfies the predicate, and otherwise
-      * applies the identity gate instead.
+    /** Returns a new gate that applies the original gate if the argument satisfies the predicate, and otherwise applies
+      * the identity gate instead.
       *
       * @param predicate the predicate that must be satisfied to apply the original gate
-      * @return the new filtered gate
+      * @return the filtered gate
       */
-    def filter(predicate: A => Boolean): Gate[A] = flatContramap(List(_) filter predicate)
-
-    /** Returns a new gate that applies the original gate only if the argument satisfies the predicate, and otherwise
-      * applies the identity gate instead.
-      *
-      * @param predicate the predicate that must be satisfied to apply the original gate
-      * @return the new filtered gate
-      */
-    def filter2(predicate: Universe => Boolean): Gate[A] =
-      multi.controlled[A]((a: A) => u => if (predicate(u)) Seq(a) else Seq.empty)
+    def filter(predicate: A => Boolean): Gate[A] = flatMap(List(_) filter predicate)
   }
 
 }
