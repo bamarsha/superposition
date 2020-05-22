@@ -39,7 +39,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @param program the program sequence
     * @return the evaluated program
     */
-  private def evalProgram(program: Seq[Application]): Gate[Unit] = program map evalApplication reduce (_ andThen _)
+  private def evalProgram(program: Seq[Application]): Gate[Unit] = program.view map evalApplication reduce (_ andThen _)
 
   /** Evaluates an expression.
     *
@@ -49,7 +49,9 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
   private def evalExpression(expression: Expression): Universe => Any = expression match {
     case Identifier(name) => evalIdentifier(name)
     case Number(value) => const(value)
-    case Tuple(expr) => universe => (expr map evalExpression map (_ (universe))).toList
+    case Tuple(exprs) =>
+      val evals = exprs map evalExpression
+      universe => evals map (_ (universe))
     case Call(function, argument) =>
       val func = evalExpression(function)
       val arg = evalExpression(argument)
@@ -80,7 +82,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     */
   private def evalApplication(application: Application): Gate[Unit] = {
     val gate = makeGate(application.gate)
-    val allTransformations = chain(application.transformers.map(evalTransformer))
+    val allTransformations = chain(application.transformers map evalTransformer)
     allTransformations(gate.asInstanceOf[Gate[Any]]).asInstanceOf[Gate[Unit]]
   }
 
@@ -91,9 +93,9 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     */
   private def evalIdentifier(name: String): Universe => Any = name match {
     case "allOn" =>
-      universe => value: List[_] =>
-        val controls = if (value.head.isInstanceOf[List[_]]) value else List(value)
-        multiverse.allOn(universe, controls.asInstanceOf[List[List[Int]]] map makeVector2)
+      universe => value: Seq[_] =>
+        val controls = if (value.head.isInstanceOf[Seq[_]]) value else Seq(value)
+        multiverse.allOn(universe, controls.asInstanceOf[Iterable[Seq[Int]]].view map makeVector2)
     case "bit" => const(multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bit)
     case "cell" => const(multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell)
     case "value" => universe => (id: StateId[_]) => universe.state(id)
@@ -109,18 +111,18 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
   private def makeGate(name: String): Gate[_] = name match {
     case "X" => X
     case "H" => H
-    case "Translate" => Translate contramap[List[Any]] {
-      case List(id: StateId[Vector2[Int]], List(x: Int, y: Int)) => (id, Vector2(x, y))
+    case "Translate" => Translate contramap[Seq[Any]] {
+      case Seq(id: StateId[Vector2[Int]], List(x: Int, y: Int)) => (id, Vector2(x, y))
     }
     case _ => error(s"Unknown gate: $name")
   }
 
-  /** Makes a vector from a list of vector components.
+  /** Makes a vector from its components.
     *
-    * @param list the vector components
+    * @param components the vector components
     * @return the vector
     */
-  private def makeVector2(list: List[Int]): Vector2[Int] = list match {
-    case List(x, y) => Vector2(x, height - y - 1)
+  private def makeVector2(components: Seq[Int]): Vector2[Int] = components match {
+    case Seq(x, y) => Vector2(x, height - y - 1)
   }
 }
