@@ -30,8 +30,8 @@ final class MultiverseRenderer extends Renderer with Disposable {
   override val family: Family = Family.all(classOf[Multiverse], classOf[MultiverseView]).get
 
   override def render(entity: Entity, deltaTime: Float): Unit = {
-    val multiverse = Multiverse.Mapper.get(entity)
-    val multiverseView = MultiverseView.Mapper.get(entity)
+    val multiverse = Multiverse.mapper.get(entity)
+    val multiverseView = MultiverseView.mapper.get(entity)
     time += deltaTime
 
     noiseBuffer.clear()

@@ -12,5 +12,5 @@ final class Player(val alive: StateId[Boolean]) extends Component
 /** Contains the component mapper for the player component. */
 object Player {
   /** The component mapper for the player component. */
-  val Mapper: ComponentMapper[Player] = ComponentMapper.getFor(classOf[Player])
+  val mapper: ComponentMapper[Player] = ComponentMapper.getFor(classOf[Player])
 }

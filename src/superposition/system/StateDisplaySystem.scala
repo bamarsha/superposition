@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import superposition.entity.Level
 import superposition.math.Universe
-import superposition.system.StateDisplaySystem.{ImportantColor, NormalColor}
+import superposition.system.StateDisplaySystem.{importantColor, normalColor}
 
 import scala.Function.const
 
@@ -47,7 +47,7 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
   override def update(deltaTime: Float): Unit = {
     val universes = level().get.multiverse.universes
     val changed = universes.view
-      .zipAll(lastUniverses, Universe.Empty, Universe.Empty)
+      .zipAll(lastUniverses, Universe.empty, Universe.empty)
       .exists(((_: Universe).state != (_: Universe).state).tupled)
     if (changed) {
       drawState()
@@ -91,7 +91,7 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
     batch.setProjectionMatrix(projection)
     batch.begin()
     for ((((header, column), important), x) <- headers.zip(columns).zip(importants).zip(xs)) {
-      font.setColor(if (important) ImportantColor else NormalColor)
+      font.setColor(if (important) importantColor else normalColor)
       font.draw(batch, header, x, ys.head)
       for ((y, cell) <- ys.tail.zip(column)) {
         font.draw(batch, cell, x, y)
@@ -135,8 +135,8 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
 /** Constants for the multiverse state display system. */
 private object StateDisplaySystem {
   /** The font color for normal state values. */
-  private val NormalColor = new Color(0x9f9f9fff)
+  private val normalColor = new Color(0x9f9f9fff)
 
   /** The font color for important state values. */
-  private val ImportantColor = WHITE
+  private val importantColor = WHITE
 }

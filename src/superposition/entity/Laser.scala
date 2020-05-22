@@ -3,7 +3,7 @@ package superposition.entity
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
 import superposition.component._
-import superposition.entity.Laser.Textures
+import superposition.entity.Laser.textures
 import superposition.game.ResourceResolver.resolve
 import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math.{Direction, Gate, StateId, Universe, Vector2}
@@ -16,26 +16,26 @@ import scala.Function.const
   * @param cell the position of the laser
   * @param gate the gate that the laser applies
   * @param direction the direction the laser points
-  * @param controls the control cells for the laser
+  * @param control the control function for the laser
   */
 final class Laser(
     multiverse: Multiverse,
     cell: Vector2[Int],
     gate: Gate[StateId[Boolean]],
     direction: Direction,
-    controls: Universe => Boolean)
+    control: Universe => Boolean)
   extends Entity {
   add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5), Set(cell)))
   add(new Collider(const(Set(cell))))
-  add(new Beam(multiverse, gate, direction, controls))
-  add(new Renderable(1, controls))
-  add(new SpriteView(texture = const(Textures(direction)), scale = const(Vector2(0, 0))))
+  add(new Beam(multiverse, gate, direction, control))
+  add(new Renderable(1, control))
+  add(new SpriteView(texture = const(textures(direction)), scale = const(Vector2(0, 0))))
 }
 
 /** Contains the sprite textures for lasers. */
 private object Laser {
   /** The sprite texture for every cardinal direction. */
-  private val Textures: Map[Direction, Texture] = Map(
+  private val textures: Map[Direction, Texture] = Map(
     Up -> "sprites/laser_up.png",
     Down -> "sprites/laser_down.png",
     Left -> "sprites/laser_left.png",

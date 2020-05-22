@@ -79,5 +79,5 @@ final case class Universe(
 /** Factories for universes. */
 object Universe {
   /** The empty universe. */
-  val Empty: Universe = Universe()
+  val empty: Universe = Universe()
 }

@@ -13,5 +13,5 @@ final class Renderable(val layer: Int, val dependentState: Universe => Any) exte
 /** Contains the component mapper for the renderable component. */
 object Renderable {
   /** The component mapper for the renderable component. */
-  val Mapper: ComponentMapper[Renderable] = ComponentMapper.getFor(classOf[Renderable])
+  val mapper: ComponentMapper[Renderable] = ComponentMapper.getFor(classOf[Renderable])
 }

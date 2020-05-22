@@ -12,5 +12,5 @@ final class PrimaryBit(val bit: StateId[Boolean]) extends Component
 /** Contains the component mapper for the primary bit component. */
 object PrimaryBit {
   /** The component mapper for the primary bit component. */
-  val Mapper: ComponentMapper[PrimaryBit] = ComponentMapper.getFor(classOf[PrimaryBit])
+  val mapper: ComponentMapper[PrimaryBit] = ComponentMapper.getFor(classOf[PrimaryBit])
 }

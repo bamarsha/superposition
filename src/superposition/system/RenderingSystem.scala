@@ -27,8 +27,8 @@ private object RenderingSystem {
     * @return the comparison result
     */
   private def compareLayers(entity1: Entity, entity2: Entity): Int = {
-    val layer1 = Renderable.Mapper.get(entity1).layer
-    val layer2 = Renderable.Mapper.get(entity2).layer
+    val layer1 = Renderable.mapper.get(entity1).layer
+    val layer2 = Renderable.mapper.get(entity2).layer
     layer1.compare(layer2)
   }
 }

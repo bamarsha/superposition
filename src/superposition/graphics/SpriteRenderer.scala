@@ -33,7 +33,7 @@ final class SpriteRenderer(level: () => Option[Level]) extends Renderer with Dis
 
   override def render(entity: Entity, deltaTime: Float): Unit = {
     val multiverseView = level().get.multiverseView
-    val dependentState = Renderable.Mapper.get(entity).dependentState
+    val dependentState = Renderable.mapper.get(entity).dependentState
     batch.setProjectionMatrix(multiverseView.camera.combined)
     multiverseView.enqueueRenderer(dependentState) { (universe, renderInfo) =>
       batch.begin()
@@ -49,7 +49,7 @@ final class SpriteRenderer(level: () => Option[Level]) extends Renderer with Dis
     * @param renderInfo the rendering information for the universe
     */
   private def draw(entity: Entity, universe: Universe, renderInfo: UniverseRenderInfo): Unit = {
-    val spriteView = SpriteView.Mapper.get(entity)
+    val spriteView = SpriteView.mapper.get(entity)
     val scale = spriteView.scale(universe)
     val position = absolutePosition(entity, universe) - scale / 2
     shader.setUniformColor("color", WHITE, colorArray)
@@ -73,7 +73,7 @@ private object SpriteRenderer {
     * @return the absolute position of the entity
     */
   private def absolutePosition(entity: Entity, universe: Universe): Vector2[Double] =
-    if (ClassicalPosition.Mapper.has(entity))
-      ClassicalPosition.Mapper.get(entity).absolute
-    else universe.meta(QuantumPosition.Mapper.get(entity).absolute)
+    if (ClassicalPosition.mapper.has(entity))
+      ClassicalPosition.mapper.get(entity).absolute
+    else universe.meta(QuantumPosition.mapper.get(entity).absolute)
 }

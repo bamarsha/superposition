@@ -10,7 +10,7 @@ import com.badlogic.gdx.maps.{MapLayer, MapObject}
 import superposition.component.{Multiverse, MultiverseView}
 import superposition.entity.{MapLayer => MapLayerEntity, _}
 import superposition.game.ResourceResolver.resolve
-import superposition.language.Parser
+import superposition.language.Interpreter
 import superposition.math._
 
 import scala.Function.const
@@ -33,13 +33,8 @@ private object LevelLoader {
     }
 
     // Apply initial gates.
-    val gatesText = map.getProperties.get("Gates", classOf[String])
-    if (gatesText != null) {
-      val program = Parser.parseProgram(multiverse, map, gatesText)
-      program match {
-        case Parser.Success(result, _) => multiverse.applyGate(result, ())
-        case _ => throw new RuntimeException("Failed to parse text: " + gatesText)
-      }
+    for (gates <- Option(map.getProperties.get("Gates", classOf[String]))) {
+      multiverse.applyGate(new Interpreter(multiverse, map).evalGate(gates), ())
     }
 
     // Create the map renderer.
@@ -114,20 +109,32 @@ private object LevelLoader {
     val id = obj.getProperties.get("id", classOf[Int])
     val cells = objectCells(map, obj)
     obj.getProperties.get("type") match {
-      case "Player" => new Cat(multiverse, id, cells.head)
-      case "Quball" => new Quball(multiverse, id, cells.head)
+      case "Player" => new Cat(id, multiverse, cells.head)
+      case "Quball" => new Quball(id, multiverse, cells.head)
       case "Laser" =>
         val gate = toGate(obj.getProperties.get("Gate", classOf[String]))
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
-        val control = parseControls(multiverse, map, obj)
+        val control = controlFunction(multiverse, map, obj)
         new Laser(multiverse, cells.head, gate, direction, control)
       case "Door" =>
-        val control = parseControls(multiverse, map, obj)
+        val control = controlFunction(multiverse, map, obj)
         new Door(multiverse, cells.head, control)
       case "Exit" => new Exit(cells)
       case unknown => error(s"Unknown entity type '$unknown'.")
     }
   }
+
+  /** Returns the control function for the tile map object.
+    *
+    * @param multiverse the multiverse
+    * @param map the tile map
+    * @param obj the tile map object
+    * @return the control function for the tile map object
+    */
+  private def controlFunction(multiverse: Multiverse, map: TiledMap, obj: MapObject): Universe => Boolean =
+    Option(obj.getProperties.get("Controls", classOf[String]))
+      .map(new Interpreter(multiverse, map).evalExpression)
+      .getOrElse(const(true))
 
   /** Parses a cell position for the tile map from a string "(x, y)".
     *
@@ -141,12 +148,6 @@ private object LevelLoader {
       case Some(m) => Vector2(m.group("x").trim.toInt, height - m.group("y").trim.toInt - 1)
       case None => error(s"Invalid cell '$string'.")
     }
-  }
-
-  private def parseControls(multiverse: Multiverse, map: TiledMap, obj: MapObject): Universe => Boolean = {
-    val controlText = Option(obj.getProperties.get("Controls", classOf[String]))
-    val control = controlText.map(Parser.parseExpression[Boolean](multiverse, map, _).get)
-    control.getOrElse(const(true))
   }
 
   /** Parses a sequence of cell positions for the tile map from a string "(x_1, y_1)\n...\n(x_n, y_n)".
