@@ -102,10 +102,11 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     */
   private def evalIdentifier(name: String): Universe => Any = name match {
     case "allOn" => universe => multiverse.allOn(universe, _)
-    case "bit" => const(multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bit)
-    case "cell" => const(multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell)
+    case "qubit" => const(multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bit)
+    case "qucell" => const(multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell)
     case "value" => universe => (id: StateId[_]) => universe.state(id)
-    case "vec2" => const(makeVector2 _)
+    case "vec2" => const { case NTuple(x: Int, y: Int) => Vector2(x, y) }
+    case "cell" => const { case NTuple(x: Int, y: Int) => Vector2(x, height - y - 1) }
     case _ => error(s"Unknown identifier: $name")
   }
 
@@ -118,19 +119,9 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     case "X" => X
     case "H" => H
     case "Translate" => Translate contramap[NTuple] {
-      // TODO: Require the second argument to be a Vector2.
-      case NTuple(id: StateId[Vector2[Int]], NTuple(x: Int, y: Int)) => (id, Vector2(x, y))
+      case NTuple(id: StateId[Vector2[Int]], delta: Vector2[Int]) => (id, delta)
     }
     case _ => error(s"Unknown gate: $name")
-  }
-
-  /** Makes a vector from its components.
-    *
-    * @param components the vector components
-    * @return the vector
-    */
-  private def makeVector2(components: NTuple): Vector2[Int] = components match {
-    case NTuple(x: Int, y: Int) => Vector2(x, height - y - 1)
   }
 }
 
