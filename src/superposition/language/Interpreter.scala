@@ -101,12 +101,12 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @return the evaluated identifier name
     */
   private def evalIdentifier(name: String): Universe => Any = name match {
-    case "allOn" => universe => multiverse.allOn(universe, _)
+    case "activated" => universe => multiverse.isActivated(universe, _)
     case "qubit" => const(multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bit)
     case "qucell" => const(multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell)
     case "value" => universe => (id: StateId[_]) => universe.state(id)
-    case "vec2" => const { case NTuple(x: Int, y: Int) => Vector2(x, y) }
-    case "cell" => const { case NTuple(x: Int, y: Int) => Vector2(x, height - y - 1) }
+    case "vec2" => const({ case NTuple(x: Int, y: Int) => Vector2(x, y) }: NTuple => Vector2[Int])
+    case "cell" => const({ case NTuple(x: Int, y: Int) => Vector2(x, height - y - 1) }: NTuple => Vector2[Int])
     case _ => error(s"Unknown identifier: $name")
   }
 

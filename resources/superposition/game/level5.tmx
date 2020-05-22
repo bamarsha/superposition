@@ -76,7 +76,7 @@
   </object>
   <object id="18" name="Door" type="Door" x="119.944" y="25.8523">
    <properties>
-    <property name="Controls" value="allOn [cell (12, 2)]"/>
+    <property name="Controls" value="activated [cell (12, 2)]"/>
    </properties>
    <point/>
   </object>
@@ -89,7 +89,7 @@
   <object id="26" name="Quball" type="Quball" gid="212" x="208" y="96" width="16" height="16"/>
   <object id="27" name="X Laser" type="Laser" gid="209" x="192" y="80" width="16" height="16">
    <properties>
-    <property name="Controls" value="allOn [cell (13, 6)]"/>
+    <property name="Controls" value="activated [cell (13, 6)]"/>
     <property name="Direction" value="Left"/>
     <property name="Gate" value="X"/>
    </properties>

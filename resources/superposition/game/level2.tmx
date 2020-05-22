@@ -70,20 +70,20 @@
   <object id="12" name="Quball" type="Quball" gid="212" x="144" y="80" width="16" height="16"/>
   <object id="13" name="X Laser" type="Laser" gid="210" x="64" y="80" width="16" height="16">
    <properties>
-    <property name="Controls" value="allOn [cell (3, 5)]"/>
+    <property name="Controls" value="activated [cell (3, 5)]"/>
     <property name="Direction" value="Right"/>
     <property name="Gate" value="X"/>
    </properties>
   </object>
   <object id="18" name="Door" type="Door" x="120.125" y="27.125">
    <properties>
-    <property name="Controls" value="allOn [cell (9, 2), cell (10, 2)]"/>
+    <property name="Controls" value="activated [cell (9, 2), cell (10, 2)]"/>
    </properties>
    <point/>
   </object>
   <object id="19" name="Door" type="Door" x="134.375" y="26.875">
    <properties>
-    <property name="Controls" value="allOn [cell (9, 2), cell (10, 2)]"/>
+    <property name="Controls" value="activated [cell (9, 2), cell (10, 2)]"/>
    </properties>
    <point/>
   </object>

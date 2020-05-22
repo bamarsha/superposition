@@ -125,18 +125,18 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
         filter Collider.mapper.has
         exists (Collider.mapper.get(_).cells(universe).contains(cell)))
 
-  /** Returns true if all control cells have at least one activator qubit in the |1⟩ state.
+  /** Returns true if all cells have at least one activator qubit in the |1⟩ state.
     *
     * @param universe the universe to look in
-    * @param controls the control cells to look at
-    * @return true if all control cells have at least one activator qubit in the |1⟩ state
+    * @param cells the cells to look at
+    * @return true if all cells have at least one activator qubit in the |1⟩ state
     */
-  def allOn(universe: Universe, controls: Iterable[Vector2[Int]]): Boolean =
-    controls forall { control =>
+  def isActivated(universe: Universe, cells: Iterable[Vector2[Int]]): Boolean =
+    cells forall { cell =>
       entities exists { entity =>
         Activator.mapper.has(entity) && QuantumPosition.mapper.has(entity) &&
           universe.state(Activator.mapper.get(entity).activator) &&
-          universe.state(QuantumPosition.mapper.get(entity).cell) == control
+          universe.state(QuantumPosition.mapper.get(entity).cell) == cell
       }
     }
 

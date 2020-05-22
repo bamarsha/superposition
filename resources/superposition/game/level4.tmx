@@ -60,7 +60,7 @@
   </object>
   <object id="10" name="Door" type="Door" x="247" y="91">
    <properties>
-    <property name="Controls" value="allOn [cell (15, 7)]"/>
+    <property name="Controls" value="activated [cell (15, 7)]"/>
    </properties>
    <point/>
   </object>

@@ -20,6 +20,6 @@ final class MapLayer(
     multiverse: Multiverse,
     controls: Iterable[Vector2[Int]])
   extends Entity {
-  add(new Renderable(renderLayer, multiverse.allOn(_, controls)))
+  add(new Renderable(renderLayer, multiverse.isActivated(_, controls)))
   add(new MapLayerView(renderer, mapLayer, controls))
 }
