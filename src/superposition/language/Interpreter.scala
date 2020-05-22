@@ -11,8 +11,8 @@ class Interpreter(multiverse: Multiverse, map: TiledMap) {
 
   private val height = map.getProperties.get("height", classOf[Int])
 
-  private val bitFunction = (id: Int) => multiverse.getById(id).get.getComponent(classOf[PrimaryBit]).bit
-  private val cellFunction = (id: Int) => multiverse.getById(id).get.getComponent(classOf[QuantumPosition]).cell
+  private val bitFunction = (id: Int) => multiverse.entityById(id).get.getComponent(classOf[PrimaryBit]).bit
+  private val cellFunction = (id: Int) => multiverse.entityById(id).get.getComponent(classOf[QuantumPosition]).cell
   private val vec2Function: List[Int] => Vector2[Int] = { case List(a, b) => Vector2(a, height - b - 1) }
 
   def iden2scala(name: String): Universe => _ = name match {

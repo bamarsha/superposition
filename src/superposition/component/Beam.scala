@@ -8,13 +8,13 @@ import superposition.math._
   * @param multiverse the multiverse that the beam belongs to
   * @param gate the gate to apply
   * @param direction the direction of the beam
-  * @param controls the cells that must contain a qubit in the |1⟩ state before the beam can be activated
+  * @param control the control function for the gate
   */
 final class Beam(
     multiverse: Multiverse,
     val gate: Gate[StateId[Boolean]],
     val direction: Direction,
-    val controls: Universe => Boolean)
+    val control: Universe => Boolean)
   extends Component {
   /** The most recent target cell, if any. */
   val lastTarget: MetaId[Option[Vector2[Int]]] = multiverse.allocateMeta(None)

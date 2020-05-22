@@ -158,8 +158,13 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
   def showUniverse(universe: Universe): Iterable[String] =
     stateIds.view map (id => /*_*/ id.show(universe.state(id)) /*_*/)
 
-  def getById(id: Int): Option[Entity] =
-    entities.filter(ObjectId.mapper.has).find(e => ObjectId.mapper.get(e).id == id)
+  /** Returns the entity with the ID.
+    *
+    * @param id the ID
+    * @return the entity with the ID
+    */
+  def entityById(id: Int): Option[Entity] =
+    entities filter EntityId.mapper.has find (EntityId.mapper.get(_).id == id)
 }
 
 /** Contains the component mapper for the multiverse component. */

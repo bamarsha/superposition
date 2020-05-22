@@ -60,8 +60,7 @@ object LaserInputSystem {
     * @return the target of the laser beam
     */
   private def beamTarget(multiverse: Multiverse, entity: Entity)(universe: Universe): Option[Vector2[Int]] = {
-    val controls = Beam.mapper.get(entity).controls
-    if (controls(universe))
+    if (Beam.mapper.get(entity).control(universe))
       beamPath(entity) find { cell =>
         multiverse.isBlocked(universe, cell) || multiverse.allInCell(universe, cell).nonEmpty
       }

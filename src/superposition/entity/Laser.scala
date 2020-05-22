@@ -16,19 +16,19 @@ import scala.Function.const
   * @param cell the position of the laser
   * @param gate the gate that the laser applies
   * @param direction the direction the laser points
-  * @param controls the control cells for the laser
+  * @param control the control function for the laser
   */
 final class Laser(
     multiverse: Multiverse,
     cell: Vector2[Int],
     gate: Gate[StateId[Boolean]],
     direction: Direction,
-    controls: Universe => Boolean)
+    control: Universe => Boolean)
   extends Entity {
   add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5), Set(cell)))
   add(new Collider(const(Set(cell))))
-  add(new Beam(multiverse, gate, direction, controls))
-  add(new Renderable(1, controls))
+  add(new Beam(multiverse, gate, direction, control))
+  add(new Renderable(1, control))
   add(new SpriteView(texture = const(textures(direction)), scale = const(Vector2(0, 0))))
 }
 
