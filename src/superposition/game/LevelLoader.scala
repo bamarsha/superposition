@@ -7,13 +7,13 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
 import com.badlogic.gdx.maps.{MapLayer, MapObject}
+import scalaz.syntax.monad._
 import superposition.component.{Multiverse, MultiverseView}
 import superposition.entity.{MapLayer => MapLayerEntity, _}
 import superposition.game.ResourceResolver.resolve
 import superposition.language.Interpreter
 import superposition.math._
 
-import scala.Function.const
 import scala.jdk.CollectionConverters._
 import scala.sys.error
 
@@ -131,10 +131,10 @@ private object LevelLoader {
     * @param obj the tile map object
     * @return the control function for the tile map object
     */
-  private def controlFunction(multiverse: Multiverse, map: TiledMap, obj: MapObject): Universe => Boolean =
+  private def controlFunction(multiverse: Multiverse, map: TiledMap, obj: MapObject): QExpr[Boolean] =
     Option(obj.getProperties.get("Controls", classOf[String]))
       .map(new Interpreter(multiverse, map).evalExpression)
-      .getOrElse(const(true))
+      .getOrElse(true.pure[QExpr])
 
   /** Parses a cell position for the tile map from a string "(x, y)".
     *

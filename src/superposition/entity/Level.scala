@@ -4,9 +4,9 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
+import scalaz.syntax.monad._
 import superposition.component.{Multiverse, MultiverseView, Renderable}
-
-import scala.Function.const
+import superposition.math.QExpr
 
 /** A quantum level with a multiverse and tile map.
   *
@@ -25,7 +25,7 @@ final class Level(
   extends Entity with Disposable {
   add(multiverse)
   add(multiverseView)
-  add(new Renderable(0, const(())))
+  add(new Renderable(0, ().pure[QExpr]))
 
   override def dispose(): Unit = {
     mapShader.dispose()

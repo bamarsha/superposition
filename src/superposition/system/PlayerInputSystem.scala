@@ -5,10 +5,11 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.SPACE
+import scalaz.Scalaz._
 import spire.implicits._
 import superposition.component._
 import superposition.entity.Level
-import superposition.math.{Gate, Translate, Vector2, X}
+import superposition.math._
 import superposition.system.PlayerInputSystem.{carryGate, updateCarriedPositions, updatePlayerPosition, walk}
 
 import scala.Function.const
@@ -61,17 +62,19 @@ private object PlayerInputSystem {
   private def walkGate(entity: Entity, carriables: Iterable[Entity]): Gate[Vector2[Int]] = {
     val player = Player.mapper.get(entity)
     val position = QuantumPosition.mapper.get(entity)
-    val walkPlayer: Gate[Vector2[Int]] = Translate.multi controlledMap { delta => universe =>
-      if (universe.state(player.alive)) List((position.cell, delta))
-      else Nil
-    }
-    val walkCarried: Gate[Vector2[Int]] = Translate.multi controlledMap { delta => universe =>
-      if (universe.state(player.alive))
-        carriables
-          .filter(carriable => universe.state(Carriable.mapper.get(carriable).carried))
-          .map(carriable => (QuantumPosition.mapper.get(carriable).cell, delta))
-          .toList
-      else Nil
+    val walkPlayer: Gate[Vector2[Int]] = Translate.multi.controlledMap(
+      player.alive.value map (isAlive => delta => if (isAlive) List((position.cell, delta)) else Nil))
+    val walkCarried: Gate[Vector2[Int]] = Translate.multi.controlledMap {
+      for {
+        isAlive <- player.alive.value
+        isCarried <- QExpr.liftBind(Carriable.mapper.get(_: Entity).carried.value)
+      } yield (delta: Vector2[Int]) =>
+        if (isAlive)
+          carriables
+            .filter(isCarried)
+            .map(carriable => (QuantumPosition.mapper.get(carriable).cell, delta))
+            .toSeq
+        else Nil
     }
     walkPlayer andThen walkCarried
   }
@@ -82,19 +85,19 @@ private object PlayerInputSystem {
     * @param carriables the carriable entities
     * @return the toggle carry gate
     */
-  private def carryGate(entity: Entity, carriables: Iterable[Entity]): Gate[Unit] = {
-    val player = Player.mapper.get(entity)
-    val playerCell = QuantumPosition.mapper.get(entity).cell
-    X.multi controlledMap const { universe =>
-      carriables
-        .filter { carriable =>
-          val carriableCell = QuantumPosition.mapper.get(carriable).cell
-          universe.state(player.alive) && universe.state(playerCell) == universe.state(carriableCell)
-        }
-        .map(Carriable.mapper.get(_).carried)
-        .toList
+  private def carryGate(entity: Entity, carriables: Iterable[Entity]): Gate[Unit] =
+    X.multi.controlledMap {
+      for {
+        isAlive <- Player.mapper.get(entity).alive.value
+        playerCell <- QuantumPosition.mapper.get(entity).cell.value
+        carriableCell <- QExpr.liftBind(QuantumPosition.mapper.get(_: Entity).cell.value)
+      } yield const {
+        carriables
+          .filter(carriable => isAlive && playerCell == carriableCell(carriable))
+          .map(Carriable.mapper.get(_).carried)
+          .toSeq
+      }
     }
-  }
 
   /** Returns the difference in player positions based on the player speed and the time elapsed since the last frame.
     *
@@ -135,13 +138,15 @@ private object PlayerInputSystem {
     * @param deltaTime the time elapsed since the last frame
     */
   private def updatePlayerPosition(multiverse: Multiverse, entity: Entity, deltaTime: Float): Unit = {
-    val player = Player.mapper.get(entity)
     val position = QuantumPosition.mapper.get(entity)
-    multiverse.updateMetaWith(position.absolute) { pos => universe =>
-      if (universe.state(player.alive)) {
-        val targetPosition = (universe.state(position.cell) map (_.toDouble)) + position.relative
-        pos.lerp(targetPosition, 1 - exp(-20 * deltaTime))
-      } else pos
+    multiverse.updateMetaWith(position.absolute) { absolutePos =>
+      for {
+        isAlive <- Player.mapper.get(entity).alive.value
+        cell <- position.cell.value
+        targetPos = (cell map (_.toDouble)) + position.relative
+      } yield
+        if (isAlive) absolutePos.lerp(targetPos, 1 - exp(-20 * deltaTime))
+        else absolutePos
     }
   }
 
@@ -157,19 +162,18 @@ private object PlayerInputSystem {
                                      entity: Entity,
                                      carriables: Iterable[Entity],
                                      deltaTime: Float): Unit = {
-    val player = Player.mapper.get(entity)
     val playerPosition = QuantumPosition.mapper.get(entity)
     for (carriable <- carriables) {
-      val carried = Carriable.mapper.get(carriable).carried
-      val carriedPosition = QuantumPosition.mapper.get(carriable)
-      multiverse.updateMetaWith(carriedPosition.absolute) { pos => universe =>
-        val relativePos =
-          if (universe.state(carried)) playerPosition.relative
-          else Vector2(0.5, 0.5)
-        val targetPos = (universe.state(carriedPosition.cell) map (_.toDouble)) + relativePos
-        if (universe.state(player.alive))
-          pos.lerp(targetPos, 1 - exp(-20 * deltaTime))
-        else pos
+      multiverse.updateMetaWith(QuantumPosition.mapper.get(carriable).absolute) { carriedPos =>
+        for {
+          isCarried <- Carriable.mapper.get(carriable).carried.value
+          carriedCell <- QuantumPosition.mapper.get(carriable).cell.value
+          isAlive <- Player.mapper.get(entity).alive.value
+          relativePos = if (isCarried) playerPosition.relative else Vector2(0.5, 0.5)
+          targetPos = (carriedCell map (_.toDouble)) + relativePos
+        } yield
+          if (isAlive) carriedPos.lerp(targetPos, 1 - exp(-20 * deltaTime))
+          else carriedPos
       }
     }
   }

@@ -6,10 +6,10 @@ import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.utils.Disposable
+import scalaz.syntax.monad._
 import superposition.component.{CellHighlightView, QuantumPosition}
 import superposition.entity.Level
-
-import scala.Function.const
+import superposition.math.QExpr
 
 /** Highlights all cells that are occupied by at least one entity in the multiverse.
   *
@@ -31,7 +31,7 @@ final class CellHighlightRenderer(level: () => Option[Level]) extends Renderer w
       } yield universe.state(position.cell)).toSet
 
     val multiverseView = level().get.multiverseView
-    multiverseView.enqueueRenderer(const(())) { (_, _) =>
+    multiverseView.enqueueRenderer(().pure[QExpr]) { (_, _) =>
       gl.glEnable(GL_BLEND)
       shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
       shapeRenderer.begin(ShapeType.Filled)

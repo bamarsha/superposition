@@ -3,9 +3,8 @@ package superposition.component
 import com.badlogic.ashley.core.{Component, ComponentMapper}
 import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.{Color, Texture}
-import superposition.math.{Universe, Vector2}
-
-import scala.Function.const
+import scalaz.syntax.monad._
+import superposition.math.{QExpr, Vector2}
 
 /** The sprite view component gives an entity a renderable sprite.
   *
@@ -14,9 +13,9 @@ import scala.Function.const
   * @param color the sprite color
   */
 final class SpriteView(
-    val texture: Universe => Texture,
-    val scale: Universe => Vector2[Double] = const(Vector2(1, 1)),
-    val color: Universe => Color = const(WHITE))
+    val texture: QExpr[Texture],
+    val scale: QExpr[Vector2[Double]] = Vector2(1.0, 1.0).pure[QExpr],
+    val color: QExpr[Color] = WHITE.pure[QExpr])
   extends Component
 
 /** Contains the component mapper for the sprite view component. */

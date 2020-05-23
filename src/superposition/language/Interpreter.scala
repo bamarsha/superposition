@@ -1,13 +1,13 @@
 package superposition.language
 
 import com.badlogic.gdx.maps.tiled.TiledMap
-import scalaz.syntax.contravariant._
+import scalaz.Scalaz._
 import superposition.component.{Multiverse, PrimaryBit, QuantumPosition}
 import superposition.language.Interpreter.NTuple
 import superposition.language.Parser.{NoSuccess, Success, expressionProgram, gateProgram, parse}
 import superposition.math._
 
-import scala.Function.{chain, const}
+import scala.Function.chain
 import scala.sys.error
 
 /** An interpreter for gate programs.
@@ -37,8 +37,8 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @throws RuntimeException if parsing fails
     * @return the evaluated expression
     */
-  def evalExpression[A](string: String): Universe => A = parse(expressionProgram, string) match {
-    case Success(expression, _) => evalExpression(expression).asInstanceOf[Universe => A]
+  def evalExpression[A](string: String): QExpr[A] = parse(expressionProgram, string) match {
+    case Success(expression, _) => evalExpression(expression).asInstanceOf[QExpr[A]]
     case NoSuccess(message, _) => error(s"Syntax error in expression program ($message): $string")
   }
 
@@ -54,27 +54,25 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @param expression the expression
     * @return the evaluated expression
     */
-  private def evalExpression(expression: Expression): Universe => Any = {
-    val exprFunc: Universe => Any = expression match {
+  private def evalExpression(expression: Expression): QExpr[Any] = {
+    val expr = expression match {
       case Identifier(name) => evalIdentifier(name)
-      case Number(value) => const(value)
-      case Tuple(items) =>
-        val xs = items map evalExpression
-        universe => NTuple(xs map (_ (universe)): _*)
-      case List(items) =>
-        val xs = items map evalExpression
-        universe => xs map (_ (universe))
+      case Number(value) => value.pure[QExpr]
+      case Tuple(items) => (items map evalExpression).toList.sequence map (NTuple(_: _*))
+      case List(items) => (items map evalExpression).toList.sequence
       case Call(function, argument) =>
-        val func = evalExpression(function)
-        val arg = evalExpression(argument)
-        universe => func(universe).asInstanceOf[Any => Any](arg(universe))
+        for {
+          func <- evalExpression(function)
+          arg <- evalExpression(argument)
+        } yield func.asInstanceOf[Any => Any](arg)
       case Equals(lhs, rhs) =>
-        val l = evalExpression(lhs)
-        val r = evalExpression(rhs)
-        universe => l(universe) == r(universe)
+        for {
+          l <- evalExpression(lhs)
+          r <- evalExpression(rhs)
+        } yield l == r
     }
-    if (isConstant(expression)) const(exprFunc(Universe.empty))
-    else exprFunc
+    if (isConstant(expression)) expr(Universe.empty).pure[QExpr]
+    else expr
   }
 
   /** Evaluates a transformer.
@@ -84,13 +82,12 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     */
   private def evalTransformer(transformer: Transformer): Gate[Any] => Gate[Any] = transformer match {
     case OnTransformer(argument) =>
-      val arg = evalExpression(argument)
-      _.controlledMap { value => universe =>
-        if (value == ()) arg(universe)
-        else arg(universe).asInstanceOf[Any => Any](value)
-      }
+      _.controlledMap(evalExpression(argument) map (arg => {
+        case () => arg
+        case value => arg.asInstanceOf[Any => Any](value)
+      }))
     case IfTransformer(expression) =>
-      val expr = evalExpression(expression).asInstanceOf[Universe => Boolean]
+      val expr = evalExpression(expression).asInstanceOf[QExpr[Boolean]]
       _.controlled(expr)
     case MultiTransformer => _.multi.asInstanceOf[Gate[Any]]
   }
@@ -111,14 +108,14 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @param name the name of the identifier
     * @return the evaluated identifier name
     */
-  private def evalIdentifier(name: String): Universe => Any = name match {
-    case "activated" => universe => multiverse.isActivated(universe, _)
-    case "activeCell" => universe => (nt: NTuple) => multiverse.isActivated(universe, Seq(makeCell(nt)))
-    case "qubit" => const(multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bit)
-    case "qucell" => const(multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell)
-    case "value" => universe => (id: StateId[_]) => universe.state(id)
-    case "vec2" => const({ case NTuple(x: Int, y: Int) => Vector2(x, y) }: NTuple => Vector2[Int])
-    case "cell" => const(makeCell)
+  private def evalIdentifier(name: String): QExpr[Any] = name match {
+    case "activated" => ??? // new QExpr(universe => multiverse.isActivated(universe, _))
+    case "activeCell" => ??? // new QExpr(universe => (cell: NTuple) => multiverse.isActivated(universe, Seq(makeCell(cell))))
+    case "qubit" => (multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bit).pure[QExpr]
+    case "qucell" => (multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell).pure[QExpr]
+    case "value" => QExpr.liftBind((_: StateId[_]).value)
+    case "vec2" => ({ case NTuple(x: Int, y: Int) => Vector2(x, y) }: NTuple => Vector2[Int]).pure[QExpr]
+    case "cell" => makeCell.pure[QExpr]
     case _ => error(s"Unknown identifier: $name")
   }
 

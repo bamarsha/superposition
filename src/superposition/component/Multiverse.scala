@@ -67,9 +67,9 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
   /** Updates a piece of metadata in every universe.
     *
     * @param id the metadata's ID
-    * @param updater a function that receives the metadata's value and the universe and returns the new value
+    * @param updater a function that receives the metadata's value returns the new value
     */
-  def updateMetaWith(id: MetaId[_])(updater: id.Value => Universe => id.Value): Unit =
+  def updateMetaWith(id: MetaId[_])(updater: id.Value => QExpr[id.Value]): Unit =
     _universes = _universes map (universe => universe.updatedMetaWith(id)(updater(_)(universe)))
 
   /** Applies a gate. If the gate produces any universe that is in an invalid state, no changes are made.

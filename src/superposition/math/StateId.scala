@@ -16,4 +16,7 @@ final class StateId[A](val name: String, showValue: A => String) extends Depende
     * @return the value as a string
     */
   def show(value: Value): String = showValue(value)
+
+  /** The value of the qudit. */
+  val value: QExpr[A] = QExpr(this)
 }

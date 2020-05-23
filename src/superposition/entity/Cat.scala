@@ -2,6 +2,7 @@ package superposition.entity
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
+import scalaz.syntax.monad._
 import superposition.component._
 import superposition.entity.Cat._
 import superposition.game.ResourceResolver.resolve
@@ -23,8 +24,11 @@ final class Cat(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) exte
     add(new Player(alive))
     add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))
     add(new PrimaryBit(alive))
-    add(new Renderable(2, universe => (universe.state(alive), universe.state(cell))))
-    add(new SpriteView(texture = universe => if (universe.state(alive)) aliveTexture else deadTexture))
+    add(new Renderable(2, for {
+      aliveValue <- alive.value
+      cellValue <- cell.value
+    } yield (aliveValue, cellValue)))
+    add(new SpriteView(alive.value map (if (_) aliveTexture else deadTexture)))
   }
 }
 

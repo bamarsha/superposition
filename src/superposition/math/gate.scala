@@ -1,7 +1,9 @@
 package superposition.math
 
+import scalaz.syntax.monad._
 import scalaz.{Divisible, NonEmptyList}
 
+import scala.Function.const
 import scala.math.sqrt
 
 /** A quantum gate.
@@ -83,10 +85,10 @@ object Gate {
       * @throws AssertionError if the mapping function violates unitarity
       * @return the controlled gate
       */
-    def controlledMap[B](f: B => Universe => A): Gate[B] = new Gate[B] {
+    def controlledMap[B](f: QExpr[B => A]): Gate[B] = new Gate[B] {
       override def apply(value: B)(universe: Universe): NonEmptyList[Universe] = {
-        val newUniverses = gate(f(value)(universe))(universe)
-        assert(newUniverses.stream forall (f(value)(_) == f(value)(universe)))
+        val newUniverses = gate(f(universe)(value))(universe)
+        assert(newUniverses.stream forall (f(_)(value) == f(universe)(value)))
         newUniverses
       }
 
@@ -99,11 +101,8 @@ object Gate {
       * @param predicate the predicate that must be satisfied to apply the original gate
       * @return the controlled gate
       */
-    def controlled(predicate: Universe => Boolean): Gate[A] =
-      multi.controlledMap /*_*/ { value => universe =>
-        if (predicate(universe)) Seq(value)
-        else Seq.empty
-      } /*_*/
+    def controlled(predicate: QExpr[Boolean]): Gate[A] = /*_*/
+      multi.controlledMap(predicate map (if (_) Seq(_) else const(Seq.empty))) /*_*/
 
     /** Returns a new gate that maps its argument to a sequence and applies the original gate with each value in the
       * sequence.

@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.math.Vector3
 import superposition.component.MultiverseView.UniversePartRenderer
 import superposition.graphics.UniverseRenderInfo
-import superposition.math.{Universe, Vector2}
+import superposition.math.{QExpr, Universe, Vector2}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -35,7 +35,7 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
     * @param dependentState the value of the quantum state that the renderer depends on
     * @param render the rendering action
     */
-  def enqueueRenderer(dependentState: Universe => Any)(render: (Universe, UniverseRenderInfo) => Unit): Unit =
+  def enqueueRenderer(dependentState: QExpr[Any])(render: (Universe, UniverseRenderInfo) => Unit): Unit =
     renderers.append(UniversePartRenderer(render, dependentState))
 
   /** Renders all of the queued renderers for the universe.
@@ -82,7 +82,7 @@ object MultiverseView {
     */
   private final case class UniversePartRenderer(
       render: (Universe, UniverseRenderInfo) => Unit,
-      dependentState: Universe => Any)
+      dependentState: QExpr[Any])
 
   /** The component mapper for the multiverse view component. */
   val mapper: ComponentMapper[MultiverseView] = ComponentMapper.getFor(classOf[MultiverseView])

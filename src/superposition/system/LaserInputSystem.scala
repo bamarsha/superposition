@@ -3,9 +3,10 @@ package superposition.system
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
+import scalaz.syntax.monad._
 import superposition.component.{Beam, ClassicalPosition, Multiverse}
 import superposition.entity.Level
-import superposition.math.{StateId, Universe, Vector2}
+import superposition.math.{QExpr, StateId, Vector2}
 import superposition.system.LaserInputSystem.{beamHits, beamTarget}
 
 import scala.Function.const
@@ -24,15 +25,16 @@ final class LaserInputSystem(level: () => Option[Level])
 
     // Apply the gate when the laser is clicked.
     if (input.isButtonJustPressed(0) && multiverseView.isSelected(cell)) {
-      multiverse.applyGate(beam.gate.multi controlledMap const(beamHits(multiverse, entity)), ())
+      multiverse.applyGate(beam.gate.multi.controlledMap(beamHits(multiverse, entity) map const), ())
       multiverse.updateMetaWith(beam.lastTarget)(const(beamTarget(multiverse, entity)))
-      multiverse.updateMetaWith(beam.elapsedTime) { time => universe =>
-        if (beamTarget(multiverse, entity)(universe).isEmpty)
-          time
-        else 0
+      multiverse.updateMetaWith(beam.elapsedTime) { time =>
+        beamTarget(multiverse, entity) map {
+          case None => time
+          case Some(_) => 0
+        }
       }
     }
-    multiverse.updateMetaWith(beam.elapsedTime)(time => const(time + deltaTime))
+    multiverse.updateMetaWith(beam.elapsedTime)(time => (time + deltaTime).pure[QExpr])
   }
 }
 
@@ -56,25 +58,27 @@ object LaserInputSystem {
     *
     * @param multiverse the multiverse
     * @param entity the entity shooting the laser beam
-    * @param universe the universe
     * @return the target of the laser beam
     */
-  private def beamTarget(multiverse: Multiverse, entity: Entity)(universe: Universe): Option[Vector2[Int]] = {
-    if (Beam.mapper.get(entity).control(universe))
-      beamPath(entity) find { cell =>
-        multiverse.isBlocked(universe, cell) || multiverse.allInCell(universe, cell).nonEmpty
-      }
-    else None
-  }
+  private def beamTarget(multiverse: Multiverse, entity: Entity): QExpr[Option[Vector2[Int]]] =
+    for {
+      control <- Beam.mapper.get(entity).control
+    } yield
+      if (control)
+        beamPath(entity) find (cell => multiverse.isBlocked(???, cell) || multiverse.allInCell(???, cell).nonEmpty)
+      else None
 
   /** Returns the qubits that are hit by the laser beam.
     *
     * @param multiverse the multiverse
     * @param entity the entity shooting the laser beam
-    * @param universe the universe
     * @return the qubits that are hit by the laser beam
     */
-  private def beamHits(multiverse: Multiverse, entity: Entity)(universe: Universe): Seq[StateId[Boolean]] =
-    (beamTarget(multiverse, entity)(universe).iterator.to(Seq)
-      flatMap (cell => multiverse.primaryBits(universe, cell)))
+  private def beamHits(multiverse: Multiverse, entity: Entity): QExpr[Seq[StateId[Boolean]]] =
+    beamTarget(multiverse, entity) map {
+      _
+        .iterator
+        .to(Seq)
+        .flatMap(cell => multiverse.primaryBits(???, cell))
+    }
 }

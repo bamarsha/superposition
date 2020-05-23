@@ -1,13 +1,13 @@
 package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
-import superposition.math.{Universe, Vector2}
+import superposition.math.{QExpr, Vector2}
 
 /** The collider component lets an entity collide with other entities.
   *
   * @param cells the set of cells that have collision
   */
-final class Collider(val cells: Universe => Set[Vector2[Int]]) extends Component
+final class Collider(val cells: QExpr[Set[Vector2[Int]]]) extends Component
 
 /** Contains the component mapper for the collider component. */
 object Collider {
