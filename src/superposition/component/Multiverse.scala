@@ -80,7 +80,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     */
   def applyGate[A](gate: Gate[A], value: A): Boolean = {
     val newUniverses = gate.applyToAll(value)(universes)
-    if (newUniverses forall isValid) {
+    if (newUniverses forall (isValid(_))) {
       _universes =
         (newUniverses
           |> combine
@@ -92,70 +92,64 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
 
   /** Returns the entities occupying the cell.
     *
-    * @param universe the universe to look in
     * @param cell the cell to look at
     * @return the entities occupying the cell
     */
-  def allInCell(universe: Universe, cell: Vector2[Int]): Iterable[Entity] =
-    entities filter { entity =>
-      QuantumPosition.mapper.has(entity) && universe.state(QuantumPosition.mapper.get(entity).cell) == cell
-    }
+  def allInCell(cell: Vector2[Int]): QExpr[Iterable[Entity]] =
+    for (currentCell <- QExpr.prepare(QuantumPosition.mapper.get(_: Entity).cell.value)) yield
+      entities filter (entity => QuantumPosition.mapper.has(entity) && currentCell(entity) == cell)
 
   /** Returns all primary qubits in the cell.
     *
-    * @param universe the universe to look in
     * @param cell the cell to look at
     * @return the primary qubits in the cell
     */
-  def primaryBits(universe: Universe, cell: Vector2[Int]): Iterable[Seq[StateId[Boolean]]] =
-    allInCell(universe, cell)
-      .filter(PrimaryBit.mapper.has)
-      .map(PrimaryBit.mapper.get(_).bits)
+  def primaryBits(cell: Vector2[Int]): QExpr[Iterable[Seq[StateId[Boolean]]]] =
+    allInCell(cell) map (_ filter PrimaryBit.mapper.has map (PrimaryBit.mapper.get(_).bits))
 
   /** Returns true if the cell is blocked by an entity with collision.
     *
-    * @param universe the universe to look in
     * @param cell the cell to look at
     * @return true if the cell is blocked by an entity with collision
     */
-  def isBlocked(universe: Universe, cell: Vector2[Int]): Boolean =
-    walls.contains(cell) ||
-      (entities
-        filter Collider.mapper.has
-        exists (Collider.mapper.get(_).cells(universe).contains(cell)))
+  def isBlocked(cell: Vector2[Int]): QExpr[Boolean] =
+    for (cells <- QExpr.prepare(Collider.mapper.get(_: Entity).cells)) yield
+      walls.contains(cell) || (entities filter Collider.mapper.has exists (cells(_).contains(cell)))
 
   /** Returns true in index idx if this cell has at least one |1⟩ activator in index idx
     *
-    * @param universe the universe to look in
     * @param cell the cell to look at
     * @return true if all cells have at least one activator qubit in the |1⟩ state
     */
-  def activation(universe: Universe, cell: Vector2[Int]): BitSeq =
-    allInCell(universe, cell)
-      .filter(Activator.mapper.has)
-      .map(Activator.mapper.get(_).bits.map(universe.state(_)))
-      .map(BitSeq(_: _*))
-      .fold(BitSeq())(_ or _)
+  def activation(cell: Vector2[Int]): QExpr[BitSeq] =
+    for {
+      entities <- allInCell(cell)
+      bit <- QExpr.prepare((_: StateId[Boolean]).value)
+    } yield
+      entities
+        .filter(Activator.mapper.has)
+        .map(Activator.mapper.get(_).bits map bit)
+        .map(BitSeq(_: _*))
+        .fold(BitSeq())(_ or _)
 
   /** Returns true in index idx if all cells have at least one |1⟩ activator in index idx
     *
-    * @param universe the universe to look in
     * @param cells the cells to look at
     * @return true if all cells have at least one activator qubit in the |1⟩ state
     */
-  def allActivated(universe: Universe, cells: Iterable[Vector2[Int]]): BitSeq =
-    if (cells.isEmpty) BitSeq()
-    else cells.map(activation(universe, _)).reduce(_ and _)
+  def allActivated(cells: Iterable[Vector2[Int]]): QExpr[BitSeq] =
+    if (cells.isEmpty) BitSeq().pure[QExpr]
+    else cells.map(activation).toList.sequence map (_ reduce (_ and _))
 
   /** Returns true if every entity has a valid position in the universe.
     *
-    * @param universe the universe to check for validity
     * @return true if every entity has a valid position in the universe
     */
-  private def isValid(universe: Universe): Boolean =
-    entities filter QuantumPosition.mapper.has forall { entity =>
-      !isBlocked(universe, universe.state(QuantumPosition.mapper.get(entity).cell))
-    }
+  private val isValid: QExpr[Boolean] =
+    for {
+      cell <- QExpr.prepare(QuantumPosition.mapper.get(_: Entity).cell.value)
+      blocked <- QExpr.prepare(isBlocked)
+    } yield entities filter QuantumPosition.mapper.has forall (cell andThen blocked)
 
   /** Shows all states in the universe.
     *

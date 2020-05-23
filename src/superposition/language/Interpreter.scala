@@ -109,8 +109,8 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @return the evaluated identifier name
     */
   private def evalIdentifier(name: String): QExpr[Any] = name match {
-    case "activated" => ??? // universe => (l: Iterable[Vector2[Int]]) => multiverse.allActivated(universe, l)
-    case "activeCell" => ??? // universe => (nt: NTuple) => multiverse.allActivated(universe, Seq(makeCell(nt)))(0)
+    case "activated" => ((cells: Iterable[Vector2[Int]]) => multiverse.allActivated(cells)).pure[QExpr]
+    case "activeCell" => ((cell: NTuple) => multiverse.allActivated(Seq(makeCell(cell))) map (_(0))).pure[QExpr]
     case "bitAt" => ({ case NTuple(bits: BitSeq, index: Int) => bits(index) }: NTuple => Boolean).pure[QExpr]
     case "indices" =>
       ({ case NTuple(items: Seq[_], indices: Seq[Int]) => indices map (items(_)) }: NTuple => Any).pure[QExpr]

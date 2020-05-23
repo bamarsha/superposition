@@ -62,9 +62,13 @@ object LaserInputSystem {
     * @return the target of the laser beam
     */
   private def beamTarget(multiverse: Multiverse, entity: Entity): QExpr[Option[Vector2[Int]]] =
-    for (control <- Beam.mapper.get(entity).control) yield
+    for {
+      control <- Beam.mapper.get(entity).control
+      isBlocked <- QExpr.prepare(multiverse.isBlocked)
+      allInCell <- QExpr.prepare(multiverse.allInCell)
+    } yield
       if (control.any)
-        beamPath(entity) find (cell => multiverse.isBlocked(???, cell) || multiverse.allInCell(???, cell).nonEmpty)
+        beamPath(entity) find (cell => isBlocked(cell) || allInCell(cell).nonEmpty)
       else None
 
   /** Returns the qubits that are hit by the laser beam.
@@ -74,11 +78,9 @@ object LaserInputSystem {
     * @return the qubits that are hit by the laser beam
     */
   private def beamHits(multiverse: Multiverse, entity: Entity): QExpr[Seq[StateId[Boolean]]] =
-    beamTarget(multiverse, entity) map {
-      _
-        .iterator
-        .to(Seq)
-        .flatMap(cell => multiverse.primaryBits(???, cell))
-        .flatMap(Beam.mapper.get(entity).control(???).filter(_))
-    }
+    for {
+      target <- beamTarget(multiverse, entity)
+      control <- Beam.mapper.get(entity).control
+      primaryBits <- QExpr.prepare(multiverse.primaryBits)
+    } yield target.iterator.to(Seq) flatMap primaryBits flatMap control.filter
 }
