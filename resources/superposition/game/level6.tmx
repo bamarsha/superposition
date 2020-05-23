@@ -61,7 +61,7 @@ if value (qucell 12) = cell (6, 2).</property>
  </layer>
  <layer id="4" name="Circuit 1" width="16" height="9">
   <properties>
-   <property name="Controls" value="(12, 2)"/>
+   <property name="Controls" value="activeCell (12, 2)"/>
   </properties>
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -77,7 +77,7 @@ if value (qucell 12) = cell (6, 2).</property>
  </layer>
  <layer id="5" name="Circuit 2" width="16" height="9">
   <properties>
-   <property name="Controls" value="(6, 2)"/>
+   <property name="Controls" value="activeCell (6, 2)"/>
   </properties>
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

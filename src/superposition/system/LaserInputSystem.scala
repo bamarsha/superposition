@@ -27,6 +27,7 @@ final class LaserInputSystem(level: () => Option[Level])
     if (input.isButtonJustPressed(0) && multiverseView.isSelected(cell)) {
       multiverse.applyGate(beam.gate.multi.controlledMap(beamHits(multiverse, entity) map const), ())
       multiverse.updateMetaWith(beam.lastTarget)(const(beamTarget(multiverse, entity)))
+      multiverse.updateMetaWith(beam.lastBeamSeq)(const(beam.control map (Some(_))))
       multiverse.updateMetaWith(beam.elapsedTime) { time =>
         beamTarget(multiverse, entity) map {
           case None => time
@@ -61,10 +62,8 @@ object LaserInputSystem {
     * @return the target of the laser beam
     */
   private def beamTarget(multiverse: Multiverse, entity: Entity): QExpr[Option[Vector2[Int]]] =
-    for {
-      control <- Beam.mapper.get(entity).control
-    } yield
-      if (control)
+    for (control <- Beam.mapper.get(entity).control) yield
+      if (control.any)
         beamPath(entity) find (cell => multiverse.isBlocked(???, cell) || multiverse.allInCell(???, cell).nonEmpty)
       else None
 
@@ -80,5 +79,6 @@ object LaserInputSystem {
         .iterator
         .to(Seq)
         .flatMap(cell => multiverse.primaryBits(???, cell))
+        .flatMap(Beam.mapper.get(entity).control(???).filter(_))
     }
 }

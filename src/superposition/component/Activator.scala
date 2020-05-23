@@ -5,9 +5,9 @@ import superposition.math.StateId
 
 /** The activator component can activate objects that require a qubit in a particular state.
   *
-  * @param activator the activator qubit
+  * @param bits the activator qubits
   */
-final class Activator(val activator: StateId[Boolean]) extends Component
+final class Activator(val bits: Seq[StateId[Boolean]]) extends Component
 
 /** Contains the component mapper for the activator component. */
 object Activator {

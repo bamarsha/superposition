@@ -22,7 +22,7 @@ final class Laser(
     cell: Vector2[Int],
     gate: Gate[StateId[Boolean]],
     direction: Direction,
-    control: QExpr[Boolean])
+    control: QExpr[BitSeq])
   extends Entity {
   add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5), Set(cell)))
   add(new Collider(Set(cell).pure[QExpr]))

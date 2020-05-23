@@ -49,15 +49,23 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer with Dispo
   private def drawBeam(entity: Entity, universe: Universe, renderInfo: UniverseRenderInfo): Unit = {
     val source = ClassicalPosition.mapper.get(entity).cells.head
     val beam = Beam.mapper.get(entity)
-    for (target <- universe.meta(beam.lastTarget)
+    for (target <- universe.meta(beam.lastTarget);
+         beamSeq <- universe.meta(beam.lastBeamSeq)
          if universe.meta(beam.elapsedTime) <= beamDuration + fadeDuration) {
       val opacity = min(fadeDuration, beamDuration + fadeDuration - universe.meta(beam.elapsedTime)) / fadeDuration
       gl.glEnable(GL_BLEND)
       shapeRenderer.begin(Filled)
-      shapeRenderer.setColor(new Color(1, 0, 0, opacity.toFloat).mixed(renderInfo.color))
-      beam.direction match {
-        case Left | Right => shapeRenderer.rect(source.x + 0.5f, source.y + 0.375f, target.x - source.x, 0.25f)
-        case Up | Down => shapeRenderer.rect(source.x + 0.375f, source.y + 0.5f, 0.25f, target.y - source.y)
+      val numBeams = beamSeq.get.length
+      val beamWidth = singleWidth / numBeams
+      val beamOffset = (i: Int) => ((i + .5f) / numBeams - .5f) * totalWidth + .5f - beamWidth / 2
+      for (i <- Seq.range(0, numBeams)) if (beamSeq.get(i)) {
+        shapeRenderer.setColor(new Color(1, 1, 1, opacity).fromHsv(i * huePerBeam, 1, 1).mixed(renderInfo.color))
+        beam.direction match {
+          case Left | Right =>
+            shapeRenderer.rect(source.x + 0.5f, source.y + beamOffset(i), target.x - source.x, beamWidth)
+          case Up | Down =>
+            shapeRenderer.rect(source.x + beamOffset(i), source.y + 0.5f, beamWidth, target.y - source.y)
+        }
       }
       shapeRenderer.end()
       gl.glDisable(GL_BLEND)
@@ -70,10 +78,19 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer with Dispo
 /** Functions for rendering laser beams. */
 private object BeamRenderer {
   /** The amount of time that the laser beam shines at full intensity. */
-  private val beamDuration: Double = 0.2
+  private val beamDuration: Float = 0.2f
 
   /** The amount of time that the laser beam takes to fade away. */
-  private val fadeDuration: Double = 0.3
+  private val fadeDuration: Float = 0.3f
+
+  /** Hue change per beam */
+  private val huePerBeam: Float = 360f / 6
+
+  /** Total possible width of a multi-controlled beam */
+  private val totalWidth: Float = .6f
+
+  /** Total width of a singly-controlled beam */
+  private val singleWidth: Float = .3f
 
   /** Draws an outline around a cell.
     *

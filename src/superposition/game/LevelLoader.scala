@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
-import com.badlogic.gdx.maps.{MapLayer, MapObject}
+import com.badlogic.gdx.maps.{MapLayer, MapObject, MapProperties}
 import scalaz.syntax.monad._
 import superposition.component.{Multiverse, MultiverseView}
 import superposition.entity.{MapLayer => MapLayerEntity, _}
@@ -82,8 +82,8 @@ private object LevelLoader {
   private def layerEntity(map: TiledMap, renderer: OrthogonalTiledMapRenderer, multiverse: Multiverse)
                          (mapLayer: MapLayer, index: Int): MapLayerEntity = {
     val renderLayer = Option(mapLayer.getProperties.get("Layer", classOf[Int])).getOrElse(0)
-    val controls = Option(mapLayer.getProperties.get("Controls", classOf[String])).toSeq flatMap parseCells(map)
-    new MapLayerEntity(renderer, renderLayer, index, multiverse, controls)
+    val control = controlExpr(multiverse, map, mapLayer.getProperties)
+    new MapLayerEntity(renderer, renderLayer, index, multiverse, control)
   }
 
   /** Returns the entities for all of the objects in the tile map.
@@ -111,53 +111,48 @@ private object LevelLoader {
     obj.getProperties.get("type") match {
       case "Player" => new Cat(id, multiverse, cells.head)
       case "Quball" => new Quball(id, multiverse, cells.head)
+      case "QuballMulti" => new QuballMulti(id, multiverse, cells.head, 4)
       case "Laser" =>
         val gate = toGate(obj.getProperties.get("Gate", classOf[String]))
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
-        val control = controlFunction(multiverse, map, obj)
-        new Laser(multiverse, cells.head, gate, direction, control)
+        if (obj.getProperties.containsKey("ControlsMulti")) {
+          val control = controlExprBitSeq(multiverse, map, obj.getProperties)
+          new Laser(multiverse, cells.head, gate, direction, control)
+        } else {
+          val control = controlExpr(multiverse, map, obj.getProperties)
+          new Laser(multiverse, cells.head, gate, direction, control map (BitSeq(_)))
+        }
       case "Door" =>
-        val control = controlFunction(multiverse, map, obj)
+        val control = controlExpr(multiverse, map, obj.getProperties)
         new Door(multiverse, cells.head, control)
       case "Exit" => new Exit(cells)
       case unknown => error(s"Unknown entity type '$unknown'.")
     }
   }
 
-  /** Returns the control function for the tile map object.
+  /** Returns the control expression for the tile map object.
     *
     * @param multiverse the multiverse
     * @param map the tile map
-    * @param obj the tile map object
-    * @return the control function for the tile map object
+    * @param prop the tile map object properties
+    * @return the control expression for the tile map object
     */
-  private def controlFunction(multiverse: Multiverse, map: TiledMap, obj: MapObject): QExpr[Boolean] =
-    Option(obj.getProperties.get("Controls", classOf[String]))
+  private def controlExpr(multiverse: Multiverse, map: TiledMap, prop: MapProperties): QExpr[Boolean] =
+    Option(prop.get("Controls", classOf[String]))
       .map(new Interpreter(multiverse, map).evalExpression)
       .getOrElse(true.pure[QExpr])
 
-  /** Parses a cell position for the tile map from a string "(x, y)".
+  /** Returns the bit sequence control expression for the tile map object.
     *
+    * @param multiverse the multiverse
     * @param map the tile map
-    * @param string the cell position string
-    * @return the cell position
+    * @param prop the tile map object properties
+    * @return the bit sequence control expression for the tile map object
     */
-  private def parseCell(map: TiledMap)(string: String): Vector2[Int] = {
-    val height = map.getProperties.get("height", classOf[Int])
-    """\((\d+),\s*(\d+)\)""".r("x", "y").findFirstMatchIn(string) match {
-      case Some(m) => Vector2(m.group("x").trim.toInt, height - m.group("y").trim.toInt - 1)
-      case None => error(s"Invalid cell '$string'.")
-    }
-  }
-
-  /** Parses a sequence of cell positions for the tile map from a string "(x_1, y_1)\n...\n(x_n, y_n)".
-    *
-    * @param map the tile map
-    * @param string the cell positions string
-    * @return the cell positions
-    */
-  private def parseCells(map: TiledMap)(string: String): Seq[Vector2[Int]] =
-    (string.linesIterator map parseCell(map)).toSeq
+  private def controlExprBitSeq(multiverse: Multiverse, map: TiledMap, prop: MapProperties): QExpr[BitSeq] =
+    Option(prop.get("ControlsMulti", classOf[String]))
+      .map(new Interpreter(multiverse, map).evalExpression)
+      .getOrElse(BitSeq(true).pure[QExpr])
 
   /** Returns the gate corresponding to the gate name.
     *

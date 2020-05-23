@@ -23,11 +23,13 @@ final class Cat(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) exte
     add(new EntityId(id))
     add(new Player(alive))
     add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))
-    add(new PrimaryBit(alive))
-    add(new Renderable(2, for {
-      aliveValue <- alive.value
-      cellValue <- cell.value
-    } yield (aliveValue, cellValue)))
+    add(new PrimaryBit(Seq(alive)))
+    add(new Renderable(
+      2,
+      for {
+        isAlive <- alive.value
+        currentCell <- cell.value
+      } yield (isAlive, currentCell)))
     add(new SpriteView(alive.value map (if (_) aliveTexture else deadTexture)))
   }
 }

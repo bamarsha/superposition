@@ -109,9 +109,16 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @return the evaluated identifier name
     */
   private def evalIdentifier(name: String): QExpr[Any] = name match {
-    case "activated" => ??? // new QExpr(universe => multiverse.isActivated(universe, _))
-    case "activeCell" => ??? // new QExpr(universe => (cell: NTuple) => multiverse.isActivated(universe, Seq(makeCell(cell))))
-    case "qubit" => (multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bit).pure[QExpr]
+    case "activated" => ??? // universe => (l: Iterable[Vector2[Int]]) => multiverse.allActivated(universe, l)
+    case "activeCell" => ??? // universe => (nt: NTuple) => multiverse.allActivated(universe, Seq(makeCell(nt)))(0)
+    case "bitAt" => ({ case NTuple(bits: BitSeq, index: Int) => bits(index) }: NTuple => Boolean).pure[QExpr]
+    case "indices" =>
+      ({ case NTuple(items: Seq[_], indices: Seq[Int]) => indices map (items(_)) }: NTuple => Any).pure[QExpr]
+    case "int" => ((_: BitSeq).toInt).pure[QExpr]
+    case "and" => ((_: NTuple).items.forall(_.asInstanceOf[Boolean])).pure[QExpr]
+    case "or" => ((_: NTuple).items.exists(_.asInstanceOf[Boolean])).pure[QExpr]
+    case "qubit" => (multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bits.head).pure[QExpr]
+    case "qubits" => (multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bits).pure[QExpr]
     case "qucell" => (multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell).pure[QExpr]
     case "value" => QExpr.liftBind((_: StateId[_]).value)
     case "vec2" => ({ case NTuple(x: Int, y: Int) => Vector2(x, y) }: NTuple => Vector2[Int]).pure[QExpr]

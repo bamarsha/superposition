@@ -3,7 +3,7 @@ package superposition.entity
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import superposition.component.{MapLayerView, Multiverse, Renderable}
-import superposition.math.Vector2
+import superposition.math.QExpr
 
 /** A map layer entity.
   *
@@ -11,15 +11,15 @@ import superposition.math.Vector2
   * @param renderLayer the render layer to render the tile map in
   * @param mapLayer the tile map layer index to render
   * @param multiverse the multiverse
-  * @param controls the control cells for the layer
+  * @param control the control for the layer
   */
 final class MapLayer(
     renderer: OrthogonalTiledMapRenderer,
     renderLayer: Int,
     mapLayer: Int,
     multiverse: Multiverse,
-    controls: Iterable[Vector2[Int]])
+    control: QExpr[Boolean])
   extends Entity {
-  add(new Renderable(renderLayer, ??? /* new QExpr(multiverse.isActivated(_, controls)) */))
-  add(new MapLayerView(renderer, mapLayer, controls))
+  add(new Renderable(renderLayer, control))
+  add(new MapLayerView(renderer, mapLayer, control))
 }
