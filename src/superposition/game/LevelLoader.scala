@@ -111,11 +111,17 @@ private object LevelLoader {
     obj.getProperties.get("type") match {
       case "Player" => new Cat(id, multiverse, cells.head)
       case "Quball" => new Quball(id, multiverse, cells.head)
+      case "QuballMulti" => new QuballMulti(id, multiverse, cells.head, 4)
       case "Laser" =>
         val gate = toGate(obj.getProperties.get("Gate", classOf[String]))
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
-        val control = controlFunction(multiverse, map, obj.getProperties)
-        new Laser(multiverse, cells.head, gate, direction, u => new BitSeq(Seq(control(u))))
+        if (obj.getProperties.containsKey("ControlsMulti")) {
+          val control = controlFunctionBitSeq(multiverse, map, obj.getProperties)
+          new Laser(multiverse, cells.head, gate, direction, control)
+        } else {
+          val control = controlFunction(multiverse, map, obj.getProperties)
+          new Laser(multiverse, cells.head, gate, direction, u => new BitSeq(Seq(control(u))))
+        }
       case "Door" =>
         val control = controlFunction(multiverse, map, obj.getProperties)
         new Door(multiverse, cells.head, control)
@@ -144,7 +150,7 @@ private object LevelLoader {
     * @return the control function for the tile map object
     */
   private def controlFunctionBitSeq(multiverse: Multiverse, map: TiledMap, prop: MapProperties): Universe => BitSeq =
-    Option(prop.get("ControlsBitSeq", classOf[String]))
+    Option(prop.get("ControlsMulti", classOf[String]))
       .map(new Interpreter(multiverse, map).evalExpression)
       .getOrElse(const(new BitSeq(Seq(true))))
 

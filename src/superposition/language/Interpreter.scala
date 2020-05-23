@@ -112,9 +112,15 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @return the evaluated identifier name
     */
   private def evalIdentifier(name: String): Universe => Any = name match {
-    case "activated" => universe => (l: Iterable[Vector2[Int]]) => multiverse.allActivated(universe, l)(0)
+    case "activated" => universe => (l: Iterable[Vector2[Int]]) => multiverse.allActivated(universe, l)
     case "activeCell" => universe => (nt: NTuple) => multiverse.allActivated(universe, Seq(makeCell(nt)))(0)
+    case "bitAt" => const((nt: NTuple) => nt.items.head.asInstanceOf[BitSeq](nt.items(1).asInstanceOf[Int]))
+    case "indices" => const((nt: NTuple) => nt.items(1).asInstanceOf[Seq[Int]].map(nt.items.head.asInstanceOf[Seq[_]](_)))
+    case "int" => const((b: BitSeq) => b.toInt)
+    case "and" => const((nt: NTuple) => nt.items.forall(_.asInstanceOf[Boolean]))
+    case "or" => const((nt: NTuple) => nt.items.exists(_.asInstanceOf[Boolean]))
     case "qubit" => const(multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bits.head)
+    case "qubits" => const(multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bits)
     case "qucell" => const(multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell)
     case "value" => universe => (id: StateId[_]) => universe.state(id)
     case "vec2" => const({ case NTuple(x: Int, y: Int) => Vector2(x, y) }: NTuple => Vector2[Int])

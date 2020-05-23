@@ -19,4 +19,6 @@ class BitSeq(private val s: Seq[Boolean]) {
 
   def or(b: BitSeq): BitSeq = new BitSeq(
     for {(x, y) <- s.zipAll(b.s, false, false)} yield x || y)
+
+  def toInt: Int = s.zipWithIndex.map({ case (a, b) => if (a) 1 << b else 0 }).sum
 }
