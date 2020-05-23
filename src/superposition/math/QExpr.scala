@@ -9,7 +9,7 @@ import scala.Function.const
   * @param f a function that evaluates the expression within a universe
   * @tparam A the type of the expression
   */
-final class QExpr[+A] private(f: Universe => A) {
+final class QExpr[+A] private(private val f: Universe => A) extends AnyVal {
   /** Evaluates the expression within a universe.
     *
     * @param universe the universe
