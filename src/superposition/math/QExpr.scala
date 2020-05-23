@@ -37,12 +37,13 @@ object QExpr {
     */
   def apply[A](id: StateId[A]): QExpr[A] = new QExpr(_.state(id))
 
-  /** Lifts a function into a quantum expression that would bind a value to another quantum expression.
+  /** Prepares a function that returns a quantum expression for being applied within the context of another quantum
+    * expression.
     *
     * @param f a function that maps a value to a quantum expression
-    * @tparam A the type of the argument
-    * @tparam B the type of the result
-    * @return the lifted function
+    * @tparam A the type of the input
+    * @tparam B the type of the output
+    * @return the prepared function
     */
-  def liftBind[A, B](f: A => QExpr[B]): QExpr[A => B] = new QExpr(universe => a => f(a)(universe))
+  def prepare[A, B](f: A => QExpr[B]): QExpr[A => B] = new QExpr(universe => a => f(a)(universe))
 }

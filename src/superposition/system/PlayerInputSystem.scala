@@ -67,7 +67,7 @@ private object PlayerInputSystem {
     val walkCarried: Gate[Vector2[Int]] = Translate.multi.controlledMap {
       for {
         isAlive <- player.alive.value
-        isCarried <- QExpr.liftBind(Carriable.mapper.get(_: Entity).carried.value)
+        isCarried <- QExpr.prepare(Carriable.mapper.get(_: Entity).carried.value)
       } yield (delta: Vector2[Int]) =>
         if (isAlive)
           carriables
@@ -90,7 +90,7 @@ private object PlayerInputSystem {
       for {
         isAlive <- Player.mapper.get(entity).alive.value
         playerCell <- QuantumPosition.mapper.get(entity).cell.value
-        carriableCell <- QExpr.liftBind(QuantumPosition.mapper.get(_: Entity).cell.value)
+        carriableCell <- QExpr.prepare(QuantumPosition.mapper.get(_: Entity).cell.value)
       } yield const {
         carriables
           .filter(carriable => isAlive && playerCell == carriableCell(carriable))

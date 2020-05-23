@@ -120,7 +120,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     case "qubit" => (multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bits.head).pure[QExpr]
     case "qubits" => (multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bits).pure[QExpr]
     case "qucell" => (multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell).pure[QExpr]
-    case "value" => QExpr.liftBind((_: StateId[_]).value)
+    case "value" => QExpr.prepare((_: StateId[_]).value)
     case "vec2" => ({ case NTuple(x: Int, y: Int) => Vector2(x, y) }: NTuple => Vector2[Int]).pure[QExpr]
     case "cell" => makeCell.pure[QExpr]
     case _ => error(s"Unknown identifier: $name")

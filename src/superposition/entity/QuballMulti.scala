@@ -30,7 +30,7 @@ final class QuballMulti(id: Int, multiverse: Multiverse, initialCell: Vector2[In
     add(new Renderable(
       1,
       for {
-        bitValue <- QExpr.liftBind((_: StateId[Boolean]).value)
+        bitValue <- QExpr.prepare((_: StateId[Boolean]).value)
         carriedValue <- carried.value
         cellValue <- cell.value
       } yield (bits map bitValue, carriedValue, cellValue)))
