@@ -1,24 +1,31 @@
 package superposition.math
 
-class BitSeq(private val s: Seq[Boolean]) {
+class BitSeq private (private val s: Seq[Boolean]) {
 
   def apply(idx: Int): Boolean = s.lift(idx).getOrElse(false)
 
-  def all: Boolean = s.forall(identity)
+  val all: Boolean = s.forall(identity)
 
-  def allNonEmpty: Boolean = s.forall(identity) && s.nonEmpty
+  val allNonEmpty: Boolean = s.forall(identity) && s.nonEmpty
 
   def and(b: BitSeq): BitSeq = new BitSeq(
     for {(x, y) <- s.zipAll(b.s, false, false)} yield x && y)
 
-  def any: Boolean = s.exists(identity)
+  val any: Boolean = s.exists(identity)
 
-  def anyOrEmpty: Boolean = s.exists(identity) || s.isEmpty
+  val anyOrEmpty: Boolean = s.exists(identity) || s.isEmpty
 
   def filter[A](o: Seq[A]): Seq[A] = o.zip(s).filter(_._2).map(_._1)
+
+  val get: Seq[Boolean] = s
 
   def or(b: BitSeq): BitSeq = new BitSeq(
     for {(x, y) <- s.zipAll(b.s, false, false)} yield x || y)
 
-  def toInt: Int = s.zipWithIndex.map({ case (a, b) => if (a) 1 << b else 0 }).sum
+  val toInt: Int = s.zipWithIndex.map({ case (a, b) => if (a) 1 << b else 0 }).sum
+}
+
+object BitSeq {
+
+  def apply(bits: Boolean*): BitSeq = new BitSeq(bits)
 }

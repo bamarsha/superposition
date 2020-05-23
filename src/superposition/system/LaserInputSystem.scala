@@ -5,7 +5,7 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
 import superposition.component.{Beam, ClassicalPosition, Multiverse}
 import superposition.entity.Level
-import superposition.math.{StateId, Universe, Vector2}
+import superposition.math.{BitSeq, StateId, Universe, Vector2}
 import superposition.system.LaserInputSystem.{beamHits, beamTarget}
 
 import scala.Function.const
@@ -26,13 +26,14 @@ final class LaserInputSystem(level: () => Option[Level])
     if (input.isButtonJustPressed(0) && multiverseView.isSelected(cell)) {
       multiverse.applyGate(beam.gate.multi controlledMap const(beamHits(multiverse, entity)), ())
       multiverse.updateMetaWith(beam.lastTarget)(const(beamTarget(multiverse, entity)))
+      multiverse.updateMetaWith(beam.lastBeamSeq)(const(beam.control andThen Some[BitSeq]))
       multiverse.updateMetaWith(beam.elapsedTime) { time => universe =>
         if (beamTarget(multiverse, entity)(universe).isEmpty)
           time
         else 0
       }
     }
-    multiverse.updateMetaWith(beam.elapsedTime)(time => const(time + deltaTime))
+    multiverse.updateMetaWith(beam.elapsedTime)(time => const(time + deltaTime.toFloat))
   }
 }
 

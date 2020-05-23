@@ -19,8 +19,11 @@ final class Beam(
   /** The most recent target cell, if any. */
   val lastTarget: MetaId[Option[Vector2[Int]]] = multiverse.allocateMeta(None)
 
+  /** The most recent sequence of beams that were fired, if any. */
+  val lastBeamSeq: MetaId[Option[BitSeq]] = multiverse.allocateMeta(None)
+
   /** The amount of time since the beam was most recently activated. */
-  val elapsedTime: MetaId[Double] = multiverse.allocateMeta(0)
+  val elapsedTime: MetaId[Float] = multiverse.allocateMeta(0f)
 }
 
 /** Contains the component mapper for the beam component. */

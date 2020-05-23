@@ -120,7 +120,7 @@ private object LevelLoader {
           new Laser(multiverse, cells.head, gate, direction, control)
         } else {
           val control = controlFunction(multiverse, map, obj.getProperties)
-          new Laser(multiverse, cells.head, gate, direction, u => new BitSeq(Seq(control(u))))
+          new Laser(multiverse, cells.head, gate, direction, u => BitSeq(control(u)))
         }
       case "Door" =>
         val control = controlFunction(multiverse, map, obj.getProperties)
@@ -152,7 +152,7 @@ private object LevelLoader {
   private def controlFunctionBitSeq(multiverse: Multiverse, map: TiledMap, prop: MapProperties): Universe => BitSeq =
     Option(prop.get("ControlsMulti", classOf[String]))
       .map(new Interpreter(multiverse, map).evalExpression)
-      .getOrElse(const(new BitSeq(Seq(true))))
+      .getOrElse(const(BitSeq(true)))
 
   /** Parses a cell position for the tile map from a string "(x, y)".
     *
