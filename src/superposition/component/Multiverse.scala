@@ -107,11 +107,10 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     * @param cell the cell to look at
     * @return the primary qubits in the cell
     */
-  def primaryBits(universe: Universe, cell: Vector2[Int]): Iterable[StateId[Boolean]] =
-    allInCell(universe, cell) flatMap { entity =>
-      if (PrimaryBit.mapper.has(entity)) Some(PrimaryBit.mapper.get(entity).bit)
-      else None
-    }
+  def primaryBits(universe: Universe, cell: Vector2[Int]): Iterable[Seq[StateId[Boolean]]] =
+    allInCell(universe, cell)
+      .filter(PrimaryBit.mapper.has)
+      .map(PrimaryBit.mapper.get(_).bits)
 
   /** Returns true if the cell is blocked by an entity with collision.
     *
@@ -125,20 +124,28 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
         filter Collider.mapper.has
         exists (Collider.mapper.get(_).cells(universe).contains(cell)))
 
-  /** Returns true if all cells have at least one activator qubit in the |1⟩ state.
+  /** Returns true in index idx if this cell has at least one |1⟩ activator in index idx
+    *
+    * @param universe the universe to look in
+    * @param cell the cell to look at
+    * @return true if all cells have at least one activator qubit in the |1⟩ state
+    */
+  def activation(universe: Universe, cell: Vector2[Int]): BitSeq =
+    allInCell(universe, cell)
+      .filter(Activator.mapper.has)
+      .map(Activator.mapper.get(_).bits.map(universe.state(_)))
+      .map(new BitSeq(_))
+      .fold(new BitSeq(Seq()))(_ or _)
+
+  /** Returns true in index idx if all cells have at least one |1⟩ activator in index idx
     *
     * @param universe the universe to look in
     * @param cells the cells to look at
     * @return true if all cells have at least one activator qubit in the |1⟩ state
     */
-  def isActivated(universe: Universe, cells: Iterable[Vector2[Int]]): Boolean =
-    cells forall { cell =>
-      entities exists { entity =>
-        Activator.mapper.has(entity) && QuantumPosition.mapper.has(entity) &&
-          universe.state(Activator.mapper.get(entity).activator) &&
-          universe.state(QuantumPosition.mapper.get(entity).cell) == cell
-      }
-    }
+  def allActivated(universe: Universe, cells: Iterable[Vector2[Int]]): BitSeq =
+    if (cells.isEmpty) new BitSeq(Seq())
+    else cells.map(activation(universe, _)).reduce(_ and _)
 
   /** Returns true if every entity has a valid position in the universe.
     *

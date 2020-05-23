@@ -14,7 +14,7 @@ final class Beam(
     multiverse: Multiverse,
     val gate: Gate[StateId[Boolean]],
     val direction: Direction,
-    val control: Universe => Boolean)
+    val control: Universe => BitSeq)
   extends Component {
   /** The most recent target cell, if any. */
   val lastTarget: MetaId[Option[Vector2[Int]]] = multiverse.allocateMeta(None)

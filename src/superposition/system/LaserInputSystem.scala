@@ -60,7 +60,7 @@ object LaserInputSystem {
     * @return the target of the laser beam
     */
   private def beamTarget(multiverse: Multiverse, entity: Entity)(universe: Universe): Option[Vector2[Int]] = {
-    if (Beam.mapper.get(entity).control(universe))
+    if (Beam.mapper.get(entity).control(universe).any)
       beamPath(entity) find { cell =>
         multiverse.isBlocked(universe, cell) || multiverse.allInCell(universe, cell).nonEmpty
       }
@@ -75,6 +75,7 @@ object LaserInputSystem {
     * @return the qubits that are hit by the laser beam
     */
   private def beamHits(multiverse: Multiverse, entity: Entity)(universe: Universe): Seq[StateId[Boolean]] =
-    (beamTarget(multiverse, entity)(universe).iterator.to(Seq)
-      flatMap (cell => multiverse.primaryBits(universe, cell)))
+    beamTarget(multiverse, entity)(universe).iterator.to(Seq)
+      .flatMap(multiverse.primaryBits(universe, _))
+      .flatMap(Beam.mapper.get(entity).control(universe).filter(_))
 }

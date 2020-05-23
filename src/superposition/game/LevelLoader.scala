@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
-import com.badlogic.gdx.maps.{MapLayer, MapObject}
+import com.badlogic.gdx.maps.{MapLayer, MapObject, MapProperties}
 import superposition.component.{Multiverse, MultiverseView}
 import superposition.entity.{MapLayer => MapLayerEntity, _}
 import superposition.game.ResourceResolver.resolve
@@ -82,8 +82,8 @@ private object LevelLoader {
   private def layerEntity(map: TiledMap, renderer: OrthogonalTiledMapRenderer, multiverse: Multiverse)
                          (mapLayer: MapLayer, index: Int): MapLayerEntity = {
     val renderLayer = Option(mapLayer.getProperties.get("Layer", classOf[Int])).getOrElse(0)
-    val controls = Option(mapLayer.getProperties.get("Controls", classOf[String])).toSeq flatMap parseCells(map)
-    new MapLayerEntity(renderer, renderLayer, index, multiverse, controls)
+    val control = controlFunction(multiverse, map, mapLayer.getProperties)
+    new MapLayerEntity(renderer, renderLayer, index, multiverse, control)
   }
 
   /** Returns the entities for all of the objects in the tile map.
@@ -114,10 +114,10 @@ private object LevelLoader {
       case "Laser" =>
         val gate = toGate(obj.getProperties.get("Gate", classOf[String]))
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
-        val control = controlFunction(multiverse, map, obj)
-        new Laser(multiverse, cells.head, gate, direction, control)
+        val control = controlFunction(multiverse, map, obj.getProperties)
+        new Laser(multiverse, cells.head, gate, direction, u => new BitSeq(Seq(control(u))))
       case "Door" =>
-        val control = controlFunction(multiverse, map, obj)
+        val control = controlFunction(multiverse, map, obj.getProperties)
         new Door(multiverse, cells.head, control)
       case "Exit" => new Exit(cells)
       case unknown => error(s"Unknown entity type '$unknown'.")
@@ -128,13 +128,25 @@ private object LevelLoader {
     *
     * @param multiverse the multiverse
     * @param map the tile map
-    * @param obj the tile map object
+    * @param prop the tile map object properties
     * @return the control function for the tile map object
     */
-  private def controlFunction(multiverse: Multiverse, map: TiledMap, obj: MapObject): Universe => Boolean =
-    Option(obj.getProperties.get("Controls", classOf[String]))
+  private def controlFunction(multiverse: Multiverse, map: TiledMap, prop: MapProperties): Universe => Boolean =
+    Option(prop.get("Controls", classOf[String]))
       .map(new Interpreter(multiverse, map).evalExpression)
       .getOrElse(const(true))
+
+  /** Returns the control function for the tile map object.
+    *
+    * @param multiverse the multiverse
+    * @param map the tile map
+    * @param prop the tile map object properties
+    * @return the control function for the tile map object
+    */
+  private def controlFunctionBitSeq(multiverse: Multiverse, map: TiledMap, prop: MapProperties): Universe => BitSeq =
+    Option(prop.get("ControlsBitSeq", classOf[String]))
+      .map(new Interpreter(multiverse, map).evalExpression)
+      .getOrElse(const(new BitSeq(Seq(true))))
 
   /** Parses a cell position for the tile map from a string "(x, y)".
     *

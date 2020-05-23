@@ -112,9 +112,9 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @return the evaluated identifier name
     */
   private def evalIdentifier(name: String): Universe => Any = name match {
-    case "activated" => universe => multiverse.isActivated(universe, _)
-    case "activeCell" => universe => (nt: NTuple) => multiverse.isActivated(universe, Seq(makeCell(nt)))
-    case "qubit" => const(multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bit)
+    case "activated" => universe => (l: Iterable[Vector2[Int]]) => multiverse.allActivated(universe, l)(0)
+    case "activeCell" => universe => (nt: NTuple) => multiverse.allActivated(universe, Seq(makeCell(nt)))(0)
+    case "qubit" => const(multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bits.head)
     case "qucell" => const(multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell)
     case "value" => universe => (id: StateId[_]) => universe.state(id)
     case "vec2" => const({ case NTuple(x: Int, y: Int) => Vector2(x, y) }: NTuple => Vector2[Int])

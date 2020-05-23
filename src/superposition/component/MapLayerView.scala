@@ -2,7 +2,7 @@ package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
-import superposition.math.Vector2
+import superposition.math.Universe
 
 /** The map layer view component contains rendering data for a tile map layer.
   *
@@ -11,12 +11,12 @@ import superposition.math.Vector2
   *
   * @param renderer the tile map renderer
   * @param layer the tile map layer index to render
-  * @param controls the control cells for the layer
+  * @param control the control for the layer
   */
 final class MapLayerView(
     val renderer: OrthogonalTiledMapRenderer,
     val layer: Int,
-    val controls: Iterable[Vector2[Int]])
+    val control: Universe => Boolean)
   extends Component
 
 /** Contains the component mapper for the map layer view component. */

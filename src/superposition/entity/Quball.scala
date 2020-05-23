@@ -25,8 +25,8 @@ final class Quball(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) e
 
     add(new EntityId(id))
     add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))
-    add(new PrimaryBit(onOff))
-    add(new Activator(onOff))
+    add(new PrimaryBit(Seq(onOff)))
+    add(new Activator(Seq(onOff)))
     add(new Carriable(carried))
     add(new Renderable(1, universe => (universe.state(onOff), universe.state(carried), universe.state(cell))))
     add(new SpriteView(
