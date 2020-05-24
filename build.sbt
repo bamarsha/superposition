@@ -2,7 +2,7 @@ name := "Superposition"
 version := "0.2-SNAPSHOT"
 
 ThisBuild / scalaVersion := "2.13.2"
-Compile / scalacOptions ++= Seq("-Xsource:3", "-deprecation")
+Compile / scalacOptions ++= Seq("-Xsource:3", "-deprecation", "-opt:l:method", "-opt:l:inline", "-opt-inline-from:**")
 Compile / scalaSource := baseDirectory.value / "src"
 Compile / resourceDirectory := baseDirectory.value / "resources"
 
