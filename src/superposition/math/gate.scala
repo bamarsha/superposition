@@ -4,6 +4,7 @@ import cats.ContravariantMonoidal
 import cats.data.NonEmptyList
 import cats.syntax.contravariant.toContravariantOps
 import cats.syntax.functor.toFunctorOps
+import superposition.math.QExpr.QExpr
 
 import scala.Function.const
 import scala.math.sqrt

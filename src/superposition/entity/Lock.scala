@@ -6,7 +6,8 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.{Color, Texture}
 import superposition.component._
 import superposition.game.ResourceResolver.resolve
-import superposition.math.{QExpr, StateId, Vector2}
+import superposition.math.QExpr.QExpr
+import superposition.math.{StateId, Vector2}
 
 
 /** A door blocks movement unless its control expression is true.
@@ -26,3 +27,4 @@ final class Lock(id: Int, multiverse: Multiverse, cell: Vector2[Int], size: Int,
   add(new Renderable(1, control))
   add(new SpriteView(texture.pure[QExpr], color = control map (if (_) Color.GREEN else Color.WHITE)))
 }
+

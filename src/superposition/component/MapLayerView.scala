@@ -2,7 +2,7 @@ package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
-import superposition.math.QExpr
+import superposition.math.QExpr.QExpr
 
 /** The map layer view component contains rendering data for a tile map layer.
   *

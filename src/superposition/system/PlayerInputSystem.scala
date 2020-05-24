@@ -10,6 +10,7 @@ import com.badlogic.gdx.Input.Keys.SPACE
 import spire.implicits._
 import superposition.component._
 import superposition.entity.Level
+import superposition.math.QExpr.QExpr
 import superposition.math._
 import superposition.system.PlayerInputSystem.{carryGate, updateCarriedPositions, updatePlayerPosition, walk}
 

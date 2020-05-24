@@ -3,7 +3,7 @@ package superposition.entity
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import superposition.component.{MapLayerView, Multiverse, Renderable}
-import superposition.math.QExpr
+import superposition.math.QExpr.QExpr
 
 /** A map layer entity.
   *

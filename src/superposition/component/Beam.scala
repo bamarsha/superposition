@@ -1,6 +1,7 @@
 package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
+import superposition.math.QExpr.QExpr
 import superposition.math._
 
 /** The beam component shoots a laser beam that applies a quantum gate.

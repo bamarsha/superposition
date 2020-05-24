@@ -1,5 +1,7 @@
 package superposition.math
 
+import superposition.math.QExpr.QExpr
+
 /** An opaque identifier corresponding to a qudit of a particular type.
   *
   * @param name the name of the qudit
@@ -18,5 +20,5 @@ final class StateId[A](val name: String, showValue: A => String) extends Depende
   def show(value: Value): String = showValue(value)
 
   /** The value of the qudit. */
-  val value: QExpr[A] = QExpr(this)
+  val value: QExpr[A] = QExpr.of(this)
 }

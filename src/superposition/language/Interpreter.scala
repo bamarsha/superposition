@@ -10,6 +10,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import superposition.component.Multiverse
 import superposition.language.Interpreter.NTuple
 import superposition.language.Parser.{NoSuccess, Success, expressionProgram, gateProgram, parse}
+import superposition.math.QExpr.QExpr
 import superposition.math._
 
 import scala.Function.chain
@@ -43,7 +44,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @return the evaluated expression
     */
   def evalExpression[A](string: String): QExpr[A] = parse(expressionProgram, string) match {
-    case Success(expression, _) => evalExpression(expression).asInstanceOf[QExpr[A]]
+    case Success(expression, _) => evalExpression(expression).asInstanceOf[QExpr[A]].memoized
     case NoSuccess(message, _) => error(s"Syntax error in expression program ($message): $string")
   }
 

@@ -1,7 +1,8 @@
 package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
-import superposition.math.{QExpr, Vector2}
+import superposition.math.QExpr.QExpr
+import superposition.math.Vector2
 
 /** The collider component lets an entity collide with other entities.
   *

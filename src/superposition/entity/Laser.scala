@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture
 import superposition.component._
 import superposition.entity.Laser._
 import superposition.game.ResourceResolver.resolve
+import superposition.math.QExpr.QExpr
 import superposition.math._
 
 /** A laser applies a quantum gate to any qubit hit by its beam.

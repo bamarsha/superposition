@@ -9,7 +9,8 @@ import com.badlogic.gdx.graphics.Texture
 import superposition.component._
 import superposition.entity.Quball._
 import superposition.game.ResourceResolver.resolve
-import superposition.math.{QExpr, Vector2}
+import superposition.math.QExpr.QExpr
+import superposition.math.Vector2
 
 /** A quball is a quantum ball that can be either on or off.
   *

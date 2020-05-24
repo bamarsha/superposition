@@ -3,7 +3,7 @@ package superposition.entity
 import cats.syntax.applicative.catsSyntaxApplicativeId
 import com.badlogic.ashley.core.Entity
 import superposition.component.{CellHighlightView, Renderable}
-import superposition.math.QExpr
+import superposition.math.QExpr.QExpr
 
 /** A cell highlighter entity.
   *

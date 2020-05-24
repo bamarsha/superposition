@@ -8,7 +8,8 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
 import superposition.component.{Beam, ClassicalPosition, Multiverse}
 import superposition.entity.Level
-import superposition.math.{QExpr, StateId, Vector2}
+import superposition.math.QExpr.QExpr
+import superposition.math.{StateId, Vector2}
 import superposition.system.LaserInputSystem.{beamHits, beamTarget}
 
 import scala.Function.const
