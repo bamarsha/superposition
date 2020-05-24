@@ -1,6 +1,8 @@
 package superposition.math
 
-import scalaz.Monad
+import cats.Monad
+import cats.syntax.flatMap.toFlatMapOps
+import cats.syntax.functor.toFunctorOps
 
 import scala.Function.const
 
@@ -23,10 +25,20 @@ object QExpr {
 
   /** An instance of the monad type class for quantum expressions. */
   implicit object QExprMonad extends Monad[QExpr] {
-    override def bind[A, B](expr: QExpr[A])(f: A => QExpr[B]): QExpr[B] =
+    override def pure[A](x: A): QExpr[A] = new QExpr(const(x))
+
+    override def flatMap[A, B](expr: QExpr[A])(f: A => QExpr[B]): QExpr[B] =
       new QExpr(universe => f(expr(universe))(universe))
 
-    override def point[A](value: => A): QExpr[A] = new QExpr(const(value))
+    override def tailRecM[A, B](a: A)(f: A => QExpr[Either[A, B]]): QExpr[B] = {
+      @scala.annotation.tailrec
+      def repeat(a: A)(universe: Universe): B = f(a)(universe) match {
+        case Left(x) => repeat(x)(universe)
+        case Right(y) => pure(y)(universe)
+      }
+
+      new QExpr(repeat(a))
+    }
   }
 
   /** Operations on quantum expressions of functions.
@@ -36,9 +48,6 @@ object QExpr {
     * @tparam B the function output type
     */
   implicit final class FunctionOps[A, B](expr: QExpr[A => B]) {
-
-    import QExprMonad.monadSyntax._
-
     /** Applies the function in the second expression to the result of the function in the first expression.
       *
       * @param next the second function expression

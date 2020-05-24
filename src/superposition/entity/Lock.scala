@@ -1,8 +1,9 @@
 package superposition.entity
 
+import cats.syntax.applicative.catsSyntaxApplicativeId
+import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.{Color, Texture}
-import scalaz.syntax.monad._
 import superposition.component._
 import superposition.game.ResourceResolver.resolve
 import superposition.math.{QExpr, StateId, Vector2}

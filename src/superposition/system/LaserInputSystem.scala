@@ -1,9 +1,11 @@
 package superposition.system
 
+import cats.syntax.applicative.catsSyntaxApplicativeId
+import cats.syntax.flatMap.toFlatMapOps
+import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
-import scalaz.syntax.monad._
 import superposition.component.{Beam, ClassicalPosition, Multiverse}
 import superposition.entity.Level
 import superposition.math.{QExpr, StateId, Vector2}

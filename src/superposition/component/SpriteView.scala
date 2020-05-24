@@ -1,9 +1,9 @@
 package superposition.component
 
+import cats.syntax.applicative.catsSyntaxApplicativeId
 import com.badlogic.ashley.core.{Component, ComponentMapper}
 import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.{Color, Texture}
-import scalaz.syntax.monad._
 import superposition.math.{QExpr, Vector2}
 
 /** The sprite view component gives an entity a renderable sprite.

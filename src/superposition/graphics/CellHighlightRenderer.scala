@@ -1,12 +1,12 @@
 package superposition.graphics
 
+import cats.syntax.applicative.catsSyntaxApplicativeId
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.gdx.Gdx.gl
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.utils.Disposable
-import scalaz.syntax.monad._
 import superposition.component.{CellHighlightView, QuantumPosition}
 import superposition.entity.Level
 import superposition.math.QExpr

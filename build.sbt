@@ -16,7 +16,7 @@ libraryDependencies ++= {
 }
 libraryDependencies += "com.beachape" %% "enumeratum" % "1.6.0"
 libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
-libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.3.0"
+libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0"
 libraryDependencies += "org.typelevel" %% "spire" % "0.17.0-M1"
 
 assemblyMergeStrategy in assembly := {

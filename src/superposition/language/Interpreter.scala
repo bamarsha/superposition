@@ -1,7 +1,12 @@
 package superposition.language
 
+import cats.implicits.catsStdInstancesForList
+import cats.syntax.applicative.catsSyntaxApplicativeId
+import cats.syntax.contravariant.toContravariantOps
+import cats.syntax.flatMap.toFlatMapOps
+import cats.syntax.functor.toFunctorOps
+import cats.syntax.traverse.toTraverseOps
 import com.badlogic.gdx.maps.tiled.TiledMap
-import scalaz.Scalaz._
 import superposition.component.Multiverse
 import superposition.language.Interpreter.NTuple
 import superposition.language.Parser.{NoSuccess, Success, expressionProgram, gateProgram, parse}
