@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+ <tileset firstgid="1" source="sprites.tsx"/>
+ <object name="Lock 1" type="Lock" gid="3" width="16" height="16">
+  <properties>
+   <property name="Code" value="1"/>
+   <property name="Controls" value="???"/>
+  </properties>
+ </object>
+</template>

@@ -27,7 +27,7 @@ final class LevelPlaylist(engine: Engine) {
     * @param fileNames the file names for the tile maps
     */
   def appendAll(loader: TmxMapLoader, fileNames: Seq[String]): Unit =
-    factories ++= fileNames map (fileName => () => loadLevel(loader.load(fileName)))
+    factories ++= fileNames map (fileName => () => loadLevel(loader.load("levels/" + fileName)))
 
   /** Advances to the next level in the playlist. */
   def next(): Unit = {

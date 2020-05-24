@@ -38,7 +38,7 @@ final class Quball(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) e
         cellValue <- cell.value
       } yield (onOffValue, carriedValue, cellValue)))
     add(new SpriteView(
-      texture = onOff.value map (if (_) onTexture else offTexture),
+      texture = texture.pure[QExpr],
       scale = carried.value map (if (_) Vector2(0.5, 0.5) else Vector2(0.75, 0.75)),
       color = WHITE.pure[QExpr]))
   }
@@ -47,6 +47,5 @@ final class Quball(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) e
 /** Contains the sprite texture for quballs. */
 private object Quball {
   /** The sprite texture for a quball. */
-  private val onTexture = new Texture(resolve("sprites/quball_v1_1.png"))
-  private val offTexture = new Texture(resolve("sprites/quball_v1_0.png"))
+  private val texture = new Texture(resolve("sprites/quball_1.png"))
 }

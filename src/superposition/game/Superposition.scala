@@ -48,14 +48,14 @@ private final class Superposition extends Game {
 private object Superposition {
   /** The level playlist. */
   private val playlist: Seq[String] = Seq(
-    "level5.tmx",
-    "level1.tmx",
-    "level2.tmx",
-    "level7.tmx",
-    "level6.tmx",
-    "level3.tmx",
-    "level4.tmx",
-    "win.tmx")
+    "level_base.tmx",
+    "level_x1.tmx",
+    "level_x2.tmx",
+    "level_super1.tmx",
+    "level_super2.tmx",
+    "level_super3.tmx",
+    "level_swap.tmx",
+    "level_win.tmx")
 
   /** The entry point for Superposition.
     *

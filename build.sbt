@@ -9,7 +9,7 @@ Compile / resourceDirectory := baseDirectory.value / "resources"
 
 libraryDependencies += "com.badlogicgames.ashley" % "ashley" % "1.7.3"
 libraryDependencies ++= {
-  val version = "1.9.10"
+  val version = "1.9.11-SNAPSHOT"
   Seq(
     "com.badlogicgames.gdx" % "gdx" % version,
     "com.badlogicgames.gdx" % "gdx-backend-lwjgl3" % version,
@@ -25,3 +25,5 @@ assemblyMergeStrategy in assembly := {
   case PathList("META-INF", "versions", "9", "module-info.class") => MergeStrategy.first
   case path => (assemblyMergeStrategy in assembly).value(path)
 }
+
+resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
