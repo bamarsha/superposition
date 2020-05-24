@@ -1,10 +1,10 @@
 package superposition.entity
 
+import cats.syntax.applicative.catsSyntaxApplicativeId
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
-import scalaz.syntax.monad._
 import superposition.component.{Multiverse, MultiverseView, Renderable}
 import superposition.math.QExpr
 

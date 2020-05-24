@@ -1,5 +1,7 @@
 package superposition.game
 
+import cats.syntax.applicative.catsSyntaxApplicativeId
+import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -7,7 +9,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
 import com.badlogic.gdx.maps.{MapLayer, MapObject, MapProperties}
-import scalaz.syntax.monad._
 import superposition.component.{Multiverse, MultiverseView}
 import superposition.entity.{MapLayer => MapLayerEntity, _}
 import superposition.game.ResourceResolver.resolve

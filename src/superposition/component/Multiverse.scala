@@ -1,7 +1,11 @@
 package superposition.component
 
+import cats.implicits.catsStdInstancesForList
+import cats.syntax.applicative.catsSyntaxApplicativeId
+import cats.syntax.flatMap.toFlatMapOps
+import cats.syntax.functor.toFunctorOps
+import cats.syntax.traverse.toTraverseOps
 import com.badlogic.ashley.core._
-import scalaz.Scalaz._
 import superposition.component.Multiverse.combine
 import superposition.math._
 
@@ -81,11 +85,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
   def applyGate[A](gate: Gate[A], value: A): Boolean = {
     val newUniverses = gate.applyToAll(value)(universes)
     if (newUniverses forall (isValid(_))) {
-      _universes =
-        (newUniverses
-          |> combine
-          |> (_.toSeq)
-          |> (_ sortBy (showUniverse andThen (_.toSeq))))
+      _universes = combine(newUniverses).toSeq sortBy (showUniverse andThen (_.toSeq))
       true
     } else false
   }
@@ -139,7 +139,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     */
   def allActivated(cells: Iterable[Vector2[Int]]): QExpr[BitSeq] =
     if (cells.isEmpty) BitSeq().pure[QExpr]
-    else cells.map(activation).toList.sequence map (_ reduce (_ and _))
+    else (cells map activation).toList.sequence map (_ reduce (_ and _))
 
   /** Returns true if every entity has a valid position in the universe.
     *
@@ -189,9 +189,8 @@ object Multiverse {
     * @return the combined universes
     */
   private def combine(universes: Iterable[Universe]): Iterable[Universe] =
-    (universes
-      .groupMapReduce(_.state)(identity)(_ + _.amplitude)
-      .values
-      .filter(_.amplitude.squaredMagnitude > 1e-6)
-      |> normalize)
+    normalize(universes
+                .groupMapReduce(_.state)(identity)(_ + _.amplitude)
+                .values
+                .filter(_.amplitude.squaredMagnitude > 1e-6))
 }

@@ -1,8 +1,8 @@
 package superposition.entity
 
+import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
-import scalaz.syntax.monad._
 import superposition.component._
 import superposition.entity.Door.{closedTexture, openTexture}
 import superposition.game.ResourceResolver.resolve

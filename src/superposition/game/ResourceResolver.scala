@@ -5,11 +5,10 @@ import java.net.URL
 
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.files.{FileHandle, FileHandleStream}
-import scalaz.Scalaz._
 
 /** Resolves file names to file handles using the application's Java resources. */
 object ResourceResolver extends FileHandleResolver {
-  override def resolve(fileName: String): FileHandle = fileName |> getClass.getResource |> (new UrlHandle(_))
+  override def resolve(fileName: String): FileHandle = new UrlHandle(getClass.getResource(fileName))
 
   /** A file handle for a URL.
     *
@@ -32,4 +31,5 @@ object ResourceResolver extends FileHandleResolver {
       new UrlHandle(childUrl)
     }
   }
+
 }
