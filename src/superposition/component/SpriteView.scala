@@ -14,7 +14,7 @@ import superposition.math.Vector2
   * @param color the sprite color
   */
 final class SpriteView(
-    val texture: QExpr[Texture],
+    var texture: QExpr[Texture],
     val scale: QExpr[Vector2[Double]] = Vector2(1.0, 1.0).pure[QExpr],
     val color: QExpr[Color] = WHITE.pure[QExpr])
   extends Component
