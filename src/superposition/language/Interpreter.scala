@@ -2,7 +2,7 @@ package superposition.language
 
 import com.badlogic.gdx.maps.tiled.TiledMap
 import scalaz.Scalaz._
-import superposition.component.{Multiverse, PrimaryBit, QuantumPosition}
+import superposition.component.Multiverse
 import superposition.language.Interpreter.NTuple
 import superposition.language.Parser.{NoSuccess, Success, expressionProgram, gateProgram, parse}
 import superposition.math._
@@ -16,8 +16,8 @@ import scala.sys.error
   * @param map the tile map
   */
 final class Interpreter(multiverse: Multiverse, map: TiledMap) {
-  /** The height of the tile map. */
-  private val height: Int = Option(map.getProperties.get("height", classOf[Int])).get
+  /** The built-in functions. */
+  private val builtIns: BuiltIns = new BuiltIns(multiverse, map)
 
   /** Evaluates a gate program string.
     *
@@ -109,28 +109,24 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @return the evaluated identifier name
     */
   private def evalIdentifier(name: String): QExpr[Any] = name match {
-    case "activated" => ((cells: Iterable[Vector2[Int]]) => multiverse.allActivated(cells)).pure[QExpr]
-    case "activeCell" => ((cell: NTuple) => multiverse.allActivated(Seq(makeCell(cell))) map (_(0))).pure[QExpr]
-    case "bitAt" => ({ case NTuple(bits: BitSeq, index: Int) => bits(index) }: NTuple => Boolean).pure[QExpr]
-    case "indices" =>
-      ({ case NTuple(items: Seq[_], indices: Seq[Int]) => indices map (items(_)) }: NTuple => Any).pure[QExpr]
-    case "int" => ((_: BitSeq).toInt).pure[QExpr]
-    case "and" => ((_: NTuple).items.forall(_.asInstanceOf[Boolean])).pure[QExpr]
-    case "or" => ((_: NTuple).items.exists(_.asInstanceOf[Boolean])).pure[QExpr]
-    case "qubit" => (multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bits.head).pure[QExpr]
-    case "qubits" => (multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bits).pure[QExpr]
-    case "qucell" => (multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell).pure[QExpr]
-    case "value" => QExpr.prepare((_: StateId[_]).value)
-    case "vec2" => ({ case NTuple(x: Int, y: Int) => Vector2(x, y) }: NTuple => Vector2[Int]).pure[QExpr]
-    case "cell" => makeCell.pure[QExpr]
+    case "activated" => builtIns.activated
+    case "activeCell" => tuple2 andThen builtIns.activeCell
+    case "and" => builtIns.and
+    case "bitAt" => tuple2 andThen builtIns.bitAt
+    case "cell" => tuple2 andThen builtIns.cell
+    case "indices" => tuple2 andThen builtIns.indices[Any]
+    case "int" => builtIns.int
+    case "or" => builtIns.or
+    case "qubit" => builtIns.qubit
+    case "qubits" => builtIns.qubits
+    case "qucell" => builtIns.qucell
+    case "value" => builtIns.value
+    case "vec2" => tuple2 andThen builtIns.vec2
     case _ => error(s"Unknown identifier: $name")
   }
 
-  /** Maps a TiledMap cell to a Vector2, accounting for the different coordinate systems
-    *
-    * @return The function that maps the TiledMap cell to the Vector2
-    */
-  private def makeCell: NTuple => Vector2[Int] = { case NTuple(x: Int, y: Int) => Vector2(x, height - y - 1) }
+  /** Converts an n-tuple into a 2-tuple. */
+  private def tuple2[A, B]: QExpr[NTuple => (A, B)] = ((_: NTuple).toTuple2[A, B]).pure[QExpr]
 
   /** Makes a gate corresponding to the name.
     *
@@ -172,6 +168,9 @@ private object Interpreter {
     *
     * @param items the items in the tuple.
     */
-  private final case class NTuple(items: Any*)
+  private final case class NTuple(items: Any*) {
+    /** Converts this n-tuple into a 2-tuple. */
+    def toTuple2[A, B]: (A, B) = (items(0).asInstanceOf[A], items(1).asInstanceOf[B])
+  }
 
 }

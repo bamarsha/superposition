@@ -88,13 +88,13 @@ Apply X multi on indices (qubits 26, [0, 1, 2]).</property>
   <object id="36" name="Exit" type="Exit" x="112" y="16" width="32" height="16"/>
   <object id="18" name="Door" type="Door" x="119.944" y="25.8523">
    <properties>
-    <property name="Controls" value="and (int (activated [cell (6, 2)]) = 7, int (activated [cell (9, 2)]) = 1)"/>
+    <property name="Controls" value="and [int (activated [cell (6, 2)]) = 7, int (activated [cell (9, 2)]) = 1]"/>
    </properties>
    <point/>
   </object>
   <object id="37" name="Door" type="Door" x="134.875" y="26">
    <properties>
-    <property name="Controls" value="and (int (activated [cell (6, 2)]) = 7, int (activated [cell (9, 2)]) = 1)"/>
+    <property name="Controls" value="and [int (activated [cell (6, 2)]) = 7, int (activated [cell (9, 2)]) = 1]"/>
    </properties>
    <point/>
   </object>

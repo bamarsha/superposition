@@ -29,10 +29,33 @@ object QExpr {
     override def point[A](value: => A): QExpr[A] = new QExpr(const(value))
   }
 
+  /** Operations on quantum expressions of functions.
+    *
+    * @param expr the function expression
+    * @tparam A the function input type
+    * @tparam B the function output type
+    */
+  implicit final class FunctionOps[A, B](expr: QExpr[A => B]) {
+
+    import QExprMonad.monadSyntax._
+
+    /** Applies the function in the second expression to the result of the function in the first expression.
+      *
+      * @param next the second function expression
+      * @tparam C the second function's output type
+      * @return an expression of the composed functions
+      */
+    def andThen[C](next: QExpr[B => C]): QExpr[A => C] =
+      for {
+        f <- expr
+        g <- next
+      } yield f andThen g
+  }
+
   /** Returns the quantum expression for the value of the state ID.
     *
     * @param id the state ID
-    * @tparam A the type of the value
+    * @tparam A the value type
     * @return the quantum expression for the value of the state ID
     */
   def apply[A](id: StateId[A]): QExpr[A] = new QExpr(_.state(id))
@@ -41,8 +64,8 @@ object QExpr {
     * expression.
     *
     * @param f a function that maps a value to a quantum expression
-    * @tparam A the type of the input
-    * @tparam B the type of the output
+    * @tparam A the input type
+    * @tparam B the output type
     * @return the prepared function
     */
   def prepare[A, B](f: A => QExpr[B]): QExpr[A => B] = new QExpr(universe => a => f(a)(universe))

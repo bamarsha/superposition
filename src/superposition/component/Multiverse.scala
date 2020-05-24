@@ -149,7 +149,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     for {
       cell <- QExpr.prepare(QuantumPosition.mapper.get(_: Entity).cell.value)
       blocked <- QExpr.prepare(isBlocked)
-    } yield entities filter QuantumPosition.mapper.has forall (cell andThen blocked)
+    } yield entities filter QuantumPosition.mapper.has forall (cell andThen blocked andThen (!_))
 
   /** Shows all states in the universe.
     *
