@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+ <tileset firstgid="1" source="sprites.tsx"/>
+ <object name="DoubleDoor" type="DoubleDoor" gid="7" width="32" height="16">
+  <properties>
+   <property name="Controls" value="???"/>
+  </properties>
+ </object>
+</template>

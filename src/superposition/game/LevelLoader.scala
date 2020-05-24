@@ -82,8 +82,13 @@ private object LevelLoader {
   private def layerEntity(map: TiledMap, renderer: OrthogonalTiledMapRenderer, multiverse: Multiverse)
                          (mapLayer: MapLayer, index: Int): MapLayerEntity = {
     val renderLayer = Option(mapLayer.getProperties.get("Layer", classOf[Int])).getOrElse(0)
-    val control = controlExpr(multiverse, map, mapLayer.getProperties)
-    new MapLayerEntity(renderer, renderLayer, index, multiverse, control)
+    if (mapLayer.getProperties.containsKey("ControlsMulti")) {
+      val control = controlExprBitSeq(multiverse, map, mapLayer.getProperties)
+      new MapLayerEntity(renderer, renderLayer, index, multiverse, control.map(_.any))
+    } else {
+      val control = controlExpr(multiverse, map, mapLayer.getProperties)
+      new MapLayerEntity(renderer, renderLayer, index, multiverse, control)
+    }
   }
 
   /** Returns the entities for all of the objects in the tile map.
@@ -125,6 +130,13 @@ private object LevelLoader {
       case "Door" =>
         val control = controlExpr(multiverse, map, obj.getProperties)
         new Door(multiverse, cells.head, control)
+      case "DoubleDoor" =>
+        val control = controlExpr(multiverse, map, obj.getProperties)
+        new DoubleDoor(multiverse, cells.head, control)
+      case "Lock" =>
+        val size = obj.getProperties.get("Size", classOf[Int])
+        val control = controlExpr(multiverse, map, obj.getProperties)
+        new Lock(id, multiverse, cells.head, size, control)
       case "Exit" => new Exit(cells)
       case unknown => error(s"Unknown entity type '$unknown'.")
     }

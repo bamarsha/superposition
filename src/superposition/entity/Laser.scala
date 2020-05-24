@@ -4,9 +4,8 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
 import scalaz.syntax.monad._
 import superposition.component._
-import superposition.entity.Laser.textures
+import superposition.entity.Laser._
 import superposition.game.ResourceResolver.resolve
-import superposition.math.Direction.{Down, Left, Right, Up}
 import superposition.math._
 
 /** A laser applies a quantum gate to any qubit hit by its beam.
@@ -24,20 +23,22 @@ final class Laser(
     direction: Direction,
     control: QExpr[BitSeq])
   extends Entity {
-  add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5), Set(cell)))
-  add(new Collider(Set(cell).pure[QExpr]))
+
+  val cells: Set[Vector2[Int]] = direction match {
+    case Direction.Up => Set(cell + Vector2(0, 1), cell, cell + Vector2(1, 0), cell + Vector2(1, 1))
+    case Direction.Right => Set(cell + Vector2(1, 0), cell, cell + Vector2(0, 1), cell + Vector2(1, 1))
+    case _ => Set(cell, cell + Vector2(1, 0), cell + Vector2(0, 1), cell + Vector2(1, 1))
+  }
+
+  add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(1, 1), cells))
+  add(new Collider(cells.pure[QExpr]))
   add(new Beam(multiverse, gate, direction, control))
   add(new Renderable(1, control))
-  add(new SpriteView(texture = textures(direction).pure[QExpr], scale = Vector2(0.0, 0.0).pure[QExpr]))
+  add(new SpriteView(offTexture.pure[QExpr], Vector2(2.0, 2.0).pure[QExpr]))
 }
 
 /** Contains the sprite textures for lasers. */
 private object Laser {
-  /** The sprite texture for every cardinal direction. */
-  private val textures: Map[Direction, Texture] = Map(
-    Up -> "sprites/laser_up.png",
-    Down -> "sprites/laser_down.png",
-    Left -> "sprites/laser_left.png",
-    Right -> "sprites/laser_right.png")
-    .map { case (direction, fileName) => (direction, new Texture(resolve(fileName))) }
+  /** The sprite texture for a laser. */
+  private val offTexture = new Texture(resolve("sprites/laser_off.png"))
 }

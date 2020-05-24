@@ -47,7 +47,9 @@ private final class BuiltIns(multiverse: Multiverse, map: TiledMap) {
 
   /** Returns the primary qubits for the entity with the ID. */
   val qubits: QExpr[Int => Seq[StateId[Boolean]]] =
-    (multiverse.entityById(_: Int).get.getComponent(classOf[PrimaryBit]).bits).pure[QExpr]
+    ((id: Int) => multiverse.entityById(id).getOrElse(
+      throw new RuntimeException("Entity with id " + id + " does not exist")
+    ).getComponent(classOf[PrimaryBit]).bits).pure[QExpr]
 
   /** Returns the first primary qubit for the entity with the ID. */
   val qubit: QExpr[Int => StateId[Boolean]] = qubits map (_ andThen (_.head))
