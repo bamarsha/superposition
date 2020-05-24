@@ -5,10 +5,8 @@
  </editorsettings>
  <properties>
   <property name="Gates">Apply X on (qubits 9) 0.
-Apply X on (qubits 10) 0.
 
-Apply X multi on indices (qubits 6, [0, 1, 2]).
-Apply X multi on indices (qubits 11, [0, 1, 2]).</property>
+Apply X multi on indices (qubits 6, [0, 1, 2]).</property>
  </properties>
  <tileset firstgid="1" source="../tilesets/industrial-sprite-sheet-DeadEnd-LMZ.tsx"/>
  <tileset firstgid="205" source="../tilesets/sprites.tsx"/>
@@ -99,14 +97,14 @@ Apply X multi on indices (qubits 11, [0, 1, 2]).</property>
   <object id="9" name="QuballMulti" type="QuballMulti" gid="210" x="48" y="112" width="16" height="16"/>
   <object id="10" name="Lock" type="Lock" gid="208" x="144" y="32" width="16" height="16">
    <properties>
-    <property name="Controls" value="int (activated [cell (9, 2)]) = 1"/>
-    <property name="Size" type="int" value="4"/>
+    <property name="Code" value="1000"/>
+    <property name="ControlsMulti" value="activated [cell (9, 2)]"/>
    </properties>
   </object>
   <object id="11" name="Lock" type="Lock" gid="208" x="96" y="32" width="16" height="16">
    <properties>
-    <property name="Controls" value="int (activated [cell (6, 2)]) = 7"/>
-    <property name="Size" type="int" value="4"/>
+    <property name="Code" value="1110"/>
+    <property name="ControlsMulti" value="activated [cell (6, 2)]"/>
    </properties>
   </object>
   <object id="12" name="Exit" type="Exit" x="112" y="16" width="32" height="16"/>

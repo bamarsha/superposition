@@ -84,13 +84,8 @@ private object LevelLoader {
   private def layerEntity(map: TiledMap, renderer: OrthogonalTiledMapRenderer, multiverse: Multiverse)
                          (mapLayer: MapLayer, index: Int): MapLayerEntity = {
     val renderLayer = Option(mapLayer.getProperties.get("Layer", classOf[Int])).getOrElse(0)
-    if (mapLayer.getProperties.containsKey("ControlsMulti")) {
-      val control = controlExprBitSeq(multiverse, map, mapLayer.getProperties)
-      new MapLayerEntity(renderer, renderLayer, index, multiverse, control.map(_.any))
-    } else {
-      val control = controlExpr(multiverse, map, mapLayer.getProperties)
-      new MapLayerEntity(renderer, renderLayer, index, multiverse, control)
-    }
+    val control = controlExprBitSeq(multiverse, map, mapLayer.getProperties)
+    new MapLayerEntity(renderer, renderLayer, index, multiverse, control.map(_.any))
   }
 
   /** Returns the entities for all of the objects in the tile map.
@@ -122,13 +117,8 @@ private object LevelLoader {
       case "Laser" =>
         val gate = toGate(obj.getProperties.get("Gate", classOf[String]))
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
-        if (obj.getProperties.containsKey("ControlsMulti")) {
-          val control = controlExprBitSeq(multiverse, map, obj.getProperties)
-          new Laser(multiverse, cells.head, gate, direction, control)
-        } else {
-          val control = controlExpr(multiverse, map, obj.getProperties)
-          new Laser(multiverse, cells.head, gate, direction, control map (BitSeq(_)))
-        }
+        val control = controlExprBitSeq(multiverse, map, obj.getProperties)
+        new Laser(multiverse, cells.head, gate, direction, control)
       case "Door" =>
         val control = controlExpr(multiverse, map, obj.getProperties)
         new Door(multiverse, cells.head, control)
@@ -136,10 +126,11 @@ private object LevelLoader {
         val control = controlExpr(multiverse, map, obj.getProperties)
         new DoubleDoor(multiverse, cells.head, control)
       case "Lock" =>
-        val size = obj.getProperties.get("Size", classOf[Int])
-        val control = controlExpr(multiverse, map, obj.getProperties)
-        new Lock(id, multiverse, cells.head, size, control)
+        val code = obj.getProperties.get("Code", classOf[String]).map(_ == '1')
+        val control = controlExprBitSeq(multiverse, map, obj.getProperties)
+        new Lock(id, multiverse, cells.head, code, control)
       case "Exit" => new Exit(cells)
+      case null => error("Entity type is null - did you remember to remove all templates in the level?")
       case unknown => error(s"Unknown entity type '$unknown'.")
     }
   }
@@ -166,7 +157,7 @@ private object LevelLoader {
   private def controlExprBitSeq(multiverse: Multiverse, map: TiledMap, prop: MapProperties): QExpr[BitSeq] =
     Option(prop.get("ControlsMulti", classOf[String]))
       .map(new Interpreter(multiverse, map).evalExpression)
-      .getOrElse(BitSeq(true).pure[QExpr])
+      .getOrElse(controlExpr(multiverse, map, prop).map(BitSeq(_)))
 
   /** Returns the gate corresponding to the gate name.
     *

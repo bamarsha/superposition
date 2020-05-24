@@ -1,11 +1,10 @@
 package superposition.graphics
 
 import com.badlogic.ashley.core.{Entity, Family}
-import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.g2d.{Batch, SpriteBatch}
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
-import superposition.component.{ClassicalPosition, PrimaryBit, QuantumPosition, Renderable, SpriteView}
+import superposition.component._
 import superposition.entity.Level
 import superposition.game.ResourceResolver.resolve
 import superposition.graphics.ColorUtils.ShaderOps
@@ -52,13 +51,16 @@ final class SpriteRenderer(level: () => Option[Level]) extends Renderer with Dis
     val spriteView = SpriteView.mapper.get(entity)
     val scale = spriteView.scale(universe)
     val position = absolutePosition(entity, universe) - scale / 2
+
     shader.setUniformColor("color", spriteView.color(universe), colorArray)
     shader.setUniformColor("tintColor", renderInfo.color, colorArray)
-    if (PrimaryBit.mapper.has(entity)) {
-      for ((bit, i) <- PrimaryBit.mapper.get(entity).bits.zipWithIndex) {
+    if (PrimaryBit.mapper.has(entity))
+      for ((bit, i) <- PrimaryBit.mapper.get(entity).bits.zipWithIndex)
         shader.setUniformi("state[" + i + "]", if (universe.state(bit)) 1 else 0)
-      }
-    }
+    if (LockCode.mapper.has(entity))
+      for ((bit, i) <- LockCode.mapper.get(entity).bits.zipWithIndex)
+        shader.setUniformi("state[" + i + "]", if (bit) 1 else 0)
+
     batch.setColor(spriteView.color(universe))
     batch.draw(spriteView.texture(universe), position.x.toFloat, position.y.toFloat, scale.x.toFloat, scale.y.toFloat)
     batch.flush()
