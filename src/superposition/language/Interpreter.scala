@@ -148,11 +148,11 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @return true if the expression does not depend on the universe
     */
   private def isConstant(expression: Expression): Boolean = expression match {
-    case Identifier("qubit") |
-         Identifier("qucell") |
-         Identifier("vec2") |
-         Identifier("cell") |
-         Number(_) => true
+    case Identifier(name) => name match {
+      case "and" | "bitAt" | "cell" | "indices" | "int" | "or" | "qubit" | "qubits" | "qucell" | "vec2" => true
+      case _ => false
+    }
+    case Number(_) => true
     case Tuple(items) => items forall isConstant
     case List(items) => items forall isConstant
     case Call(function, argument) => isConstant(function) && isConstant(argument)
