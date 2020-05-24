@@ -7,6 +7,7 @@ import superposition.component._
 import superposition.entity.Laser.textures
 import superposition.game.ResourceResolver.resolve
 import superposition.math.Direction.{Down, Left, Right, Up}
+import superposition.math.QExpr.QExpr
 import superposition.math._
 
 /** A laser applies a quantum gate to any qubit hit by its beam.

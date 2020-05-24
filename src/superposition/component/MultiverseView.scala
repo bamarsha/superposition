@@ -6,7 +6,8 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.math.Vector3
 import superposition.component.MultiverseView.UniversePartRenderer
 import superposition.graphics.UniverseRenderInfo
-import superposition.math.{QExpr, Universe, Vector2}
+import superposition.math.QExpr.QExpr
+import superposition.math.{Universe, Vector2}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer

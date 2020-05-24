@@ -1,7 +1,7 @@
 package superposition.component
 
 import com.badlogic.ashley.core.{Component, ComponentMapper}
-import superposition.math.QExpr
+import superposition.math.QExpr.QExpr
 
 /** The renderable component allows an entity to be rendered on the screen.
   *

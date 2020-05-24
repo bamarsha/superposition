@@ -7,6 +7,7 @@ import cats.syntax.functor.toFunctorOps
 import cats.syntax.traverse.toTraverseOps
 import com.badlogic.ashley.core._
 import superposition.component.Multiverse.combine
+import superposition.math.QExpr.QExpr
 import superposition.math._
 
 import scala.Ordering.Implicits._

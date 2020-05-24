@@ -13,6 +13,7 @@ import superposition.component.{Multiverse, MultiverseView}
 import superposition.entity.{MapLayer => MapLayerEntity, _}
 import superposition.game.ResourceResolver.resolve
 import superposition.language.Interpreter
+import superposition.math.QExpr.QExpr
 import superposition.math._
 
 import scala.jdk.CollectionConverters._

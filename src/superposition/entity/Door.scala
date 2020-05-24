@@ -6,7 +6,8 @@ import com.badlogic.gdx.graphics.Texture
 import superposition.component._
 import superposition.entity.Door.{closedTexture, openTexture}
 import superposition.game.ResourceResolver.resolve
-import superposition.math.{QExpr, Vector2}
+import superposition.math.QExpr.QExpr
+import superposition.math.Vector2
 
 /** A door blocks movement unless its control expression is true.
   *

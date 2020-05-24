@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.Disposable
 import superposition.component.{Multiverse, MultiverseView, Renderable}
-import superposition.math.QExpr
+import superposition.math.QExpr.QExpr
 
 /** A quantum level with a multiverse and tile map.
   *

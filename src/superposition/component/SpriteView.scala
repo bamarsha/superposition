@@ -4,7 +4,8 @@ import cats.syntax.applicative.catsSyntaxApplicativeId
 import com.badlogic.ashley.core.{Component, ComponentMapper}
 import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.{Color, Texture}
-import superposition.math.{QExpr, Vector2}
+import superposition.math.QExpr.QExpr
+import superposition.math.Vector2
 
 /** The sprite view component gives an entity a renderable sprite.
   *

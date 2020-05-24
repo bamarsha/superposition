@@ -10,6 +10,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import superposition.component.Multiverse
 import superposition.language.Interpreter.NTuple
 import superposition.language.Parser.{NoSuccess, Success, expressionProgram, gateProgram, parse}
+import superposition.math.QExpr.QExpr
 import superposition.math._
 
 import scala.Function.chain

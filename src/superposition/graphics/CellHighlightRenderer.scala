@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.utils.Disposable
 import superposition.component.{CellHighlightView, QuantumPosition}
 import superposition.entity.Level
-import superposition.math.QExpr
+import superposition.math.QExpr.QExpr
 
 /** Highlights all cells that are occupied by at least one entity in the multiverse.
   *
