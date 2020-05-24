@@ -44,7 +44,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @return the evaluated expression
     */
   def evalExpression[A](string: String): QExpr[A] = parse(expressionProgram, string) match {
-    case Success(expression, _) => evalExpression(expression).asInstanceOf[QExpr[A]]
+    case Success(expression, _) => evalExpression(expression).asInstanceOf[QExpr[A]].memoized
     case NoSuccess(message, _) => error(s"Syntax error in expression program ($message): $string")
   }
 

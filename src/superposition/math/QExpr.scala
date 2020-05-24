@@ -7,6 +7,7 @@ import io.estatico.newtype.macros.newtype
 import io.estatico.newtype.ops.toCoercibleIdOps
 
 import scala.Function.const
+import scala.collection.mutable
 
 /** Quantum expressions. */
 object QExpr {
@@ -23,6 +24,12 @@ object QExpr {
       * @return the expression value
       */
     def apply(universe: Universe): A = f(universe)
+
+    /** Memoizes the result of the expression based on the quantum state of the universe. */
+    def memoized: QExpr[A] = {
+      val cache = new mutable.WeakHashMap[DependentMap[StateId[_]], A]
+      QExpr(universe => cache.getOrElseUpdate(universe.state, f(universe)))
+    }
   }
 
   /** Functions and type class instances for quantum expressions. */
