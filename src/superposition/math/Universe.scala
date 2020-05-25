@@ -1,8 +1,5 @@
 package superposition.math
 
-import cats.Functor
-import cats.implicits.catsStdInstancesForOption
-
 /** A universe represents a basis state, its corresponding probability amplitude, and additional arbitrary metadata.
   *
   * @param amplitude the probability amplitude of the universe
@@ -56,7 +53,7 @@ final case class Universe(
     * @return the updated universe
     */
   def updatedStateWith(id: StateId[_])(updater: id.Value => id.Value): Universe =
-    copy(state = state.updatedWith(id)(Functor[Option].lift(updater)))
+    copy(state = state.updatedWith(id)(updater))
 
   /** Adds or replaces the value of a piece of metadata.
     *
@@ -73,7 +70,7 @@ final case class Universe(
     * @return the updated universe
     */
   def updatedMetaWith(id: MetaId[_])(updater: id.Value => id.Value): Universe =
-    copy(meta = meta.updatedWith(id)(Functor[Option].lift(updater)))
+    copy(meta = meta.updatedWith(id)(updater))
 }
 
 /** Factories for universes. */

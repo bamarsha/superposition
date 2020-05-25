@@ -32,20 +32,13 @@ final class DependentMap[K <: DependentKey] private(private val map: Map[K, Any]
     if (map.contains(key) && map(key) == value) this
     else new DependentMap(map.updated(key, value))
 
-  /** Maps the optional value associated with the key to a new optional value.
+  /** Maps the value associated with the key to a new value.
     *
     * @param key the key
     * @param updater a function that maps the value of the key
     * @return the updated map
     */
-  def updatedWith(key: K)(updater: Option[key.Value] => Option[key.Value]): DependentMap[K] = {
-    val value = get(key)
-    (value, updater(value)) match {
-      case (None, None) => this
-      case (Some(_), None) => removed(key)
-      case (_, Some(value)) => updated(key)(value)
-    }
-  }
+  def updatedWith(key: K)(updater: key.Value => key.Value): DependentMap[K] = updated(key)(updater(this(key)))
 
   /** Removes the key.
     *
