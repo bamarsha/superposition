@@ -1,12 +1,12 @@
 package superposition.math
 
-import scala.collection.immutable.HashMap
+import scala.collection.immutable.ListMap
 
 /** A map in which the type of the value depends on the key.
   *
   * @tparam K the type of the key
   */
-final class DependentMap[K <: DependentKey] private(private val map: HashMap[K, Any]) extends AnyVal {
+final class DependentMap[K <: DependentKey] private(private val map: Map[K, Any]) extends AnyVal {
   /** Returns the value associated with the key.
     *
     * @param key the key
@@ -28,7 +28,9 @@ final class DependentMap[K <: DependentKey] private(private val map: HashMap[K, 
     * @param value the new value associated with the key
     * @return the updated map
     */
-  def updated(key: K)(value: key.Value): DependentMap[K] = new DependentMap(map.updated(key, value))
+  def updated(key: K)(value: key.Value): DependentMap[K] =
+    if (map.contains(key) && map(key) == value) this
+    else new DependentMap(map.updated(key, value))
 
   /** Maps the optional value associated with the key to a new optional value.
     *
@@ -36,12 +38,14 @@ final class DependentMap[K <: DependentKey] private(private val map: HashMap[K, 
     * @param updater a function that maps the value of the key
     * @return the updated map
     */
-  def updatedWith(key: K)(updater: Option[key.Value] => Option[key.Value]): DependentMap[K] =
-    (get(key), updater(get(key))) match {
+  def updatedWith(key: K)(updater: Option[key.Value] => Option[key.Value]): DependentMap[K] = {
+    val value = get(key)
+    (value, updater(value)) match {
       case (None, None) => this
       case (Some(_), None) => removed(key)
       case (_, Some(value)) => updated(key)(value)
     }
+  }
 
   /** Removes the key.
     *
@@ -59,5 +63,5 @@ object DependentMap {
     *
     * @tparam K the type of the key.
     */
-  def empty[K <: DependentKey]: DependentMap[K] = new DependentMap(new HashMap)
+  def empty[K <: DependentKey]: DependentMap[K] = new DependentMap(new ListMap)
 }
