@@ -22,7 +22,7 @@ import superposition.math.Vector2
   */
 final class DoubleDoor(multiverse: Multiverse, cell: Vector2[Int], control: QExpr[Boolean]) extends Entity {
   locally {
-    val animation = control map (if (_) openAnimation else closedAnimation)
+    val animation = control map (if (_) openAnimation else closeAnimation)
     val animationTime = multiverse.allocateMeta(0f)
     val lastAnimation = multiverse.allocateMeta[Option[Animation[_]]](None)
     val frame = Animated.frame(animation, animationTime)
@@ -35,19 +35,16 @@ final class DoubleDoor(multiverse: Multiverse, cell: Vector2[Int], control: QExp
   }
 }
 
-/** Contains the textures for double doors. */
+/** Contains the animations for double doors. */
 private object DoubleDoor {
   /** The frames in the door animation. */
   private val frames: GArray[TextureRegion] =
     new GArray(Animated.frames(
-      new Texture(resolve("sprites/door_anim.png")),
-      32,
-      16,
-      14))
+      new Texture(resolve("sprites/door_anim.png")), 32, 16, 14))
 
   /** The door opening animation. */
   private val openAnimation: Animation[TextureRegion] = new Animation(0.02f, frames)
 
   /** The door closing animation. */
-  private val closedAnimation: Animation[TextureRegion] = new Animation(0.02f, frames, REVERSED)
+  private val closeAnimation: Animation[TextureRegion] = new Animation(0.02f, frames, REVERSED)
 }

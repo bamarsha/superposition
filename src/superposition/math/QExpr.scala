@@ -106,19 +106,6 @@ object QExpr {
       * @return the prepared function
       */
     def prepare[A, B](f: A => QExpr[B]): QExpr[A => B] = QExpr(universe => a => f(a)(universe))
-
-    /** Converts an iterable of quantum expressions into an array.
-      *
-      * @param exprs the expressions
-      * @tparam A the expression type
-      * @return the array of expressions
-      */
-    def toArray[A](exprs: IterableOnce[QExpr[A]]): Array[QExpr[A]] =
-      exprs
-        .asInstanceOf[IterableOnce[Universe => A]]
-        .iterator
-        .toArray
-        .asInstanceOf[Array[QExpr[A]]]
   }
 
 }

@@ -1,12 +1,14 @@
 package superposition.entity
 
-import cats.syntax.applicative.catsSyntaxApplicativeId
 import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.graphics.Color.{GREEN, WHITE}
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode.REVERSED
+import com.badlogic.gdx.graphics.g2d.{Animation, TextureRegion}
+import com.badlogic.gdx.utils.{Array => GArray}
+import superposition.component.Animated.invertTime
 import superposition.component._
+import superposition.entity.Lock.{lockAnimation, unlockAnimation}
 import superposition.game.ResourceResolver.resolve
 import superposition.math.QExpr.QExpr
 import superposition.math.{BitSeq, Vector2}
@@ -21,11 +23,46 @@ import superposition.math.{BitSeq, Vector2}
 final class Lock(id: Int, multiverse: Multiverse, cell: Vector2[Int], code: Seq[Boolean], control: QExpr[BitSeq])
   extends Entity {
   locally {
-    val texture = new TextureRegion(new Texture(resolve(s"sprites/lock_${code.length}.png")))
+    val unlocking = unlockAnimation(code.length)
+    val locking = lockAnimation(code.length)
+    val animation = control map (bits => if (bits.equals(code)) unlocking else locking)
+    val animationTime = multiverse.allocateMeta(0f)
+    val lastAnimation = multiverse.allocateMeta[Option[Animation[_]]](None)
+    val frame = Animated.frame(animation, animationTime)
+
     add(new EntityId(id))
     add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5)))
     add(new LockCode(code))
-    add(new Renderable(1, control))
-    add(new SpriteView(texture.pure[QExpr], color = control map (bits => if (bits.equals(code)) GREEN else WHITE)))
+    add(new Renderable(1, frame))
+    add(new SpriteView(frame))
+    add(new Animated(animation, animationTime, lastAnimation, invertTime))
   }
+}
+
+/** Contains the animations for locks. */
+private object Lock {
+  /** Returns the frames in the lock animation.
+    *
+    * @param codeLength the length of the lock code
+    * @return the frames in the lock animation
+    */
+  private def frames(codeLength: Int): GArray[TextureRegion] =
+    new GArray(Animated.frames(
+      new Texture(resolve(s"sprites/lock_${codeLength}_anim.png")), 16, 16, 5))
+
+  /** Returns the unlocking animation.
+    *
+    * @param codeLength the length of the lock code
+    * @return the unlocking animation
+    */
+  private def unlockAnimation(codeLength: Int): Animation[TextureRegion] =
+    new Animation(0.02f, frames(codeLength))
+
+  /** Returns the locking animation.
+    *
+    * @param codeLength the length of the lock code
+    * @return the locking animation
+    */
+  private def lockAnimation(codeLength: Int): Animation[TextureRegion] =
+    new Animation(0.02f, frames(codeLength), REVERSED)
 }
