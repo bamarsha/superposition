@@ -14,7 +14,7 @@ final class BitSeq private(private val bits: Int, val length: Int) {
   def apply(i: Int): Boolean = ((bits >> i) & 1) == 1
 
   /** True if any bit is 1. */
-  val any: Boolean = bits != 0
+  def any: Boolean = bits != 0
 
   /** Returns the bitwise AND of two bit sequences. The length of the new sequence is the length of the longer sequence.
     *
@@ -39,14 +39,14 @@ final class BitSeq private(private val bits: Int, val length: Int) {
   def filter[A](xs: Seq[A]): Seq[A] = (xs.view.zipWithIndex filter (x => this (x._2)) map (_._1)).toSeq
 
   /** Converts the bit sequence to an integer. */
-  val toInt: Int = bits
+  def toInt: Int = bits
 
   override def equals(obj: Any): Boolean = obj match {
     case other: BitSeq => other.bits == bits && other.length == length
     case _ => false
   }
 
-  override val hashCode: Int = bits.hashCode
+  override def hashCode: Int = bits.hashCode
 }
 
 /** Factories for bit sequences. */
