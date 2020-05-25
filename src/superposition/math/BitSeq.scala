@@ -1,5 +1,7 @@
 package superposition.math
 
+import scala.collection.immutable.ArraySeq
+
 /** A sequence of bits.
   *
   * @param bits the bits in the sequence
@@ -21,14 +23,14 @@ final class BitSeq private(private val bits: Int, val length: Int) {
     * @param other the other bit sequence
     * @return the bitwise AND of the two bit sequences
     */
-  def &(other: BitSeq): BitSeq = new BitSeq(bits & other.bits, length max other.length)
+  def &(other: BitSeq): BitSeq = BitSeq(bits & other.bits, length max other.length)
 
   /** Returns the bitwise OR of two bit sequences. The length of the new sequence is the length of the longer sequence.
     *
     * @param other the other bit sequence
     * @return the bitwise OR of the two bit sequences
     */
-  def |(other: BitSeq): BitSeq = new BitSeq(bits | other.bits, length max other.length)
+  def |(other: BitSeq): BitSeq = BitSeq(bits | other.bits, length max other.length)
 
   /** Filters the sequence to contain only elements whose index corresponds to a 1 bit in the bit sequence.
     *
@@ -51,12 +53,29 @@ final class BitSeq private(private val bits: Int, val length: Int) {
 
 /** Factories for bit sequences. */
 object BitSeq {
+  /** A precomputed cache of small bit sequences. The index of the outer sequence is the length, and the index of the
+    * inner sequence is the bit mask.
+    */
+  private val cache: IndexedSeq[IndexedSeq[BitSeq]] = ArraySeq.tabulate(5) { length =>
+    ArraySeq.tabulate(1 << length)(new BitSeq(_, length))
+  }
+
   /** Converts a boolean sequence into a bit sequence.
     *
     * @param booleans the boolean sequence
     * @return the bit sequence
     */
-  def apply(booleans: Boolean*): BitSeq = new BitSeq(booleansToInt(booleans), booleans.length)
+  def apply(booleans: Boolean*): BitSeq = BitSeq(booleansToInt(booleans), booleans.length)
+
+  /** Converts a bit mask and length into a bit sequence.
+    *
+    * @param bits the bit mask
+    * @param length the length of the bit sequence
+    * @return the bit sequence
+    */
+  private def apply(bits: Int, length: Int): BitSeq =
+    if (length < cache.length) cache(length)(bits)
+    else new BitSeq(bits, length)
 
   /** Converts the boolean sequence to an integer.
     *
@@ -73,5 +92,5 @@ object BitSeq {
   }
 
   /** The empty bit sequence. */
-  val zero: BitSeq = BitSeq()
+  val empty: BitSeq = BitSeq()
 }

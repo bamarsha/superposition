@@ -130,7 +130,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
       entities
         .filter(Activator.mapper.has)
         .map(entity => BitSeq(Activator.mapper.get(entity).bits map bit: _*))
-        .fold(BitSeq.zero)(_ | _)
+        .fold(BitSeq.empty)(_ | _)
 
   /** Returns true in index idx if all cells have at least one |1⟩ activator in index idx
     *
