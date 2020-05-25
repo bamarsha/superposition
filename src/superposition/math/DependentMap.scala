@@ -6,7 +6,7 @@ import scala.collection.immutable.HashMap
   *
   * @tparam K the type of the key
   */
-final class DependentMap[K <: DependentKey] private(private val map: HashMap[K, Any]) {
+final class DependentMap[K <: DependentKey] private(private val map: HashMap[K, Any]) extends AnyVal {
   /** Returns the value associated with the key.
     *
     * @param key the key
@@ -51,13 +51,6 @@ final class DependentMap[K <: DependentKey] private(private val map: HashMap[K, 
   def removed(key: K): DependentMap[K] = new DependentMap(map.removed(key))
 
   override def toString: String = map.toString
-
-  override def hashCode: Int = map.hashCode
-
-  override def equals(that: Any): Boolean = that match {
-    case thatMap: DependentMap[_] => thatMap.map.equals(map)
-    case _ => super.equals(that)
-  }
 }
 
 /** Factories for dependent maps. */
