@@ -54,7 +54,7 @@ final class Laser(
 private object Laser {
   /** The animation for an inactive laser. */
   private val offAnimation: Animation[TextureRegion] =
-    new Animation(1f, new TextureRegion(new Texture(resolve("sprites/laser_off.png"))))
+    new Animation(0, new TextureRegion(new Texture(resolve("sprites/laser_off.png"))))
 
   /** The animation for an active laser. */
   private val onAnimation: Animation[TextureRegion] =

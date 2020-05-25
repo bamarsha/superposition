@@ -4,9 +4,13 @@ import cats.syntax.flatMap.toFlatMapOps
 import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode.LOOP_PINGPONG
+import com.badlogic.gdx.graphics.g2d.{Animation, TextureRegion}
+import com.badlogic.gdx.utils.{Array => GArray}
+import superposition.component.Animated.keepTime
+import superposition.component.Player.isWalking
 import superposition.component._
-import superposition.entity.Cat._
+import superposition.entity.Cat.{deadAnimation, standingAnimation, walkingAnimation}
 import superposition.game.ResourceResolver.resolve
 import superposition.math.Vector2
 
@@ -22,6 +26,16 @@ final class Cat(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) exte
     val absolutePosition = multiverse.allocateMeta((initialCell map (_.toDouble)) + Vector2(0.5, 0.5))
     val cell = multiverse.allocate("Position", initialCell)
 
+    val animation = alive.value map {
+      if (_)
+        if (isWalking) walkingAnimation
+        else standingAnimation
+      else deadAnimation
+    }
+    val animationTime = multiverse.allocateMeta(0f)
+    val lastAnimation = multiverse.allocateMeta[Option[Animation[_]]](None)
+    val frame = Animated.frame(animation, animationTime)
+
     add(new EntityId(id))
     add(new Player(alive))
     add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))
@@ -32,15 +46,24 @@ final class Cat(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) exte
         isAlive <- alive.value
         currentCell <- cell.value
       } yield (isAlive, currentCell)))
-    add(new SpriteView(alive.value map (if (_) aliveTexture else deadTexture)))
+    add(new SpriteView(frame))
+    add(new Animated(animation, animationTime, lastAnimation, keepTime))
   }
 }
 
-/** Contains the textures for Schrödinger's cat. */
+/** Contains the animations for Schrödinger's cat. */
 private object Cat {
-  /** The texture for an alive Schrödinger's cat. */
-  private val aliveTexture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/cat_alive.png")))
+  /** The frames in the walking animation. */
+  private val walkingFrames: Array[TextureRegion] =
+    Animated.frames(new Texture(resolve("sprites/cat_anim.png")), 32, 32, 3)
 
-  /** The texture for a dead Schrödinger's cat. */
-  private val deadTexture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/cat_dead.png")))
+  /** The animation for a standing Schrödinger's cat. */
+  private val standingAnimation: Animation[TextureRegion] = new Animation(0, GArray.`with`(walkingFrames(1)))
+
+  /** The animation for a walking Schrödinger's cat. */
+  private val walkingAnimation: Animation[TextureRegion] = new Animation(0.1f, new GArray(walkingFrames), LOOP_PINGPONG)
+
+  /** The animation for a dead Schrödinger's cat. */
+  private val deadAnimation: Animation[TextureRegion] =
+    new Animation(0, new TextureRegion(new Texture(resolve("sprites/cat_dead.png"))))
 }

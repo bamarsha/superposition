@@ -5,9 +5,9 @@ import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.{Engine, Entity, Family}
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
-import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Keys.SPACE
 import spire.implicits._
+import superposition.component.Player.walkingKeys
 import superposition.component._
 import superposition.entity.Level
 import superposition.math.QExpr.QExpr
@@ -46,14 +46,7 @@ final class PlayerInputSystem(level: () => Option[Level])
 /** Player settings and functions for performing player actions. */
 private object PlayerInputSystem {
   /** The speed of the player in cells per second. */
-  private val Speed: Float = 3f
-
-  /** A map from key code to unit vector representing the direction of movement. */
-  private val WalkKeys: Map[Int, Vector2[Double]] = Map(
-    Keys.W -> Vector2(0, 1),
-    Keys.A -> Vector2(-1, 0),
-    Keys.S -> Vector2(0, -1),
-    Keys.D -> Vector2(1, 0))
+  private val speed: Float = 3f
 
   /** Returns a gate that walks the player and all carried entities to another cell.
     *
@@ -107,12 +100,12 @@ private object PlayerInputSystem {
     * @return the difference in player positions
     */
   private def deltaPosition(deltaTime: Float): Vector2[Double] = {
-    val delta = WalkKeys.foldLeft(Vector2(0d, 0d)) {
+    val delta = walkingKeys.foldLeft(Vector2(0.0, 0.0)) {
       case (delta, (key, direction)) =>
         if (input.isKeyPressed(key)) delta + direction
         else delta
     }
-    if (delta.length == 0) delta else delta.withLength(Speed * deltaTime)
+    if (delta.length == 0) delta else delta.withLength(speed * deltaTime)
   }
 
   /** Walks the player and all carried entities based on input.

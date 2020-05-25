@@ -5,7 +5,6 @@ import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.{Component, ComponentMapper}
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.{Animation, TextureRegion}
-import superposition.component.Animated.resetTime
 import superposition.math.MetaId
 import superposition.math.QExpr.QExpr
 
@@ -23,7 +22,7 @@ final class Animated(
     val animation: QExpr[Animation[_]],
     val time: MetaId[Float],
     val lastAnimation: MetaId[Option[Animation[_]]],
-    val timeTransition: (Animation[_], Animation[_], Float) => Float = resetTime)
+    val timeTransition: (Animation[_], Animation[_], Float) => Float)
   extends Component
 
 /** Contains the component mapper for animation components. */
