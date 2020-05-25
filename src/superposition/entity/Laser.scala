@@ -60,6 +60,6 @@ private object Laser {
   private val onAnimation: Animation[TextureRegion] =
     new Animation(
       0.1f,
-      new GArray(Animated.frames(new Texture(resolve("sprites/laser_anim.png")), 32, 32, 4)),
+      new GArray(Animated.frames(new Texture(resolve("sprites/laser_anim.png")), 32, 32)),
       LOOP)
 }

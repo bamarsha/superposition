@@ -48,7 +48,7 @@ private object Lock {
     */
   private def frames(codeLength: Int): GArray[TextureRegion] =
     new GArray(Animated.frames(
-      new Texture(resolve(s"sprites/lock_${codeLength}_anim.png")), 16, 16, 5))
+      new Texture(resolve(s"sprites/lock_${codeLength}_anim.png")), 16, 16))
 
   /** Returns the unlocking animation.
     *

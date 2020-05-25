@@ -47,11 +47,10 @@ object Animated {
     * @param texture the sprite sheet texture
     * @param frameWidth the width of each animation frame
     * @param frameHeight the height of each animation frame
-    * @param frames the number of frames in the animation
     * @return the animation frame textures
     */
-  def frames(texture: Texture, frameWidth: Int, frameHeight: Int, frames: Int): Array[TextureRegion] =
-    TextureRegion.split(texture, frameWidth, frameHeight).flatten.take(frames)
+  def frames(texture: Texture, frameWidth: Int, frameHeight: Int): Array[TextureRegion] =
+    TextureRegion.split(texture, frameWidth, frameHeight).flatten
 
   /** A time transition function that resets the animation time to zero.
     *

@@ -55,7 +55,7 @@ final class Cat(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) exte
 private object Cat {
   /** The frames in the walking animation. */
   private val walkingFrames: Array[TextureRegion] =
-    Animated.frames(new Texture(resolve("sprites/cat_anim.png")), 32, 32, 3)
+    Animated.frames(new Texture(resolve("sprites/cat_anim.png")), 32, 32)
 
   /** The animation for a standing Schrödinger's cat. */
   private val standingAnimation: Animation[TextureRegion] = new Animation(0, GArray.`with`(walkingFrames(1)))

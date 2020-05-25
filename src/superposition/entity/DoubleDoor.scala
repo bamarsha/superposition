@@ -38,9 +38,8 @@ final class DoubleDoor(multiverse: Multiverse, cell: Vector2[Int], control: QExp
 /** Contains the animations for double doors. */
 private object DoubleDoor {
   /** The frames in the door animation. */
-  private val frames: GArray[TextureRegion] =
-    new GArray(Animated.frames(
-      new Texture(resolve("sprites/door_anim.png")), 32, 16, 14))
+  private val frames: GArray[TextureRegion] = new GArray(
+    Animated.frames(new Texture(resolve("sprites/door_anim.png")), 32, 16).take(14))
 
   /** The door opening animation. */
   private val openAnimation: Animation[TextureRegion] = new Animation(0.02f, frames)
