@@ -16,16 +16,16 @@ import scala.Function.const
 final class AnimationSystem(level: () => Option[Level]) extends IteratingSystem(Family.all(classOf[Animated]).get) {
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
     val multiverse = level().get.multiverse
-    val animation = Animated.mapper.get(entity)
-    multiverse.updateMetaWith(animation.time) { time =>
+    val animated = Animated.mapper.get(entity)
+    multiverse.updateMetaWith(animated.time) { time =>
       for {
-        currentAnimation <- animation.animation
-        lastAnimation <- animation.lastAnimation.value
+        currentAnimation <- animated.animation
+        lastAnimation <- animated.lastAnimation.value
       } yield lastAnimation match {
         case Some(lastAnimation) if currentAnimation != lastAnimation => 0
         case _ => time + deltaTime
       }
     }
-    multiverse.updateMetaWith(animation.lastAnimation)(const(animation.animation map (Some(_))))
+    multiverse.updateMetaWith(animated.lastAnimation)(const(animated.animation map (Some(_))))
   }
 }
