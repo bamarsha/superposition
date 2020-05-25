@@ -1,9 +1,12 @@
 package superposition.entity
 
 import cats.syntax.applicative.catsSyntaxApplicativeId
+import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode.LOOP
+import com.badlogic.gdx.graphics.g2d.{Animation, TextureRegion}
+import com.badlogic.gdx.utils.{Array => GArray}
 import superposition.component._
 import superposition.entity.Laser._
 import superposition.game.ResourceResolver.resolve
@@ -25,22 +28,37 @@ final class Laser(
     direction: Direction,
     control: QExpr[BitSeq])
   extends Entity {
+  locally {
+    val cells = direction match {
+      case Direction.Up => Set(cell + Vector2(0, 1), cell, cell + Vector2(1, 0), cell + Vector2(1, 1))
+      case Direction.Right => Set(cell + Vector2(1, 0), cell, cell + Vector2(0, 1), cell + Vector2(1, 1))
+      case _ => Set(cell, cell + Vector2(1, 0), cell + Vector2(0, 1), cell + Vector2(1, 1))
+    }
 
-  val cells: Set[Vector2[Int]] = direction match {
-    case Direction.Up => Set(cell + Vector2(0, 1), cell, cell + Vector2(1, 0), cell + Vector2(1, 1))
-    case Direction.Right => Set(cell + Vector2(1, 0), cell, cell + Vector2(0, 1), cell + Vector2(1, 1))
-    case _ => Set(cell, cell + Vector2(1, 0), cell + Vector2(0, 1), cell + Vector2(1, 1))
+    val animation = control map (bits => if (bits.any) onAnimation else offAnimation)
+    val animationTime = multiverse.allocateMeta(0f)
+    val lastAnimation = multiverse.allocateMeta[Option[Animation[_]]](None)
+    val frame = Animated.frame(animation, animationTime)
+
+    add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(1, 1), cells))
+    add(new Collider(cells.pure[QExpr]))
+    add(new Beam(multiverse, gate, direction, control))
+    add(new Renderable(1, frame))
+    add(new SpriteView(frame, Vector2(2.0, 2.0).pure[QExpr]))
+    add(new Animated(animation, animationTime, lastAnimation))
   }
-
-  add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(1, 1), cells))
-  add(new Collider(cells.pure[QExpr]))
-  add(new Beam(multiverse, gate, direction, control))
-  add(new Renderable(1, control))
-  add(new SpriteView(offTexture.pure[QExpr], Vector2(2.0, 2.0).pure[QExpr]))
 }
 
-/** Contains the textures for lasers. */
+/** Contains the animations for lasers. */
 private object Laser {
-  /** The texture for a laser. */
-  private val offTexture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/laser_off.png")))
+  /** The animation for an inactive laser. */
+  private val offAnimation: Animation[TextureRegion] =
+    new Animation(0.2f, new TextureRegion(new Texture(resolve("sprites/laser_off.png"))))
+
+  /** The animation for an active laser. */
+  private val onAnimation: Animation[TextureRegion] =
+    new Animation(
+      0.2f,
+      new GArray(Animated.frames(new Texture(resolve("sprites/laser_anim.png")), 32, 32, 3)),
+      LOOP)
 }
