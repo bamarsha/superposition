@@ -129,9 +129,8 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     } yield
       entities
         .filter(Activator.mapper.has)
-        .map(Activator.mapper.get(_).bits map bit)
-        .map(BitSeq(_: _*))
-        .fold(BitSeq())(_ or _)
+        .map(entity => BitSeq(Activator.mapper.get(entity).bits map bit: _*))
+        .fold(BitSeq.zero)(_ | _)
 
   /** Returns true in index idx if all cells have at least one |1⟩ activator in index idx
     *
@@ -140,7 +139,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     */
   def allActivated(cells: Iterable[Vector2[Int]]): QExpr[BitSeq] =
     if (cells.isEmpty) BitSeq().pure[QExpr]
-    else (cells map activation).toList.sequence map (_ reduce (_ and _))
+    else (cells map activation).toList.sequence map (_ reduce (_ & _))
 
   /** Returns true if every entity has a valid position in the universe.
     *

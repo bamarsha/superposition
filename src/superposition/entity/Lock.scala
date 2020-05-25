@@ -25,7 +25,7 @@ final class Lock(id: Int, multiverse: Multiverse, cell: Vector2[Int], code: Seq[
   locally {
     val unlocking = unlockAnimation(code.length)
     val locking = lockAnimation(code.length)
-    val animation = control map (bits => if (bits.equals(code)) unlocking else locking)
+    val animation = control map (bits => if (bits == BitSeq(code: _*)) unlocking else locking)
     val animationTime = multiverse.allocateMeta(0f)
     val lastAnimation = multiverse.allocateMeta[Option[Animation[_]]](None)
     val frame = Animated.frame(animation, animationTime)

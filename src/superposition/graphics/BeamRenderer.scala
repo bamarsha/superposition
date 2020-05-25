@@ -55,10 +55,9 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer with Dispo
       val opacity = min(fadeDuration, beamDuration + fadeDuration - universe.meta(beam.elapsedTime)) / fadeDuration
       gl.glEnable(GL_BLEND)
       shapeRenderer.begin(Filled)
-      val numBeams = beamSeq.get.length
-      val beamWidth = singleWidth / numBeams
-      val beamOffset = (i: Int) => ((i + .5f) / numBeams - .5f) * totalWidth + .5f - beamWidth / 2
-      for (i <- Seq.range(0, numBeams)) if (beamSeq.get(i)) {
+      val beamWidth = singleWidth / beamSeq.length
+      val beamOffset = (i: Int) => ((i + .5f) / beamSeq.length - .5f) * totalWidth + .5f - beamWidth / 2
+      for (i <- Seq.range(0, beamSeq.length)) if (beamSeq(i)) {
         shapeRenderer.setColor(new Color(1, 1, 1, opacity).fromHsv(i * huePerBeam, 1, 1).mixed(renderInfo.color))
         beam.direction match {
           case Left | Right =>
