@@ -4,12 +4,14 @@ import cats.syntax.applicative.catsSyntaxApplicativeId
 import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode.REVERSED
+import com.badlogic.gdx.graphics.g2d.{Animation, TextureRegion}
+import com.badlogic.gdx.utils.{Array => GArray}
 import superposition.component._
 import superposition.entity.DoubleDoor._
 import superposition.game.ResourceResolver.resolve
 import superposition.math.QExpr.QExpr
 import superposition.math.Vector2
-
 
 /** A door blocks movement unless its control expression is true.
   *
@@ -18,17 +20,29 @@ import superposition.math.Vector2
   * @param control the control for the door
   */
 final class DoubleDoor(multiverse: Multiverse, cell: Vector2[Int], control: QExpr[Boolean]) extends Entity {
-  add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(1.0, 0.5)))
-  add(new Collider(control map (if (_) Set.empty else Set(cell, cell + Vector2(1, 0)))))
-  add(new Renderable(1, control))
-  add(new SpriteView(closedTexture.pure[QExpr], control map (if (_) Vector2(0.0, 0.0) else Vector2(2.0, 1.0))))
+  locally {
+    val animation = control map (if (_) openAnimation else closedAnimation)
+    val animationTime = multiverse.allocateMeta(0f)
+    val lastAnimation = multiverse.allocateMeta[Option[Animation[_]]](None)
+    val frame = Animated.frame(animation, animationTime)
+
+    add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(1.0, 0.5)))
+    add(new Collider(control map (if (_) Set.empty else Set(cell, cell + Vector2(1, 0)))))
+    add(new Renderable(1, frame))
+    add(new SpriteView(frame, Vector2(2.0, 1.0).pure[QExpr]))
+    add(new Animated(animation, animationTime, lastAnimation))
+  }
 }
 
-/** Contains the sprite textures for doors. */
+/** Contains the textures for double doors. */
 private object DoubleDoor {
-  /** The sprite texture for a closed door. */
-  private val closedTexture = new Texture(resolve("sprites/door.png"))
+  /** The frames in the door animation. */
+  private val frames: Array[TextureRegion] =
+    Animated.frames(new Texture(resolve("sprites/door_anim.png")), 32, 16, 14)
+
+  /** The door opening animation. */
+  private val openAnimation: Animation[TextureRegion] = new Animation(0.1f, new GArray(frames))
+
+  /** The door closing animation. */
+  private val closedAnimation: Animation[TextureRegion] = new Animation(0.1f, new GArray(frames), REVERSED)
 }
-
-
-

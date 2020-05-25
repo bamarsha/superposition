@@ -1,15 +1,31 @@
 package superposition.system
 
+import cats.syntax.flatMap.toFlatMapOps
+import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.ashley.systems.IteratingSystem
-import superposition.component.{Animation, SpriteView}
+import superposition.component.Animated
+import superposition.entity.Level
 
-/** Plays the animation for all entities. */
-final class AnimationSystem extends IteratingSystem(Family.all(classOf[Animation], classOf[SpriteView]).get) {
+import scala.Function.const
+
+/** Updates animation timers.
+  *
+  * @param level a function that returns the current level
+  */
+final class AnimationSystem(level: () => Option[Level]) extends IteratingSystem(Family.all(classOf[Animated]).get) {
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
-    val animation = Animation.mapper.get(entity)
-    val spriteView = SpriteView.mapper.get(entity)
-    animation.time += deltaTime
-    spriteView.texture = animation.animation.getKeyFrame(animation.time)
+    val multiverse = level().get.multiverse
+    val animation = Animated.mapper.get(entity)
+    multiverse.updateMetaWith(animation.time) { time =>
+      for {
+        currentAnimation <- animation.animation
+        lastAnimation <- animation.lastAnimation.value
+      } yield lastAnimation match {
+        case Some(lastAnimation) if currentAnimation != lastAnimation => 0
+        case _ => time + deltaTime
+      }
+    }
+    multiverse.updateMetaWith(animation.lastAnimation)(const(animation.animation map (Some(_))))
   }
 }

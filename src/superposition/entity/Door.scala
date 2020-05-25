@@ -3,6 +3,7 @@ package superposition.entity
 import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import superposition.component._
 import superposition.entity.Door.{closedTexture, openTexture}
 import superposition.game.ResourceResolver.resolve
@@ -22,11 +23,11 @@ final class Door(multiverse: Multiverse, cell: Vector2[Int], control: QExpr[Bool
   add(new SpriteView(control map (if (_) openTexture else closedTexture)))
 }
 
-/** Contains the sprite textures for doors. */
+/** Contains the textures for doors. */
 private object Door {
-  /** The sprite texture for a closed door. */
-  private val closedTexture = new Texture(resolve("sprites/door_closed.png"))
+  /** The texture for a closed door. */
+  private val closedTexture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/door_closed.png")))
 
-  /** The sprite texture for an open door. */
-  private val openTexture = new Texture(resolve("sprites/door_open.png"))
+  /** The texture for an open door. */
+  private val openTexture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/door_open.png")))
 }

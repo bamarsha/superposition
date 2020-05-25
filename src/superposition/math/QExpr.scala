@@ -46,7 +46,7 @@ object QExpr {
         @scala.annotation.tailrec
         def repeat(a: A)(universe: Universe): B = f(a)(universe) match {
           case Left(x) => repeat(x)(universe)
-          case Right(y) => pure(y)(universe)
+          case Right(x) => pure(x)(universe)
         }
 
         QExpr(repeat(a))
@@ -87,7 +87,15 @@ object QExpr {
       * @tparam A the value type
       * @return the quantum expression for the value of the state ID
       */
-    def of[A](id: StateId[A]): QExpr[A] = QExpr(_.state(id))
+    def ofState[A](id: StateId[A]): QExpr[A] = QExpr(_.state(id))
+
+    /** Returns the quantum expression for the value of the metadata ID.
+      *
+      * @param id the metadata ID
+      * @tparam A the value type
+      * @return the quantum expression for the value of the metadata ID
+      */
+    def ofMeta[A](id: MetaId[A]): QExpr[A] = QExpr(_.meta(id))
 
     /** Prepares a function that returns a quantum expression for being applied within the context of another quantum
       * expression.

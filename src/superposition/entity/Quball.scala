@@ -6,6 +6,7 @@ import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import superposition.component._
 import superposition.entity.Quball._
 import superposition.game.ResourceResolver.resolve
@@ -44,8 +45,8 @@ final class Quball(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) e
   }
 }
 
-/** Contains the sprite texture for quballs. */
+/** Contains the texture for quballs. */
 private object Quball {
-  /** The sprite texture for a quball. */
-  private val texture = new Texture(resolve("sprites/quball_1.png"))
+  /** The texture for a quball. */
+  private val texture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/quball_1.png")))
 }

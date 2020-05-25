@@ -3,6 +3,7 @@ package superposition.entity
 import cats.syntax.applicative.catsSyntaxApplicativeId
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import superposition.component._
 import superposition.entity.Laser._
 import superposition.game.ResourceResolver.resolve
@@ -38,8 +39,8 @@ final class Laser(
   add(new SpriteView(offTexture.pure[QExpr], Vector2(2.0, 2.0).pure[QExpr]))
 }
 
-/** Contains the sprite textures for lasers. */
+/** Contains the textures for lasers. */
 private object Laser {
-  /** The sprite texture for a laser. */
-  private val offTexture = new Texture(resolve("sprites/laser_off.png"))
+  /** The texture for a laser. */
+  private val offTexture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/laser_off.png")))
 }

@@ -4,6 +4,7 @@ import cats.syntax.flatMap.toFlatMapOps
 import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import superposition.component._
 import superposition.entity.Cat._
 import superposition.game.ResourceResolver.resolve
@@ -35,9 +36,11 @@ final class Cat(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) exte
   }
 }
 
-/** Contains the sprite texture for Schrödinger's cat. */
+/** Contains the textures for Schrödinger's cat. */
 private object Cat {
-  /** The sprite texture for Schrödinger's cat. */
-  private val aliveTexture: Texture = new Texture(resolve("sprites/cat_alive.png"))
-  private val deadTexture: Texture = new Texture(resolve("sprites/cat_dead.png"))
+  /** The texture for an alive Schrödinger's cat. */
+  private val aliveTexture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/cat_alive.png")))
+
+  /** The texture for a dead Schrödinger's cat. */
+  private val deadTexture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/cat_dead.png")))
 }
