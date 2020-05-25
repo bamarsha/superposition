@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode.REVERSED
 import com.badlogic.gdx.graphics.g2d.{Animation, TextureRegion}
 import com.badlogic.gdx.utils.{Array => GArray}
+import superposition.component.Animated.invertTime
 import superposition.component._
 import superposition.entity.DoubleDoor._
 import superposition.game.ResourceResolver.resolve
@@ -30,19 +31,23 @@ final class DoubleDoor(multiverse: Multiverse, cell: Vector2[Int], control: QExp
     add(new Collider(control map (if (_) Set.empty else Set(cell, cell + Vector2(1, 0)))))
     add(new Renderable(1, frame))
     add(new SpriteView(frame, Vector2(2.0, 1.0).pure[QExpr]))
-    add(new Animated(animation, animationTime, lastAnimation))
+    add(new Animated(animation, animationTime, lastAnimation, invertTime))
   }
 }
 
 /** Contains the textures for double doors. */
 private object DoubleDoor {
   /** The frames in the door animation. */
-  private val frames: Array[TextureRegion] =
-    Animated.frames(new Texture(resolve("sprites/door_anim.png")), 32, 16, 14)
+  private val frames: GArray[TextureRegion] =
+    new GArray(Animated.frames(
+      new Texture(resolve("sprites/door_anim.png")),
+      32,
+      16,
+      14))
 
   /** The door opening animation. */
-  private val openAnimation: Animation[TextureRegion] = new Animation(0.1f, new GArray(frames))
+  private val openAnimation: Animation[TextureRegion] = new Animation(0.02f, frames)
 
   /** The door closing animation. */
-  private val closedAnimation: Animation[TextureRegion] = new Animation(0.1f, new GArray(frames), REVERSED)
+  private val closedAnimation: Animation[TextureRegion] = new Animation(0.02f, frames, REVERSED)
 }

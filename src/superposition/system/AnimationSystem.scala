@@ -22,7 +22,8 @@ final class AnimationSystem(level: () => Option[Level]) extends IteratingSystem(
         currentAnimation <- animated.animation
         lastAnimation <- animated.lastAnimation.value
       } yield lastAnimation match {
-        case Some(lastAnimation) if currentAnimation != lastAnimation => 0
+        case Some(lastAnimation) if currentAnimation != lastAnimation =>
+          animated.timeTransition(lastAnimation, currentAnimation, time + deltaTime)
         case _ => time + deltaTime
       }
     }
