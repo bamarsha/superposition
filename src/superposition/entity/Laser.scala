@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode.LOOP
 import com.badlogic.gdx.graphics.g2d.{Animation, TextureRegion}
 import com.badlogic.gdx.utils.{Array => GArray}
+import superposition.component.Animated.keepTime
 import superposition.component._
 import superposition.entity.Laser._
 import superposition.game.ResourceResolver.resolve
@@ -45,7 +46,7 @@ final class Laser(
     add(new Beam(multiverse, gate, direction, control))
     add(new Renderable(1, frame))
     add(new SpriteView(frame, Vector2(2.0, 2.0).pure[QExpr]))
-    add(new Animated(animation, animationTime, lastAnimation, Animated.noChange))
+    add(new Animated(animation, animationTime, lastAnimation, keepTime))
   }
 }
 
@@ -53,7 +54,7 @@ final class Laser(
 private object Laser {
   /** The animation for an inactive laser. */
   private val offAnimation: Animation[TextureRegion] =
-    new Animation(0.2f, new TextureRegion(new Texture(resolve("sprites/laser_off.png"))))
+    new Animation(1f, new TextureRegion(new Texture(resolve("sprites/laser_off.png"))))
 
   /** The animation for an active laser. */
   private val onAnimation: Animation[TextureRegion] =
