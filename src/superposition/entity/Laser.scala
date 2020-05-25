@@ -45,7 +45,7 @@ final class Laser(
     add(new Beam(multiverse, gate, direction, control))
     add(new Renderable(1, frame))
     add(new SpriteView(frame, Vector2(2.0, 2.0).pure[QExpr]))
-    add(new Animated(animation, animationTime, lastAnimation))
+    add(new Animated(animation, animationTime, lastAnimation, Animated.noChange))
   }
 }
 
@@ -58,7 +58,7 @@ private object Laser {
   /** The animation for an active laser. */
   private val onAnimation: Animation[TextureRegion] =
     new Animation(
-      0.2f,
-      new GArray(Animated.frames(new Texture(resolve("sprites/laser_anim.png")), 32, 32, 3)),
+      0.1f,
+      new GArray(Animated.frames(new Texture(resolve("sprites/laser_anim.png")), 32, 32, 4)),
       LOOP)
 }

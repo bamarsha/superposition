@@ -56,7 +56,7 @@ private object Lock {
     * @return the unlocking animation
     */
   private def unlockAnimation(codeLength: Int): Animation[TextureRegion] =
-    new Animation(0.02f, frames(codeLength))
+    new Animation(0.05f, frames(codeLength))
 
   /** Returns the locking animation.
     *
@@ -64,5 +64,5 @@ private object Lock {
     * @return the locking animation
     */
   private def lockAnimation(codeLength: Int): Animation[TextureRegion] =
-    new Animation(0.02f, frames(codeLength), REVERSED)
+    new Animation(0.05f, frames(codeLength), REVERSED)
 }

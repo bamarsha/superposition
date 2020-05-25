@@ -63,6 +63,15 @@ object Animated {
     */
   def resetTime(previous: Animation[_], next: Animation[_], time: Float): Float = 0
 
+  /** A time transition function that doesn't change the animation time.
+    *
+    * @param previous the previous animation
+    * @param next the next animation
+    * @param time the previous animation time
+    * @return the new animation time
+    */
+  def noChange(previous: Animation[_], next: Animation[_], time: Float): Float = time
+
   /** A time transition function that swaps the time remaining and the time elapsed for the previous animation.
     *
     * This is useful when reversing the direction of an animation. Requires that the previous and next animations have
