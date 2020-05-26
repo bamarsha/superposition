@@ -45,13 +45,16 @@ final class Laser(
     add(new Collider(cells.pure[QExpr]))
     add(new Beam(multiverse, gate, direction, control))
     add(new Renderable(1, frame))
-    add(new SpriteView(frame, Vector2(2.0, 2.0).pure[QExpr]))
+    add(new SpriteView(frame, baseTexture, scale = Vector2(2.0, 2.0).pure[QExpr]))
     add(new Animated(animation, animationTime, lastAnimation, keepTime))
   }
 }
 
 /** Contains the animations for lasers. */
 private object Laser {
+  /** The base texture for lasers. */
+  private val baseTexture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/laser_base.png")))
+
   /** The animation for an inactive laser. */
   private val offAnimation: Animation[TextureRegion] =
     new Animation(0, new TextureRegion(new Texture(resolve("sprites/laser_off.png"))))

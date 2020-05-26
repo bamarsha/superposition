@@ -30,7 +30,7 @@ final class DoubleDoor(multiverse: Multiverse, cell: Vector2[Int], control: QExp
     add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(1.0, 0.5)))
     add(new Collider(control map (if (_) Set.empty else Set(cell, cell + Vector2(1, 0)))))
     add(new Renderable(1, frame))
-    add(new SpriteView(frame, Vector2(2.0, 1.0).pure[QExpr]))
+    add(new SpriteView(frame, scale = Vector2(2.0, 1.0).pure[QExpr]))
     add(new Animated(animation, animationTime, lastAnimation, invertTime))
   }
 }
