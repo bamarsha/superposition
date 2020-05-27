@@ -1,12 +1,13 @@
 package superposition.math
 
-import scala.collection.immutable.ListMap
+import scala.collection.mutable
 
-/** A map in which the type of the value depends on the key.
+/** A mutable map in which the type of the value depends on the key.
   *
   * @tparam K the type of the key
   */
-final class DependentMap[K <: DependentKey] private(private val map: Map[K, Any]) extends AnyVal {
+final class MutableDependentMap[K <: DependentKey] private(map: mutable.Map[K, Any])
+  extends mutable.Cloneable[MutableDependentMap[K]] {
   /** Returns the value associated with the key.
     *
     * @param key the key
@@ -26,33 +27,32 @@ final class DependentMap[K <: DependentKey] private(private val map: Map[K, Any]
     *
     * @param key the key
     * @param value the new value associated with the key
-    * @return the updated map
     */
-  def updated(key: K)(value: key.Value): DependentMap[K] = new DependentMap(map.updated(key, value))
+  def update(key: K)(value: key.Value): Unit = map.update(key, value)
 
   /** Maps the value associated with the key to a new value.
     *
     * @param key the key
     * @param updater a function that maps the value of the key
-    * @return the updated map
     */
-  def updatedWith(key: K)(updater: key.Value => key.Value): DependentMap[K] = updated(key)(updater(this (key)))
+  def updateWith(key: K)(updater: key.Value => key.Value): Unit = update(key)(updater(this (key)))
 
   /** Removes the key.
     *
     * @param key the key to remove
-    * @return the updated map
     */
-  def removed(key: K): DependentMap[K] = new DependentMap(map.removed(key))
+  def removed(key: K): Unit = map.remove(key)
+
+  override def clone: MutableDependentMap[K] = new MutableDependentMap(map.clone)
 
   override def toString: String = map.toString
 }
 
-/** Factories for dependent maps. */
-object DependentMap {
-  /** An empty dependent map.
+/** Factories for mutable dependent maps. */
+object MutableDependentMap {
+  /** A new empty mutable dependent map.
     *
     * @tparam K the type of the key.
     */
-  def empty[K <: DependentKey]: DependentMap[K] = new DependentMap(new ListMap)
+  def empty[K <: DependentKey]: MutableDependentMap[K] = new MutableDependentMap(new mutable.HashMap)
 }

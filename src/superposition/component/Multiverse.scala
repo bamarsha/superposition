@@ -65,7 +65,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     */
   def allocateMeta[A](initialValue: A): MetaId[A] = {
     val id = new MetaId[A]
-    _universes = _universes map (_.updatedMeta(id)(initialValue))
+    _universes.foreach(_.meta.update(id)(initialValue))
     id
   }
 
@@ -75,7 +75,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     * @param updater a function that receives the metadata's value returns the new value
     */
   def updateMetaWith(id: MetaId[_])(updater: id.Value => QExpr[id.Value]): Unit =
-    _universes = _universes map (universe => universe.updatedMetaWith(id)(updater(_)(universe)))
+    _universes.foreach(universe => universe.meta.updateWith(id)(updater(_)(universe)))
 
   /** Applies a gate. If the gate produces any universe that is in an invalid state, no changes are made.
     *
