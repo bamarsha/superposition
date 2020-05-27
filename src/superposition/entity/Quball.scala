@@ -1,7 +1,7 @@
 package superposition.entity
 
+import cats.Apply
 import cats.syntax.applicative.catsSyntaxApplicativeId
-import cats.syntax.flatMap.toFlatMapOps
 import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color.WHITE
@@ -31,13 +31,7 @@ final class Quball(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) e
     add(new PrimaryBit(Seq(onOff)))
     add(new Activator(Seq(onOff)))
     add(new Carriable(carried))
-    add(new Renderable(
-      1,
-      for {
-        onOffValue <- onOff.value
-        carriedValue <- carried.value
-        cellValue <- cell.value
-      } yield (onOffValue, carriedValue, cellValue)))
+    add(new Renderable(1, Apply[QExpr].map3(onOff.value, carried.value, cell.value)((_, _, _))))
     add(new SpriteView(
       texture = texture.pure[QExpr],
       scale = carried.value map (if (_) Vector2(0.5, 0.5) else Vector2(0.75, 0.75)),

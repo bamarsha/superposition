@@ -1,7 +1,6 @@
 package superposition.component
 
-import cats.syntax.flatMap.toFlatMapOps
-import cats.syntax.functor.toFunctorOps
+import cats.Apply
 import com.badlogic.ashley.core.{Component, ComponentMapper}
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.{Animation, TextureRegion}
@@ -37,10 +36,7 @@ object Animated {
     * @return the texture region for the current frame
     */
   def frame(animation: QExpr[Animation[TextureRegion]], time: MetaId[Float]): QExpr[TextureRegion] =
-    for {
-      currentAnimation <- animation
-      currentTime <- time.value
-    } yield currentAnimation.getKeyFrame(currentTime)
+    Apply[QExpr].map2(animation, time.value)(_.getKeyFrame(_))
 
   /** Splits a sprite sheet into a sequence of animation frames.
     *

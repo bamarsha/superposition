@@ -39,6 +39,14 @@ object QExpr {
     implicit object QExprMonad extends Monad[QExpr] {
       override def pure[A](x: A): QExpr[A] = QExpr(const(x))
 
+      override def map[A, B](expr: QExpr[A])(f: A => B): QExpr[B] = QExpr(universe => f(expr(universe)))
+
+      override def map2[A, B, C](expr1: QExpr[A], expr2: QExpr[B])(f: (A, B) => C): QExpr[C] =
+        QExpr(universe => f(expr1(universe), expr2(universe)))
+
+      override def map3[A, B, C, D](expr1: QExpr[A], expr2: QExpr[B], expr3: QExpr[C])(f: (A, B, C) => D): QExpr[D] =
+        QExpr(universe => f(expr1(universe), expr2(universe), expr3(universe)))
+
       override def flatMap[A, B](expr: QExpr[A])(f: A => QExpr[B]): QExpr[B] =
         QExpr(universe => f(expr(universe))(universe))
 
