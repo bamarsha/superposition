@@ -3,9 +3,17 @@ version := "0.2-SNAPSHOT"
 
 ThisBuild / scalaVersion := "2.13.2"
 Compile / scalacOptions ++= Seq(
-  "-Xsource:3", "-Ymacro-annotations", "-deprecation", "-opt:l:method", "-opt:l:inline", "-opt-inline-from:**")
+  "-Xsource:3",
+  "-Ymacro-annotations",
+  "-opt:l:method",
+  "-opt:l:inline",
+  "-opt-inline-from:**",
+  "-feature",
+  "-deprecation")
 Compile / scalaSource := baseDirectory.value / "src"
 Compile / resourceDirectory := baseDirectory.value / "resources"
+
+resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
 libraryDependencies += "com.badlogicgames.ashley" % "ashley" % "1.7.3"
 libraryDependencies ++= {
@@ -25,5 +33,3 @@ assemblyMergeStrategy in assembly := {
   case PathList("META-INF", "versions", "9", "module-info.class") => MergeStrategy.first
   case path => (assemblyMergeStrategy in assembly).value(path)
 }
-
-resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
