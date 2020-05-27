@@ -28,7 +28,15 @@ object QExpr {
     /** Memoizes the result of the expression based on the quantum state of the universe. */
     def memoized: QExpr[A] = {
       val cache = new mutable.WeakHashMap[DependentMap[StateId[_]], A]
-      QExpr(universe => cache.getOrElseUpdate(universe.state, f(universe)))
+      QExpr { universe =>
+        cache.underlying.get(universe.state) match {
+          case null =>
+            val result = f(universe)
+            cache(universe.state) = result
+            result
+          case result => result
+        }
+      }
     }
   }
 
