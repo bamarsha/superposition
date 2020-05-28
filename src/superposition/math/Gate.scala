@@ -150,7 +150,10 @@ object Gate {
     }
   }
 
-  val Phase: Gate[Complex] = Gate(z => Unitary(u => NonEmptyList.of(u * z), Phase(z.conjugate)))
+  val Phase: Gate[Complex] = Gate(z => new Unitary {
+    override def apply(universe: Universe): NonEmptyList[Universe] = NonEmptyList.of(universe * z)
+    override def adjoint: Unitary = Phase(z.conjugate)
+  })
 
   val Rz: Gate[(StateId[Boolean], Double)] = Phase
     .contramap[(StateId[Boolean], Double)] { case (_, theta) => Complex.polar(1, theta) }
