@@ -32,15 +32,14 @@ object Unitary {
       universes flatMap (unitary(_).toList)
 
     /** The product of this unitary with another. */
-    def *(unitary2: Unitary): Unitary = Unitary(
-      universe => unitary.apply(universe) flatMap unitary2.apply,
-      unitary2.adjoint * unitary.adjoint)
+    def *(unitary2: Unitary): Unitary = new Unitary {
+      override def apply(universe: Universe): NonEmptyList[Universe] = unitary.apply(universe) flatMap unitary2.apply
+      override def adjoint: Unitary = unitary2.adjoint * unitary.adjoint
+    }
   }
 
-  def apply(f: Universe => NonEmptyList[Universe], g: => Unitary): Unitary = new Unitary {
-    override def apply(universe: Universe): NonEmptyList[Universe] = f(universe)
-    override def adjoint: Unitary = g
+  val identity: Unitary = new Unitary {
+    override def apply(universe: Universe): NonEmptyList[Universe] = NonEmptyList.of(universe)
+    override def adjoint: Unitary = identity
   }
-
-  val identity: Unitary = Unitary(NonEmptyList.one, identity)
 }

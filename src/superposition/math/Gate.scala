@@ -69,11 +69,14 @@ object Gate {
       * @return the new gate
       */
     def onQExpr: Gate[QExpr[A]] = Gate(
-      value => Unitary(universe => {
-        val newUniverses = gate(value(universe))(universe)
-        assert(newUniverses forall (value(_) == value(universe)))
-        newUniverses
-      }, gate.adjoint.onQExpr(value)))
+      value => new Unitary {
+        override def apply(universe: Universe): NonEmptyList[Universe] = {
+          val newUniverses = gate(value(universe))(universe)
+          assert(newUniverses forall (value(_) == value(universe)))
+          newUniverses
+        }
+        override def adjoint: Unitary = gate.adjoint.onQExpr(value)
+      })
 
     // ---------- Helper ops ----------
 
@@ -125,19 +128,25 @@ object Gate {
     def filter(predicate: A => Boolean): Gate[A] = flatMap(List(_) filter predicate)
   }
 
-  val X: Gate[StateId[Boolean]] = Gate(id => Unitary(
-    universe => NonEmptyList.of(universe.updatedStateWith(id)(!_)),
-    X(id)))
+  val X: Gate[StateId[Boolean]] = Gate(id => new Unitary {
+    override def apply(universe: Universe): NonEmptyList[Universe] =
+      NonEmptyList.of(universe.updatedStateWith(id)(!_))
+    override def adjoint: Unitary = X(id)
+  })
 
-  val H: Gate[StateId[Boolean]] = Gate(id => Unitary(
-    universe => NonEmptyList.of(
-      universe / Complex((if (universe.state(id)) -1 else 1) * sqrt(2)),
-      universe.updatedStateWith(id)(!_) / Complex(sqrt(2))),
-    H(id)))
+  val H: Gate[StateId[Boolean]] = Gate(id => new Unitary {
+    override def apply(universe: Universe): NonEmptyList[Universe] =
+      NonEmptyList.of(
+        universe / Complex((if (universe.state(id)) -1 else 1) * sqrt(2)),
+        universe.updatedStateWith(id)(!_) / Complex(sqrt(2)))
+    override def adjoint: Unitary = H(id)
+  })
 
   val Translate: Gate[(StateId[Vector2[Int]], Vector2[Int])] = Gate {
-    case (id, delta) => Unitary(
-      universe => NonEmptyList.of(universe.updatedStateWith(id)(_ + delta)),
-      Translate(id, -delta))
+    case (id, delta) => new Unitary {
+      override def apply(universe: Universe): NonEmptyList[Universe] =
+        NonEmptyList.of(universe.updatedStateWith(id)(_ + delta))
+      override def adjoint: Unitary = Translate(id, -delta)
+    }
   }
 }
