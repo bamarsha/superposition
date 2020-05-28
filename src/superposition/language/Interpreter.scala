@@ -14,7 +14,7 @@ import superposition.math.Gate._
 import superposition.math.QExpr.QExpr
 import superposition.math._
 
-import scala.Function.chain
+import scala.Function.{chain, const}
 import scala.sys.error
 
 /** An interpreter for gate programs.
@@ -95,8 +95,9 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
       }))
     case IfTransformer(expression) =>
       val expr = evalExpression(expression).asInstanceOf[QExpr[Boolean]]
-      _.controlled(expr)
+      _.controlled(expr.map(const))
     case MultiTransformer => _.multi.asInstanceOf[Gate[Any]]
+    case AdjointTransformer => _.adjoint
   }
 
   /** Evaluates an application.
@@ -124,6 +125,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     case "indices" => tuple2 andThen builtIns.indices[Any]
     case "int" => builtIns.int
     case "or" => builtIns.or
+    case "primaryAt" => builtIns.primaryAt
     case "qubit" => builtIns.qubit
     case "qubits" => builtIns.qubits
     case "qucell" => builtIns.qucell
@@ -146,6 +148,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     case "Translate" => Translate contramap[NTuple] {
       case NTuple(id: StateId[Vector2[Int]], delta: Vector2[Int]) => (id, delta)
     }
+    case "QFT" => QFT
     case _ => error(s"Unknown gate: $name")
   }
 

@@ -48,6 +48,9 @@ final case class Complex(real: Double, imaginary: Double = 0) {
 
   /** The phase angle θ when this complex number is written in the polar form re^iθ^. */
   def phase: Double = atan2(imaginary, real)
+
+  /** The complex conjugate of this number. */
+  def conjugate: Complex = Complex(real, -imaginary)
 }
 
 /** Complex number factory. */

@@ -48,6 +48,8 @@ private final class BuiltIns(multiverse: Multiverse, map: TiledMap) {
   /** Returns true if any bit is true. */
   val or: QExpr[Iterable[Boolean] => Boolean] = ((_: Iterable[Boolean]) exists identity).pure[QExpr]
 
+  val primaryAt: QExpr[Vector2[Int] => Iterable[Seq[StateId[Boolean]]]] = QExpr.prepare(multiverse.primaryBits)
+
   /** Returns the primary qubits for the entity with the ID. */
   val qubits: QExpr[Int => Seq[StateId[Boolean]]] =
     ((id: Int) => multiverse.entityById(id).getOrElse(

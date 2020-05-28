@@ -104,8 +104,8 @@ object Gate {
       * @param predicate the predicate that must be satisfied to apply the original gate
       * @return the controlled gate
       */
-    def controlled(predicate: QExpr[Boolean]): Gate[A] = /*_*/
-      multi.controlledMap(predicate map (if (_) Seq(_) else const(Seq.empty))) /*_*/
+    def controlled(predicate: QExpr[A => Boolean]): Gate[A] = /*_*/
+      multi.onQExpr.contramap(a => predicate.map(_(a)).map(if (_) Seq(a) else Seq())) /*_*/
 
     /** Returns a new gate that maps its argument to a sequence and applies the original gate with each value in the
       * sequence.
@@ -139,5 +139,23 @@ object Gate {
     case (id, delta) => Unitary(
       universe => NonEmptyList.of(universe.updatedStateWith(id)(_ + delta)),
       Translate(id, -delta))
+  }
+
+  val Phase: Gate[Complex] = Gate(z => Unitary(u => NonEmptyList.of(u * z), Phase(z.conjugate)))
+
+  val Rz: Gate[(StateId[Boolean], Double)] = Phase
+    .contramap[(StateId[Boolean], Double)] { case (_, theta) => Complex.polar(1, theta) }
+    .controlled(QExpr.prepare { case (id, _) => id.value })
+
+  val QFT: Gate[Seq[StateId[Boolean]]] = Gate { ids =>
+    var u = Unitary.identity
+    val len = ids.length
+    for (i <- Seq.range(0, len)) {
+      u = H(ids(i)) * u
+      for (j <- Seq.range(i + 1, len)) {
+        u = Rz.controlled(ids(j).value.map(const))(ids(i), 2 * math.Pi / math.pow(2, j-i+1)) * u
+      }
+    }
+    u
   }
 }

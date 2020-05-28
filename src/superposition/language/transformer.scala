@@ -17,3 +17,6 @@ private final case class IfTransformer(condition: Expression) extends Transforme
 
 /** The multi-transformer converts a gate into one that takes a sequence of arguments. */
 private case object MultiTransformer extends Transformer
+
+/** The adjoint-transformer converts a gate into its adjoint. */
+private case object AdjointTransformer extends Transformer

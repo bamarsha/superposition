@@ -120,6 +120,9 @@ private object LevelLoader {
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
         val control = controlExprBitSeq(multiverse, map, obj.getProperties)
         new Laser(multiverse, cells.head, gate, direction, control)
+      case "Oracle" =>
+        val gate = new Interpreter(multiverse, map).evalUnitary(obj.getProperties.get("Gates", classOf[String]))
+        new Oracle(multiverse, cells.head, gate)
       case "Door" =>
         val control = controlExpr(multiverse, map, obj.getProperties)
         new Door(multiverse, cells.head, control)

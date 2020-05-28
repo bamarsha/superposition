@@ -16,7 +16,7 @@ private object Parser extends RegexParsers {
   }
 
   /** The reserved keywords. */
-  private val keyword: Parser[String] = "Apply" | "on" | "if" | "multi"
+  private val keyword: Parser[String] = "Apply" | "on" | "if" | "multi" | "adjoint"
 
   /** An identifier. */
   private val identifier: Parser[String] = """[^\d\W]\w*""".r - keyword
@@ -67,8 +67,11 @@ private object Parser extends RegexParsers {
   /** The multi-transformer. */
   private val multiTransformer: Parser[Transformer] = "multi" ^^^ MultiTransformer
 
+  /** The multi-transformer. */
+  private val adjointTransformer: Parser[Transformer] = "adjoint" ^^^ AdjointTransformer
+
   /** A transformer. */
-  private val transformer: Parser[Transformer] = onTransformer | ifTransformer | multiTransformer
+  private val transformer: Parser[Transformer] = onTransformer | ifTransformer | multiTransformer | adjointTransformer
 
   /** A gate application. */
   private val application: Parser[Application] =
