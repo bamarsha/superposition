@@ -10,11 +10,11 @@ import spire.implicits._
 import superposition.component.Player.walkingKeys
 import superposition.component._
 import superposition.entity.Level
+import superposition.math.Gate._
 import superposition.math.QExpr.QExpr
 import superposition.math._
 import superposition.system.PlayerInputSystem.{carryGate, updateCarriedPositions, updatePlayerPosition, walk}
 
-import scala.Function.const
 import scala.jdk.CollectionConverters._
 import scala.math.exp
 
@@ -36,7 +36,7 @@ final class PlayerInputSystem(level: () => Option[Level])
     val multiverse = level().get.multiverse
     walk(multiverse, entity, carriables, deltaTime)
     if (input.isKeyJustPressed(SPACE)) {
-      multiverse.applyGate(carryGate(entity, carriables), ())
+      multiverse.applyUnitary(carryGate(entity, carriables))
     }
     updatePlayerPosition(multiverse, entity, deltaTime)
     updateCarriedPositions(multiverse, entity, carriables, deltaTime)
@@ -80,13 +80,13 @@ private object PlayerInputSystem {
     * @param carriables the carriable entities
     * @return the toggle carry gate
     */
-  private def carryGate(entity: Entity, carriables: Iterable[Entity]): Gate[Unit] =
-    X.multi.controlledMap {
+  private def carryGate(entity: Entity, carriables: Iterable[Entity]): Unitary =
+    X.multi.quantum {
       for {
         isAlive <- Player.mapper.get(entity).alive.value
         playerCell <- QuantumPosition.mapper.get(entity).cell.value
         carriableCell <- QExpr.prepare(QuantumPosition.mapper.get(_: Entity).cell.value)
-      } yield const {
+      } yield {
         carriables
           .filter(carriable => isAlive && playerCell == carriableCell(carriable))
           .map(Carriable.mapper.get(_).carried)
@@ -121,8 +121,8 @@ private object PlayerInputSystem {
     val Vector2(dx, dy) = (position.relative + rawDelta) map (_.floor.toInt)
     val gate = walkGate(entity, carriables)
     val delta = rawDelta - Vector2(
-      if (dx != 0 && multiverse.applyGate(gate, Vector2(dx, 0))) dx else 0,
-      if (dy != 0 && multiverse.applyGate(gate, Vector2(0, dy))) dy else 0)
+      if (dx != 0 && multiverse.applyUnitary(gate(Vector2(dx, 0)))) dx else 0,
+      if (dy != 0 && multiverse.applyUnitary(gate(Vector2(0, dy)))) dy else 0)
     position.relative = (position.relative + delta).clamp(0, 1)
   }
 

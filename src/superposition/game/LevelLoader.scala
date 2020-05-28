@@ -13,6 +13,7 @@ import superposition.component.{Multiverse, MultiverseView}
 import superposition.entity.{MapLayer => MapLayerEntity, _}
 import superposition.game.ResourceResolver.resolve
 import superposition.language.Interpreter
+import superposition.math.Gate._
 import superposition.math.QExpr.QExpr
 import superposition.math._
 
@@ -36,7 +37,7 @@ private object LevelLoader {
 
     // Apply initial gates.
     for (gates <- Option(map.getProperties.get("Gates", classOf[String]))) {
-      multiverse.applyGate(new Interpreter(multiverse, map).evalGate(gates), ())
+      multiverse.applyUnitary(new Interpreter(multiverse, map).evalUnitary(gates))
     }
 
     // Create the map renderer.
@@ -166,7 +167,6 @@ private object LevelLoader {
     */
   private def toGate(name: String): Gate[StateId[Boolean]] = name match {
     case "X" => X
-    case "Z" => Z
     case "H" => H
     case _ => error(s"Unsupported gate '$name'.")
   }
