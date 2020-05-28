@@ -43,6 +43,9 @@ final class BitSeq private(private val bits: Int, val length: Int) {
   /** Converts the bit sequence to an integer. */
   def toInt: Int = bits
 
+  /** Returns an equivalent bit sequence with the given length. */
+  def withLength(length: Int): BitSeq = BitSeq(bits & ((1 << length) - 1), length)
+
   override def equals(obj: Any): Boolean = obj match {
     case other: BitSeq => other.bits == bits && other.length == length
     case _ => false

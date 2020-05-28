@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="16" height="9" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="23">
+ <properties>
+  <property name="Gates">Apply X multi on indices (qubits 19, [1, 2]).
+Apply X multi on indices (qubits 20, [0, 3]).
+Apply X multi on indices (qubits 21, [0]).
+Apply X multi on indices (qubits 22, [3]).</property>
+ </properties>
+ <tileset firstgid="1" source="../tilesets/industrial-sprite-sheet-DeadEnd-LMZ.tsx"/>
+ <tileset firstgid="205" source="../tilesets/sprites.tsx"/>
+ <tileset firstgid="212" source="../tilesets/wire_tileset.tsx"/>
+ <layer id="1" name="Art" width="16" height="9">
+  <data encoding="csv">
+4,6,6,6,6,15,6,6,6,6,15,6,6,6,6,5,
+7,30,30,30,30,7,30,21,21,30,7,30,30,30,30,7,
+7,21,21,21,21,7,190,21,21,190,7,21,21,21,21,7,
+7,21,21,21,21,7,21,21,21,21,7,21,21,21,21,7,
+7,21,21,21,21,16,6,6,6,6,17,21,21,21,21,7,
+7,21,21,21,21,30,30,21,21,30,30,21,21,21,21,7,
+7,21,21,21,21,21,190,21,21,190,21,21,21,21,21,7,
+7,21,21,21,21,21,21,21,21,21,21,21,21,21,21,7,
+16,6,6,6,6,6,6,6,6,6,6,6,6,6,6,17
+</data>
+ </layer>
+ <layer id="2" name="Collision" width="16" height="9" visible="0">
+  <properties>
+   <property name="Collision" type="bool" value="true"/>
+  </properties>
+  <data encoding="csv">
+101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,
+101,101,101,101,101,101,101,0,0,101,101,101,101,101,101,101,
+101,0,0,0,0,101,0,0,0,0,101,0,0,0,0,101,
+101,0,0,0,0,101,0,0,0,0,101,0,0,0,0,101,
+101,0,0,0,0,101,101,0,0,101,101,0,0,0,0,101,
+101,0,0,0,0,101,101,0,0,101,101,0,0,0,0,101,
+101,0,0,0,0,0,0,0,0,0,0,0,0,0,0,101,
+101,0,0,0,0,0,0,0,0,0,0,0,0,0,0,101,
+101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101
+</data>
+ </layer>
+ <objectgroup id="3" name="Objects">
+  <object id="1" name="Exit" type="Exit" x="112" y="16" width="32" height="16"/>
+  <object id="2" name="Player" type="Player" gid="205" x="112" y="128" width="16" height="16"/>
+  <object id="3" name="DoubleDoor" type="DoubleDoor" gid="211" x="112" y="32" width="32" height="16">
+   <properties>
+    <property name="Controls" value="unlocked [15, 18]"/>
+   </properties>
+  </object>
+  <object id="14" name="Lock 1" type="Lock" gid="207" x="144" y="96" width="16" height="16">
+   <properties>
+    <property name="Code" value="1"/>
+    <property name="ControlsMulti" value="activated [cell (9, 6)]"/>
+   </properties>
+  </object>
+  <object id="15" name="Lock 4" type="Lock" gid="208" x="144" y="32" width="16" height="16">
+   <properties>
+    <property name="Code" value="1000"/>
+    <property name="ControlsMulti" value="activated [cell (9, 2)]"/>
+   </properties>
+  </object>
+  <object id="16" name="DoubleDoor" type="DoubleDoor" gid="211" x="112" y="96" width="32" height="16">
+   <properties>
+    <property name="Controls" value="unlocked [14, 17]"/>
+   </properties>
+  </object>
+  <object id="17" name="Lock 4" type="Lock" gid="208" x="96" y="96" width="16" height="16">
+   <properties>
+    <property name="Code" value="0110"/>
+    <property name="ControlsMulti" value="activated [cell (6, 6)]"/>
+   </properties>
+  </object>
+  <object id="18" name="Lock 4" type="Lock" gid="208" x="96" y="32" width="16" height="16">
+   <properties>
+    <property name="Code" value="0001"/>
+    <property name="ControlsMulti" value="activated [cell (6, 2)]"/>
+   </properties>
+  </object>
+  <object id="19" name="QuballMulti" type="QuballMulti" gid="210" x="48" y="112" width="16" height="16"/>
+  <object id="20" name="QuballMulti" type="QuballMulti" gid="210" x="48" y="64" width="16" height="16"/>
+  <object id="21" name="QuballMulti" type="QuballMulti" gid="210" x="192" y="112" width="16" height="16"/>
+  <object id="22" name="QuballMulti" type="QuballMulti" gid="210" x="192" y="64" width="16" height="16"/>
+ </objectgroup>
+</map>

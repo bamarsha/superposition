@@ -4,7 +4,7 @@
  <object name="Lock 4" type="Lock" gid="4" width="16" height="16">
   <properties>
    <property name="Code" value="1111"/>
-   <property name="Controls" value="???"/>
+   <property name="ControlsMulti" value="???"/>
   </properties>
  </object>
 </template>

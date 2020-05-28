@@ -129,6 +129,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     case "qubit" => builtIns.qubit
     case "qubits" => builtIns.qubits
     case "qucell" => builtIns.qucell
+    case "unlocked" => builtIns.unlocked
     case "value" => builtIns.value
     case "vec2" => tuple2 andThen builtIns.vec2
     case _ => error(s"Unknown identifier: $name")
