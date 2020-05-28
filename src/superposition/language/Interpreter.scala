@@ -10,6 +10,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import superposition.component.Multiverse
 import superposition.language.Interpreter.NTuple
 import superposition.language.Parser.{NoSuccess, Success, expressionProgram, gateProgram, parse}
+import superposition.math.Gate._
 import superposition.math.QExpr.QExpr
 import superposition.math._
 
@@ -31,7 +32,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @throws RuntimeException if parsing fails
     * @return the evaluated program
     */
-  def evalGate(string: String): Gate[Unit] = parse(gateProgram, string) match {
+  def evalUnitary(string: String): Unitary = parse(gateProgram, string) match {
     case Success(program, _) => evalProgram(program)
     case NoSuccess(message, _) => error(s"Syntax error in gate program ($message): $string")
   }
@@ -53,7 +54,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @param program the program sequence
     * @return the evaluated program
     */
-  private def evalProgram(program: Seq[Application]): Gate[Unit] = program.view map evalApplication reduce (_ andThen _)
+  private def evalProgram(program: Seq[Application]): Unitary = program.view map evalApplication reduce (_ * _)
 
   /** Evaluates an expression.
     *
@@ -103,10 +104,10 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @param application the application
     * @return the evaluated application
     */
-  private def evalApplication(application: Application): Gate[Unit] = {
+  private def evalApplication(application: Application): Unitary = {
     val gate = makeGate(application.gate)
     val allTransformations = chain(application.transformers map evalTransformer)
-    allTransformations(gate.asInstanceOf[Gate[Any]]).asInstanceOf[Gate[Unit]]
+    allTransformations(gate.asInstanceOf[Gate[Any]]).asInstanceOf[Gate[Unit]].apply(())
   }
 
   /** Evaluates an identifier name.

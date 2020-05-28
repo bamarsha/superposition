@@ -28,7 +28,7 @@ final class LaserInputSystem(level: () => Option[Level])
 
     // Apply the gate when the laser is clicked.
     if (input.isButtonJustPressed(0) && multiverseView.isSelected(cell)) {
-      multiverse.applyGate(beam.gate.multi.controlledMap(beamHits(multiverse, entity) map const), ())
+      multiverse.applyUnitary(beam.gate.multi.onQExpr(beamHits(multiverse, entity)))
       multiverse.updateMetaWith(beam.lastTarget)(const(beamTarget(multiverse, entity)))
       multiverse.updateMetaWith(beam.lastBeamSeq)(const(beam.control map (Some(_))))
       multiverse.updateMetaWith(beam.elapsedTime) { time =>

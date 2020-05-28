@@ -79,12 +79,11 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
 
   /** Applies a gate. If the gate produces any universe that is in an invalid state, no changes are made.
     *
-    * @param gate the gate to apply
-    * @param value the gate's argument
+    * @param unitary the unitary to apply
     * @return true if the gate was successfully applied
     */
-  def applyGate[A](gate: Gate[A], value: A): Boolean = {
-    val newUniverses = gate.applyToAll(value)(universes)
+  def applyUnitary[A](unitary: Unitary): Boolean = {
+    val newUniverses = unitary.applyToAll(universes)
     if (newUniverses forall (isValid(_))) {
       _universes = combine(newUniverses).toSeq sortBy (showUniverse andThen (_.toSeq))
       true
