@@ -3,7 +3,7 @@ package superposition.math
 import cats.data.NonEmptyList
 
 /** A quantum unitary transformation. */
-sealed trait Unitary {
+trait Unitary {
   /** Applies the gate within a universe.
     *
     * @param universe the universe in which to apply the unitary

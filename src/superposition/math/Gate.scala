@@ -31,7 +31,7 @@ object Gate {
     * @tparam A the expression type
     * @return the quantum gate
     */
-  private def apply[A](f: A => Unitary): Gate[A] = /*_*/ new Gate(f) /*_*/
+  private def apply[A](f: A => Unitary): Gate[A] = new Gate(f)
 
   /** An instance of the contravariant monoidal type class for gates. */
   implicit object GateCM extends ContravariantMonoidal[Gate] {
@@ -68,12 +68,12 @@ object Gate {
       * @throws AssertionError if the mapping function violates unitarity
       * @return the new gate
       */
-    def quantum: Gate[QExpr[A]] = Gate(
+    def onQExpr: Gate[QExpr[A]] = Gate(
       value => Unitary(universe => {
         val newUniverses = gate(value(universe))(universe)
         assert(newUniverses forall (value(_) == value(universe)))
         newUniverses
-      }, gate.adjoint.quantum(value)))
+      }, gate.adjoint.onQExpr(value)))
 
     // ---------- Helper ops ----------
 
@@ -96,7 +96,7 @@ object Gate {
       * @throws AssertionError if the mapping function violates unitarity
       * @return the controlled gate
       */
-    def controlledMap[B](f: QExpr[B => A]): Gate[B] = gate.quantum.contramap(b => f.map(_(b)))
+    def controlledMap[B](f: QExpr[B => A]): Gate[B] = gate.onQExpr.contramap(b => f.map(_(b)))
 
     /** Returns a new gate that applies the original gate if the universe satisfies the predicate, and otherwise applies
       * the identity gate instead.

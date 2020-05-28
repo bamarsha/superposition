@@ -81,7 +81,7 @@ private object PlayerInputSystem {
     * @return the toggle carry gate
     */
   private def carryGate(entity: Entity, carriables: Iterable[Entity]): Unitary =
-    X.multi.quantum {
+    X.multi.onQExpr {
       for {
         isAlive <- Player.mapper.get(entity).alive.value
         playerCell <- QuantumPosition.mapper.get(entity).cell.value
