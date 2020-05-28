@@ -5,7 +5,7 @@
   <image width="32" height="32" source="../sprites/cat_alive.png"/>
  </tile>
  <tile id="1">
-  <image width="32" height="32" source="../sprites/laser_off.png"/>
+  <image width="32" height="32" source="../sprites/laser_base.png"/>
  </tile>
  <tile id="2">
   <image width="16" height="16" source="../sprites/lock_1.png"/>

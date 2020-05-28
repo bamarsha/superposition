@@ -54,6 +54,8 @@ private object Superposition {
     "level_super1.tmx",
     "level_super2.tmx",
     "level_super3.tmx",
+    "level_reg1.tmx",
+    "level_reg2.tmx",
     "level_swap.tmx",
     "level_win.tmx")
 

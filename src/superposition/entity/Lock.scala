@@ -23,16 +23,17 @@ import superposition.math.{BitSeq, Vector2}
 final class Lock(id: Int, multiverse: Multiverse, cell: Vector2[Int], code: Seq[Boolean], control: QExpr[BitSeq])
   extends Entity {
   locally {
+    val isOpen = control map (_.withLength(code.length) == BitSeq(code: _*))
     val unlocking = unlockAnimation(code.length)
     val locking = lockAnimation(code.length)
-    val animation = control map (bits => if (bits == BitSeq(code: _*)) unlocking else locking)
+    val animation = isOpen map (if (_) unlocking else locking)
     val animationTime = multiverse.allocateMeta(0f)
     val lastAnimation = multiverse.allocateMeta[Option[Animation[_]]](None)
     val frame = Animated.frame(animation, animationTime)
 
     add(new EntityId(id))
     add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5)))
-    add(new LockCode(code))
+    add(new LockCode(code, isOpen))
     add(new Renderable(1, frame))
     add(new SpriteView(frame))
     add(new Animated(animation, animationTime, lastAnimation, invertTime))

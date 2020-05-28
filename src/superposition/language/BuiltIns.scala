@@ -4,8 +4,9 @@ import cats.Monad
 import cats.syntax.applicative.catsSyntaxApplicativeId
 import cats.syntax.flatMap.toFlatMapOps
 import cats.syntax.functor.toFunctorOps
+import com.badlogic.ashley.core.Component
 import com.badlogic.gdx.maps.tiled.TiledMap
-import superposition.component.{Multiverse, PrimaryBit, QuantumPosition}
+import superposition.component.{LockCode, Multiverse, PrimaryBit, QuantumPosition}
 import superposition.math.QExpr.QExpr
 import superposition.math.{BitSeq, StateId, Vector2}
 
@@ -38,6 +39,11 @@ private final class BuiltIns(multiverse: Multiverse, map: TiledMap) {
       bitAtValue <- bitAt
     } yield cellValue andThen (Seq(_)) andThen activatedValue andThen (bitAtValue(_, 0))
 
+  private def component[A <: Component](c: Class[A])(id: Int): A =
+    multiverse.entityById(id).getOrElse(
+      throw new RuntimeException("Entity with id " + id + " does not exist")
+      ).getComponent(c)
+
   /** Filters the sequence to include only the given indices. */
   def indices[A]: QExpr[((Seq[A], Seq[Int])) => Seq[A]] =
     Monad[QExpr].pure { case (items, indices) => indices map (items(_)) }
@@ -50,16 +56,19 @@ private final class BuiltIns(multiverse: Multiverse, map: TiledMap) {
 
   /** Returns the primary qubits for the entity with the ID. */
   val qubits: QExpr[Int => Seq[StateId[Boolean]]] =
-    ((id: Int) => multiverse.entityById(id).getOrElse(
-      throw new RuntimeException("Entity with id " + id + " does not exist")
-    ).getComponent(classOf[PrimaryBit]).bits).pure[QExpr]
+    (component(classOf[PrimaryBit]) andThen (_.bits)).pure[QExpr]
 
   /** Returns the first primary qubit for the entity with the ID. */
   val qubit: QExpr[Int => StateId[Boolean]] = qubits map (_ andThen (_.head))
 
   /** Returns the cell qudit for the entity with the ID. */
   val qucell: QExpr[Int => StateId[Vector2[Int]]] =
-    (multiverse.entityById(_: Int).get.getComponent(classOf[QuantumPosition]).cell).pure[QExpr]
+    (component(classOf[QuantumPosition]) andThen (_.cell)).pure[QExpr]
+
+  /** Returns whether all the given locks are open. */
+  val unlocked: QExpr[Seq[Int] => Boolean] = for {
+    lockOpen <- QExpr.prepare(component(classOf[LockCode])(_: Int).isOpen)
+  } yield (_: Seq[Int]).forall(lockOpen)
 
   /** Returns the value of the qudit. */
   def value[A]: QExpr[StateId[A] => A] = QExpr.prepare(_.value)
