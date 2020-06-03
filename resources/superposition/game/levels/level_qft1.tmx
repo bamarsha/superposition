@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="16" height="9" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="18">
+<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="16" height="9" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="21">
  <properties>
-  <property name="Gates" value="Apply X on qubit 16."/>
+  <property name="Gates">Apply X on qubit 16.
+Apply X on qubit 16.
+Apply X on (qubits 16) 1.
+Apply X on (qubits 16) 3.</property>
  </properties>
  <tileset firstgid="1" source="../tilesets/industrial-sprite-sheet-DeadEnd-LMZ.tsx"/>
  <tileset firstgid="205" source="../tilesets/sprites.tsx"/>
@@ -47,7 +50,18 @@
   <object id="16" name="QuballMulti" type="QuballMulti" gid="210" x="144" y="96" width="16" height="16"/>
   <object id="17" name="Oracle" type="Oracle" gid="212" x="176" y="80" width="16" height="16">
    <properties>
-    <property name="Gates" value="Apply QFT adjoint multi on primaryAt (cell (11, 5))."/>
+    <property name="Gates" value="Apply Phase on 0.0625 repeat int (activated [cell (11, 5)])."/>
+   </properties>
+  </object>
+  <object id="18" name="QuballMulti" type="QuballMulti" gid="210" x="144" y="80" width="16" height="16"/>
+  <object id="19" name="Oracle" type="Oracle" gid="212" x="208" y="80" width="16" height="16">
+   <properties>
+    <property name="Gates" value="Apply QFT adjoint multi on primaryAt (cell (13, 5))."/>
+   </properties>
+  </object>
+  <object id="20" name="Oracle" type="Oracle" gid="212" x="192" y="80" width="16" height="16">
+   <properties>
+    <property name="Gates" value="Apply Phase on 0.0625 repeat int (activated [cell (12, 5)]) repeat int (activated [cell (12, 3)])."/>
    </properties>
   </object>
  </objectgroup>

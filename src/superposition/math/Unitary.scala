@@ -28,7 +28,7 @@ object Unitary {
       * @param universes the universes in which to apply the unitary
       * @return the new universes
       */
-    def applyToAll(universes: Iterable[Universe]): Iterable[Universe] =
+    def applyToAll(universes: Seq[Universe]): Seq[Universe] =
       universes flatMap (unitary(_).toList)
 
     /** The product of this unitary with another. */

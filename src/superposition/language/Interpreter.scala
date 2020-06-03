@@ -34,7 +34,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     */
   def evalUnitary(string: String): Unitary = parse(gateProgram, string) match {
     case Success(program, _) => evalProgram(program)
-    case NoSuccess(message, _) => error(s"Syntax error in gate program ($message): $string")
+    case NoSuccess(message, _) => error(s"Syntax error in gate program ($message):\n\n$string\n")
   }
 
   /** Evaluates an expression program string.
@@ -64,7 +64,8 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
   private def evalExpression(expression: Expression): QExpr[Any] = {
     val expr = expression match {
       case Identifier(name) => evalIdentifier(name)
-      case Number(value) => value.pure[QExpr]
+      case IntegerNumber(value) => value.pure[QExpr]
+      case DecimalNumber(value) => value.pure[QExpr]
       case Tuple(items) => (items map evalExpression).toList.sequence map (NTuple(_: _*))
       case List(items) => (items map evalExpression).toList.sequence
       case Call(function, argument) =>
@@ -96,6 +97,9 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     case IfTransformer(expression) =>
       val expr = evalExpression(expression).asInstanceOf[QExpr[Boolean]]
       _.controlled(expr.map(const))
+    case RepeatTransformer(expression) =>
+      val expr = evalExpression(expression).asInstanceOf[QExpr[Int]]
+      _.repeat(expr.map(const))
     case MultiTransformer => _.multi.asInstanceOf[Gate[Any]]
     case AdjointTransformer => _.adjoint
   }
@@ -150,6 +154,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
       case NTuple(id: StateId[Vector2[Int]], delta: Vector2[Int]) => (id, delta)
     }
     case "QFT" => QFT
+    case "Phase" => Phase
     case _ => error(s"Unknown gate: $name")
   }
 
@@ -163,7 +168,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
       case "and" | "bitAt" | "cell" | "indices" | "int" | "or" | "qubit" | "qubits" | "qucell" | "vec2" => true
       case _ => false
     }
-    case Number(_) => true
+    case IntegerNumber(_) => true
     case Tuple(items) => items forall isConstant
     case List(items) => items forall isConstant
     case Call(function, argument) => isConstant(function) && isConstant(argument)

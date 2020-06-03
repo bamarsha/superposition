@@ -6,8 +6,8 @@ Compile / scalacOptions ++= Seq(
   "-Xsource:3",
   "-Ymacro-annotations",
   "-opt:l:method",
-  "-opt:l:inline",
-  "-opt-inline-from:**",
+//  "-opt:l:inline",
+//  "-opt-inline-from:**",
   "-feature",
   "-deprecation")
 Compile / scalaSource := baseDirectory.value / "src"

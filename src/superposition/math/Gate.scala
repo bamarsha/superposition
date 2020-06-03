@@ -110,6 +110,14 @@ object Gate {
     def controlled(predicate: QExpr[A => Boolean]): Gate[A] = /*_*/
       multi.onQExpr.contramap(a => predicate.map(_(a)).map(if (_) Seq(a) else Seq())) /*_*/
 
+    /** Returns a new gate that applies the original gate a number of times based on the input.
+      *
+      * @param number the number of times to apply the original gate
+      * @return the repeated gate
+      */
+    def repeat(number: QExpr[A => Int]): Gate[A] = /*_*/
+      multi.onQExpr.contramap(a => number.map(_(a)).map(Seq.fill(_)(a))) /*_*/
+
     /** Returns a new gate that maps its argument to a sequence and applies the original gate with each value in the
       * sequence.
       *
@@ -150,18 +158,31 @@ object Gate {
     }
   }
 
-  val Phase: Gate[Complex] = Gate(z => new Unitary {
-    override def apply(universe: Universe): NonEmptyList[Universe] = NonEmptyList.of(universe * z)
-    override def adjoint: Unitary = Phase(z.conjugate)
+  val Ri: Gate[Double] = Gate(theta => new Unitary {
+    override def apply(universe: Universe): NonEmptyList[Universe] = NonEmptyList.of(universe * Complex.polar(1, theta))
+    override def adjoint: Unitary = Ri(-theta)
   })
 
-  val Rz: Gate[(StateId[Boolean], Double)] = Phase
-    .contramap[(StateId[Boolean], Double)] { case (_, theta) => Complex.polar(1, theta) }
-    .controlled(QExpr.prepare { case (id, _) => id.value })
+  val Phase: Gate[Double] = Ri.contramap(_ * 2 * math.Pi)
+
+  val Rz: Gate[(StateId[Boolean], Double)] = Ri
+    .contramap((_: (StateId[Boolean], Double))._2)
+    .controlled(QExpr.prepare (_._1.value))
+
+  val CNot: Gate[(StateId[Boolean], StateId[Boolean])] = Gate { case (a, b) =>
+    X.controlled(QExpr.prepare(const(a.value)))(b)
+  }
+
+  val Swap: Gate[(StateId[Boolean], StateId[Boolean])] = Gate {
+    case (a, b) => CNot(a, b) * CNot(b, a) * CNot(a, b)
+  }
 
   val QFT: Gate[Seq[StateId[Boolean]]] = Gate { ids =>
-    var u = Unitary.identity
     val len = ids.length
+    var u = Unitary.identity
+    for (i <- Seq.range(0, len/2)) {
+      u = Swap(ids(len-1-i), ids(i)) * u
+    }
     for (i <- Seq.range(0, len)) {
       u = H(ids(i)) * u
       for (j <- Seq.range(i + 1, len)) {

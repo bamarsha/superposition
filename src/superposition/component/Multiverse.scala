@@ -85,7 +85,10 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
   def applyUnitary[A](unitary: Unitary): Boolean = {
     val newUniverses = unitary.applyToAll(universes)
     if (newUniverses forall (isValid(_))) {
-      _universes = combine(newUniverses).toSeq sortBy (showUniverse andThen (_.toSeq))
+      if (newUniverses.size == universes.size)
+        _universes = newUniverses
+      else
+        _universes = combine(newUniverses).toSeq sortBy (showUniverse andThen (_.tail.toSeq))
       true
     } else false
   }
@@ -156,7 +159,7 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     * @return the states in the universe converted to strings
     */
   def showUniverse(universe: Universe): Iterable[String] =
-    stateIds.view map (id => /*_*/ id.show(universe.state(id)) /*_*/)
+    stateIds.view map (id => /*_*/ id.show(universe.state(id)) /*_*/) prepended universe.amplitude.toString
 
   /** Returns the entity with the ID.
     *

@@ -13,7 +13,13 @@ private final case class Identifier(name: String) extends Expression
   *
   * @param value the value of the number
   */
-private final case class Number(value: Int) extends Expression
+private final case class IntegerNumber(value: Int) extends Expression
+
+/** A floating-point number.
+  *
+  * @param value the value of the number
+  */
+private final case class DecimalNumber(value: Double) extends Expression
 
 /** A tuple.
   *

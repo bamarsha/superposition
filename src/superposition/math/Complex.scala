@@ -51,6 +51,13 @@ final case class Complex(real: Double, imaginary: Double = 0) {
 
   /** The complex conjugate of this number. */
   def conjugate: Complex = Complex(real, -imaginary)
+
+  override def toString: String =
+    if (imaginary >= 0) f"$real%.3f + $imaginary%.3fi"
+    else {
+      val im2 = -imaginary
+      f"$real%.3f - $im2%.3fi"
+    }
 }
 
 /** Complex number factory. */

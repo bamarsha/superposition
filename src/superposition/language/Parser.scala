@@ -16,16 +16,19 @@ private object Parser extends RegexParsers {
   }
 
   /** The reserved keywords. */
-  private val keyword: Parser[String] = "Apply" | "on" | "if" | "multi" | "adjoint"
+  private val keyword: Parser[String] = "Apply" | "on" | "if" | "repeat" | "multi" | "adjoint"
 
   /** An identifier. */
   private val identifier: Parser[String] = """[^\d\W]\w*""".r - keyword
 
-  /** A number. */
-  private val number: Parser[Int] = """-?\d+""".r ^^ (_.toInt)
+  /** An integer. */
+  private val integer: Parser[Int] = """-?\d+""".r ^^ (_.toInt)
+
+  /** A decimal number. */
+  private val decimal: Parser[Double] = """-?\d+\.\d+""".r ^^ (_.toDouble)
 
   /** A literal is an identifier or a number. */
-  private val literal: Parser[Expression] = identifier ^^ Identifier | number ^^ Number
+  private val literal: Parser[Expression] = identifier ^^ Identifier | decimal ^^ DecimalNumber | integer ^^ IntegerNumber
 
   /** A parenthetical expression. */
   private val parenthetical: Parser[Expression] = "(" ~> whiteSpace.? ~> expression <~ whiteSpace.? <~ ")"
@@ -64,6 +67,9 @@ private object Parser extends RegexParsers {
   /** The if-transformer. */
   private val ifTransformer: Parser[Transformer] = "if" ~> whiteSpace ~> expression ^^ IfTransformer
 
+  /** The repeat-transformer. */
+  private val repeatTransformer: Parser[Transformer] = "repeat" ~> whiteSpace ~> expression ^^ RepeatTransformer
+
   /** The multi-transformer. */
   private val multiTransformer: Parser[Transformer] = "multi" ^^^ MultiTransformer
 
@@ -71,7 +77,7 @@ private object Parser extends RegexParsers {
   private val adjointTransformer: Parser[Transformer] = "adjoint" ^^^ AdjointTransformer
 
   /** A transformer. */
-  private val transformer: Parser[Transformer] = onTransformer | ifTransformer | multiTransformer | adjointTransformer
+  private val transformer: Parser[Transformer] = onTransformer | ifTransformer | repeatTransformer | multiTransformer | adjointTransformer
 
   /** A gate application. */
   private val application: Parser[Application] =
