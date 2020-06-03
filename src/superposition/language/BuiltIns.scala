@@ -44,6 +44,9 @@ private final class BuiltIns(multiverse: Multiverse, map: TiledMap) {
       throw new RuntimeException("Entity with id " + id + " does not exist")
       ).getComponent(c)
 
+  /** Gets all the fourier bits in the given cell. */
+  val fourierAt: QExpr[Vector2[Int] => Iterable[StateId[Boolean]]] = QExpr.prepare(multiverse.fourierBits)
+
   /** Filters the sequence to include only the given indices. */
   def indices[A]: QExpr[((Seq[A], Seq[Int])) => Seq[A]] =
     Monad[QExpr].pure { case (items, indices) => indices map (items(_)) }
@@ -54,6 +57,7 @@ private final class BuiltIns(multiverse: Multiverse, map: TiledMap) {
   /** Returns true if any bit is true. */
   val or: QExpr[Iterable[Boolean] => Boolean] = ((_: Iterable[Boolean]) exists identity).pure[QExpr]
 
+  /** Gets all the primary bits in the given cell. */
   val primaryAt: QExpr[Vector2[Int] => Iterable[Seq[StateId[Boolean]]]] = QExpr.prepare(multiverse.primaryBits)
 
   /** Returns the primary qubits for the entity with the ID. */

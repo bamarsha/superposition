@@ -44,23 +44,21 @@ Apply X on (qubits 16) 3.</property>
   <object id="3" name="DoubleDoor" type="DoubleDoor" gid="211" x="112" y="32" width="32" height="16"/>
   <object id="15" name="Oracle" type="Oracle" gid="212" x="160" y="80" width="16" height="16">
    <properties>
-    <property name="Gates" value="Apply QFT multi on primaryAt (cell (10, 5))."/>
+    <property name="Conjugate" type="bool" value="false"/>
+    <property name="Gates" value="Apply X multi on fourierAt (cell (10, 5))."/>
    </properties>
   </object>
   <object id="16" name="QuballMulti" type="QuballMulti" gid="210" x="144" y="96" width="16" height="16"/>
   <object id="17" name="Oracle" type="Oracle" gid="212" x="176" y="80" width="16" height="16">
    <properties>
+    <property name="Conjugate" type="bool" value="true"/>
     <property name="Gates" value="Apply Phase on 0.0625 repeat int (activated [cell (11, 5)])."/>
    </properties>
   </object>
   <object id="18" name="QuballMulti" type="QuballMulti" gid="210" x="144" y="80" width="16" height="16"/>
-  <object id="19" name="Oracle" type="Oracle" gid="212" x="208" y="80" width="16" height="16">
-   <properties>
-    <property name="Gates" value="Apply QFT adjoint multi on primaryAt (cell (13, 5))."/>
-   </properties>
-  </object>
   <object id="20" name="Oracle" type="Oracle" gid="212" x="192" y="80" width="16" height="16">
    <properties>
+    <property name="Conjugate" type="bool" value="true"/>
     <property name="Gates" value="Apply Phase on 0.0625 repeat int (activated [cell (12, 5)]) repeat int (activated [cell (12, 3)])."/>
    </properties>
   </object>

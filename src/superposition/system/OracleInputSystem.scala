@@ -19,7 +19,8 @@ final class OracleInputSystem(level: () => Option[Level])
 
     // Apply the unitary when the oracle is clicked.
     if (input.isButtonJustPressed(0) && multiverseView.isSelected(cell)) {
-      multiverse.applyUnitary(OracleUnitary.mapper.get(entity).unitary)
+      val oracleUnitary = OracleUnitary.mapper.get(entity)
+      multiverse.applyUnitary(oracleUnitary.unitary, oracleUnitary.conjugate)
     }
   }
 }

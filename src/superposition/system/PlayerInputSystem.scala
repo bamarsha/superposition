@@ -36,7 +36,7 @@ final class PlayerInputSystem(level: () => Option[Level])
     val multiverse = level().get.multiverse
     walk(multiverse, entity, carriables, deltaTime)
     if (input.isKeyJustPressed(SPACE)) {
-      multiverse.applyUnitary(carryGate(entity, carriables))
+      multiverse.applyUnitary(carryGate(entity, carriables), false)
     }
     updatePlayerPosition(multiverse, entity, deltaTime)
     updateCarriedPositions(multiverse, entity, carriables, deltaTime)
@@ -121,8 +121,8 @@ private object PlayerInputSystem {
     val Vector2(dx, dy) = (position.relative + rawDelta) map (_.floor.toInt)
     val gate = walkGate(entity, carriables)
     val delta = rawDelta - Vector2(
-      if (dx != 0 && multiverse.applyUnitary(gate(Vector2(dx, 0)))) dx else 0,
-      if (dy != 0 && multiverse.applyUnitary(gate(Vector2(0, dy)))) dy else 0)
+      if (dx != 0 && multiverse.applyUnitary(gate(Vector2(dx, 0)), false)) dx else 0,
+      if (dy != 0 && multiverse.applyUnitary(gate(Vector2(0, dy)), false)) dy else 0)
     position.relative = (position.relative + delta).clamp(0, 1)
   }
 

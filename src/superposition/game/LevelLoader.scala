@@ -37,7 +37,7 @@ private object LevelLoader {
 
     // Apply initial gates.
     for (gates <- Option(map.getProperties.get("Gates", classOf[String]))) {
-      multiverse.applyUnitary(new Interpreter(multiverse, map).evalUnitary(gates))
+      multiverse.applyUnitary(new Interpreter(multiverse, map).evalUnitary(gates), true)
     }
 
     // Create the map renderer.
@@ -122,7 +122,8 @@ private object LevelLoader {
         new Laser(multiverse, cells.head, gate, direction, control)
       case "Oracle" =>
         val gate = new Interpreter(multiverse, map).evalUnitary(obj.getProperties.get("Gates", classOf[String]))
-        new Oracle(multiverse, cells.head, gate)
+        val conjugate = obj.getProperties.get("Conjugate", classOf[Boolean])
+        new Oracle(multiverse, cells.head, gate, conjugate)
       case "Door" =>
         val control = controlExpr(multiverse, map, obj.getProperties)
         new Door(multiverse, cells.head, control)

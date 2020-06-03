@@ -167,10 +167,10 @@ object Gate {
 
   val Rz: Gate[(StateId[Boolean], Double)] = Ri
     .contramap((_: (StateId[Boolean], Double))._2)
-    .controlled(QExpr.prepare (_._1.value))
+    .controlled(QExpr.prepare(_._1.value))
 
   val CNot: Gate[(StateId[Boolean], StateId[Boolean])] = Gate { case (a, b) =>
-    X.controlled(QExpr.prepare(const(a.value)))(b)
+    X.controlled(a.value.map(const))(b)
   }
 
   val Swap: Gate[(StateId[Boolean], StateId[Boolean])] = Gate {

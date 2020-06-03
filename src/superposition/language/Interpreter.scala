@@ -54,7 +54,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @param program the program sequence
     * @return the evaluated program
     */
-  private def evalProgram(program: Seq[Application]): Unitary = program.view map evalApplication reduce (_ * _)
+  private def evalProgram(program: Seq[Application]): Unitary = (program.view map evalApplication).reverse reduce (_ * _)
 
   /** Evaluates an expression.
     *
@@ -126,6 +126,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     case "and" => builtIns.and
     case "bitAt" => tuple2 andThen builtIns.bitAt
     case "cell" => tuple2 andThen builtIns.cell
+    case "fourierAt" => builtIns.fourierAt
     case "indices" => tuple2 andThen builtIns.indices[Any]
     case "int" => builtIns.int
     case "or" => builtIns.or

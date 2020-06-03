@@ -23,17 +23,9 @@ object Unitary {
     */
   implicit final class Ops(val unitary: Unitary) extends AnyVal {
 
-    /** Applies the unitary on all of the universes.
-      *
-      * @param universes the universes in which to apply the unitary
-      * @return the new universes
-      */
-    def applyToAll(universes: Seq[Universe]): Seq[Universe] =
-      universes flatMap (unitary(_).toList)
-
     /** The product of this unitary with another. */
     def *(unitary2: Unitary): Unitary = new Unitary {
-      override def apply(universe: Universe): NonEmptyList[Universe] = unitary.apply(universe) flatMap unitary2.apply
+      override def apply(universe: Universe): NonEmptyList[Universe] = unitary2.apply(universe) flatMap unitary.apply
       override def adjoint: Unitary = unitary2.adjoint * unitary.adjoint
     }
   }

@@ -8,7 +8,7 @@ import superposition.math.Unitary
  *
  * @param unitary the unitary to apply
  */
-final class OracleUnitary(val unitary: Unitary) extends Component
+final class OracleUnitary(val unitary: Unitary, val conjugate: Boolean) extends Component
 
 /** Contains the component mapper for the OracleUnitary component. */
 object OracleUnitary {

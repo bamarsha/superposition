@@ -1,12 +1,12 @@
 package superposition.math
 
-import scala.collection.immutable.ListMap
+import scala.collection.immutable.VectorMap
 
 /** A map in which the type of the value depends on the key.
   *
   * @tparam K the type of the key
   */
-final class DependentMap[K <: DependentKey] private(private val map: Map[K, Any]) extends AnyVal {
+final class DependentMap[K <: DependentKey] private(private val map: Map[K, Any]) {
   /** Returns the value associated with the key.
     *
     * @param key the key
@@ -46,6 +46,17 @@ final class DependentMap[K <: DependentKey] private(private val map: Map[K, Any]
   def removed(key: K): DependentMap[K] = new DependentMap(map.removed(key))
 
   override def toString: String = map.toString
+
+  def size: Int = map.size
+
+  private val _hash = map.hashCode()
+
+  override def hashCode(): Int = _hash
+
+  override def equals(obj: Any): Boolean = obj match {
+    case value: DependentMap[_] => map.equals(value.map)
+    case _ => false
+  }
 }
 
 /** Factories for dependent maps. */
@@ -54,5 +65,5 @@ object DependentMap {
     *
     * @tparam K the type of the key.
     */
-  def empty[K <: DependentKey]: DependentMap[K] = new DependentMap(new ListMap)
+  def empty[K <: DependentKey]: DependentMap[K] = new DependentMap(VectorMap[K, Any]())
 }
