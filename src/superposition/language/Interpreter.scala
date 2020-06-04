@@ -122,6 +122,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     */
   private def evalIdentifier(name: String): QExpr[Any] = name match {
     case "activated" => builtIns.activated
+    case "activatedNF" => builtIns.activatedNF
     case "activeCell" => tuple2 andThen builtIns.activeCell
     case "and" => builtIns.and
     case "bitAt" => tuple2 andThen builtIns.bitAt
@@ -156,6 +157,7 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     }
     case "QFT" => QFT
     case "Phase" => Phase
+    case "Fourier" => builtIns.Fourier
     case _ => error(s"Unknown gate: $name")
   }
 

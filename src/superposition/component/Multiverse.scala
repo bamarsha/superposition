@@ -152,13 +152,14 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     * @param cell the cell to look at
     * @return true if all cells have at least one activator qubit in the |1⟩ state
     */
-  def activation(cell: Vector2[Int]): QExpr[BitSeq] =
+  def activation(allowFourier: Boolean)(cell: Vector2[Int]): QExpr[BitSeq] =
     for {
       entities <- allInCell(cell)
       bit <- QExpr.prepare((_: StateId[Boolean]).value)
     } yield
       entities
         .filter(Activator.mapper.has)
+      .filter(entity => allowFourier || !(FourierBit.mapper.has(entity) && bit(FourierBit.mapper.get(entity).bit)))
         .map(entity => BitSeq(Activator.mapper.get(entity).bits map bit: _*))
         .fold(BitSeq.empty)(_ | _)
 
@@ -167,9 +168,9 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     * @param cells the cells to look at
     * @return true if all cells have at least one activator qubit in the |1⟩ state
     */
-  def allActivated(cells: Iterable[Vector2[Int]]): QExpr[BitSeq] =
+  def allActivated(allowFourier: Boolean)(cells: Iterable[Vector2[Int]]): QExpr[BitSeq] =
     if (cells.isEmpty) BitSeq().pure[QExpr]
-    else (cells map activation).toList.sequence map (_ reduce (_ & _))
+    else (cells map activation(allowFourier)).toList.sequence map (_ reduce (_ & _))
 
   /** Returns true if every entity has a valid position in the universe.
     *

@@ -31,7 +31,7 @@ object Gate {
     * @tparam A the expression type
     * @return the quantum gate
     */
-  private def apply[A](f: A => Unitary): Gate[A] = new Gate(f)
+  def apply[A](f: A => Unitary): Gate[A] = new Gate(f)
 
   /** An instance of the contravariant monoidal type class for gates. */
   implicit object GateCM extends ContravariantMonoidal[Gate] {
@@ -56,7 +56,7 @@ object Gate {
     def adjoint: Gate[A] = Gate(gate.apply andThen (_.adjoint))
 
     /** A new gate that applies this gate to each argument in the sequence in order. */
-    def multi: Gate[Seq[A]] = Gate {
+    def multi: Gate[Iterable[A]] = Gate {
       case Nil => Unitary.identity
       case x :: xs => gate(x) * gate.multi(xs)
     }

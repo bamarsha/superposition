@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="16" height="9" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="28">
- <properties>
-  <property name="Gates" value="Apply X on qubit 23."/>
- </properties>
+<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="16" height="9" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="29">
  <tileset firstgid="1" source="../tilesets/industrial-sprite-sheet-DeadEnd-LMZ.tsx"/>
  <tileset firstgid="205" source="../tilesets/sprites.tsx"/>
  <tileset firstgid="214" source="../tilesets/wire_tileset.tsx"/>
@@ -13,7 +10,7 @@
 7,21,21,21,21,21,21,21,21,190,21,21,21,21,21,7,
 7,21,21,21,21,21,21,21,21,21,21,21,21,21,21,7,
 7,21,21,21,21,21,21,21,21,21,21,21,21,21,21,7,
-7,21,21,21,190,21,21,21,21,21,21,190,190,21,21,7,
+7,21,21,21,190,21,21,21,21,21,21,190,21,21,21,7,
 7,21,21,21,21,21,21,21,21,21,21,21,21,21,21,7,
 7,21,21,21,21,21,21,21,21,21,21,21,21,21,21,7,
 16,6,6,6,6,6,6,6,6,6,6,6,6,6,6,17
@@ -53,16 +50,14 @@
   <object id="21" name="Rotator" type="Rotator" gid="213" x="176" y="80" width="32" height="32">
    <properties>
     <property name="ControlsMulti" value="activated [cell (11, 5)]"/>
-    <property name="ControlsMulti2" value="activated [cell (12, 5)]"/>
    </properties>
   </object>
-  <object id="22" name="Lock 4" type="Lock" gid="208" x="144" y="32" width="16" height="16">
+  <object id="22" name="Lock 1" type="Lock" gid="208" x="144" y="32" width="16" height="16">
    <properties>
-    <property name="Code" value="0101"/>
-    <property name="ControlsMulti" value="activatedNF [cell (9, 2)]"/>
+    <property name="Code" value="1"/>
+    <property name="Controls" value="activeCell (9, 2)"/>
    </properties>
   </object>
-  <object id="23" name="Quball" type="Quball" gid="209" x="192" y="96" width="16" height="16"/>
-  <object id="24" name="QuballMulti" type="QuballMulti" gid="210" x="96" y="96" width="16" height="16"/>
+  <object id="28" name="Quball" type="Quball" gid="209" x="96" y="96" width="16" height="16"/>
  </objectgroup>
 </map>

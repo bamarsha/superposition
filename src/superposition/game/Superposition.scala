@@ -30,6 +30,7 @@ private final class Superposition extends Game {
     engine.addSystem(new RenderingSystem(Iterable(
       new MapLayerRenderer(() => levels.current),
       new SpriteRenderer(() => levels.current),
+      new TextRenderer(() => levels.current),
       new BeamRenderer(() => levels.current),
       new CellHighlightRenderer(() => levels.current),
       new MultiverseRenderer)))
@@ -49,6 +50,8 @@ private final class Superposition extends Game {
 private object Superposition {
   /** The level playlist. */
   private val playlist: Seq[String] = Seq(
+    "level_h1.tmx",
+    "level_h2.tmx",
     "level_qft1.tmx",
     "level_base.tmx",
     "level_x1.tmx",

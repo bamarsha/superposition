@@ -3,7 +3,9 @@
  <tileset firstgid="1" source="sprites.tsx"/>
  <object name="Oracle" type="Oracle" gid="8" width="16" height="16">
   <properties>
-   <property name="Gates" value="???"/>
+   <property name="Conjugate" type="bool" value="false"/>
+   <property name="Gates" value="Apply Fourier on cell (4, 5)."/>
+   <property name="Name" value="Fourier"/>
   </properties>
  </object>
 </template>

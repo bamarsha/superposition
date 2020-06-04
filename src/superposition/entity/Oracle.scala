@@ -20,7 +20,8 @@ final class Oracle(
     multiverse: Multiverse,
     cell: Vector2[Int],
     unitary: Unitary,
-    conjugate: Boolean)
+    conjugate: Boolean,
+    name: String)
   extends Entity {
   locally {
     add(new OracleUnitary(unitary, conjugate))
@@ -28,6 +29,7 @@ final class Oracle(
     add(new Collider(Set(cell).pure[QExpr]))
     add(new Renderable(1, ().pure[QExpr]))
     add(new SpriteView(texture.pure[QExpr]))
+    add(new Text(name, (cell map (_.toDouble)) + Vector2(.5, 1)))
   }
 }
 
