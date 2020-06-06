@@ -17,6 +17,9 @@ final class MultiverseRenderer extends Renderer with Disposable {
   /** The batch. */
   private val batch: Batch = new SpriteBatch
 
+  /** The shape renderer. */
+  private val shapeRenderer: ShapeRenderer = new ShapeRenderer
+
   /** The universe frame buffer. */
   private val universeBuffer = new PostProcessedBuffer(resolve("shaders/sprite.frag"))
 
@@ -84,17 +87,8 @@ final class MultiverseRenderer extends Renderer with Disposable {
     multiverseView.clearRenderers()
   }
 
-  override def dispose(): Unit = {
-    batch.dispose()
-    universeBuffer.dispose()
-    multiverseBuffer.dispose()
-    noiseBuffer.dispose()
-  }
-
   def drawCompass(multiverseView: MultiverseView, universe: Universe, color: Color): Unit = {
-    val shapeRenderer = new ShapeRenderer()
     shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
-
     val radius = .4f
 
     shapeRenderer.begin(Filled)
@@ -113,5 +107,12 @@ final class MultiverseRenderer extends Renderer with Disposable {
                            1.5f + radius * math.sin(universe.amplitude.phase).toFloat,
                            .001f)
     shapeRenderer.end()
+  }
+
+  override def dispose(): Unit = {
+    batch.dispose()
+    universeBuffer.dispose()
+    multiverseBuffer.dispose()
+    noiseBuffer.dispose()
   }
 }
