@@ -1,10 +1,8 @@
 package superposition.entity
 
-import cats.syntax.applicative.catsSyntaxApplicativeId
 import cats.syntax.flatMap.toFlatMapOps
 import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import superposition.component._
@@ -28,7 +26,7 @@ final class QuballMulti(id: Int, multiverse: Multiverse, initialCell: Vector2[In
     val fourierBit = multiverse.allocate("In Fourier Space?", false, if (_) "Yes" else "No")
 
     add(new EntityId(id))
-    add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))
+    add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5), true))
     add(new PrimaryBit(bits))
     add(new Activator(bits))
     add(new Carriable(carried))

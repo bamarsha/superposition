@@ -27,7 +27,7 @@ final class Quball(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) e
     val cell = multiverse.allocate("Position", initialCell)
 
     add(new EntityId(id))
-    add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))
+    add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5), true))
     add(new PrimaryBit(Seq(onOff)))
     add(new Activator(Seq(onOff)))
     add(new Carriable(carried))

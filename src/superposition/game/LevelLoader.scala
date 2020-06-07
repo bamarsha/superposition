@@ -29,7 +29,7 @@ private object LevelLoader {
     */
   def loadLevel(map: TiledMap): Level = {
     // Spawn object entities.
-    val multiverse = new Multiverse(walls(map))
+    val multiverse = new Multiverse(walls(map, "Collision"), walls(map, "Grates"))
     for (entity <- getEntities(multiverse, map)) {
       println(s"Spawning ${entity.getClass.getSimpleName}.")
       multiverse.addEntity(entity)
@@ -69,8 +69,8 @@ private object LevelLoader {
       .getLayers
       .getByType(classOf[TiledMapTileLayer])
       .asScala
-      .filter(_.isVisible)
       .zipWithIndex
+      .filter(_._1.isVisible)
       .map(layerEntity(map, renderer, multiverse).tupled)
 
   /** Returns the entity for a tile map layer.
@@ -210,9 +210,10 @@ private object LevelLoader {
     * @param map the tile map
     * @return the set of walls in the tile map
     */
-  private def walls(map: TiledMap): Set[Vector2[Int]] =
+  private def walls(map: TiledMap, key: String): Set[Vector2[Int]] =
     (map.getLayers.asScala flatMap {
-      case layer: TiledMapTileLayer if hasCollision(layer) =>
+      case layer: TiledMapTileLayer
+        if layer.getProperties.containsKey(key) && layer.getProperties.get(key, classOf[Boolean]) =>
         for {
           x <- 0 until layer.getWidth
           y <- 0 until layer.getHeight
@@ -222,14 +223,6 @@ private object LevelLoader {
         } yield Vector2(cellX, cellY)
       case _ => Nil
     }).toSet
-
-  /** Returns true if the tile map layer has collision.
-    *
-    * @param layer the tile map layer
-    * @return true if the tile map layer has collision
-    */
-  private def hasCollision(layer: MapLayer): Boolean =
-    layer.getProperties.containsKey("Collision") && layer.getProperties.get("Collision", classOf[Boolean])
 
   /** Returns true if the tile map layer has a tile at the position.
     *

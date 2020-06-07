@@ -12,8 +12,9 @@ import scala.math.sqrt
 /** The multiverse component is the quantum system for a level.
   *
   * @param walls the set of cells in the multiverse that always have collision
+  * @param grates the set of cells in the multiverse that always block quballs
   */
-final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
+final class Multiverse(val walls: Set[Vector2[Int]], val grates: Set[Vector2[Int]]) extends Component {
   /** The universes in the multiverse. */
   private var _universes: Seq[Universe] = Seq(Universe.empty)
 
@@ -147,6 +148,13 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     for (cells <- QExpr.prepare(Collider.mapper.get(_: Entity).cells)) yield
       walls.contains(cell) || (entities filter Collider.mapper.has exists (cells(_).contains(cell)))
 
+  /** Returns true if the cell is blocked by a grate.
+    *
+    * @param cell the cell to look at
+    * @return true if the cell is blocked by a grate
+    */
+  def isGrate(cell: Vector2[Int]): Boolean = grates.contains(cell)
+
   /** Returns true in index idx if this cell has at least one |1⟩ activator in index idx
     *
     * @param cell the cell to look at
@@ -180,7 +188,9 @@ final class Multiverse(val walls: Set[Vector2[Int]]) extends Component {
     for {
       cell <- QExpr.prepare(QuantumPosition.mapper.get(_: Entity).cell.value)
       blocked <- QExpr.prepare(isBlocked)
-    } yield entities filter QuantumPosition.mapper.has forall (cell andThen blocked andThen (!_))
+    } yield entities filter QuantumPosition.mapper.has forall { e =>
+      !(blocked(cell(e)) || (QuantumPosition.mapper.get(e).blockedByGrates && isGrate(cell(e))))
+    }
 
   /** Shows all states in the universe.
     *
