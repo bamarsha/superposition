@@ -6,7 +6,7 @@ import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx.input
-import superposition.component.{Beam, ClassicalPosition, Multiverse}
+import superposition.component.{Beam, ClassicalPosition, Multiverse, Outline}
 import superposition.entity.Level
 import superposition.math.QExpr.QExpr
 import superposition.math.{StateId, Vector2}
@@ -22,12 +22,12 @@ final class LaserInputSystem(level: () => Option[Level])
   extends IteratingSystem(Family.all(classOf[Beam], classOf[ClassicalPosition]).get) {
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
     val beam = Beam.mapper.get(entity)
-    val cell = ClassicalPosition.mapper.get(entity).cells.head
+    val outline = Outline.mapper.get(entity)
     val multiverse = level().get.multiverse
     val multiverseView = level().get.multiverseView
 
     // Apply the gate when the laser is clicked.
-    if (input.isButtonJustPressed(0) && multiverseView.isSelected(cell)) {
+    if (input.isButtonJustPressed(0) && multiverseView.isSelected(outline)) {
       multiverse.applyUnitary(beam.gate.multi.onQExpr(beamHits(multiverse, entity)), true)
       multiverse.updateMetaWith(beam.lastTarget)(const(beamTarget(multiverse, entity)))
       multiverse.updateMetaWith(beam.lastBeamSeq)(const(beam.control map (Some(_))))

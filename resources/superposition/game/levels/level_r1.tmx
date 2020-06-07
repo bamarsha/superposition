@@ -4,8 +4,7 @@
   <export target="." format="tmx"/>
  </editorsettings>
  <properties>
-  <property name="Gates">Apply X on qubit 14.
-Apply X on qubit 21.</property>
+  <property name="Gates" value="Apply X on qubit 14."/>
  </properties>
  <tileset firstgid="1" source="../tilesets/industrial-sprite-sheet-DeadEnd-LMZ.tsx"/>
  <tileset firstgid="205" source="../tilesets/sprites.tsx"/>

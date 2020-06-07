@@ -24,13 +24,14 @@ final class Rotator(
   locally {
     val cells = Set(cell, cell + Vector2(1, 0), cell + Vector2(0, 1), cell + Vector2(1, 1))
     val texture = control1 map (bits => if (bits.any) onTexture else offTexture)
-    val unitary = Gate.Phase.onQExpr(
-      for (c1 <- control1; c2 <- control2)
-        yield 1.0 * c1.toInt * c2.toInt / (1 << c1.length.max(c2.length)))
+    val phase = for (c1 <- control1; c2 <- control2)
+      yield 1.0 * c1.toInt * c2.toInt / (1 << c1.length.max(c2.length))
+    val unitary = Gate.Phase.onQExpr(phase)
 
     add(new OracleUnitary(unitary, true))
     add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(1, 1), cells))
     add(new Collider(cells.pure[QExpr]))
+    add(new Outline(phase map (_ != 0), cell map (_.toDouble), Vector2(2, 2)))
     add(new Renderable(1, texture))
     add(new SpriteView(texture, scale = Vector2(2.0, 2.0).pure[QExpr]))
   }

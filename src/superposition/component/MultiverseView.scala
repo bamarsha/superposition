@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector3
 import superposition.component.MultiverseView.UniversePartRenderer
 import superposition.graphics.UniverseRenderInfo
 import superposition.math.QExpr.QExpr
-import superposition.math.{Universe, Vector2}
+import superposition.math.Universe
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -23,12 +23,13 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
 
   /** Returns true if the cell is selected by the mouse.
     *
-    * @param cell the cell to check
+    * @param outline the outline to check
     * @return true if the cell is selected by the mouse
     */
-  def isSelected(cell: Vector2[Int]): Boolean = {
+  def isSelected(outline: Outline): Boolean = {
     val mouse = camera.unproject(new Vector3(input.getX, input.getY, 0))
-    cell == Vector2(mouse.x.floor.toInt, mouse.y.floor.toInt)
+    outline.lowerLeft.x <= mouse.x && mouse.x <= outline.lowerLeft.x + outline.size.x &&
+      outline.lowerLeft.y <= mouse.y && mouse.y <= outline.lowerLeft.y + outline.size.y
   }
 
   /** Enqueues a renderer that will be called for each universe.

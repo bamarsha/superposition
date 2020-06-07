@@ -32,6 +32,7 @@ private final class Superposition extends Game {
       new SpriteRenderer(() => levels.current),
       new TextRenderer(() => levels.current),
       new BeamRenderer(() => levels.current),
+      new OutlineRenderer(() => levels.current),
       new CellHighlightRenderer(() => levels.current),
       new MultiverseRenderer)))
     engine.addSystem(new StateDisplaySystem(() => levels.current))

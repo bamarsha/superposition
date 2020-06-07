@@ -3,17 +3,16 @@ package superposition.graphics
 import com.badlogic.ashley.core.{Entity, Family}
 import com.badlogic.gdx.Gdx.gl
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Color.RED
 import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.{Filled, Line}
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled
 import com.badlogic.gdx.utils.Disposable
 import superposition.component.{Beam, ClassicalPosition, Renderable}
 import superposition.entity.Level
 import superposition.graphics.BeamRenderer._
 import superposition.graphics.ColorUtils.ColorOps
 import superposition.math.Direction.{Down, Left, Right, Up}
-import superposition.math.{Universe, Vector2}
+import superposition.math.Universe
 
 import scala.math.min
 
@@ -30,14 +29,8 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer with Dispo
   override def render(entity: Entity, deltaTime: Float): Unit = {
     val multiverseView = level().get.multiverseView
     shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
-    val cell = ClassicalPosition.mapper.get(entity).cells.head
     val dependentState = Renderable.mapper.get(entity).dependentState
-    multiverseView.enqueueRenderer(dependentState) { (universe, renderInfo) =>
-      if (multiverseView.isSelected(cell)) {
-        drawOutline(shapeRenderer, cell)
-      }
-      drawBeam(entity, universe, renderInfo)
-    }
+    multiverseView.enqueueRenderer(dependentState)(drawBeam(entity))
   }
 
   /** Draws the laser beam.
@@ -46,7 +39,7 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer with Dispo
     * @param universe the universe
     * @param renderInfo the rendering information for the universe
     */
-  private def drawBeam(entity: Entity, universe: Universe, renderInfo: UniverseRenderInfo): Unit = {
+  private def drawBeam(entity: Entity)(universe: Universe, renderInfo: UniverseRenderInfo): Unit = {
     val source = ClassicalPosition.mapper.get(entity).cells.head
     val beam = Beam.mapper.get(entity)
     for (target <- universe.meta(beam.lastTarget);
@@ -90,16 +83,4 @@ private object BeamRenderer {
 
   /** Total width of a singly-controlled beam */
   private val singleWidth: Float = .3f
-
-  /** Draws an outline around a cell.
-    *
-    * @param shapeRenderer a shape renderer
-    * @param cell the cell
-    */
-  private def drawOutline(shapeRenderer: ShapeRenderer, cell: Vector2[Int]): Unit = {
-    shapeRenderer.begin(Line)
-    shapeRenderer.setColor(RED)
-    shapeRenderer.rect(cell.x, cell.y, 1, 1)
-    shapeRenderer.end()
-  }
 }
