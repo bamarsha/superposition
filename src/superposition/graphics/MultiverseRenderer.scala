@@ -17,6 +17,9 @@ final class MultiverseRenderer extends Renderer with Disposable {
   /** The batch. */
   private val batch: Batch = new SpriteBatch
 
+  /** The shape renderer. */
+  private val shapeRenderer = new ShapeRenderer
+
   /** The universe frame buffer. */
   private val universeBuffer = new PostProcessedBuffer(resolve("shaders/sprite.frag"))
 
@@ -92,7 +95,6 @@ final class MultiverseRenderer extends Renderer with Disposable {
   }
 
   def drawCompass(multiverseView: MultiverseView, universe: Universe, color: Color): Unit = {
-    val shapeRenderer = new ShapeRenderer()
     shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
 
     val radius = .4f
@@ -103,15 +105,18 @@ final class MultiverseRenderer extends Renderer with Disposable {
     shapeRenderer.circle(1.5f, 1.5f, radius, 24)
     shapeRenderer.end()
 
-    shapeRenderer.begin(Line)
+    shapeRenderer.begin(Filled)
     gl.glDisable(GL_BLEND)
-    shapeRenderer.setColor(0, 0, 0, 1)
-    shapeRenderer.circle(1.5f, 1.5f, radius, 24)
     shapeRenderer.setColor(color)
     shapeRenderer.rectLine(1.5f, 1.5f,
-                           1.5f + radius * math.cos(universe.amplitude.phase).toFloat,
-                           1.5f + radius * math.sin(universe.amplitude.phase).toFloat,
-                           .001f)
+      1.5f + radius * math.cos(universe.amplitude.phase).toFloat,
+      1.5f + radius * math.sin(universe.amplitude.phase).toFloat,
+      .05f)
+    shapeRenderer.end()
+
+    shapeRenderer.begin(Line)
+    shapeRenderer.setColor(0, 0, 0, 1)
+    shapeRenderer.circle(1.5f, 1.5f, radius, 24)
     shapeRenderer.end()
   }
 }

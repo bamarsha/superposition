@@ -120,7 +120,8 @@ void main() {
     float noise = 0.;
     float scale = 1.;
     for (int i = 0; i < 1; i++) {
-        noise += snoise(vec3(texCoords.xy * scale * 15., time / 5.)) / scale;
+        vec2 newTexCoords = texCoords.xy * vec2(16., 9.) / 10.;
+        noise += snoise(vec3(newTexCoords * scale * 15., time / 5.)) / scale;
         scale *= 2.;
     }
     noise = probability * exp(5. * noise);
