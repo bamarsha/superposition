@@ -62,9 +62,15 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
   /** Draws the state table to the frame buffer. */
   private def drawState(): Unit = {
     val multiverse = level().get.multiverse
-    val headers = multiverse.stateIds.view map (_.name)
-    val columns = (multiverse.universes.view map multiverse.showUniverse).transpose
-    val importants = columns map (column => column exists (_ != column.head))
+    var headers = multiverse.stateIds.view map (_.name) prepended "Amplitude"
+    var columns = (multiverse.universes.view map multiverse.showUniverse).transpose
+    var importants = columns map (column => column exists (_ != column.head))
+
+//    if (importants.forall(!_)) return
+//    headers = headers.zip(importants).filter(_._2).map(_._1).toSeq.view
+//    columns = columns.zip(importants).filter(_._2).map(_._1)
+//    importants = importants.filter(identity)
+
     val widths = columns.zip(headers) map { case (column, header) => textWidth(header).max((column map textWidth).max) }
     val totalWidth = widths.sum
     val xs = widths.scanLeft(16f)(_ + _)
@@ -82,10 +88,12 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
 
     shapeRenderer.setProjectionMatrix(projection)
     shapeRenderer.begin(Filled)
-    drawRectangle(WHITE, ys.head, totalWidth)
-    for ((y, minValue) <- ys.tail.zip(minValues)) {
-      drawRectangle((new Color).fromHsv(minValue * 360, 1, 1), y, totalWidth)
-    }
+    shapeRenderer.setColor(.5f, .5f, .5f, 0.75f)
+    shapeRenderer.rect(12f, ys.head + 2, totalWidth - 2, ys.last - 16 - ys.head)
+    //    drawRectangle(WHITE, ys.head, totalWidth)
+//    for ((y, minValue) <- ys.tail.zip(minValues)) {
+//      drawRectangle((new Color).fromHsv(minValue * 360, 1, 1), y, totalWidth)
+//    }
     shapeRenderer.end()
 
     batch.setProjectionMatrix(projection)
@@ -93,7 +101,10 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
     for ((((header, column), important), x) <- headers.zip(columns).zip(importants).zip(xs)) {
       font.setColor(if (important) importantColor else normalColor)
       font.draw(batch, header, x, ys.head)
-      for ((y, cell) <- ys.tail.zip(column)) {
+      for (((y, cell), minValue) <- ys.tail.zip(column).zip(minValues)) {
+        val color = (new Color).fromHsv(minValue * 360, 1, 1)
+        color.a = 1
+        font.setColor(if (important) color else normalColor)
         font.draw(batch, cell, x, y)
       }
     }

@@ -48,6 +48,16 @@ final case class Complex(real: Double, imaginary: Double = 0) {
 
   /** The phase angle θ when this complex number is written in the polar form re^iθ^. */
   def phase: Double = atan2(imaginary, real)
+
+  /** The complex conjugate of this number. */
+  def conjugate: Complex = Complex(real, -imaginary)
+
+  override def toString: String =
+    if (imaginary >= 0) f"$real%.3f + $imaginary%.3fi"
+    else {
+      val im2 = -imaginary
+      f"$real%.3f - $im2%.3fi"
+    }
 }
 
 /** Complex number factory. */

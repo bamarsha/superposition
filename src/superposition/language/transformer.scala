@@ -15,5 +15,14 @@ private final case class OnTransformer(argument: Expression) extends Transformer
   */
 private final case class IfTransformer(condition: Expression) extends Transformer
 
+/** The multi-transformer converts a gate into a repeated version.
+  *
+  * @param number the number
+  * */
+private final case class RepeatTransformer(number: Expression) extends Transformer
+
 /** The multi-transformer converts a gate into one that takes a sequence of arguments. */
 private case object MultiTransformer extends Transformer
+
+/** The adjoint-transformer converts a gate into its adjoint. */
+private case object AdjointTransformer extends Transformer

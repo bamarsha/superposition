@@ -2,16 +2,23 @@ package superposition.graphics
 
 import com.badlogic.ashley.core._
 import com.badlogic.gdx.Gdx.gl
+import com.badlogic.gdx.graphics.GL20.GL_BLEND
 import com.badlogic.gdx.graphics.g2d.{Batch, SpriteBatch}
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.{Filled, Line}
 import com.badlogic.gdx.graphics.{Color, GL20}
 import com.badlogic.gdx.utils.Disposable
 import superposition.component._
 import superposition.game.ResourceResolver.resolve
+import superposition.math.Universe
 
 /** Renders the multiverse. */
 final class MultiverseRenderer extends Renderer with Disposable {
   /** The batch. */
   private val batch: Batch = new SpriteBatch
+
+  /** The shape renderer. */
+  private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
   /** The universe frame buffer. */
   private val universeBuffer = new PostProcessedBuffer(resolve("shaders/sprite.frag"))
@@ -53,7 +60,9 @@ final class MultiverseRenderer extends Renderer with Disposable {
     for (universe <- multiverse.universes) {
       universeBuffer.clear()
       universeBuffer.buffer.begin()
-      multiverseView.render(universe, UniverseRenderInfo(new Color(1, 1, 1, .3f).fromHsv(minValue * 360f, 1, 1)))
+      val color = new Color(1, 1, 1, .3f).fromHsv(minValue * 360f, 1, 1)
+      multiverseView.render(universe, UniverseRenderInfo(color))
+      drawCompass(multiverseView, universe, color)
       universeBuffer.buffer.end()
 
       val probability = universe.amplitude.squaredMagnitude.toFloat
@@ -76,6 +85,31 @@ final class MultiverseRenderer extends Renderer with Disposable {
     batch.end()
 
     multiverseView.clearRenderers()
+  }
+
+  def drawCompass(multiverseView: MultiverseView, universe: Universe, color: Color): Unit = {
+    shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
+    val radius = .4f
+
+    shapeRenderer.begin(Filled)
+    gl.glEnable(GL_BLEND)
+    shapeRenderer.setColor(.5f, .5f, .5f, .5f)
+    shapeRenderer.circle(1.5f, 1.5f, radius, 24)
+    shapeRenderer.end()
+
+    shapeRenderer.begin(Filled)
+    gl.glDisable(GL_BLEND)
+    shapeRenderer.setColor(color)
+    shapeRenderer.rectLine(1.5f, 1.5f,
+      1.5f + radius * math.cos(universe.amplitude.phase).toFloat,
+      1.5f + radius * math.sin(universe.amplitude.phase).toFloat,
+      .05f)
+    shapeRenderer.end()
+
+    shapeRenderer.begin(Line)
+    shapeRenderer.setColor(0, 0, 0, 1)
+    shapeRenderer.circle(1.5f, 1.5f, radius, 24)
+    shapeRenderer.end()
   }
 
   override def dispose(): Unit = {

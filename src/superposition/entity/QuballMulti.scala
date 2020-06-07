@@ -1,10 +1,8 @@
 package superposition.entity
 
-import cats.syntax.applicative.catsSyntaxApplicativeId
 import cats.syntax.flatMap.toFlatMapOps
 import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.graphics.Color.WHITE
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import superposition.component._
@@ -25,12 +23,14 @@ final class QuballMulti(id: Int, multiverse: Multiverse, initialCell: Vector2[In
     val bits = Seq.tabulate(size)(i => multiverse.allocate("Bit " + i, false, if (_) "1" else "0"))
     val carried = multiverse.allocate("Is Carried?", false, if (_) "Carried" else "Dropped")
     val cell = multiverse.allocate("Position", initialCell)
+    val fourierBit = multiverse.allocate("In Fourier Space?", false, if (_) "Yes" else "No")
 
     add(new EntityId(id))
-    add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))
+    add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5), true))
     add(new PrimaryBit(bits))
     add(new Activator(bits))
     add(new Carriable(carried))
+    add(new FourierBit(fourierBit))
     add(new Renderable(
       1,
       for {
@@ -39,9 +39,8 @@ final class QuballMulti(id: Int, multiverse: Multiverse, initialCell: Vector2[In
         cellValue <- cell.value
       } yield (bits map bitValue, carriedValue, cellValue)))
     add(new SpriteView(
-      texture = texture.pure[QExpr],
-      scale = carried.value map (if (_) Vector2(0.5, 0.5) else Vector2(0.75, 0.75)),
-      color = WHITE.pure[QExpr]))
+      texture = fourierBit.value map (if (_) textureFourier else texture),
+      scale = carried.value map (if (_) Vector2(0.5, 0.5) else Vector2(0.75, 0.75))))
   }
 }
 
@@ -49,4 +48,7 @@ final class QuballMulti(id: Int, multiverse: Multiverse, initialCell: Vector2[In
 private object QuballMulti {
   /** The texture for a quball. */
   private val texture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/quball_4.png")))
+
+  /** The texture for a quball in Fourier space. */
+  private val textureFourier: TextureRegion = new TextureRegion(new Texture(resolve("sprites/quball_4_fourier.png")))
 }

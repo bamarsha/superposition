@@ -31,7 +31,7 @@ object Gate {
     * @tparam A the expression type
     * @return the quantum gate
     */
-  private def apply[A](f: A => Unitary): Gate[A] = new Gate(f)
+  def apply[A](f: A => Unitary): Gate[A] = new Gate(f)
 
   /** An instance of the contravariant monoidal type class for gates. */
   implicit object GateCM extends ContravariantMonoidal[Gate] {
@@ -56,7 +56,7 @@ object Gate {
     def adjoint: Gate[A] = Gate(gate.apply andThen (_.adjoint))
 
     /** A new gate that applies this gate to each argument in the sequence in order. */
-    def multi: Gate[Seq[A]] = Gate {
+    def multi: Gate[Iterable[A]] = Gate {
       case Nil => Unitary.identity
       case x :: xs => gate(x) * gate.multi(xs)
     }
@@ -107,8 +107,16 @@ object Gate {
       * @param predicate the predicate that must be satisfied to apply the original gate
       * @return the controlled gate
       */
-    def controlled(predicate: QExpr[Boolean]): Gate[A] = /*_*/
-      multi.controlledMap(predicate map (if (_) Seq(_) else const(Seq.empty))) /*_*/
+    def controlled(predicate: QExpr[A => Boolean]): Gate[A] = /*_*/
+      multi.onQExpr.contramap(a => predicate.map(_(a)).map(if (_) Seq(a) else Seq())) /*_*/
+
+    /** Returns a new gate that applies the original gate a number of times based on the input.
+      *
+      * @param number the number of times to apply the original gate
+      * @return the repeated gate
+      */
+    def repeat(number: QExpr[A => Int]): Gate[A] = /*_*/
+      multi.onQExpr.contramap(a => number.map(_(a)).map(Seq.fill(_)(a))) /*_*/
 
     /** Returns a new gate that maps its argument to a sequence and applies the original gate with each value in the
       * sequence.
@@ -148,5 +156,39 @@ object Gate {
         NonEmptyList.of(universe.updatedStateWith(id)(_ + delta))
       override def adjoint: Unitary = Translate(id, -delta)
     }
+  }
+
+  val Ri: Gate[Double] = Gate(theta => new Unitary {
+    override def apply(universe: Universe): NonEmptyList[Universe] = NonEmptyList.of(universe * Complex.polar(1, theta))
+    override def adjoint: Unitary = Ri(-theta)
+  })
+
+  val Phase: Gate[Double] = Ri.contramap(_ * 2 * math.Pi)
+
+  val Rz: Gate[(StateId[Boolean], Double)] = Ri
+    .contramap((_: (StateId[Boolean], Double))._2)
+    .controlled(QExpr.prepare(_._1.value))
+
+  val CNot: Gate[(StateId[Boolean], StateId[Boolean])] = Gate { case (a, b) =>
+    X.controlled(a.value.map(const))(b)
+  }
+
+  val Swap: Gate[(StateId[Boolean], StateId[Boolean])] = Gate {
+    case (a, b) => CNot(a, b) * CNot(b, a) * CNot(a, b)
+  }
+
+  val QFT: Gate[Seq[StateId[Boolean]]] = Gate { ids =>
+    val len = ids.length
+    var u = Unitary.identity
+    for (i <- Seq.range(0, len/2)) {
+      u = Swap(ids(len-1-i), ids(i)) * u
+    }
+    for (i <- Seq.range(0, len)) {
+      u = H(ids(i)) * u
+      for (j <- Seq.range(i + 1, len)) {
+        u = Rz.controlled(ids(j).value.map(const))(ids(i), 2 * math.Pi / math.pow(2, j-i+1)) * u
+      }
+    }
+    u
   }
 }

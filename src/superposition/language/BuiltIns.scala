@@ -6,9 +6,9 @@ import cats.syntax.flatMap.toFlatMapOps
 import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Component
 import com.badlogic.gdx.maps.tiled.TiledMap
-import superposition.component.{LockCode, Multiverse, PrimaryBit, QuantumPosition}
+import superposition.component.{FourierBit, LockCode, Multiverse, PrimaryBit, QuantumPosition}
 import superposition.math.QExpr.QExpr
-import superposition.math.{BitSeq, StateId, Vector2}
+import superposition.math.{BitSeq, Gate, StateId, Vector2}
 
 /** The built-in functions.
   *
@@ -20,7 +20,10 @@ private final class BuiltIns(multiverse: Multiverse, map: TiledMap) {
   private val height: Int = Option(map.getProperties.get("height", classOf[Int])).get
 
   /** Returns true in index `i` if all cells have at least one |1⟩ activator in index `i`. */
-  val activated: QExpr[Iterable[Vector2[Int]] => BitSeq] = QExpr.prepare(multiverse.allActivated)
+  val activated: QExpr[Iterable[Vector2[Int]] => BitSeq] = QExpr.prepare(multiverse.allActivated(true))
+
+  /** Returns true in index `i` if all cells have at least one |1⟩ activator in index `i`. */
+  val activatedNF: QExpr[Iterable[Vector2[Int]] => BitSeq] = QExpr.prepare(multiverse.allActivated(false))
 
   /** Returns true if all bits are true. */
   val and: QExpr[Iterable[Boolean] => Boolean] = ((_: Iterable[Boolean]) forall identity).pure[QExpr]
@@ -44,6 +47,20 @@ private final class BuiltIns(multiverse: Multiverse, map: TiledMap) {
       throw new RuntimeException("Entity with id " + id + " does not exist")
       ).getComponent(c)
 
+  val Fourier: Gate[Vector2[Int]] = Gate { cell =>
+    val flipFourier = Gate.X.multi.controlledMap(fourierAt)(cell)
+    val qftNonFourier = Gate.QFT.multi.onQExpr(multiverse.allInCell(cell).map {
+      _
+        .filter(!FourierBit.mapper.has(_))
+        .filter(PrimaryBit.mapper.has)
+        .map(PrimaryBit.mapper.get(_).bits)
+    })
+    flipFourier * qftNonFourier
+  }
+
+  /** Gets all the fourier bits in the given cell. */
+  val fourierAt: QExpr[Vector2[Int] => Iterable[StateId[Boolean]]] = QExpr.prepare(multiverse.fourierBits)
+
   /** Filters the sequence to include only the given indices. */
   def indices[A]: QExpr[((Seq[A], Seq[Int])) => Seq[A]] =
     Monad[QExpr].pure { case (items, indices) => indices map (items(_)) }
@@ -53,6 +70,9 @@ private final class BuiltIns(multiverse: Multiverse, map: TiledMap) {
 
   /** Returns true if any bit is true. */
   val or: QExpr[Iterable[Boolean] => Boolean] = ((_: Iterable[Boolean]) exists identity).pure[QExpr]
+
+  /** Gets all the primary bits in the given cell. */
+  val primaryAt: QExpr[Vector2[Int] => Iterable[Seq[StateId[Boolean]]]] = QExpr.prepare(multiverse.primaryBits)
 
   /** Returns the primary qubits for the entity with the ID. */
   val qubits: QExpr[Int => Seq[StateId[Boolean]]] =

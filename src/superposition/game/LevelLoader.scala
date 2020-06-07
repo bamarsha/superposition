@@ -29,7 +29,7 @@ private object LevelLoader {
     */
   def loadLevel(map: TiledMap): Level = {
     // Spawn object entities.
-    val multiverse = new Multiverse(walls(map))
+    val multiverse = new Multiverse(walls(map, "Collision"), walls(map, "Grates"))
     for (entity <- getEntities(multiverse, map)) {
       println(s"Spawning ${entity.getClass.getSimpleName}.")
       multiverse.addEntity(entity)
@@ -37,7 +37,7 @@ private object LevelLoader {
 
     // Apply initial gates.
     for (gates <- Option(map.getProperties.get("Gates", classOf[String]))) {
-      multiverse.applyUnitary(new Interpreter(multiverse, map).evalUnitary(gates))
+      multiverse.applyUnitary(new Interpreter(multiverse, map).evalUnitary(gates), true)
     }
 
     // Create the map renderer.
@@ -69,8 +69,8 @@ private object LevelLoader {
       .getLayers
       .getByType(classOf[TiledMapTileLayer])
       .asScala
-      .filter(_.isVisible)
       .zipWithIndex
+      .filter(_._1.isVisible)
       .map(layerEntity(map, renderer, multiverse).tupled)
 
   /** Returns the entity for a tile map layer.
@@ -120,6 +120,17 @@ private object LevelLoader {
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
         val control = controlExprBitSeq(multiverse, map, obj.getProperties)
         new Laser(multiverse, cells.head, gate, direction, control)
+      case "Rotator" =>
+        val control1 = controlExprBitSeq(multiverse, map, obj.getProperties)
+        val control2 = Option(obj.getProperties.get("ControlsMulti2", classOf[String]))
+          .map(new Interpreter(multiverse, map).evalExpression)
+          .getOrElse(controlExpr(multiverse, map, obj.getProperties).map(BitSeq(_)))
+        new Rotator(multiverse, cells.head, control1, control2)
+      case "Oracle" =>
+        val gate = new Interpreter(multiverse, map).evalUnitary(obj.getProperties.get("Gates", classOf[String]))
+        val conjugate = obj.getProperties.get("Conjugate", classOf[Boolean])
+        val name = obj.getProperties.get("Name", classOf[String])
+        new Oracle(multiverse, cells.head, gate, conjugate, name)
       case "Door" =>
         val control = controlExpr(multiverse, map, obj.getProperties)
         new Door(multiverse, cells.head, control)
@@ -199,9 +210,10 @@ private object LevelLoader {
     * @param map the tile map
     * @return the set of walls in the tile map
     */
-  private def walls(map: TiledMap): Set[Vector2[Int]] =
+  private def walls(map: TiledMap, key: String): Set[Vector2[Int]] =
     (map.getLayers.asScala flatMap {
-      case layer: TiledMapTileLayer if hasCollision(layer) =>
+      case layer: TiledMapTileLayer
+        if layer.getProperties.containsKey(key) && layer.getProperties.get(key, classOf[Boolean]) =>
         for {
           x <- 0 until layer.getWidth
           y <- 0 until layer.getHeight
@@ -211,14 +223,6 @@ private object LevelLoader {
         } yield Vector2(cellX, cellY)
       case _ => Nil
     }).toSet
-
-  /** Returns true if the tile map layer has collision.
-    *
-    * @param layer the tile map layer
-    * @return true if the tile map layer has collision
-    */
-  private def hasCollision(layer: MapLayer): Boolean =
-    layer.getProperties.containsKey("Collision") && layer.getProperties.get("Collision", classOf[Boolean])
 
   /** Returns true if the tile map layer has a tile at the position.
     *

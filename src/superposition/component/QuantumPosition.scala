@@ -12,7 +12,8 @@ import superposition.math.{MetaId, StateId, Vector2}
 final class QuantumPosition(
     val absolute: MetaId[Vector2[Double]],
     val cell: StateId[Vector2[Int]],
-    var relative: Vector2[Double])
+    var relative: Vector2[Double],
+    val blockedByGrates: Boolean = false)
   extends Component
 
 /** Contains the component mapper for the quantum position component. */
