@@ -10,10 +10,10 @@ import superposition.game.ResourceResolver.resolve
 import superposition.math.QExpr.QExpr
 import superposition.math._
 
-/** A laser applies a quantum gate to any qubit hit by its beam.
+/** A rotator applies a phase gate multi-controlled on the target qubits.
   *
   * @param multiverse the multiverse
-  * @param cell the position of the laser
+  * @param cell the position of the rotator
   */
 final class Rotator(
     multiverse: Multiverse,
@@ -23,7 +23,7 @@ final class Rotator(
   extends Entity {
   locally {
     val cells = Set(cell, cell + Vector2(1, 0), cell + Vector2(0, 1), cell + Vector2(1, 1))
-    val texture = control1 map (bits => if (bits.any) onTexture else offTexture)
+    val texture = onTexture.pure[QExpr]
     val phase = for (c1 <- control1; c2 <- control2)
       yield 1.0 * c1.toInt * c2.toInt / (1 << c1.length.max(c2.length))
     val unitary = Gate.Phase.onQExpr(phase)
@@ -37,11 +37,8 @@ final class Rotator(
   }
 }
 
-/** Contains the animations for lasers. */
+/** Contains the animations for rotators. */
 private object Rotator {
-  /** The animation for an inactive laser. */
-  private val offTexture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/rotator.png")))
-
-  /** The animation for an active laser. */
+  /** The animation for an active rotator. */
   private val onTexture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/rotator.png")))
 }
