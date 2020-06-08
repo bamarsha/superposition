@@ -55,7 +55,7 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
     lastUniverses = universes
 
     batch.begin()
-    batch.draw(buffer.getColorBufferTexture, 0, graphics.getHeight, graphics.getWidth, -graphics.getHeight)
+    batch.draw(buffer.getColorBufferTexture, 0, buffer.getHeight, buffer.getWidth, -buffer.getHeight)
     batch.end()
   }
 
@@ -76,7 +76,7 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
     val xs = widths.scanLeft(16f)(_ + _)
     val ys = multiverse.universes.view
       .map(const(-20f))
-      .scanLeft(graphics.getHeight - 16f)(_ + _)
+      .scanLeft(buffer.getHeight - 16f)(_ + _)
     val minValues = multiverse.universes.view
       .map(_.amplitude.squaredMagnitude.toFloat)
       .scanLeft(0f)(_ + _)
