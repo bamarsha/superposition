@@ -43,28 +43,34 @@ assemblyMergeStrategy in assembly := {
 
 val appImage = taskKey[File]("Creates an application image.")
 appImage := {
-  val baseDir = assembly.value.getParentFile / "app-image"
+  val log = streams.value.log
+  val originalJar = assembly.value
+  val jarMainClass = (assembly / mainClass).value
+  val baseDir = originalJar.getParentFile / "app-image"
   val inputDir = baseDir / "input"
   val destDir = baseDir / "dest"
-  val mainJar = inputDir / assembly.value.getName
+  val inputJar = inputDir / originalJar.getName
 
-  // jpackage needs this directory to be empty.
-  Directory(destDir).deleteRecursively()
+  if (originalJar.lastModified <= destDir.lastModified) {
+    log.info(s"Application image is already up-to-date in: ${destDir.getAbsolutePath}")
+  } else {
+    // jpackage needs this directory to be empty.
+    Directory(destDir).deleteRecursively()
 
-  inputDir.mkdirs()
-  copy(assembly.value.toPath, mainJar.toPath, REPLACE_EXISTING)
-  assert(
-    Seq("jpackage",
-        "--type", "app-image",
-        "--input", inputDir.getAbsolutePath,
-        "--dest", destDir.getAbsolutePath,
-        "--name", name.value,
-        "--main-jar", mainJar.getName,
-        "--main-class", (assembly / mainClass).value.get,
-        "--java-options", "-XX:+UseParallelGC").! == 0,
-    "Running jpackage failed.")
-
-  val log = streams.value.log
-  log.info(s"Created application image in: ${destDir.getAbsolutePath}")
+    inputDir.mkdirs()
+    copy(originalJar.toPath, inputJar.toPath, REPLACE_EXISTING)
+    assert(
+      Seq("jpackage",
+          "--type", "app-image",
+          "--input", inputDir.getAbsolutePath,
+          "--dest", destDir.getAbsolutePath,
+          "--name", name.value,
+          "--main-jar", inputJar.getName,
+          "--main-class", jarMainClass.get,
+          "--java-options", "-XX:+UseParallelGC")
+        .! == 0,
+      "Running jpackage failed.")
+    log.info(s"Created application image in: ${destDir.getAbsolutePath}")
+  }
   destDir
 }
