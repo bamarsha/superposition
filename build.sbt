@@ -63,5 +63,8 @@ appImage := {
         "--main-class", (assembly / mainClass).value.get,
         "--java-options", "-XX:+UseParallelGC").! == 0,
     "Running jpackage failed.")
+
+  val log = streams.value.log
+  log.info(s"Created application image in: ${destDir.getAbsolutePath}")
   destDir
 }
