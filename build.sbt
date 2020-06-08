@@ -1,3 +1,9 @@
+import java.nio.file.Files.copy
+import java.nio.file.StandardCopyOption.REPLACE_EXISTING
+
+import scala.reflect.io.Directory
+import scala.sys.process.stringSeqToProcess
+
 name := "Superposition"
 version := "0.2-SNAPSHOT"
 
@@ -6,8 +12,9 @@ Compile / scalacOptions ++= Seq(
   "-Xsource:3",
   "-Ymacro-annotations",
   "-opt:l:method",
-//  "-opt:l:inline",
-//  "-opt-inline-from:**",
+  // TODO:
+  //  "-opt:l:inline",
+  //  "-opt-inline-from:**",
   "-feature",
   "-deprecation")
 Compile / scalaSource := baseDirectory.value / "src"
@@ -32,4 +39,29 @@ libraryDependencies += "org.typelevel" %% "spire" % "0.17.0-M1"
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", "versions", "9", "module-info.class") => MergeStrategy.first
   case path => (assemblyMergeStrategy in assembly).value(path)
+}
+
+val appImage = taskKey[File]("Creates an application image.")
+appImage := {
+  val baseDir = assembly.value.getParentFile / "app-image"
+  val inputDir = baseDir / "input"
+  val destDir = baseDir / "dest"
+  val mainJar = inputDir / assembly.value.getName
+
+  // jpackage needs this directory to be empty.
+  Directory(destDir).deleteRecursively()
+
+  inputDir.mkdirs()
+  copy(assembly.value.toPath, mainJar.toPath, REPLACE_EXISTING)
+  assert(
+    Seq("jpackage",
+        "--type", "app-image",
+        "--input", inputDir.getAbsolutePath,
+        "--dest", destDir.getAbsolutePath,
+        "--name", name.value,
+        "--main-jar", mainJar.getName,
+        "--main-class", (assembly / mainClass).value.get,
+        "--java-options", "-XX:+UseParallelGC").! == 0,
+    "Running jpackage failed.")
+  destDir
 }
