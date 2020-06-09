@@ -8,7 +8,7 @@ import superposition.math.QExpr.QExpr
   * @param layer the layer to render in
   * @param dependentState the quantum state that the renderers depend on
   */
-final class Renderable(val layer: Int, val dependentState: QExpr[Any]) extends Component
+final class Renderable(val layer: QExpr[Int], val dependentState: QExpr[Any]) extends Component
 
 /** Contains the component mapper for the renderable component. */
 object Renderable {

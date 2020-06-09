@@ -1,5 +1,6 @@
 package superposition.entity
 
+import cats.syntax.applicative.catsSyntaxApplicativeId
 import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
@@ -19,7 +20,7 @@ import superposition.math.Vector2
 final class Door(multiverse: Multiverse, cell: Vector2[Int], control: QExpr[Boolean]) extends Entity {
   add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5)))
   add(new Collider(control map (if (_) Set.empty else Set(cell))))
-  add(new Renderable(1, control))
+  add(new Renderable(1.pure[QExpr], control))
   add(new SpriteView(control map (if (_) openTexture else closedTexture)))
 }
 

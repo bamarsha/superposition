@@ -31,7 +31,9 @@ final class Quball(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) e
     add(new PrimaryBit(Seq(onOff)))
     add(new Activator(Seq(onOff)))
     add(new Carriable(carried))
-    add(new Renderable(1, Apply[QExpr].map3(onOff.value, carried.value, cell.value)((_, _, _))))
+    add(new Renderable(
+      carried.value map (if (_) 3 else 1),
+      Apply[QExpr].map3(onOff.value, carried.value, cell.value)((_, _, _))))
     add(new SpriteView(
       texture = texture.pure[QExpr],
       scale = carried.value map (if (_) Vector2(0.5, 0.5) else Vector2(0.75, 0.75)),

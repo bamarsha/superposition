@@ -1,5 +1,6 @@
 package superposition.entity
 
+import cats.syntax.applicative.catsSyntaxApplicativeId
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import superposition.component.{MapLayerView, Multiverse, Renderable}
@@ -20,6 +21,6 @@ final class MapLayer(
     multiverse: Multiverse,
     control: QExpr[Boolean])
   extends Entity {
-  add(new Renderable(renderLayer, control))
+  add(new Renderable(renderLayer.pure[QExpr], control))
   add(new MapLayerView(renderer, mapLayer, control))
 }

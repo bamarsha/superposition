@@ -31,9 +31,7 @@ final class TextRenderer(level: () => Option[Level]) extends Renderer with Dispo
 
   override def render(entity: Entity, deltaTime: Float): Unit = {
     val multiverseView = level().get.multiverseView
-    val dependentState = Renderable.mapper.get(entity).dependentState
-
-    multiverseView.enqueueRenderer(dependentState) { (universe, renderInfo) =>
+    multiverseView.enqueueRenderer(Renderable.mapper.get(entity)) { (universe, renderInfo) =>
       draw(entity, multiverseView.camera.combined, universe, renderInfo)
     }
   }

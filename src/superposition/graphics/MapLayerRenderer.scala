@@ -17,12 +17,10 @@ final class MapLayerRenderer(level: () => Option[Level]) extends Renderer {
   override val family: Family = Family.all(classOf[MapLayerView]).get
 
   override def render(entity: Entity, deltaTime: Float): Unit = {
-    val multiverse = level().get.multiverse
     val multiverseView = level().get.multiverseView
     val mapView = MapLayerView.mapper.get(entity)
     val shader = mapView.renderer.getBatch.getShader
-    val dependentState = Renderable.mapper.get(entity).dependentState
-    multiverseView.enqueueRenderer(dependentState) { (universe, renderInfo) =>
+    multiverseView.enqueueRenderer(Renderable.mapper.get(entity)) { (universe, renderInfo) =>
       shader.begin()
       val drawOn = mapView.control(universe)
       val tintColor = renderInfo.color.cpy().mul(1, 1, 1, if (drawOn) 2 else .5f)

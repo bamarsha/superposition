@@ -1,5 +1,6 @@
 package superposition.entity
 
+import cats.syntax.applicative.catsSyntaxApplicativeId
 import cats.syntax.flatMap.toFlatMapOps
 import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
@@ -12,6 +13,7 @@ import superposition.component.Player.isWalking
 import superposition.component._
 import superposition.entity.Cat.{deadAnimation, standingAnimation, walkingAnimation}
 import superposition.game.ResourceResolver.resolve
+import superposition.math.QExpr.QExpr
 import superposition.math.Vector2
 
 /** Schrödinger's cat.
@@ -41,7 +43,7 @@ final class Cat(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) exte
     add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))
     add(new PrimaryBit(Seq(alive)))
     add(new Renderable(
-      2,
+      2.pure[QExpr],
       for {
         isAlive <- alive.value
         currentCell <- cell.value

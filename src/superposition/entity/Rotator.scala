@@ -32,7 +32,7 @@ final class Rotator(
     add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(1, 1), cells))
     add(new Collider(cells.pure[QExpr]))
     add(new Outline(phase map (_ != 0), cell map (_.toDouble), Vector2(2, 2)))
-    add(new Renderable(1, texture))
+    add(new Renderable(1.pure[QExpr], texture))
     add(new SpriteView(texture, scale = Vector2(2.0, 2.0).pure[QExpr]))
   }
 }

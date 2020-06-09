@@ -1,5 +1,6 @@
 package superposition.entity
 
+import cats.syntax.applicative.catsSyntaxApplicativeId
 import cats.syntax.flatMap.toFlatMapOps
 import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
@@ -32,7 +33,7 @@ final class QuballMulti(id: Int, multiverse: Multiverse, initialCell: Vector2[In
     add(new Carriable(carried))
     add(new FourierBit(fourierBit))
     add(new Renderable(
-      1,
+      1.pure[QExpr],
       for {
         bitValue <- QExpr.prepare((_: StateId[Boolean]).value)
         carriedValue <- carried.value

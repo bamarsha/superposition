@@ -45,7 +45,7 @@ final class Laser(
     add(new Collider(cells.pure[QExpr]))
     add(new Beam(multiverse, gate, direction, control))
     add(new Outline(control map (_.any), cell map (_.toDouble), Vector2(2, 2)))
-    add(new Renderable(1, frame))
+    add(new Renderable(1.pure[QExpr], frame))
     add(new SpriteView(frame, baseTexture, scale = Vector2(2.0, 2.0).pure[QExpr]))
     add(new Animated(animation, animationTime, lastAnimation, keepTime))
   }

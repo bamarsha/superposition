@@ -34,11 +34,11 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
 
   /** Enqueues a renderer that will be called for each universe.
     *
-    * @param dependentState the value of the quantum state that the renderer depends on
+    * @param renderable the renderable component for the rendered entity
     * @param render the rendering action
     */
-  def enqueueRenderer(dependentState: QExpr[Any])(render: (Universe, UniverseRenderInfo) => Unit): Unit =
-    renderers.append(UniversePartRenderer(render, dependentState))
+  def enqueueRenderer(renderable: Renderable)(render: (Universe, UniverseRenderInfo) => Unit): Unit =
+    renderers.append(UniversePartRenderer(render, renderable))
 
   /** Renders all of the queued renderers for the universe.
     *
@@ -49,24 +49,25 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
     * @param renderInfo the rendering information for the universe
     */
   def render(universe: Universe, renderInfo: UniverseRenderInfo): Unit =
-    for (renderer <- renderers) {
-      renderer.render(universe, if (isSameInAllUniverses(renderer)) UniverseRenderInfo.default else renderInfo)
+    for (renderer <- renderers.view sortBy (_.renderable.layer(universe))) {
+      val dependentState = renderer.renderable.dependentState
+      renderer.render(universe, if (isSameInAllUniverses(dependentState)) UniverseRenderInfo.default else renderInfo)
     }
 
   /** Clears the renderer queue for this frame. */
   def clearRenderers(): Unit = renderers.clear()
 
-  /** Returns true if the renderer's dependent state is the same in all universes.
+  /** Returns true if the dependent state is the same in all universes.
     *
-    * @param renderer the universe part renderer
-    * @return true if the renderer's dependent state is the same in all universes
+    * @param dependentState the dependent state
+    * @return true if the dependent state is the same in all universes
     */
-  private def isSameInAllUniverses(renderer: UniversePartRenderer): Boolean = {
+  private def isSameInAllUniverses(dependentState: QExpr[Any]): Boolean = {
     val iterator = multiverse.universes.iterator
-    var state = renderer.dependentState(iterator.next())
+    var state = dependentState(iterator.next())
     var allSame = true
     while (allSame && iterator.hasNext) {
-      val nextState = renderer.dependentState(iterator.next())
+      val nextState = dependentState(iterator.next())
       allSame &&= state == nextState
       state = nextState
     }
@@ -79,12 +80,12 @@ object MultiverseView {
 
   /** Renders a part of a universe.
     *
-    * @param render the action that renders the part
-    * @param dependentState the value of the quantum state that the renderer depends on
+    * @param render the rendering action
+    * @param renderable the renderable component for the rendered entity
     */
   private final case class UniversePartRenderer(
       render: (Universe, UniverseRenderInfo) => Unit,
-      dependentState: QExpr[Any])
+      renderable: Renderable)
 
   /** The component mapper for the multiverse view component. */
   val mapper: ComponentMapper[MultiverseView] = ComponentMapper.getFor(classOf[MultiverseView])

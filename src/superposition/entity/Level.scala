@@ -25,7 +25,7 @@ final class Level(
   extends Entity with Disposable {
   add(multiverse)
   add(multiverseView)
-  add(new Renderable(0, ().pure[QExpr]))
+  add(new Renderable(0.pure[QExpr], ().pure[QExpr]))
 
   override def dispose(): Unit = {
     mapShader.dispose()

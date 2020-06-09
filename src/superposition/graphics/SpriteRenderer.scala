@@ -33,9 +33,8 @@ final class SpriteRenderer(level: () => Option[Level]) extends Renderer with Dis
 
   override def render(entity: Entity, deltaTime: Float): Unit = {
     val multiverseView = level().get.multiverseView
-    val dependentState = Renderable.mapper.get(entity).dependentState
     batch.setProjectionMatrix(multiverseView.camera.combined)
-    multiverseView.enqueueRenderer(dependentState) { (universe, renderInfo) =>
+    multiverseView.enqueueRenderer(Renderable.mapper.get(entity)) { (universe, renderInfo) =>
       batch.begin()
       draw(entity, universe, renderInfo)
       batch.end()

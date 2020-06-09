@@ -10,6 +10,6 @@ import superposition.math.QExpr.QExpr
   * @param layer the layer in which to render the cell highlighting
   */
 final class CellHighlighter(layer: Int) extends Entity {
-  add(new Renderable(layer, ().pure[QExpr]))
+  add(new Renderable(layer.pure[QExpr], ().pure[QExpr]))
   add(CellHighlightView)
 }

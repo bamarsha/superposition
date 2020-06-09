@@ -1,34 +1,18 @@
 package superposition.system
 
 import com.badlogic.ashley.core.{Entity, Family}
-import com.badlogic.ashley.systems.SortedIteratingSystem
+import com.badlogic.ashley.systems.IteratingSystem
 import superposition.component.Renderable
 import superposition.graphics.Renderer
-import superposition.system.RenderingSystem.compareLayers
 
 /** The rendering system uses the renderers to render all renderable entities.
   *
   * @param renderers the renderers
   */
 final class RenderingSystem(renderers: Iterable[Renderer])
-  extends SortedIteratingSystem(Family.all(classOf[Renderable]).get, compareLayers) {
+  extends IteratingSystem(Family.all(classOf[Renderable]).get) {
   override def processEntity(entity: Entity, deltaTime: Float): Unit =
     for (renderer <- renderers if renderer.family.matches(entity)) {
       renderer.render(entity, deltaTime)
     }
-}
-
-/** Functions for the rendering system. */
-private object RenderingSystem {
-  /** Compares the layers of both entities and returns an integer whose sign indicates the result.
-    *
-    * @param entity1 the first entity
-    * @param entity2 the second entity
-    * @return the comparison result
-    */
-  private def compareLayers(entity1: Entity, entity2: Entity): Int = {
-    val layer1 = Renderable.mapper.get(entity1).layer
-    val layer2 = Renderable.mapper.get(entity2).layer
-    layer1.compare(layer2)
-  }
 }

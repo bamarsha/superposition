@@ -1,5 +1,6 @@
 package superposition.entity
 
+import cats.syntax.applicative.catsSyntaxApplicativeId
 import cats.syntax.functor.toFunctorOps
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
@@ -34,7 +35,7 @@ final class Lock(id: Int, multiverse: Multiverse, cell: Vector2[Int], code: Seq[
     add(new EntityId(id))
     add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(0.5, 0.5)))
     add(new LockCode(code, isOpen))
-    add(new Renderable(1, frame))
+    add(new Renderable(1.pure[QExpr], frame))
     add(new SpriteView(frame))
     add(new Animated(animation, animationTime, lastAnimation, invertTime))
   }

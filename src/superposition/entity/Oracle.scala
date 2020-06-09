@@ -28,7 +28,7 @@ final class Oracle(
     add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(.5, .5), Set(cell)))
     add(new Collider(Set(cell).pure[QExpr]))
     add(new Outline(true.pure[QExpr], cell map (_.toDouble), Vector2(1, 1)))
-    add(new Renderable(1, ().pure[QExpr]))
+    add(new Renderable(1.pure[QExpr], ().pure[QExpr]))
     add(new SpriteView(texture.pure[QExpr]))
     add(new Text(name, (cell map (_.toDouble)) + Vector2(.5, 1)))
   }

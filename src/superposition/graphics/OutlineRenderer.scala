@@ -22,8 +22,7 @@ final class OutlineRenderer(level: () => Option[Level]) extends Renderer with Di
     val multiverseView = level().get.multiverseView
     shapeRenderer.setProjectionMatrix(multiverseView.camera.combined)
     val outline = Outline.mapper.get(entity)
-    val dependentState = Renderable.mapper.get(entity).dependentState
-    multiverseView.enqueueRenderer(dependentState) { (universe, renderInfo) =>
+    multiverseView.enqueueRenderer(Renderable.mapper.get(entity)) { (universe, _) =>
       if (outline.visible(universe) && multiverseView.isSelected(outline)) {
         shapeRenderer.begin(Line)
         shapeRenderer.setColor(RED)
@@ -36,5 +35,3 @@ final class OutlineRenderer(level: () => Option[Level]) extends Renderer with Di
 
   override def dispose(): Unit = shapeRenderer.dispose()
 }
-
-
