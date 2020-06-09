@@ -15,6 +15,9 @@ final class LevelPlaylist(engine: Engine) {
   /** The list of level factories. */
   private var factories: Seq[LevelFactory] = Nil
 
+  /** The index of the current level. */
+  private var currentIndex: Int = 0
+
   /** The current level. */
   private var _current: Option[Level] = None
 
@@ -31,17 +34,24 @@ final class LevelPlaylist(engine: Engine) {
 
   /** Advances to the next level in the playlist. */
   def next(): Unit = {
-    factories = factories match {
-      case Nil => Nil
-      case _ :: next => next
+    if (currentIndex < factories.size - 1) {
+      currentIndex += 1
+      play()
     }
-    play()
+  }
+
+  /** Retreats to the previous level in the playlist. */
+  def prev(): Unit = {
+    if (currentIndex > 0) {
+      currentIndex -= 1
+      play()
+    }
   }
 
   /** Plays the current level or resets the current level if it is already playing. */
   def play(): Unit = {
     current.foreach(removeLevel(engine))
-    _current = factories.headOption map (_ ())
+    _current = Some(factories(currentIndex)())
     current.foreach(addLevel(engine))
   }
 }

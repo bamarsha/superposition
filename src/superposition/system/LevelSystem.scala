@@ -2,7 +2,7 @@ package superposition.system
 
 import com.badlogic.ashley.core.{Engine, Entity, EntitySystem, Family}
 import com.badlogic.gdx.Gdx.input
-import com.badlogic.gdx.Input.Keys.{N, R}
+import com.badlogic.gdx.Input.Keys._
 import superposition.component._
 import superposition.game.LevelPlaylist
 
@@ -25,8 +25,13 @@ final class LevelSystem(levels: LevelPlaylist) extends EntitySystem {
   }
 
   override def update(deltaTime: Float): Unit = {
+    if (input.isKeyJustPressed(P)) {
+      levels.prev()
+      return
+    }
     if (input.isKeyJustPressed(R)) {
       levels.play()
+      return
     }
     val multiverse = levels.current.get.multiverse
     val allExitSquares = exits.flatMap(ClassicalPosition.mapper.get(_).cells).toSet
@@ -34,6 +39,7 @@ final class LevelSystem(levels: LevelPlaylist) extends EntitySystem {
       .forall(entityCell => multiverse.universes.map(_.state(entityCell)).forall(allExitSquares.contains))
     if (input.isKeyJustPressed(N) || playersAtExits) {
       levels.next()
+      return
     }
   }
 }
