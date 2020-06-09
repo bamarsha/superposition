@@ -27,19 +27,16 @@ final class LevelSystem(levels: LevelPlaylist) extends EntitySystem {
   override def update(deltaTime: Float): Unit = {
     if (input.isKeyJustPressed(P)) {
       levels.prev()
-      return
-    }
-    if (input.isKeyJustPressed(R)) {
+    } else if (input.isKeyJustPressed(R)) {
       levels.play()
-      return
-    }
-    val multiverse = levels.current.get.multiverse
-    val allExitSquares = exits.flatMap(ClassicalPosition.mapper.get(_).cells).toSet
-    val playersAtExits = players.map(QuantumPosition.mapper.get(_).cell)
-      .forall(entityCell => multiverse.universes.map(_.state(entityCell)).forall(allExitSquares.contains))
-    if (input.isKeyJustPressed(N) || playersAtExits) {
-      levels.next()
-      return
+    } else {
+      val multiverse = levels.current.get.multiverse
+      val allExitSquares = exits.flatMap(ClassicalPosition.mapper.get(_).cells).toSet
+      val playersAtExits = players.map(QuantumPosition.mapper.get(_).cell)
+        .forall(entityCell => multiverse.universes.map(_.state(entityCell)).forall(allExitSquares.contains))
+      if (input.isKeyJustPressed(N) || playersAtExits) {
+        levels.next()
+      }
     }
   }
 }
