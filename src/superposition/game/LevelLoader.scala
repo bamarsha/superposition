@@ -63,16 +63,13 @@ private object LevelLoader {
     * @param multiverse the multiverse
     * @return entities for all visible tile map layers
     */
-  private def layerEntities(map: TiledMap,
-                            renderer: OrthogonalTiledMapRenderer,
-                            multiverse: Multiverse): Iterable[MapLayerEntity] =
-    map
-      .getLayers
+  private def layerEntities(map: TiledMap, renderer: OrthogonalTiledMapRenderer, multiverse: Multiverse) =
+    map.getLayers
       .getByType(classOf[TiledMapTileLayer])
       .asScala
       .zipWithIndex
       .filter(_._1.isVisible)
-      .map(layerEntity(map, renderer, multiverse).tupled)
+      .map((layerEntity(map, renderer, multiverse) _).tupled)
 
   /** Returns the entity for a tile map layer.
     *
