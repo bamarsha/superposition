@@ -21,29 +21,36 @@ object AppImage {
     val inputDir = baseDir / "input"
     val destDir = baseDir / "dest"
     val inputJar = inputDir / jar.getName
-
     if (jar.lastModified <= destDir.lastModified) {
       log.info(s"Application image is already up-to-date in: ${destDir.getAbsolutePath}")
     } else {
-      // jpackage needs this directory to be empty.
       Directory(destDir).deleteRecursively()
-
       inputDir.mkdirs()
       copy(jar.toPath, inputJar.toPath, REPLACE_EXISTING)
-      assert(
-        List(
-          "jpackage",
-          "--type", "app-image",
-          "--input", inputDir.getAbsolutePath,
-          "--dest", destDir.getAbsolutePath,
-          "--name", name,
-          "--main-jar", inputJar.getName,
-          "--main-class", mainClass,
-          "--java-options", "-XX:+UseParallelGC")
-          .! == 0,
-        "Running jpackage failed.")
+      jpackage(inputDir, destDir, name, inputJar, mainClass)
       log.info(s"Created application image in: ${destDir.getAbsolutePath}")
     }
     destDir
+  }
+
+  /** Runs the `jpackage` command.
+    *
+    * @param input The path of the input directory that contains the files to be packaged.
+    * @param dest The path where generated output file is placed.
+    * @param name The name of the application and/or package.
+    * @param mainJar The main JAR of the application.
+    * @param mainClass The qualified name of the application main class to execute.
+    */
+  private def jpackage(input: File, dest: File, name: String, mainJar: File, mainClass: String): Unit = {
+    val args = List(
+      "jpackage",
+      "--type", "app-image",
+      "--input", input.getAbsolutePath,
+      "--dest", dest.getAbsolutePath,
+      "--name", name,
+      "--main-jar", mainJar.relativeTo(input).get.getPath,
+      "--main-class", mainClass,
+      "--java-options", "-XX:+UseParallelGC")
+    assert(args.! == 0, "jpackage finished with non-zero exit code.")
   }
 }
