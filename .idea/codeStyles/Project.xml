@@ -10,8 +10,5 @@
       <option name="SD_ALIGN_EXCEPTION_COMMENTS" value="false" />
       <option name="SD_ALIGN_RETURN_COMMENTS" value="false" />
     </ScalaCodeStyleSettings>
-    <codeStyleSettings language="Scala">
-      <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
-    </codeStyleSettings>
   </code_scheme>
 </component>
