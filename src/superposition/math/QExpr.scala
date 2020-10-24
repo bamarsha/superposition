@@ -1,13 +1,14 @@
 package superposition.math
 
 import cats.Monad
-import cats.syntax.flatMap.toFlatMapOps
-import cats.syntax.functor.toFunctorOps
+import cats.syntax.flatMap._
+import cats.syntax.functor._
 import io.estatico.newtype.macros.newtype
-import io.estatico.newtype.ops.toCoercibleIdOps
+import io.estatico.newtype.ops._
 
 import scala.Function.const
 import scala.collection.mutable
+import scala.language.implicitConversions
 
 /** Quantum expressions. */
 object QExpr {
@@ -95,7 +96,7 @@ object QExpr {
       * @tparam A the expression type
       * @return the quantum expression
       */
-    private def apply[A](f: Universe => A): QExpr[A] = /*_*/ f.coerce /*_*/
+    private def apply[A](f: Universe => A) = f.coerce[QExpr[A]]
 
     /** Returns the quantum expression for the value of the state ID.
       *
