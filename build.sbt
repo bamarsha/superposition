@@ -1,9 +1,3 @@
-import java.nio.file.Files.copy
-import java.nio.file.StandardCopyOption.REPLACE_EXISTING
-
-import scala.reflect.io.Directory
-import scala.sys.process.stringSeqToProcess
-
 name := "Superposition"
 version := "0.3-SNAPSHOT"
 
@@ -41,36 +35,5 @@ assemblyMergeStrategy in assembly := {
   case path => (assemblyMergeStrategy in assembly).value(path)
 }
 
-val appImage = taskKey[File]("Creates an application image.")
-appImage := {
-  val log = streams.value.log
-  val originalJar = assembly.value
-  val jarMainClass = (assembly / mainClass).value
-  val baseDir = originalJar.getParentFile / "app-image"
-  val inputDir = baseDir / "input"
-  val destDir = baseDir / "dest"
-  val inputJar = inputDir / originalJar.getName
-
-  if (originalJar.lastModified <= destDir.lastModified) {
-    log.info(s"Application image is already up-to-date in: ${destDir.getAbsolutePath}")
-  } else {
-    // jpackage needs this directory to be empty.
-    Directory(destDir).deleteRecursively()
-
-    inputDir.mkdirs()
-    copy(originalJar.toPath, inputJar.toPath, REPLACE_EXISTING)
-    assert(
-      Seq("jpackage",
-          "--type", "app-image",
-          "--input", inputDir.getAbsolutePath,
-          "--dest", destDir.getAbsolutePath,
-          "--name", name.value,
-          "--main-jar", inputJar.getName,
-          "--main-class", jarMainClass.get,
-          "--java-options", "-XX:+UseParallelGC")
-        .! == 0,
-      "Running jpackage failed.")
-    log.info(s"Created application image in: ${destDir.getAbsolutePath}")
-  }
-  destDir
-}
+lazy val appImage = taskKey[File]("Creates an application image.")
+appImage := AppImage.create(name.value, assembly.value, (assembly / mainClass).value.get, streams.value.log)
