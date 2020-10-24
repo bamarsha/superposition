@@ -37,12 +37,13 @@ private object LevelLoader {
 
     // Apply initial gates.
     for (gates <- Option(map.getProperties.get("Gates", classOf[String]))) {
-      multiverse.applyUnitary(new Interpreter(multiverse, map).evalUnitary(gates), true)
+      multiverse.applyUnitary(new Interpreter(multiverse, map).evalUnitary(gates), conjugate = true)
     }
 
     // Create the map renderer.
-    val camera = new OrthographicCamera(map.getProperties.get("width", classOf[Int]),
-                                        map.getProperties.get("height", classOf[Int]))
+    val camera = new OrthographicCamera(
+      map.getProperties.get("width", classOf[Int]).toFloat,
+      map.getProperties.get("height", classOf[Int]).toFloat)
     camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0)
     camera.update()
     val shader = new ShaderProgram(resolve("shaders/sprite.vert"), resolve("shaders/spriteMixColor.frag"))

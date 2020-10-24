@@ -27,7 +27,7 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
     * @return true if the cell is selected by the mouse
     */
   def isSelected(outline: Outline): Boolean = {
-    val mouse = camera.unproject(new Vector3(input.getX, input.getY, 0))
+    val mouse = camera.unproject(new Vector3(input.getX.toFloat, input.getY.toFloat, 0))
     outline.lowerLeft.x <= mouse.x && mouse.x <= outline.lowerLeft.x + outline.size.x &&
       outline.lowerLeft.y <= mouse.y && mouse.y <= outline.lowerLeft.y + outline.size.y
   }

@@ -35,7 +35,7 @@ final class CellHighlightRenderer(level: () => Option[Level]) extends Renderer w
       shapeRenderer.begin(ShapeType.Filled)
       shapeRenderer.setColor(1, 1, 1, 0.3f)
       for (cell <- occupiedCells) {
-        shapeRenderer.rect(cell.x, cell.y, 1, 1)
+        shapeRenderer.rect(cell.x.toFloat, cell.y.toFloat, 1, 1)
       }
       shapeRenderer.end()
       gl.glDisable(GL_BLEND)

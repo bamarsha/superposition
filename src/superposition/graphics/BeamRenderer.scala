@@ -53,9 +53,9 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer with Dispo
         shapeRenderer.setColor(new Color(1, 1, 1, opacity).fromHsv(i * huePerBeam, 1, 1).mixed(renderInfo.color))
         beam.direction match {
           case Left | Right =>
-            shapeRenderer.rect(source.x + 0.5f, source.y + beamOffset(i), target.x - source.x, beamWidth)
+            shapeRenderer.rect(source.x + 0.5f, source.y + beamOffset(i), (target.x - source.x).toFloat, beamWidth)
           case Up | Down =>
-            shapeRenderer.rect(source.x + beamOffset(i), source.y + 0.5f, beamWidth, target.y - source.y)
+            shapeRenderer.rect(source.x + beamOffset(i), source.y + 0.5f, beamWidth, (target.y - source.y).toFloat)
         }
       }
       shapeRenderer.end()

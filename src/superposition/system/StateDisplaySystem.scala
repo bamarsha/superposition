@@ -39,7 +39,7 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
   private val buffer: FrameBuffer = new FrameBuffer(RGBA8888, graphics.getWidth, graphics.getHeight, false)
 
   /** The projection matrix. */
-  private val projection: Matrix4 = (new Matrix4).setToOrtho2D(0, 0, graphics.getWidth, graphics.getHeight)
+  private val projection = new Matrix4().setToOrtho2D(0, 0, graphics.getWidth.toFloat, graphics.getHeight.toFloat)
 
   /** The universes in the multiverse when the state display was last updated. */
   private var lastUniverses: Seq[Universe] = Nil
@@ -55,7 +55,12 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
     lastUniverses = universes
 
     batch.begin()
-    batch.draw(buffer.getColorBufferTexture, 0, buffer.getHeight, buffer.getWidth, -buffer.getHeight)
+    batch.draw(
+      buffer.getColorBufferTexture,
+      0,
+      buffer.getHeight.toFloat,
+      buffer.getWidth.toFloat,
+      -buffer.getHeight.toFloat)
     batch.end()
   }
 
