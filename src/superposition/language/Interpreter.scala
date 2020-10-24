@@ -152,9 +152,10 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
   private def makeGate(name: String): Gate[_] = name match {
     case "X" => X
     case "H" => H
-    case "Translate" => Translate contramap[NTuple] {
-      case NTuple(id: StateId[Vector2[Int]], delta: Vector2[Int]) => (id, delta)
-    }
+    case "Translate" =>
+      Translate.contramap[NTuple] {
+        case NTuple(id, delta) => (id.asInstanceOf[StateId[Vector2[Int]]], delta.asInstanceOf[Vector2[Int]])
+      }
     case "QFT" => QFT
     case "Phase" => Phase
     case "Fourier" => builtIns.Fourier
