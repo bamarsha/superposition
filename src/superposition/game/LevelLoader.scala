@@ -54,7 +54,7 @@ private object LevelLoader {
     val renderer = new OrthogonalTiledMapRenderer(map, 1 / 16f, batch)
     renderer.setView(camera)
 
-    val layers = layerEntities(map, renderer, multiverse) ++ Iterable(new CellHighlighter(1))
+    val layers = layerEntities(map, renderer, multiverse) ++ Iterable(CellHighlighter(1))
     new Level(multiverse, new MultiverseView(multiverse, camera), layers, shader, batch)
   }
 
@@ -85,10 +85,10 @@ private object LevelLoader {
   private def layerEntity(map: TiledMap, renderer: OrthogonalTiledMapRenderer, multiverse: Multiverse)(
       mapLayer: MapLayer,
       index: Int
-  ): MapLayerEntity = {
+  ): Entity = {
     val renderLayer = Option(mapLayer.getProperties.get("Layer", classOf[Int])).getOrElse(0)
     val control = controlExprBitSeq(multiverse, map, mapLayer.getProperties)
-    new MapLayerEntity(renderer, renderLayer, index, multiverse, control.map(_.any))
+    MapLayerEntity(renderer, renderLayer, index, multiverse, control.map(_.any))
   }
 
   /** Returns the entities for all of the objects in the tile map.
@@ -114,36 +114,36 @@ private object LevelLoader {
     val id = obj.getProperties.get("id", classOf[Int])
     val cells = objectCells(map, obj)
     obj.getProperties.get("type") match {
-      case "Player" => new Cat(id, multiverse, cells.head)
-      case "Quball" => new Quball(id, multiverse, cells.head)
-      case "QuballMulti" => new QuballMulti(id, multiverse, cells.head, 4)
+      case "Player" => Cat(id, multiverse, cells.head)
+      case "Quball" => Quball(id, multiverse, cells.head)
+      case "QuballMulti" => QuballMulti(id, multiverse, cells.head, 4)
       case "Laser" =>
         val gate = toGate(obj.getProperties.get("Gate", classOf[String]))
         val direction = Direction.withName(obj.getProperties.get("Direction", classOf[String]))
         val control = controlExprBitSeq(multiverse, map, obj.getProperties)
-        new Laser(multiverse, cells.head, gate, direction, control)
+        Laser(multiverse, cells.head, gate, direction, control)
       case "Rotator" =>
         val control1 = controlExprBitSeq(multiverse, map, obj.getProperties)
         val control2 = Option(obj.getProperties.get("ControlsMulti2", classOf[String]))
           .map(new Interpreter(multiverse, map).evalExpression)
           .getOrElse(controlExpr(multiverse, map, obj.getProperties).map(BitSeq(_)))
-        new Rotator(multiverse, cells.head, control1, control2)
+        Rotator(multiverse, cells.head, control1, control2)
       case "Oracle" =>
         val gate = new Interpreter(multiverse, map).evalUnitary(obj.getProperties.get("Gates", classOf[String]))
         val conjugate = obj.getProperties.get("Conjugate", classOf[Boolean])
         val name = obj.getProperties.get("Name", classOf[String])
-        new Oracle(multiverse, cells.head, gate, conjugate, name)
+        Oracle(multiverse, cells.head, gate, conjugate, name)
       case "Door" =>
         val control = controlExpr(multiverse, map, obj.getProperties)
-        new Door(multiverse, cells.head, control)
+        Door(multiverse, cells.head, control)
       case "DoubleDoor" =>
         val control = controlExpr(multiverse, map, obj.getProperties)
-        new DoubleDoor(multiverse, cells.head, control)
+        DoubleDoor(multiverse, cells.head, control)
       case "Lock" =>
         val code = obj.getProperties.get("Code", classOf[String]).map(_ == '1')
         val control = controlExprBitSeq(multiverse, map, obj.getProperties)
-        new Lock(id, multiverse, cells.head, code, control)
-      case "Exit" => new Exit(cells)
+        Lock(id, multiverse, cells.head, code, control)
+      case "Exit" => Exit(cells)
       case null => error("Entity type is null - did you remember to remove all templates in the level?")
       case unknown => error(s"Unknown entity type '$unknown'.")
     }
