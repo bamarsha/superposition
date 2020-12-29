@@ -81,7 +81,7 @@ private object Superposition {
     val config = new Lwjgl3ApplicationConfiguration
     config.setTitle("Superposition")
     config.setWindowedMode(1536, 864)
-    config.useOpenGL3(true, 3, 3)
+    config.useOpenGL3(true, 3, 2)
     new Lwjgl3Application(new Superposition, config)
   }
 }
