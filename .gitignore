@@ -1,6 +1,5 @@
 .DS_Store
 target
 
-/.bsp/sbt.json
-/.idea/*
-!/.idea/codeStyles
+/.bsp
+/.idea
