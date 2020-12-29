@@ -16,6 +16,7 @@ import superposition.math.{BitSeq, Gate, StateId, Vector2}
   * @param map the tile map
   */
 private final class BuiltIns(multiverse: Multiverse, map: TiledMap) {
+
   /** The height of the tile map. */
   private val height: Int = Option(map.getProperties.get("height", classOf[Int])).get
 
@@ -29,7 +30,7 @@ private final class BuiltIns(multiverse: Multiverse, map: TiledMap) {
   val and: QExpr[Iterable[Boolean] => Boolean] = ((_: Iterable[Boolean]) forall identity).pure[QExpr]
 
   /** Returns the bit at the index in the bit sequence. */
-  val bitAt: QExpr[((BitSeq, Int)) => Boolean] = ((_: BitSeq) (_: Int)).tupled.pure[QExpr]
+  val bitAt: QExpr[((BitSeq, Int)) => Boolean] = ((_: BitSeq)(_: Int)).tupled.pure[QExpr]
 
   /** Returns the cell in game coordinates corresponding to the (x, y) position in tile map coordinates. */
   val cell: QExpr[((Int, Int)) => Vector2[Int]] = Monad[QExpr].pure { case (x, y) => Vector2(x, height - y - 1) }
@@ -43,15 +44,15 @@ private final class BuiltIns(multiverse: Multiverse, map: TiledMap) {
     } yield cellValue andThen (Seq(_)) andThen activatedValue andThen (bitAtValue(_, 0))
 
   private def component[A <: Component](c: Class[A])(id: Int): A =
-    multiverse.entityById(id).getOrElse(
-      throw new RuntimeException("Entity with id " + id + " does not exist")
-      ).getComponent(c)
+    multiverse
+      .entityById(id)
+      .getOrElse(throw new RuntimeException("Entity with id " + id + " does not exist"))
+      .getComponent(c)
 
   val Fourier: Gate[Vector2[Int]] = Gate { cell =>
     val flipFourier = Gate.X.multi.controlledMap(fourierAt)(cell)
     val qftNonFourier = Gate.QFT.multi.onQExpr(multiverse.allInCell(cell).map {
-      _
-        .filter(!FourierBit.mapper.has(_))
+      _.filter(!FourierBit.mapper.has(_))
         .filter(PrimaryBit.mapper.has)
         .map(PrimaryBit.mapper.get(_).bits)
     })

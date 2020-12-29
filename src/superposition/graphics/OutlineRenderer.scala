@@ -13,6 +13,7 @@ import superposition.entity.Level
   * @param level a function that returns the current level
   */
 final class OutlineRenderer(level: () => Option[Level]) extends Renderer with Disposable {
+
   /** The shape renderer. */
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
@@ -26,8 +27,12 @@ final class OutlineRenderer(level: () => Option[Level]) extends Renderer with Di
       if (outline.visible(universe) && multiverseView.isSelected(outline)) {
         shapeRenderer.begin(Line)
         shapeRenderer.setColor(RED)
-        shapeRenderer.rect(outline.lowerLeft.x.toFloat, outline.lowerLeft.y.toFloat,
-                           outline.size.x.toFloat, outline.size.y.toFloat)
+        shapeRenderer.rect(
+          outline.lowerLeft.x.toFloat,
+          outline.lowerLeft.y.toFloat,
+          outline.size.x.toFloat,
+          outline.size.y.toFloat
+        )
         shapeRenderer.end()
       }
     }

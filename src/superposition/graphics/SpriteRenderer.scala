@@ -14,10 +14,9 @@ import superposition.math.{Universe, Vector2}
 
 /** Renders sprites. */
 final class SpriteRenderer(level: () => Option[Level]) extends Renderer with Disposable {
+
   /** The sprite shader program. */
-  private val shader: ShaderProgram = new ShaderProgram(
-    resolve("shaders/sprite.vert"),
-    resolve("shaders/object.frag"))
+  private val shader: ShaderProgram = new ShaderProgram(resolve("shaders/sprite.vert"), resolve("shaders/object.frag"))
   assert(shader.isCompiled, shader.getLog)
 
   /** The batch. */
@@ -80,6 +79,7 @@ final class SpriteRenderer(level: () => Option[Level]) extends Renderer with Dis
 }
 
 private object SpriteRenderer {
+
   /** Returns the absolute position of an entity that has either a classical or quantum position component.
     *
     * @param entity the entity

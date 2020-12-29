@@ -18,7 +18,7 @@ private final case class IfTransformer(condition: Expression) extends Transforme
 /** The multi-transformer converts a gate into a repeated version.
   *
   * @param number the number
-  * */
+  */
 private final case class RepeatTransformer(number: Expression) extends Transformer
 
 /** The multi-transformer converts a gate into one that takes a sequence of arguments. */

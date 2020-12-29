@@ -22,7 +22,7 @@ import superposition.math.{BitSeq, Vector2}
   * @param control the control for the lock
   */
 final class Lock(id: Int, multiverse: Multiverse, cell: Vector2[Int], code: Seq[Boolean], control: QExpr[BitSeq])
-  extends Entity {
+    extends Entity {
   locally {
     val isOpen = control map (_.withLength(code.length) == BitSeq(code: _*))
     val unlocking = unlockAnimation(code.length)
@@ -43,14 +43,14 @@ final class Lock(id: Int, multiverse: Multiverse, cell: Vector2[Int], code: Seq[
 
 /** Contains the animations for locks. */
 private object Lock {
+
   /** Returns the frames in the lock animation.
     *
     * @param codeLength the length of the lock code
     * @return the frames in the lock animation
     */
   private def frames(codeLength: Int): GArray[TextureRegion] =
-    new GArray(Animated.frames(
-      new Texture(resolve(s"sprites/lock_${codeLength}_anim.png")), 16, 16))
+    new GArray(Animated.frames(new Texture(resolve(s"sprites/lock_${codeLength}_anim.png")), 16, 16))
 
   /** Returns the unlocking animation.
     *

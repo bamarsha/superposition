@@ -12,6 +12,7 @@ final class Collider(val cells: QExpr[Set[Vector2[Int]]]) extends Component
 
 /** Contains the component mapper for the collider component. */
 object Collider {
+
   /** The component mapper for the collider component. */
   val mapper: ComponentMapper[Collider] = ComponentMapper.getFor(classOf[Collider])
 }

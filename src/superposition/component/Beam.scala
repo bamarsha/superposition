@@ -15,8 +15,9 @@ final class Beam(
     multiverse: Multiverse,
     val gate: Gate[StateId[Boolean]],
     val direction: Direction,
-    val control: QExpr[BitSeq])
-  extends Component {
+    val control: QExpr[BitSeq]
+) extends Component {
+
   /** The most recent target cell, if any. */
   val lastTarget: MetaId[Option[Vector2[Int]]] = multiverse.allocateMeta(None)
 
@@ -29,6 +30,7 @@ final class Beam(
 
 /** Contains the component mapper for the beam component. */
 object Beam {
+
   /** The component mapper for the beam component. */
   val mapper: ComponentMapper[Beam] = ComponentMapper.getFor(classOf[Beam])
 }

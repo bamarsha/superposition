@@ -21,8 +21,9 @@ final class Level(
     val multiverseView: MultiverseView,
     val entities: Iterable[Entity],
     mapShader: ShaderProgram,
-    mapBatch: Batch)
-  extends Entity with Disposable {
+    mapBatch: Batch
+) extends Entity
+    with Disposable {
   add(multiverse)
   add(multiverseView)
   add(new Renderable(0.pure[QExpr], ().pure[QExpr]))

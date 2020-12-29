@@ -10,7 +10,7 @@ import superposition.graphics.Renderer
   * @param renderers the renderers
   */
 final class RenderingSystem(renderers: Iterable[Renderer])
-  extends IteratingSystem(Family.all(classOf[Renderable]).get) {
+    extends IteratingSystem(Family.all(classOf[Renderable]).get) {
   override def processEntity(entity: Entity, deltaTime: Float): Unit =
     for (renderer <- renderers if renderer.family.matches(entity)) {
       renderer.render(entity, deltaTime)

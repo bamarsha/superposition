@@ -11,6 +11,7 @@ private object ColorUtils {
     * @param color the color
     */
   implicit final class ColorOps(val color: Color) extends AnyVal {
+
     /** Mixes this color with the other color and returns the mixed color.
       *
       * @param other the color to mix with
@@ -28,6 +29,7 @@ private object ColorUtils {
     * @param shader the shader
     */
   implicit final class ShaderOps(val shader: ShaderProgram) extends AnyVal {
+
     /** Sets the uniform to the color.
       *
       * @param name the name of the uniform
@@ -42,5 +44,4 @@ private object ColorUtils {
       shader.setUniform4fv(name, array, 0, 4)
     }
   }
-
 }

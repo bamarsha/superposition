@@ -23,7 +23,8 @@ import scala.math.exp
   * @param level a function that returns the current level
   */
 final class PlayerInputSystem(level: () => Option[Level])
-  extends IteratingSystem(Family.all(classOf[Player], classOf[QuantumPosition]).get) {
+    extends IteratingSystem(Family.all(classOf[Player], classOf[QuantumPosition]).get) {
+
   /** The entities that can be carried by the player. */
   private var carriables: Iterable[Entity] = Nil
 
@@ -45,6 +46,7 @@ final class PlayerInputSystem(level: () => Option[Level])
 
 /** Player settings and functions for performing player actions. */
 private object PlayerInputSystem {
+
   /** The speed of the player in cells per second. */
   private val speed: Float = 3f
 
@@ -58,7 +60,8 @@ private object PlayerInputSystem {
     val player = Player.mapper.get(entity)
     val position = QuantumPosition.mapper.get(entity)
     val walkPlayer: Gate[Vector2[Int]] = Translate.multi.controlledMap(
-      player.alive.value map (isAlive => delta => if (isAlive) List((position.cell, delta)) else Nil))
+      player.alive.value map (isAlive => delta => if (isAlive) List((position.cell, delta)) else Nil)
+    )
     val walkCarried: Gate[Vector2[Int]] = Translate.multi.controlledMap {
       for {
         isAlive <- player.alive.value
@@ -100,10 +103,9 @@ private object PlayerInputSystem {
     * @return the difference in player positions
     */
   private def deltaPosition(deltaTime: Float): Vector2[Double] = {
-    val delta = walkingKeys.foldLeft(Vector2(0.0, 0.0)) {
-      case (delta, (key, direction)) =>
-        if (input.isKeyPressed(key)) delta + direction
-        else delta
+    val delta = walkingKeys.foldLeft(Vector2(0.0, 0.0)) { case (delta, (key, direction)) =>
+      if (input.isKeyPressed(key)) delta + direction
+      else delta
     }
     if (delta.length == 0) delta else delta.withLength(speed * deltaTime)
   }
@@ -122,7 +124,8 @@ private object PlayerInputSystem {
     val gate = walkGate(entity, carriables)
     val delta = rawDelta - Vector2(
       if (dx != 0 && multiverse.applyUnitary(gate(Vector2(dx, 0)), false)) dx else 0,
-      if (dy != 0 && multiverse.applyUnitary(gate(Vector2(0, dy)), false)) dy else 0)
+      if (dy != 0 && multiverse.applyUnitary(gate(Vector2(0, dy)), false)) dy else 0
+    )
     position.relative = (position.relative + delta).clamp(0, 1)
   }
 
@@ -153,10 +156,12 @@ private object PlayerInputSystem {
     * @param carriables the carriable entities
     * @param deltaTime the time elapsed since the last frame
     */
-  private def updateCarriedPositions(multiverse: Multiverse,
-                                     entity: Entity,
-                                     carriables: Iterable[Entity],
-                                     deltaTime: Float): Unit = {
+  private def updateCarriedPositions(
+      multiverse: Multiverse,
+      entity: Entity,
+      carriables: Iterable[Entity],
+      deltaTime: Float
+  ): Unit = {
     val playerPosition = QuantumPosition.mapper.get(entity)
     for (carriable <- carriables) {
       multiverse.updateMetaWith(QuantumPosition.mapper.get(carriable).absolute) { carriedPos =>

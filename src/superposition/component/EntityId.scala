@@ -10,6 +10,7 @@ final class EntityId(val id: Int) extends Component
 
 /** Contains the component mapper for the entity ID component. */
 object EntityId {
+
   /** The component mapper for the entity ID component. */
   val mapper: ComponentMapper[EntityId] = ComponentMapper.getFor(classOf[EntityId])
 }

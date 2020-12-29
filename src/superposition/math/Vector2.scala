@@ -11,6 +11,7 @@ import spire.math.{Fractional, Numeric}
   * @tparam A the type of the components
   */
 final case class Vector2[@specialized(Int, Double) A](x: A, y: A) {
+
   /** Adds two vectors.
     *
     * @param that the other vector

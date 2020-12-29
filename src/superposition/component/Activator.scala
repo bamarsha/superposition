@@ -11,6 +11,7 @@ final class Activator(val bits: Seq[StateId[Boolean]]) extends Component
 
 /** Contains the component mapper for the activator component. */
 object Activator {
+
   /** The component mapper for the activator component. */
   val mapper: ComponentMapper[Activator] = ComponentMapper.getFor(classOf[Activator])
 }

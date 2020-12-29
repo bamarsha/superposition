@@ -22,6 +22,7 @@ import scala.sys.error
 
 /** Loads game levels. */
 private object LevelLoader {
+
   /** Loads a level from the tile map.
     *
     * @param map the tile map
@@ -43,7 +44,8 @@ private object LevelLoader {
     // Create the map renderer.
     val camera = new OrthographicCamera(
       map.getProperties.get("width", classOf[Int]).toFloat,
-      map.getProperties.get("height", classOf[Int]).toFloat)
+      map.getProperties.get("height", classOf[Int]).toFloat
+    )
     camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0)
     camera.update()
     val shader = new ShaderProgram(resolve("shaders/sprite.vert"), resolve("shaders/spriteMixColor.frag"))
@@ -80,8 +82,10 @@ private object LevelLoader {
     * @param index the map layer index
     * @return the tile map layer entity
     */
-  private def layerEntity(map: TiledMap, renderer: OrthogonalTiledMapRenderer, multiverse: Multiverse)
-                         (mapLayer: MapLayer, index: Int): MapLayerEntity = {
+  private def layerEntity(map: TiledMap, renderer: OrthogonalTiledMapRenderer, multiverse: Multiverse)(
+      mapLayer: MapLayer,
+      index: Int
+  ): MapLayerEntity = {
     val renderLayer = Option(mapLayer.getProperties.get("Layer", classOf[Int])).getOrElse(0)
     val control = controlExprBitSeq(multiverse, map, mapLayer.getProperties)
     new MapLayerEntity(renderer, renderLayer, index, multiverse, control.map(_.any))
@@ -190,12 +194,16 @@ private object LevelLoader {
     val tileWidth = map.getProperties.get("tilewidth", classOf[Int])
     val tileHeight = map.getProperties.get("tileheight", classOf[Int])
     val bottomLeft =
-      (Vector2(obj.getProperties.get("x", classOf[Float]) / tileWidth,
-               obj.getProperties.get("y", classOf[Float]) / tileHeight)
+      (Vector2(
+        obj.getProperties.get("x", classOf[Float]) / tileWidth,
+        obj.getProperties.get("y", classOf[Float]) / tileHeight
+      )
         map (_.floor.toInt))
     val topRight = bottomLeft +
-      (Vector2(obj.getProperties.get("width", classOf[Float]) / tileWidth,
-               obj.getProperties.get("height", classOf[Float]) / tileHeight)
+      (Vector2(
+        obj.getProperties.get("width", classOf[Float]) / tileWidth,
+        obj.getProperties.get("height", classOf[Float]) / tileHeight
+      )
         map (_.floor.toInt.max(1)))
     (for {
       x <- bottomLeft.x until topRight.x
@@ -211,7 +219,7 @@ private object LevelLoader {
   private def walls(map: TiledMap, key: String): Set[Vector2[Int]] =
     (map.getLayers.asScala flatMap {
       case layer: TiledMapTileLayer
-        if layer.getProperties.containsKey(key) && layer.getProperties.get(key, classOf[Boolean]) =>
+          if layer.getProperties.containsKey(key) && layer.getProperties.get(key, classOf[Boolean]) =>
         for {
           x <- 0 until layer.getWidth
           y <- 0 until layer.getHeight

@@ -13,6 +13,7 @@ import scala.reflect.ClassTag
   * @param renderNanoTime a function that returns the time it took to render the last frame in nanoseconds
   */
 final class DebugDisplaySystem(renderNanoTime: () => Long) extends EntitySystem with Disposable {
+
   /** The batch. */
   private val batch: Batch = new SpriteBatch
 
@@ -54,6 +55,7 @@ private object DebugDisplaySystem {
     * @tparam A the type of the buffer elements
     */
   private final class CircularBuffer[@specialized(Long) A: ClassTag](capacity: Int) {
+
     /** The backing array. */
     private val array: Array[A] = Array.ofDim(capacity)
 
@@ -107,5 +109,4 @@ private object DebugDisplaySystem {
       acc
     }
   }
-
 }

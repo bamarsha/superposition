@@ -21,11 +21,12 @@ final class SpriteView(
     val texture: QExpr[TextureRegion] = blank.pure[QExpr],
     val base: TextureRegion = blank,
     val scale: QExpr[Vector2[Double]] = Vector2(1.0, 1.0).pure[QExpr],
-    val color: QExpr[Color] = WHITE.pure[QExpr])
-  extends Component
+    val color: QExpr[Color] = WHITE.pure[QExpr]
+) extends Component
 
 /** Contains the component mapper for the sprite view component. */
 object SpriteView {
+
   /** The component mapper for the sprite view component. */
   val mapper: ComponentMapper[SpriteView] = ComponentMapper.getFor(classOf[SpriteView])
 

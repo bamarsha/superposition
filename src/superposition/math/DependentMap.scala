@@ -6,7 +6,8 @@ import scala.collection.immutable.VectorMap
   *
   * @tparam K the type of the key
   */
-final class DependentMap[K <: DependentKey] private(private val map: Map[K, Any]) {
+final class DependentMap[K <: DependentKey] private (private val map: Map[K, Any]) {
+
   /** Returns the value associated with the key.
     *
     * @param key the key
@@ -36,7 +37,7 @@ final class DependentMap[K <: DependentKey] private(private val map: Map[K, Any]
     * @param updater a function that maps the value of the key
     * @return the updated map
     */
-  def updatedWith(key: K)(updater: key.Value => key.Value): DependentMap[K] = updated(key)(updater(this (key)))
+  def updatedWith(key: K)(updater: key.Value => key.Value): DependentMap[K] = updated(key)(updater(this(key)))
 
   /** Removes the key.
     *
@@ -61,6 +62,7 @@ final class DependentMap[K <: DependentKey] private(private val map: Map[K, Any]
 
 /** Factories for dependent maps. */
 object DependentMap {
+
   /** An empty dependent map.
     *
     * @tparam K the type of the key.

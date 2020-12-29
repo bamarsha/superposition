@@ -31,5 +31,4 @@ object ResourceResolver extends FileHandleResolver {
       new UrlHandle(childUrl)
     }
   }
-
 }

@@ -21,6 +21,7 @@ import scala.math.min
   * @param level a function that returns the current level
   */
 final class BeamRenderer(level: () => Option[Level]) extends Renderer with Disposable {
+
   /** The shape renderer. */
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
@@ -41,9 +42,11 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer with Dispo
   private def drawBeam(entity: Entity)(universe: Universe, renderInfo: UniverseRenderInfo): Unit = {
     val source = ClassicalPosition.mapper.get(entity).cells.head
     val beam = Beam.mapper.get(entity)
-    for (target <- universe.meta(beam.lastTarget);
-         beamSeq <- universe.meta(beam.lastBeamSeq)
-         if universe.meta(beam.elapsedTime) <= beamDuration + fadeDuration) {
+    for (
+      target <- universe.meta(beam.lastTarget);
+      beamSeq <- universe.meta(beam.lastBeamSeq)
+      if universe.meta(beam.elapsedTime) <= beamDuration + fadeDuration
+    ) {
       val opacity = min(fadeDuration, beamDuration + fadeDuration - universe.meta(beam.elapsedTime)) / fadeDuration
       gl.glEnable(GL_BLEND)
       shapeRenderer.begin(Filled)
@@ -68,6 +71,7 @@ final class BeamRenderer(level: () => Option[Level]) extends Renderer with Dispo
 
 /** Functions for rendering laser beams. */
 private object BeamRenderer {
+
   /** The amount of time that the laser beam shines at full intensity. */
   private val beamDuration: Float = 0.2f
 

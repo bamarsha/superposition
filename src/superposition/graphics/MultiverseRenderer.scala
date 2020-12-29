@@ -14,6 +14,7 @@ import superposition.math.Universe
 
 /** Renders the multiverse. */
 final class MultiverseRenderer extends Renderer with Disposable {
+
   /** The batch. */
   private val batch: Batch = new SpriteBatch
 
@@ -100,10 +101,13 @@ final class MultiverseRenderer extends Renderer with Disposable {
     shapeRenderer.begin(Filled)
     gl.glDisable(GL_BLEND)
     shapeRenderer.setColor(color)
-    shapeRenderer.rectLine(1.5f, 1.5f,
+    shapeRenderer.rectLine(
+      1.5f,
+      1.5f,
       1.5f + radius * math.cos(universe.amplitude.phase).toFloat,
       1.5f + radius * math.sin(universe.amplitude.phase).toFloat,
-      .05f)
+      .05f
+    )
     shapeRenderer.end()
 
     shapeRenderer.begin(Line)

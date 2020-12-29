@@ -21,11 +21,12 @@ final class Animated(
     val animation: QExpr[Animation[_]],
     val time: MetaId[Float],
     val lastAnimation: MetaId[Option[Animation[_]]],
-    val timeTransition: (Animation[_], Animation[_], Float) => Float)
-  extends Component
+    val timeTransition: (Animation[_], Animation[_], Float) => Float
+) extends Component
 
 /** Contains the component mapper for animation components. */
 object Animated {
+
   /** The component mapper for animation components. */
   val mapper: ComponentMapper[Animated] = ComponentMapper.getFor(classOf[Animated])
 

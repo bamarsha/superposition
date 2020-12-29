@@ -12,6 +12,7 @@ import superposition.game.LevelPlaylist.{LevelFactory, addLevel, removeLevel}
   * @param engine the entity engine
   */
 final class LevelPlaylist(engine: Engine) {
+
   /** The list of level factories. */
   private var factories: Seq[LevelFactory] = Nil
 
@@ -58,6 +59,7 @@ final class LevelPlaylist(engine: Engine) {
 
 /** Functions for creating and destroying levels. */
 private object LevelPlaylist {
+
   /** A function that returns a new instance of a level. */
   private type LevelFactory = () => Level
 

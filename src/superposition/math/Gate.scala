@@ -13,7 +13,8 @@ import scala.math.sqrt
   *
   * @tparam A the type of the gate's argument
   */
-final class Gate[-A] private(val f: A => Unitary) {
+final class Gate[-A] private (val f: A => Unitary) {
+
   /** Applies the gate to a value.
     *
     * @param value the value of the argument to the gate
@@ -37,8 +38,8 @@ object Gate {
   implicit object GateCM extends ContravariantMonoidal[Gate] {
     override def contramap[A, B](gate: Gate[A])(f: B => A): Gate[B] = Gate(gate.apply compose f)
 
-    override def product[A, B](gate1: Gate[A], gate2: Gate[B]): Gate[(A, B)] = Gate {
-      case (a, b) => gate1(a) * gate2(b)
+    override def product[A, B](gate1: Gate[A], gate2: Gate[B]): Gate[(A, B)] = Gate { case (a, b) =>
+      gate1(a) * gate2(b)
     }
 
     override val unit: Gate[Unit] = Gate(const(Unitary.identity))
@@ -68,15 +69,16 @@ object Gate {
       * @throws AssertionError if the mapping function violates unitarity
       * @return the new gate
       */
-    def onQExpr: Gate[QExpr[A]] = Gate(
-      value => new Unitary {
+    def onQExpr: Gate[QExpr[A]] = Gate(value =>
+      new Unitary {
         override def apply(universe: Universe): NonEmptyList[Universe] = {
           val newUniverses = gate(value(universe))(universe)
           assert(newUniverses forall (value(_) == value(universe)))
           newUniverses
         }
         override def adjoint: Unitary = gate.adjoint.onQExpr(value)
-      })
+      }
+    )
 
     // ---------- Helper ops ----------
 
@@ -136,32 +138,40 @@ object Gate {
     def filter(predicate: A => Boolean): Gate[A] = flatMap(List(_) filter predicate)
   }
 
-  val X: Gate[StateId[Boolean]] = Gate(id => new Unitary {
-    override def apply(universe: Universe): NonEmptyList[Universe] =
-      NonEmptyList.of(universe.updatedStateWith(id)(!_))
-    override def adjoint: Unitary = X(id)
-  })
+  val X: Gate[StateId[Boolean]] = Gate(id =>
+    new Unitary {
+      override def apply(universe: Universe): NonEmptyList[Universe] =
+        NonEmptyList.of(universe.updatedStateWith(id)(!_))
+      override def adjoint: Unitary = X(id)
+    }
+  )
 
-  val H: Gate[StateId[Boolean]] = Gate(id => new Unitary {
-    override def apply(universe: Universe): NonEmptyList[Universe] =
-      NonEmptyList.of(
-        universe / Complex((if (universe.state(id)) -1 else 1) * sqrt(2)),
-        universe.updatedStateWith(id)(!_) / Complex(sqrt(2)))
-    override def adjoint: Unitary = H(id)
-  })
+  val H: Gate[StateId[Boolean]] = Gate(id =>
+    new Unitary {
+      override def apply(universe: Universe): NonEmptyList[Universe] =
+        NonEmptyList.of(
+          universe / Complex((if (universe.state(id)) -1 else 1) * sqrt(2)),
+          universe.updatedStateWith(id)(!_) / Complex(sqrt(2))
+        )
+      override def adjoint: Unitary = H(id)
+    }
+  )
 
-  val Translate: Gate[(StateId[Vector2[Int]], Vector2[Int])] = Gate {
-    case (id, delta) => new Unitary {
+  val Translate: Gate[(StateId[Vector2[Int]], Vector2[Int])] = Gate { case (id, delta) =>
+    new Unitary {
       override def apply(universe: Universe): NonEmptyList[Universe] =
         NonEmptyList.of(universe.updatedStateWith(id)(_ + delta))
       override def adjoint: Unitary = Translate(id, -delta)
     }
   }
 
-  val Ri: Gate[Double] = Gate(theta => new Unitary {
-    override def apply(universe: Universe): NonEmptyList[Universe] = NonEmptyList.of(universe * Complex.polar(1, theta))
-    override def adjoint: Unitary = Ri(-theta)
-  })
+  val Ri: Gate[Double] = Gate(theta =>
+    new Unitary {
+      override def apply(universe: Universe): NonEmptyList[Universe] =
+        NonEmptyList.of(universe * Complex.polar(1, theta))
+      override def adjoint: Unitary = Ri(-theta)
+    }
+  )
 
   val Phase: Gate[Double] = Ri.contramap(_ * 2 * math.Pi)
 
@@ -173,20 +183,20 @@ object Gate {
     X.controlled(a.value.map(const))(b)
   }
 
-  val Swap: Gate[(StateId[Boolean], StateId[Boolean])] = Gate {
-    case (a, b) => CNot(a, b) * CNot(b, a) * CNot(a, b)
+  val Swap: Gate[(StateId[Boolean], StateId[Boolean])] = Gate { case (a, b) =>
+    CNot(a, b) * CNot(b, a) * CNot(a, b)
   }
 
   val QFT: Gate[Seq[StateId[Boolean]]] = Gate { ids =>
     val len = ids.length
     var u = Unitary.identity
-    for (i <- Seq.range(0, len/2)) {
-      u = Swap(ids(len-1-i), ids(i)) * u
+    for (i <- Seq.range(0, len / 2)) {
+      u = Swap(ids(len - 1 - i), ids(i)) * u
     }
     for (i <- Seq.range(0, len)) {
       u = H(ids(i)) * u
       for (j <- Seq.range(i + 1, len)) {
-        u = Rz.controlled(ids(j).value.map(const))(ids(i), 2 * math.Pi / math.pow(2, j-i+1)) * u
+        u = Rz.controlled(ids(j).value.map(const))(ids(i), 2 * math.Pi / math.pow(2, j - i + 1)) * u
       }
     }
     u

@@ -13,6 +13,7 @@ import scala.jdk.CollectionConverters._
   * @param levels the level playlist
   */
 final class LevelSystem(levels: LevelPlaylist) extends EntitySystem {
+
   /** The level exit entities. */
   private var exits: Iterable[Entity] = Nil
 
@@ -32,7 +33,8 @@ final class LevelSystem(levels: LevelPlaylist) extends EntitySystem {
     } else {
       val multiverse = levels.current.get.multiverse
       val allExitSquares = exits.flatMap(ClassicalPosition.mapper.get(_).cells).toSet
-      val playersAtExits = players.map(QuantumPosition.mapper.get(_).cell)
+      val playersAtExits = players
+        .map(QuantumPosition.mapper.get(_).cell)
         .forall(entityCell => multiverse.universes.map(_.state(entityCell)).forall(allExitSquares.contains))
       if (input.isKeyJustPressed(N) || playersAtExits) {
         levels.next()

@@ -26,6 +26,7 @@ final class Door(multiverse: Multiverse, cell: Vector2[Int], control: QExpr[Bool
 
 /** Contains the textures for doors. */
 private object Door {
+
   /** The texture for a closed door. */
   private val closedTexture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/door_closed.png")))
 

@@ -19,7 +19,7 @@ import scala.Function.const
   * @param level a function that returns the current level
   */
 final class LaserInputSystem(level: () => Option[Level])
-  extends IteratingSystem(Family.all(classOf[Beam], classOf[ClassicalPosition]).get) {
+    extends IteratingSystem(Family.all(classOf[Beam], classOf[ClassicalPosition]).get) {
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
     val beam = Beam.mapper.get(entity)
     val outline = Outline.mapper.get(entity)
@@ -44,6 +44,7 @@ final class LaserInputSystem(level: () => Option[Level])
 
 /** Laser settings and functions for computing properties of the laser beam. */
 object LaserInputSystem {
+
   /** The maximum length of the laser beam. */
   private val beamLength: Int = 25
 

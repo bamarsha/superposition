@@ -8,6 +8,7 @@ import scala.sys.process.stringSeqToProcess
 
 /** A module for creating application images. */
 object AppImage {
+
   /** Creates an application image.
     *
     * @param name The name of the image.
@@ -44,13 +45,21 @@ object AppImage {
   private def jpackage(input: File, dest: File, name: String, mainJar: File, mainClass: String): Unit = {
     val args = List(
       "jpackage",
-      "--type", "app-image",
-      "--input", input.getAbsolutePath,
-      "--dest", dest.getAbsolutePath,
-      "--name", name,
-      "--main-jar", mainJar.relativeTo(input).get.getPath,
-      "--main-class", mainClass,
-      "--java-options", "-XX:+UseZGC")
+      "--type",
+      "app-image",
+      "--input",
+      input.getAbsolutePath,
+      "--dest",
+      dest.getAbsolutePath,
+      "--name",
+      name,
+      "--main-jar",
+      mainJar.relativeTo(input).get.getPath,
+      "--main-class",
+      mainClass,
+      "--java-options",
+      "-XX:+UseZGC"
+    )
     assert(args.! == 0, "jpackage finished with non-zero exit code.")
   }
 }

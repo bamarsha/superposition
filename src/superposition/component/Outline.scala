@@ -13,11 +13,12 @@ import superposition.math.Vector2
 final class Outline(
     val visible: QExpr[Boolean],
     val lowerLeft: Vector2[Double],
-    val size: Vector2[Double] = Vector2(1, 1))
-  extends Component
+    val size: Vector2[Double] = Vector2(1, 1)
+) extends Component
 
 /** Contains the component mapper for the outline component. */
 object Outline {
+
   /** The component mapper for the outline component. */
   val mapper: ComponentMapper[Outline] = ComponentMapper.getFor(classOf[Outline])
 }

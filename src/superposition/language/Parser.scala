@@ -11,8 +11,8 @@ private object Parser extends RegexParsers {
     * @tparam A the type of the first result
     * @tparam B the type of the second result
     */
-  private def makeTuple[A, B]: A ~ B => (A, B) = {
-    case x ~ y => (x, y)
+  private def makeTuple[A, B]: A ~ B => (A, B) = { case x ~ y =>
+    (x, y)
   }
 
   /** The reserved keywords. */
@@ -28,7 +28,8 @@ private object Parser extends RegexParsers {
   private val decimal: Parser[Double] = """-?\d+\.\d+""".r ^^ (_.toDouble)
 
   /** A literal is an identifier or a number. */
-  private val literal: Parser[Expression] = identifier ^^ Identifier | decimal ^^ DecimalNumber | integer ^^ IntegerNumber
+  private val literal: Parser[Expression] =
+    identifier ^^ Identifier | decimal ^^ DecimalNumber | integer ^^ IntegerNumber
 
   /** A parenthetical expression. */
   private val parenthetical: Parser[Expression] = "(" ~> whiteSpace.? ~> expression <~ whiteSpace.? <~ ")"
@@ -77,7 +78,8 @@ private object Parser extends RegexParsers {
   private val adjointTransformer: Parser[Transformer] = "adjoint" ^^^ AdjointTransformer
 
   /** A transformer. */
-  private val transformer: Parser[Transformer] = onTransformer | ifTransformer | repeatTransformer | multiTransformer | adjointTransformer
+  private val transformer: Parser[Transformer] =
+    onTransformer | ifTransformer | repeatTransformer | multiTransformer | adjointTransformer
 
   /** A gate application. */
   private val application: Parser[Application] =

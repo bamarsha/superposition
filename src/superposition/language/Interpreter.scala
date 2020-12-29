@@ -23,6 +23,7 @@ import scala.sys.error
   * @param map the tile map
   */
 final class Interpreter(multiverse: Multiverse, map: TiledMap) {
+
   /** The built-in functions. */
   private val builtIns: BuiltIns = new BuiltIns(multiverse, map)
 
@@ -54,7 +55,8 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @param program the program sequence
     * @return the evaluated program
     */
-  private def evalProgram(program: Seq[Application]): Unitary = (program.view map evalApplication).reverse reduce (_ * _)
+  private def evalProgram(program: Seq[Application]): Unitary =
+    (program.view map evalApplication).reverse reduce (_ * _)
 
   /** Evaluates an expression.
     *
@@ -153,8 +155,8 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     case "X" => X
     case "H" => H
     case "Translate" =>
-      Translate.contramap[NTuple] {
-        case NTuple(id, delta) => (id.asInstanceOf[StateId[Vector2[Int]]], delta.asInstanceOf[Vector2[Int]])
+      Translate.contramap[NTuple] { case NTuple(id, delta) =>
+        (id.asInstanceOf[StateId[Vector2[Int]]], delta.asInstanceOf[Vector2[Int]])
       }
     case "QFT" => QFT
     case "Phase" => Phase
@@ -168,10 +170,11 @@ final class Interpreter(multiverse: Multiverse, map: TiledMap) {
     * @return true if the expression does not depend on the universe
     */
   private def isConstant(expression: Expression): Boolean = expression match {
-    case Identifier(name) => name match {
-      case "and" | "bitAt" | "cell" | "indices" | "int" | "or" | "qubit" | "qubits" | "qucell" | "vec2" => true
-      case _ => false
-    }
+    case Identifier(name) =>
+      name match {
+        case "and" | "bitAt" | "cell" | "indices" | "int" | "or" | "qubit" | "qubits" | "qucell" | "vec2" => true
+        case _ => false
+      }
     case IntegerNumber(_) => true
     case Tuple(items) => items forall isConstant
     case List(items) => items forall isConstant
@@ -189,8 +192,8 @@ private object Interpreter {
     * @param items the items in the tuple.
     */
   private final case class NTuple(items: Any*) {
+
     /** Converts this n-tuple into a 2-tuple. */
     def toTuple2[A, B]: (A, B) = (items(0).asInstanceOf[A], items(1).asInstanceOf[B])
   }
-
 }

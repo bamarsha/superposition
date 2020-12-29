@@ -8,6 +8,7 @@ import scala.math.{atan2, cos, sin, sqrt}
   * @param imaginary the imaginary part
   */
 final case class Complex(real: Double, imaginary: Double = 0) {
+
   /** Adds two complex numbers.
     *
     * @param that the complex number to add to this
@@ -27,9 +28,8 @@ final case class Complex(real: Double, imaginary: Double = 0) {
     * @param that the complex number to multiply with this
     * @return the product of the two complex numbers
     */
-  def *(that: Complex): Complex = Complex(
-    real * that.real - imaginary * that.imaginary,
-    real * that.imaginary + imaginary * that.real)
+  def *(that: Complex): Complex =
+    Complex(real * that.real - imaginary * that.imaginary, real * that.imaginary + imaginary * that.real)
 
   /** Divides two complex numbers.
     *
@@ -38,7 +38,8 @@ final case class Complex(real: Double, imaginary: Double = 0) {
     */
   def /(that: Complex): Complex = Complex(
     (real * that.real + imaginary * that.imaginary) / that.squaredMagnitude,
-    (imaginary * that.real - real * that.imaginary) / that.squaredMagnitude)
+    (imaginary * that.real - real * that.imaginary) / that.squaredMagnitude
+  )
 
   /** The magnitude, or absolute value, of this complex number. */
   def magnitude: Double = sqrt(squaredMagnitude)
@@ -62,6 +63,7 @@ final case class Complex(real: Double, imaginary: Double = 0) {
 
 /** Complex number factory. */
 object Complex {
+
   /** Creates a complex number from its polar form re^iθ^.
     *
     * @param r the radius r

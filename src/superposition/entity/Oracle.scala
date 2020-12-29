@@ -16,13 +16,8 @@ import superposition.math._
   * @param cell the position of the oracle
   * @param unitary the unitary that the oracle applies
   */
-final class Oracle(
-    multiverse: Multiverse,
-    cell: Vector2[Int],
-    unitary: Unitary,
-    conjugate: Boolean,
-    name: String)
-  extends Entity {
+final class Oracle(multiverse: Multiverse, cell: Vector2[Int], unitary: Unitary, conjugate: Boolean, name: String)
+    extends Entity {
   locally {
     add(new OracleUnitary(unitary, conjugate))
     add(new ClassicalPosition((cell map (_.toDouble)) + Vector2(.5, .5), Set(cell)))
@@ -36,6 +31,7 @@ final class Oracle(
 
 /** Contains the texture for oracles. */
 private object Oracle {
+
   /** The texture for an oracle. */
   private val texture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/fourier_active.png")))
 }

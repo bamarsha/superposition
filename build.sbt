@@ -13,7 +13,8 @@ Compile / scalacOptions ++= List(
   //  "-opt:l:inline",
   //  "-opt-inline-from:**",
   "-feature",
-  "-deprecation")
+  "-deprecation"
+)
 
 Compile / scalaSource := baseDirectory.value / "src"
 Compile / resourceDirectory := baseDirectory.value / "resources"
@@ -32,7 +33,8 @@ libraryDependencies ++= {
   List(
     "com.badlogicgames.gdx" % "gdx" % version,
     "com.badlogicgames.gdx" % "gdx-backend-lwjgl3" % version,
-    "com.badlogicgames.gdx" % "gdx-platform" % version classifier "natives-desktop")
+    "com.badlogicgames.gdx" % "gdx-platform" % version classifier "natives-desktop"
+  )
 }
 
 libraryDependencies += "com.beachape" %% "enumeratum" % "1.6.1"

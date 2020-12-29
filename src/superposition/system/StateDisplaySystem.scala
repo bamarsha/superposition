@@ -22,6 +22,7 @@ import scala.Function.const
   * @param level a function that returns the current level
   */
 final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem with Disposable {
+
   /** The shape renderer. */
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 
@@ -60,7 +61,8 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
       0,
       buffer.getHeight.toFloat,
       buffer.getWidth.toFloat,
-      -buffer.getHeight.toFloat)
+      -buffer.getHeight.toFloat
+    )
     batch.end()
   }
 
@@ -150,6 +152,7 @@ final class StateDisplaySystem(level: () => Option[Level]) extends EntitySystem 
 
 /** Constants for the multiverse state display system. */
 private object StateDisplaySystem {
+
   /** The font color for normal state values. */
   private val normalColor = new Color(0x9f9f9fff)
 

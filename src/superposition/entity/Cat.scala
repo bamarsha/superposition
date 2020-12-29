@@ -42,12 +42,15 @@ final class Cat(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) exte
     add(new Player(alive))
     add(new QuantumPosition(absolutePosition, cell, Vector2(0.5, 0.5)))
     add(new PrimaryBit(Seq(alive)))
-    add(new Renderable(
-      2.pure[QExpr],
-      for {
-        isAlive <- alive.value
-        currentCell <- cell.value
-      } yield (isAlive, currentCell)))
+    add(
+      new Renderable(
+        2.pure[QExpr],
+        for {
+          isAlive <- alive.value
+          currentCell <- cell.value
+        } yield (isAlive, currentCell)
+      )
+    )
     add(new SpriteView(frame))
     add(new Animated(animation, animationTime, lastAnimation, keepTime))
   }
@@ -55,6 +58,7 @@ final class Cat(id: Int, multiverse: Multiverse, initialCell: Vector2[Int]) exte
 
 /** Contains the animations for Schrödinger's cat. */
 private object Cat {
+
   /** The frames in the walking animation. */
   private val walkingFrames: Array[TextureRegion] =
     Animated.frames(new Texture(resolve("sprites/cat_anim.png")), 32, 32)

@@ -19,8 +19,8 @@ final class MapLayer(
     renderLayer: Int,
     mapLayer: Int,
     multiverse: Multiverse,
-    control: QExpr[Boolean])
-  extends Entity {
+    control: QExpr[Boolean]
+) extends Entity {
   add(new Renderable(renderLayer.pure[QExpr], control))
   add(new MapLayerView(renderer, mapLayer, control))
 }

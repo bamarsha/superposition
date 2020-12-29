@@ -4,6 +4,7 @@ import cats.data.NonEmptyList
 
 /** A quantum unitary transformation. */
 trait Unitary {
+
   /** Applies the gate within a universe.
     *
     * @param universe the universe in which to apply the unitary

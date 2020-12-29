@@ -14,6 +14,7 @@ import superposition.entity.Level
   * @param level a function that returns the current level
   */
 final class CellHighlightRenderer(level: () => Option[Level]) extends Renderer with Disposable {
+
   /** A shape renderer. */
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 

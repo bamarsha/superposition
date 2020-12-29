@@ -12,6 +12,7 @@ final class Renderable(val layer: QExpr[Int], val dependentState: QExpr[Any]) ex
 
 /** Contains the component mapper for the renderable component. */
 object Renderable {
+
   /** The component mapper for the renderable component. */
   val mapper: ComponentMapper[Renderable] = ComponentMapper.getFor(classOf[Renderable])
 }

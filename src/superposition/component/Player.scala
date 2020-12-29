@@ -13,15 +13,13 @@ final class Player(val alive: StateId[Boolean]) extends Component
 
 /** Contains the component mapper for the player component. */
 object Player {
+
   /** The component mapper for the player component. */
   val mapper: ComponentMapper[Player] = ComponentMapper.getFor(classOf[Player])
 
   /** A map from key code to the unit vector in the direction that the player should move when the key is pressed. */
-  val walkingKeys: Map[Int, Vector2[Double]] = Map(
-    W -> Vector2(0, 1),
-    A -> Vector2(-1, 0),
-    S -> Vector2(0, -1),
-    D -> Vector2(1, 0))
+  val walkingKeys: Map[Int, Vector2[Double]] =
+    Map(W -> Vector2(0, 1), A -> Vector2(-1, 0), S -> Vector2(0, -1), D -> Vector2(1, 0))
 
   /** True if the player is currently pressing a walking key. */
   def isWalking: Boolean = walkingKeys.keys exists input.isKeyPressed

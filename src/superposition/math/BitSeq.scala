@@ -7,7 +7,8 @@ import scala.collection.immutable.ArraySeq
   * @param bits the bits in the sequence
   * @param length the length of the sequence
   */
-final class BitSeq private(private val bits: Int, val length: Int) {
+final class BitSeq private (private val bits: Int, val length: Int) {
+
   /** Returns true if the `i`th bit is 1.
     *
     * @param i the index
@@ -38,7 +39,7 @@ final class BitSeq private(private val bits: Int, val length: Int) {
     * @tparam A the element type
     * @return the filtered sequence
     */
-  def filter[A](xs: Seq[A]): Seq[A] = (xs.view.zipWithIndex filter (x => this (x._2)) map (_._1)).toSeq
+  def filter[A](xs: Seq[A]): Seq[A] = (xs.view.zipWithIndex filter (x => this(x._2)) map (_._1)).toSeq
 
   /** Converts the bit sequence to an integer. */
   def toInt: Int = bits
@@ -56,6 +57,7 @@ final class BitSeq private(private val bits: Int, val length: Int) {
 
 /** Factories for bit sequences. */
 object BitSeq {
+
   /** A precomputed cache of small bit sequences. The index of the outer sequence is the length, and the index of the
     * inner sequence is the bit mask.
     */

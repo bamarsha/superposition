@@ -11,6 +11,7 @@ import superposition.system._
 
 /** The Superposition game. */
 private final class Superposition extends Game {
+
   /** The entity engine. */
   private val engine: Engine = new Engine
 
@@ -27,14 +28,19 @@ private final class Superposition extends Game {
     engine.addSystem(new LaserInputSystem(() => levels.current))
     engine.addSystem(new OracleInputSystem(() => levels.current))
     engine.addSystem(new AnimationSystem(() => levels.current))
-    engine.addSystem(new RenderingSystem(Iterable(
-      new MapLayerRenderer(() => levels.current),
-      new SpriteRenderer(() => levels.current),
-      new TextRenderer(() => levels.current),
-      new BeamRenderer(() => levels.current),
-      new OutlineRenderer(() => levels.current),
-      new CellHighlightRenderer(() => levels.current),
-      new MultiverseRenderer)))
+    engine.addSystem(
+      new RenderingSystem(
+        Iterable(
+          new MapLayerRenderer(() => levels.current),
+          new SpriteRenderer(() => levels.current),
+          new TextRenderer(() => levels.current),
+          new BeamRenderer(() => levels.current),
+          new OutlineRenderer(() => levels.current),
+          new CellHighlightRenderer(() => levels.current),
+          new MultiverseRenderer
+        )
+      )
+    )
     engine.addSystem(new StateDisplaySystem(() => levels.current))
     engine.addSystem(new DebugDisplaySystem(() => renderNanoTime))
   }
@@ -49,6 +55,7 @@ private final class Superposition extends Game {
 
 /** The main class for Superposition. */
 private object Superposition {
+
   /** The level playlist. */
   private val playlist: Seq[String] = Seq(
     "level_base1.tmx",
@@ -71,7 +78,8 @@ private object Superposition {
     "level_qft3.tmx",
     "level_qft4.tmx",
     "level_qft5.tmx",
-    "level_win.tmx")
+    "level_win.tmx"
+  )
 
   /** The entry point for Superposition.
     *

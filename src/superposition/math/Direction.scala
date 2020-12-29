@@ -5,6 +5,7 @@ import superposition.math.Direction.{Down, Left, Right, Up}
 
 /** A cardinal direction. */
 sealed trait Direction extends EnumEntry {
+
   /** The value of this direction as a [[superposition.math.Vector2]]. */
   def toVector2: Vector2[Int] = this match {
     case Up => Vector2(0, 1)

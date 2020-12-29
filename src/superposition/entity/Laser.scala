@@ -27,8 +27,8 @@ final class Laser(
     cell: Vector2[Int],
     gate: Gate[StateId[Boolean]],
     direction: Direction,
-    control: QExpr[BitSeq])
-  extends Entity {
+    control: QExpr[BitSeq]
+) extends Entity {
   locally {
     val cells = direction match {
       case Direction.Up => Set(cell + Vector2(0, 1), cell, cell + Vector2(1, 0), cell + Vector2(1, 1))
@@ -53,6 +53,7 @@ final class Laser(
 
 /** Contains the animations for lasers. */
 private object Laser {
+
   /** The base texture for lasers. */
   private val baseTexture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/laser_base.png")))
 
@@ -62,8 +63,5 @@ private object Laser {
 
   /** The animation for an active laser. */
   private val onAnimation: Animation[TextureRegion] =
-    new Animation(
-      0.1f,
-      new GArray(Animated.frames(new Texture(resolve("sprites/laser_anim.png")), 32, 32)),
-      LOOP)
+    new Animation(0.1f, new GArray(Animated.frames(new Texture(resolve("sprites/laser_anim.png")), 32, 32)), LOOP)
 }

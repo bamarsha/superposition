@@ -11,6 +11,7 @@ final case class UniverseRenderInfo(color: Color) extends AnyVal
 
 /** Contains presets for universe rendering information. */
 object UniverseRenderInfo {
+
   /** The default rendering information. */
   val default: UniverseRenderInfo = UniverseRenderInfo(CLEAR)
 }

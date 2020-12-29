@@ -6,10 +6,12 @@ package superposition.math
   * @param state the classical values of each qudit in the universe
   * @param meta arbitrary metadata for the universe
   */
-final case class Universe private(
+final case class Universe private (
     amplitude: Complex = Complex(1),
     state: DependentMap[StateId[_]] = DependentMap.empty,
-    meta: DependentMap[MetaId[_]] = DependentMap.empty) {
+    meta: DependentMap[MetaId[_]] = DependentMap.empty
+) {
+
   /** Increases the probability amplitude by `c`.
     *
     * @param c the number to add to the probability amplitude
@@ -77,6 +79,7 @@ final case class Universe private(
 
 /** Factories for universes. */
 object Universe {
+
   /** The empty universe. */
   val empty: Universe = Universe()
 }

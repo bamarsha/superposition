@@ -32,21 +32,28 @@ final class QuballMulti(id: Int, multiverse: Multiverse, initialCell: Vector2[In
     add(new Activator(bits))
     add(new Carriable(carried))
     add(new FourierBit(fourierBit))
-    add(new Renderable(
-      1.pure[QExpr],
-      for {
-        bitValue <- QExpr.prepare((_: StateId[Boolean]).value)
-        carriedValue <- carried.value
-        cellValue <- cell.value
-      } yield (bits map bitValue, carriedValue, cellValue)))
-    add(new SpriteView(
-      texture = fourierBit.value map (if (_) textureFourier else texture),
-      scale = carried.value map (if (_) Vector2(0.5, 0.5) else Vector2(0.75, 0.75))))
+    add(
+      new Renderable(
+        1.pure[QExpr],
+        for {
+          bitValue <- QExpr.prepare((_: StateId[Boolean]).value)
+          carriedValue <- carried.value
+          cellValue <- cell.value
+        } yield (bits map bitValue, carriedValue, cellValue)
+      )
+    )
+    add(
+      new SpriteView(
+        texture = fourierBit.value map (if (_) textureFourier else texture),
+        scale = carried.value map (if (_) Vector2(0.5, 0.5) else Vector2(0.75, 0.75))
+      )
+    )
   }
 }
 
 /** Contains the texture for quballs. */
 private object QuballMulti {
+
   /** The texture for a quball. */
   private val texture: TextureRegion = new TextureRegion(new Texture(resolve("sprites/quball_4.png")))
 

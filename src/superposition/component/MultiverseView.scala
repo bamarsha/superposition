@@ -18,6 +18,7 @@ import scala.collection.mutable.ArrayBuffer
   * @param camera the camera used to view the multiverse
   */
 final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends Component {
+
   /** The queued renderers. */
   private val renderers: mutable.IndexedBuffer[UniversePartRenderer] = new ArrayBuffer
 
@@ -29,7 +30,7 @@ final class MultiverseView(multiverse: Multiverse, val camera: Camera) extends C
   def isSelected(outline: Outline): Boolean = {
     val mouse = camera.unproject(new Vector3(input.getX.toFloat, input.getY.toFloat, 0))
     outline.lowerLeft.x <= mouse.x && mouse.x <= outline.lowerLeft.x + outline.size.x &&
-      outline.lowerLeft.y <= mouse.y && mouse.y <= outline.lowerLeft.y + outline.size.y
+    outline.lowerLeft.y <= mouse.y && mouse.y <= outline.lowerLeft.y + outline.size.y
   }
 
   /** Enqueues a renderer that will be called for each universe.
@@ -83,9 +84,7 @@ object MultiverseView {
     * @param render the rendering action
     * @param renderable the renderable component for the rendered entity
     */
-  private final case class UniversePartRenderer(
-      render: (Universe, UniverseRenderInfo) => Unit,
-      renderable: Renderable)
+  private final case class UniversePartRenderer(render: (Universe, UniverseRenderInfo) => Unit, renderable: Renderable)
 
   /** The component mapper for the multiverse view component. */
   val mapper: ComponentMapper[MultiverseView] = ComponentMapper.getFor(classOf[MultiverseView])

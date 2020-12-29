@@ -7,6 +7,7 @@ final class LockCode(val bits: Seq[Boolean], val isOpen: QExpr[Boolean]) extends
 
 /** Contains the component mapper for the classical position component. */
 object LockCode {
+
   /** The component mapper for the classical position component. */
   val mapper: ComponentMapper[LockCode] = ComponentMapper.getFor(classOf[LockCode])
 }

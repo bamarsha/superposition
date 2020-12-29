@@ -13,14 +13,12 @@ import superposition.math.QExpr.QExpr
   * @param layer the tile map layer index to render
   * @param control the control for the layer
   */
-final class MapLayerView(
-    val renderer: OrthogonalTiledMapRenderer,
-    val layer: Int,
-    val control: QExpr[Boolean])
-  extends Component
+final class MapLayerView(val renderer: OrthogonalTiledMapRenderer, val layer: Int, val control: QExpr[Boolean])
+    extends Component
 
 /** Contains the component mapper for the map layer view component. */
 object MapLayerView {
+
   /** The component mapper for the map layer view component. */
   val mapper: ComponentMapper[MapLayerView] = ComponentMapper.getFor(classOf[MapLayerView])
 }

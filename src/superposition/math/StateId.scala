@@ -9,6 +9,7 @@ import superposition.math.QExpr.QExpr
   * @tparam A the type of the qudit
   */
 final class StateId[A](val name: String, showValue: A => String) extends DependentKey {
+
   /** The type of the qudit value. */
   type Value = A
 

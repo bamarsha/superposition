@@ -11,7 +11,7 @@ import superposition.entity.Level
   * @param level a function that returns the current level
   */
 final class OracleInputSystem(level: () => Option[Level])
-  extends IteratingSystem(Family.all(classOf[OracleUnitary], classOf[ClassicalPosition]).get) {
+    extends IteratingSystem(Family.all(classOf[OracleUnitary], classOf[ClassicalPosition]).get) {
   override def processEntity(entity: Entity, deltaTime: Float): Unit = {
     val outline = Outline.mapper.get(entity)
     val multiverse = level().get.multiverse

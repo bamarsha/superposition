@@ -11,6 +11,7 @@ final class FourierBit(val bit: StateId[Boolean]) extends Component
 
 /** Contains the component mapper for the Fourier bit component. */
 object FourierBit {
+
   /** The component mapper for the Fourier bit component. */
   val mapper: ComponentMapper[FourierBit] = ComponentMapper.getFor(classOf[FourierBit])
 }

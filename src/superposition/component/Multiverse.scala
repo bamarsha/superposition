@@ -15,6 +15,7 @@ import scala.math.sqrt
   * @param grates the set of cells in the multiverse that always block quballs
   */
 final class Multiverse(val walls: Set[Vector2[Int]], val grates: Set[Vector2[Int]]) extends Component {
+
   /** The universes in the multiverse. */
   private var _universes: Seq[Universe] = Seq(Universe.empty)
 
@@ -85,12 +86,12 @@ final class Multiverse(val walls: Set[Vector2[Int]], val grates: Set[Vector2[Int
     def ap(u: Unitary)(us: Seq[Universe]): Seq[Universe] = {
       val us2 = us flatMap (u(_).toList)
       if (us2.size == us.size) us2
-      else mapGroupMapReduce(us)(u(_).toList)(key)(identity) {
-        case (a, b) =>
+      else
+        mapGroupMapReduce(us)(u(_).toList)(key)(identity) { case (a, b) =>
           val c = a + b.amplitude
           if (c.amplitude.squaredMagnitude < 1e-12) None
           else Some(c)
-      }.values.toSeq
+        }.values.toSeq
     }
 
     val newUniverses = if (conjugate) {
@@ -120,8 +121,8 @@ final class Multiverse(val walls: Set[Vector2[Int]], val grates: Set[Vector2[Int
     * @return the entities occupying the cell
     */
   def allInCell(cell: Vector2[Int]): QExpr[Iterable[Entity]] =
-    for (currentCell <- QExpr.prepare(QuantumPosition.mapper.get(_: Entity).cell.value)) yield
-      entities filter (entity => QuantumPosition.mapper.has(entity) && currentCell(entity) == cell)
+    for (currentCell <- QExpr.prepare(QuantumPosition.mapper.get(_: Entity).cell.value))
+      yield entities filter (entity => QuantumPosition.mapper.has(entity) && currentCell(entity) == cell)
 
   /** Returns all fourier qubits in the cell.
     *
@@ -145,8 +146,8 @@ final class Multiverse(val walls: Set[Vector2[Int]], val grates: Set[Vector2[Int
     * @return true if the cell is blocked by an entity with collision
     */
   def isBlocked(cell: Vector2[Int]): QExpr[Boolean] =
-    for (cells <- QExpr.prepare(Collider.mapper.get(_: Entity).cells)) yield
-      walls.contains(cell) || (entities filter Collider.mapper.has exists (cells(_).contains(cell)))
+    for (cells <- QExpr.prepare(Collider.mapper.get(_: Entity).cells))
+      yield walls.contains(cell) || (entities filter Collider.mapper.has exists (cells(_).contains(cell)))
 
   /** Returns true if the cell is blocked by a grate.
     *
@@ -164,12 +165,11 @@ final class Multiverse(val walls: Set[Vector2[Int]], val grates: Set[Vector2[Int
     for {
       entities <- allInCell(cell)
       bit <- QExpr.prepare((_: StateId[Boolean]).value)
-    } yield
-      entities
-        .filter(Activator.mapper.has)
+    } yield entities
+      .filter(Activator.mapper.has)
       .filter(entity => allowFourier || !(FourierBit.mapper.has(entity) && bit(FourierBit.mapper.get(entity).bit)))
-        .map(entity => BitSeq(Activator.mapper.get(entity).bits map bit: _*))
-        .fold(BitSeq.empty)(_ | _)
+      .map(entity => BitSeq(Activator.mapper.get(entity).bits map bit: _*))
+      .fold(BitSeq.empty)(_ | _)
 
   /** Returns true in index idx if all cells have at least one |1⟩ activator in index idx
     *
@@ -198,7 +198,7 @@ final class Multiverse(val walls: Set[Vector2[Int]], val grates: Set[Vector2[Int
     * @return the states in the universe converted to strings
     */
   def showUniverse(universe: Universe): Iterable[String] =
-    stateIds.view map (id => /*_*/ id.show(universe.state(id)) /*_*/) prepended universe.amplitude.toString
+    stateIds.view map (id => /*_*/ id.show(universe.state(id)) /*_*/ ) prepended universe.amplitude.toString
 
   /** Returns the entity with the ID.
     *
@@ -225,14 +225,18 @@ final class Multiverse(val walls: Set[Vector2[Int]], val grates: Set[Vector2[Int
     * @return the combined universes
     */
   private def combine(universes: Iterable[Universe]): Iterable[Universe] = {
-    println("Running combine on " + universes.size + " universes, with states of size " + universes.head.state.size + " each")
+    println(
+      "Running combine on " + universes.size + " universes, with states of size " + universes.head.state.size + " each"
+    )
     universes
       .groupMapReduce(showUniverse(_).tail.reduce(_ + _))(identity)(_ + _.amplitude)
       .values
       .filter(_.amplitude.squaredMagnitude > 1e-6)
   }
 
-  def mapGroupMapReduce[C, A, K, B](l: Seq[C])(f1: C => Seq[A])(key: A => K)(f: A => B)(reduce: (B, B) => Option[B]): Map[K, B] = {
+  def mapGroupMapReduce[C, A, K, B](
+      l: Seq[C]
+  )(f1: C => Seq[A])(key: A => K)(f: A => B)(reduce: (B, B) => Option[B]): Map[K, B] = {
     val m = mutable.Map.empty[K, B]
     for (elem1 <- l; elem <- f1(elem1)) {
       m.updateWith(key(elem)) {
@@ -246,6 +250,7 @@ final class Multiverse(val walls: Set[Vector2[Int]], val grates: Set[Vector2[Int
 
 /** Contains the component mapper for the multiverse component. */
 object Multiverse {
+
   /** The component mapper for the multiverse component. */
   val mapper: ComponentMapper[Multiverse] = ComponentMapper.getFor(classOf[Multiverse])
 }

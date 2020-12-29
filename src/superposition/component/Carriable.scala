@@ -11,6 +11,7 @@ final class Carriable(val carried: StateId[Boolean]) extends Component
 
 /** Contains the component mapper for the carriable component. */
 object Carriable {
+
   /** The component mapper for the carriable component. */
   val mapper: ComponentMapper[Carriable] = ComponentMapper.getFor(classOf[Carriable])
 }

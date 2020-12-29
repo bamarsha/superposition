@@ -15,6 +15,7 @@ import superposition.math.Universe
 
 /** Renders sprites. */
 final class TextRenderer(level: () => Option[Level]) extends Renderer with Disposable {
+
   /** The shape renderer. */
   private val shapeRenderer: ShapeRenderer = new ShapeRenderer
 

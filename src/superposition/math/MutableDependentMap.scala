@@ -6,8 +6,9 @@ import scala.collection.mutable
   *
   * @tparam K the type of the key
   */
-final class MutableDependentMap[K <: DependentKey] private(map: mutable.Map[K, Any])
-  extends mutable.Cloneable[MutableDependentMap[K]] {
+final class MutableDependentMap[K <: DependentKey] private (map: mutable.Map[K, Any])
+    extends mutable.Cloneable[MutableDependentMap[K]] {
+
   /** Returns the value associated with the key.
     *
     * @param key the key
@@ -35,7 +36,7 @@ final class MutableDependentMap[K <: DependentKey] private(map: mutable.Map[K, A
     * @param key the key
     * @param updater a function that maps the value of the key
     */
-  def updateWith(key: K)(updater: key.Value => key.Value): Unit = update(key)(updater(this (key)))
+  def updateWith(key: K)(updater: key.Value => key.Value): Unit = update(key)(updater(this(key)))
 
   /** Removes the key.
     *
@@ -50,6 +51,7 @@ final class MutableDependentMap[K <: DependentKey] private(map: mutable.Map[K, A
 
 /** Factories for mutable dependent maps. */
 object MutableDependentMap {
+
   /** A new empty mutable dependent map.
     *
     * @tparam K the type of the key.

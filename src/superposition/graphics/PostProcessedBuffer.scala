@@ -17,6 +17,7 @@ import superposition.game.ResourceResolver.resolve
   * [[com.badlogic.gdx.graphics.glutils.FrameBuffer]]
   */
 final class PostProcessedBuffer(fragmentShader: FileHandle, useFloats: Boolean = false) extends Disposable {
+
   /** The post-processing shader program. */
   val shader: ShaderProgram = new ShaderProgram(resolve("shaders/sprite.vert"), fragmentShader)
   assert(shader.isCompiled, shader.getLog)

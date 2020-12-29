@@ -18,7 +18,8 @@ object QExpr {
     * @param f a function that evaluates the expression within a universe
     * @tparam A the expression type
     */
-  @newtype final class QExpr[+A] private(val f: Universe => A) {
+  @newtype final class QExpr[+A] private (val f: Universe => A) {
+
     /** Evaluates the expression within a universe.
       *
       * @param universe the universe
@@ -77,6 +78,7 @@ object QExpr {
       * @tparam B the function output type
       */
     implicit final class FunctionOps[A, B](expr: QExpr[A => B]) {
+
       /** Applies the function in the second expression to the result of the function in the first expression.
         *
         * @param next the second function expression
@@ -124,5 +126,4 @@ object QExpr {
       */
     def prepare[A, B](f: A => QExpr[B]): QExpr[A => B] = QExpr(universe => a => f(a)(universe))
   }
-
 }

@@ -11,6 +11,7 @@ import superposition.graphics.ColorUtils.ShaderOps
   * @param level a function that returns the current level
   */
 final class MapLayerRenderer(level: () => Option[Level]) extends Renderer {
+
   /** An array for holding color components. */
   private val colorArray: Array[Float] = Array.ofDim(4)
 

@@ -13,11 +13,12 @@ final class QuantumPosition(
     val absolute: MetaId[Vector2[Double]],
     val cell: StateId[Vector2[Int]],
     var relative: Vector2[Double],
-    val blockedByGrates: Boolean = false)
-  extends Component
+    val blockedByGrates: Boolean = false
+) extends Component
 
 /** Contains the component mapper for the quantum position component. */
 object QuantumPosition {
+
   /** The component mapper for the quantum position component. */
   val mapper: ComponentMapper[QuantumPosition] = ComponentMapper.getFor(classOf[QuantumPosition])
 }
