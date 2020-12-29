@@ -49,7 +49,8 @@ object AppImage {
       "--dest", dest.getAbsolutePath,
       "--name", name,
       "--main-jar", mainJar.relativeTo(input).get.getPath,
-      "--main-class", mainClass)
+      "--main-class", mainClass,
+      "--java-options", "-XX:+UseZGC")
     assert(args.! == 0, "jpackage finished with non-zero exit code.")
   }
 }
