@@ -2,7 +2,7 @@
   <configuration default="false" name="Superposition" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="superposition.game.Superposition" />
     <module name="Superposition" />
-    <option name="VM_PARAMETERS" value="-XX:+UseParallelGC -Xlog:gc" />
+    <option name="VM_PARAMETERS" value="-Xlog:gc" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
